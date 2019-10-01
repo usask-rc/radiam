@@ -4,7 +4,7 @@ services:
 
   # Elasticsearch. See README for necessary host settings.
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -24,12 +24,12 @@ services:
       timeout: 10s
       retries: 5
 
-  # Postgres
+  # Postgres/PostGIS
   db:
-    image: postgres
+    image: postgres:${POSTGRES_VERSION}
     restart: always
     env_file:
-      - config/db/db_env
+      - api/config/db/db_env
     ports:
       - "5432:5432"
     healthcheck:
@@ -42,59 +42,77 @@ services:
 
   # Memcached for Django
   memcached:
-      image: memcached
+      image: memcached:${MEMCACHED_VERSION}
 
   # Radiam API
   radiamapi:
-    # Uncomment and comment out image to use local radiam-api branch.
-    # build: ../radiam-api/api/
-    image: "${REGISTRY_HOST}/radiam-api"
-    command: gunicorn --bind :8000 --reload radiam.wsgi:application
+    build:
+      context: ./api
+      dockerfile: ./api/Dockerfile
+    command: ["/wait-for-it/wait-for-it.sh", "db:5432", "-s", "--timeout=60", "--", "gunicorn", "--bind", ":8000", "--reload", "radiam.wsgi:application"]
+    environment:
+      - SESSIONAUTH=1
+    volumes:
+      - ./api:/code
+      - static_volume:/django/static
     healthcheck:
       test: "curl -X OPTIONS http://localhost:8000 -H 'Origin: http://localhost:8000' -H 'Access-Control-Request-Headers: Origin, Accept, Content-Type' -H 'Access-Control-Request-Method: GET' || exit 1"
       interval: 30s
       timeout: 10s
       retries: 5
-    volumes:
-      - static_volume:/django/static
-      # Uncomment to use local radiam api branch.
-      # - ../radiam-api/api/:/code
-      - ./uploads:/code/uploads
     depends_on:
       - elasticsearch
-      - db
+      - migration
       - memcached
+      - db
+
+  # Run database migrations for Django on startup.
+  migration:
+    build: .
+    command: ["/wait-for-it/wait-for-it.sh", "db:5432", "-s", "--timeout=60", "--", "python", "/code/manage.py", "migrate", "--noinput"]
+    volumes:
+      - ./api:/code
+    restart: on-failure
+    depends_on:
+      - db
+
+  # Run Radiam Initialization after the application is built
+  init:
+    build: .
+    command: ["/wait-for-it/wait-for-it.sh", "elasticsearch:9200", "-s", "--timeout=60", "--", "python", "/code/manage.py", "radiam"]
+    volumes:
+      - ./api:/code
+    depends_on:
+      - elasticsearch
 
   # Radiam GUI
   radiamgui:
     container_name: radiamgui
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./gui
+      dockerfile: ./gui/Dockerfile
     healthcheck:
       test: "curl -X OPTIONS http://localhost:3000 -H 'Origin: http://localhost:3000' -H 'Access-Control-Request-Headers: Origin, Accept, Content-Type' -H 'Access-Control-Request-Method: GET' || exit 1"
       interval: 30s
       timeout: 10s
       retries: 5
     volumes:
-      - '.:/usr/src/app'
+      - './gui:/usr/src/app'
       - '/usr/src/app/node_modules'
     ports:
       - '3000:3000'
     environment:
       - NODE_ENV=development
 
-  # Web front end for both API and GUI
+  # Web server for both the GUI and API
   nginx:
-    image: nginx:1.15
+    image: nginx:${NGINX_VERSION}
     ports:
       - "8100:80"
     volumes:
-      - ./config/nginx/conf.d/local/:/etc/nginx/conf.d
+      - ./api/config/nginx/conf.d/local/:/etc/nginx/conf.d
+      - ./api/uploads/:/django/uploads
       - static_volume:/django/static
-      # Uncomment to use local radiam api branch and comment out the volume below.
-      # - ../radiam-api/api/uploads/:/django/uploads
-      - ./uploads/:/django/uploads
     depends_on:
       - radiamapi
       - radiamgui
