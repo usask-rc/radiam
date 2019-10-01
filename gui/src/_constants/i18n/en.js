@@ -108,11 +108,11 @@ export default {
         crawl_minutes: 'Minutes between crawls',
         version: 'Agent Version',
         projects: 'Associated Project', 
-        rootdir: "Project Root Directory",
-        remoteapiusername: "Remote System Username",
-        remoteapitoken: "Remote System Token",
-        active: "Active?",
-        project_name: "Name of Project"
+        rootdir: 'Project Root Directory',
+        remoteapiusername: 'Remote System Username',
+        remoteapitoken: 'Remote System Token',
+        active: 'Active?',
+        project_name: 'Name of Project'
       },
       datasets: {
         data_abstract: 'Data Abstract',
@@ -341,6 +341,7 @@ export default {
       useragents: {
         locations: 'A location is required for this user agent.',
         user: 'A user is required for this user agent.',
+        version: 'Version Number is in format X.X.X ',
       },
     },
     warnings: {}
