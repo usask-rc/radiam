@@ -76,7 +76,7 @@ class ChangeDetails extends Component {
     getUserDetails() {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
-            const localID = JSON.parse(localStorage.getItem("user")).id
+            const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
 
             console.log("id as stored in local storage is: ", localID)
             if (response.data.id === localID) {
@@ -84,7 +84,7 @@ class ChangeDetails extends Component {
             }
             else {
                 //TODO: user in storage does not match.  Log the user out.  Figure out how to do that.
-                toastErrors("Could not authenticate.  Please log out and back in, then try again.")
+                toastErrors(Constants.warnings.NO_AUTH_TOKEN)
             }
         }).catch(err => {
             toastErrors("Could not connect to server.  Please refresh the page and then try again.")
@@ -121,7 +121,7 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.USERNAME}
                                             label={Constants.model_fields.USERNAME}
                                             value={this.state.username}
-                                            onChange={this.handleChange('username')}
+                                            onChange={this.handleChange(Constants.model_fields.USERNAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
@@ -130,7 +130,7 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.FIRST_NAME}
                                             label={Constants.model_fields.FIRST_NAME}
                                             value={this.state.first_name}
-                                            onChange={this.handleChange('first_name')}
+                                            onChange={this.handleChange(Constants.model_fields.FIRST_NAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
@@ -139,7 +139,7 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.LAST_NAME}
                                             label={Constants.model_fields.LAST_NAME}
                                             value={this.state.last_name}
-                                            onChange={this.handleChange('last_name')}
+                                            onChange={this.handleChange(Constants.model_fields.LAST_NAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
@@ -148,7 +148,7 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.EMAIL}
                                             label={Constants.model_fields.EMAIL}
                                             value={this.state.email}
-                                            onChange={this.handleChange('email')}
+                                            onChange={this.handleChange(Constants.model_fields.EMAIL)}
                                             type={"email"} />
                                     </div>
                                     <div className={styles.input}>
@@ -156,7 +156,7 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.NOTES}
                                             label={Constants.model_fields.NOTES}
                                             value={this.state.notes || ""}
-                                            onChange={this.handleChange('notes')}
+                                            onChange={this.handleChange(Constants.model_fields.NOTES)}
                                         />
                                     </div>
 

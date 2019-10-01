@@ -110,7 +110,6 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withStyles(styles)(
   ({ classes, permissions, ...props }) => {
-    console.log("in projectshow, props is: ", props)
     return (
       <Show {...props}>
         <TabbedShowLayout>
@@ -136,7 +135,7 @@ export const ProjectShow = withStyles(styles)(
             </ReferenceField>
             <MapView/>
           </Tab>
-          <Tab label={'files'} path={'files'}>
+          <Tab label={Constants.model_fields.FILES} path={Constants.model_fields.FILES}>
             <ProjectName label={'en.models.projects.name'} />
 
             <FilesTab projectID={props.id} />

@@ -38,7 +38,7 @@ class UserFormWithAssoc extends Component {
         } else {
             //TODO: logout the user.
             toastErrors(
-                "No authentication token detected.  Please logout and back in to proceed."
+                Constants.warnings.NO_AUTH_TOKEN
             );
         }
 
@@ -46,11 +46,11 @@ class UserFormWithAssoc extends Component {
 
 
         if (date_expires) {
-            date_expires = translateDates(date_expires, "date_expires");
+            date_expires = translateDates(date_expires, Constants.model_fields.DATE_EXPIRES);
         }
 
         const request = new Request(
-            getAPIEndpoint() + "/users/", {
+            `${getAPIEndpoint()}/${Constants.models.USERS}/`, {
                 method: Constants.methods.POST,
                 body: JSON.stringify({ ...this.state }),
                 headers: headers

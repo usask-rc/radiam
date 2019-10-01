@@ -31,7 +31,7 @@ class UserEditForm extends Component {
         } else {
             //TODO: logout the user.
             toastErrors(
-                "No authentication token detected.  Please logout and back in to proceed."
+                Constants.warnings.NO_AUTH_TOKEN
             );
         }
 

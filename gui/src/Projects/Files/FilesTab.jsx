@@ -26,9 +26,12 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'flex-end',
   },
+  loading: {
+    textAlign: "left",
+  }
 });
 //TODO: indexed_date is currently the default display method, but should be passed into the files display as a parameter if coming from the button on the front page.
-function FilesTab({ projectID, classes, ...props }) {
+function FilesTab({ projectID, classes, translate, ...props }) {
   const [status, setStatus] = useState({ loading: true });
   const [searchField, setSearchField] = useState('');
   const [data, setData] = useState({ files: [] });
@@ -91,8 +94,8 @@ function FilesTab({ projectID, classes, ...props }) {
         <form className={classes.flex} onSubmit={handleSubmit}>
           <React.Fragment>
             <TextField
-              id={'search'}
-              type={'search'}
+              id={Constants.paths.SEARCH}
+              type={Constants.paths.SEARCH}
               className={classes.textField}
               defaultValue={search || ''}
               placeholder={`Search Files`}
@@ -108,19 +111,22 @@ function FilesTab({ projectID, classes, ...props }) {
             onChange={e => setSort(e.target.value)}
           >
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-            <MenuItem value="indexed_date">Indexed On</MenuItem>
-            <MenuItem value="last_modified">Last Modified</MenuItem>
-            <MenuItem value="filesize">Filesize</MenuItem>
-            <MenuItem value="last_access">Last Accessed</MenuItem>
+            <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
+            <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
+            <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
+            <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
           </Select>
         </form>
       )}
       <Divider />
 
       {status && status.loading ? (
-        <Typography>{`Loading File Data...`}</Typography>
+        <Typography className={classes.loading}>{translate('en.loading')}</Typography>
       ) : status.error ? (
-        <Typography>{`Error loading information: ${status.error}`}</Typography>
+        <div className={classes.loading}>
+        <Typography>{translate('en.loadingError')}</Typography>
+        <Typography>{`${status.error}`}</Typography>
+        </div>
       ) : data && data.files && data.files.length > 0 ? (
         <React.Fragment>
           <FileList data={data.files} />

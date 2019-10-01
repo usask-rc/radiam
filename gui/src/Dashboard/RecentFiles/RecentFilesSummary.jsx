@@ -81,7 +81,7 @@ class RecentFilesSummary extends React.Component {
           <Redirect
             to={{
               pathname: `/projects/${id}/show/files`,
-              state: { sortType: 'indexed_date' },
+              state: { sortType: Constants.model_fields.INDEXED_DATE },
             }}
           />
         )}

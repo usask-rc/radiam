@@ -60,7 +60,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           let query
 
           // /search endpoint needs to be handled differently than the base models.
-          if (resource.split('/').pop() !== 'search') {
+          if (resource.split('/').pop() !== Constants.paths.SEARCH) {
             query = {
               ...fetchUtils.flattenObject(params.filter),
               _sort: sortField ? sortField : null,
@@ -118,7 +118,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       }
 
       case 'PASSWORD_CHANGE': {
-        url = `${apiUrl}/users/${params.userID}/set_password/`;
+        url = `${apiUrl}/${Constants.models.USERS}/${params.userID}/${Constants.paths.SET_PASSWORD}/`;
 
         options.method = Constants.methods.POST;
         options.body = JSON.stringify({

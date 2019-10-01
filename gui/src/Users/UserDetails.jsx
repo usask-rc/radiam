@@ -33,7 +33,6 @@ class UserDetails extends Component {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const { id, is_active } = this.props.record
 
-        console.log("in user details, is_active is: ", is_active)
         dataProvider(GET_ONE, Constants.models.USERS, {
             id: id, is_active: is_active
         }).then(response => {

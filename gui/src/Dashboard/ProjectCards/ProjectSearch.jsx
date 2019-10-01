@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Typography } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
+import * as Constants from "../../_constants/index"
 
 const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
     const [searchHidden, setSearchHidden] = useState(true);
@@ -13,8 +14,8 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
             <div className={classes.searchArea}>
                 {!searchHidden && (
                     <TextField
-                        id="search"
-                        type="search"
+                        id={Constants.paths.SEARCH}
+                        type={Constants.paths.SEARCH}
                         className={classes.textField}
                         onChange={handleChange}
                         placeholder={`Search Files`}
@@ -26,7 +27,7 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                     onClick={() => setSearchHidden(!searchHidden)}
                 />
                 <Typography variant="body1" component="p" onClick={() => setSearchHidden(!searchHidden)} className={classes.fileCount}>
-                    {`${project.nbFiles} Files`}
+                    {`${project.nbFiles} ${Constants.model_fields.FILES}`}
                 </Typography>
             </div>
         </form>

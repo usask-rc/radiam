@@ -5,7 +5,8 @@ export default {
   en: {
     search: 'Search',
     language: 'Language',
-    loading: 'Loading',
+    loading: 'Loading...',
+    loading_error: 'Error loading information:',
     settings: {
       label: 'Settings',
       update_password: 'Update Account Password',

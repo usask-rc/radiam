@@ -63,7 +63,6 @@ class ChangePassword extends Component {
     this.state = { password: "", newPassword: "", confirmPassword: ""}
   }
 
-
   changePassword(userID) {
     let headers = new Headers({ "Content-Type": "application/json" });
 
@@ -76,13 +75,13 @@ class ChangePassword extends Component {
       //TODO: no token?  Log the user out.
       //no idea how to do this when I have no access to History since authprovider is monopolized by the Admin component.
       toastErrors(
-        "No authentication token detected.  Please return to the login page, then return here and try again."
+        Constants.warnings.NO_AUTH_TOKEN
       );
       return;
     }
 
     const request = new Request(
-      getAPIEndpoint() + "/users/" + userID + "/set_password/",
+      `${getAPIEndpoint()}/${Constants.models.USERS}/${userID}/${Constants.paths.SET_PASSWORD}/`,
       {
         method: Constants.methods.POST,
         body: JSON.stringify({ ...this.state }),
@@ -115,7 +114,7 @@ class ChangePassword extends Component {
       })
       .catch(err => {
         toastErrors(
-          "You may have a connection issue.  Please try refreshing the page and trying again."
+          Constants.warnings.NO_CONNECTION
         );
       });
   }
@@ -124,7 +123,7 @@ class ChangePassword extends Component {
     event.preventDefault();
 
     //get uuid from storage
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     if (user && user.id) {
       //the endpoint we need is at /users/${user.id}/set_password/
       if (this.state.newPassword === this.state.confirmPassword) {

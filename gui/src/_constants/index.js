@@ -1,15 +1,15 @@
 module.exports = Object.freeze({
+  API_ENDPOINT: "/api",
+  API_PORT: "8100",
+  AVATAR_HEIGHT: "36px",
+  I18N_TLE: "en", //TODO: modularize this or remove it.
   ROLE_ANONYMOUS: "anonymous",
   ROLE_DATA_MANAGER: "c4e21cc8-a446-4b38-9879-f2af71c227c3",
   ROLE_GROUP_ADMIN: "a59be619-fd9b-462b-8643-486e68f38613",
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
   ROLE_USER: "user",
-  WEBTOKEN: "token",
-  API_PORT: "8100",
-  API_ENDPOINT: "/api",
-  I18N_TLE: "en", //NOTE: this should be your i18n top level element if you want translations to work.
-  AVATAR_HEIGHT: "36px",
   VERSION: "1.0.8", //NOTE: this must be updated with every merge to master.
+  WEBTOKEN: "token",
   fields: {
     PASSWORD: "password",
     SUBMIT: "submit"
@@ -36,24 +36,28 @@ module.exports = Object.freeze({
     PASSWORD_CONFIRM: "confirm_password",
     PASSWORD_NEW: "new_password"
   },
-  //
+  paths:{
+    SET_PASSWORD: "set_password",
+    SEARCH: "search",
+  },
   models: {
-    GROUPS: "researchgroups",
-    DATA_COLLECTION_STATUS: "datacollectionstatus",
+    AGENTS: "useragents",
     DATA_COLLECTION_METHOD: "datacollectionmethod",
+    DATA_COLLECTION_STATUS: "datacollectionstatus",
     DATASETS: "datasets",
     DISTRIBUTION_RESTRICTION: "distributionrestriction",
-    SENSITIVITY_LEVEL: "sensitivitylevel",
-    PROJECTSENSITIVITY: "projectsensitivity",
-    PROJECTDATACOLLECTIONMETHOD: "projectdatacollectionmethod",
-    AGENTS: "useragents",
-    GROUPMEMBERS: "groupmembers",
     GRANTS: "groupviewgrants",
+    GROUPMEMBERS: "groupmembers",
+    GROUPS: "researchgroups",
     LOCATIONS: "locations",
     LOCATIONTYPES: "locationtypes",
+    PROJECTSENSITIVITY: "projectsensitivity",
+    PROJECTDATACOLLECTIONMETHOD: "projectdatacollectionmethod",
+    PROJECTAVATARS: "projectavatars",
     PROJECTS: "projects",
     ROLES: "grouproles",
-    USERS: "users"
+    SENSITIVITY_LEVEL: "sensitivitylevel",
+    USERS: "users",
   },
   //this exists to help turn foreign key references into their model endpoint counterparts.
   model_fk_fields: {
@@ -96,6 +100,8 @@ module.exports = Object.freeze({
   model_fields: {
     ABSTRACT: "abstract",
     ACTIVE: "is_active",
+    AVATAR: "avatar",
+    AVATAR_IMAGE: "avatar_image",
     CREATED_AT: "date_created",
     DATA_COLLECTION_METHOD: "data_collection_method",
     DATA_COLLECTION_STATUS: "data_collection_status",
@@ -107,6 +113,8 @@ module.exports = Object.freeze({
     DISTRIBUTION_RESTRICTION: "distribution_restriction",
     EMAIL: "email",
     FIELDS: "fields",
+    FILES: "files",
+    FILESIZE: "filesize",
     FIRST_NAME: "first_name",
     GROUP: "group",
     HOST_NAME: "host_name",
@@ -114,6 +122,8 @@ module.exports = Object.freeze({
     INDEXED_DATE: "indexed_date",
     KEYWORDS: "keywords",
     LABEL: "label",
+    LAST_ACCESS:"last_access",
+    LAST_MODIFIED: "last_modified",
     TRANSLATENAME: "translatename",
     LAST_NAME: "last_name",
     LOCATION: "location",
@@ -133,5 +143,7 @@ module.exports = Object.freeze({
   warnings: {
     TOO_MANY_ROLES: "This user is already assigned a role in this group. Only one role is allowed per group.",
     UNSAVED_CHANGES: "This form contains unsaved changes.  Leave without saving?",
+    NO_AUTH_TOKEN: "No authentication token detected.  Please return to the login page, then return here and try again.",
+    NO_CONNECTION: "Could not connect to the API.  Please refresh the page and try again.",
   }
 });

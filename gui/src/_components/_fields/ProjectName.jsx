@@ -44,11 +44,11 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
         basePath={basePath}
         linkType={false}
         record={record}
-        source={"avatar"}
-        reference={"projectavatars"}
+        source={Constants.model_fields.AVATAR}
+        reference={Constants.models.PROJECTAVATARS}
         allowEmpty
       >
-        <ShowImage classes={classes} source={"avatar_image"} record={record} />
+        <ShowImage classes={classes} source={Constants.model_fields.AVATAR_IMAGE} record={record} />
       </ReferenceField>
     </div>
     <div className={classes.nameContainer}>
