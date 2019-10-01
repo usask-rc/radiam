@@ -8,10 +8,9 @@ import {
   Edit,
   Filter,
   List,
-  LongTextInput,
+  NumberInput,
   ReferenceField,
   ReferenceInput,
-  ReferenceArrayInput,
   required,
   SelectInput,
   Show,
@@ -24,11 +23,8 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { SelectArrayInput, FileInput, DisabledInput } from "ra-ui-materialui/lib/input";
-import { FileField } from "ra-ui-materialui/lib/field/FileField";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import { SimpleFormIterator } from "ra-ui-materialui/lib/form";
-import { NumberInput } from "ra-ui-materialui/lib/input/NumberInput";
 import { ProjectName } from "../_components/_fields/ProjectName";
 
 const filterStyles = {
@@ -158,19 +154,11 @@ export const UserAgentTitle = ({ record }) => {
 
 //TODO: some values must be moved to the Strings file.
 export const UserAgentCreate = props => {
-  function handleSubmit(data) {
-    console.log("data in onSave is: ", data)
 
-  }
-
-  function handleChange(data) {
-    console.log("handlechange data is: ", data)
-  }
-  console.log("useragentcreate")
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <SimpleForm {...props} save={handleSubmit} onChange={handleChange}>
+      <SimpleForm {...props}>
       <ReferenceInput
       label={"en.models.agents.user"}
       source={Constants.model_fk_fields.USER}
@@ -196,6 +184,8 @@ export const UserAgentCreate = props => {
       </ArrayInput>
       <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
       <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
+      <TextInput source="version" label={"en.models.agents.version"} />
+      <NumberInput source="crawl_minutes" defaultValue={15} label={"en.models.agents.crawl_minutes"} />
       <TextInput source="version" label={"en.models.agents.version"} />
       <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
     </SimpleForm>
@@ -235,6 +225,8 @@ export const UserAgentEdit = props => {
       </ArrayInput>
       <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
       <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
+      <NumberInput source="crawl_minutes" defaultValue={15} label={"en.models.agents.crawl_minutes"} />
+      <TextInput source="version" label={"en.models.agents.version"} />
       <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
     </SimpleForm>
     </Edit>

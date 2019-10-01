@@ -99,6 +99,7 @@ class LocationForm extends Component {
           label={'en.models.locations.globus_path'}
           source="globus_path"
         />
+        <TextInput label={"en.models.locations.osf_project"} source="osf_project" />
         <LongTextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
