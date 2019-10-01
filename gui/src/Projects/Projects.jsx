@@ -137,7 +137,6 @@ export const ProjectShow = withStyles(styles)(
           </Tab>
           <Tab label={Constants.model_fields.FILES} path={Constants.model_fields.FILES}>
             <ProjectName label={'en.models.projects.name'} />
-
             <FilesTab projectID={props.id} />
           </Tab>
           <Tab label={'browse'} path={'browse'}>

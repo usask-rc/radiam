@@ -26,7 +26,7 @@ import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import { SimpleFormIterator } from "ra-ui-materialui/lib/form";
 import { ProjectName } from "../_components/_fields/ProjectName";
-import { regex } from "ra-core";
+import { regex, number, minValue } from "ra-core";
 
 const filterStyles = {
   form: {
@@ -147,6 +147,7 @@ export const UserAgentShow = props => (
 );
 
 const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
+const validateCrawlTime = [number(), minValue(1)]
 const validateLocation=required('en.validate.useragents.location')
 const validateUser = required('en.validate.useragents.user');
 
@@ -186,7 +187,7 @@ export const UserAgentCreate = props => {
       </ArrayInput>
       <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
       <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
-      <NumberInput source="crawl_minutes" defaultValue={15} label={"en.models.agents.crawl_minutes"} />
+      <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
       <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
       <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
     </SimpleForm>
@@ -226,7 +227,7 @@ export const UserAgentEdit = props => {
       </ArrayInput>
       <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
       <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
-      <NumberInput source="crawl_minutes" defaultValue={15} label={"en.models.agents.crawl_minutes"} />
+      <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
       <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
       <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
     </SimpleForm>
