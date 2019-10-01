@@ -1,0 +1,16 @@
+[
+{
+    "model": "api.datacollectionstatus",
+    "pk": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+    "fields": {
+        "label": "datacollection.status.planned"
+    }
+},
+{
+    "model": "api.datacollectionstatus",
+    "pk": "db4dec28-85cb-4511-a938-1484e2f639f7",
+    "fields": {
+        "label": "datacollection.status.inprogress"
+    }
+}
+]

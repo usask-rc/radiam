@@ -1,0 +1,35 @@
+[
+{
+    "model": "api.projectstatistics",
+    "pk": "d4c08008-86ae-4f07-a739-72d2b3f8ad78",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "stat_key": "file_count",
+        "stat_qualifier": "",
+        "stat_value": "1093",
+        "stat_date": "2019-03-13T15:43:20.953Z"
+    }
+},
+{
+    "model": "api.projectstatistics",
+    "pk": "93bb66e6-e0b4-479a-9472-140df3ff9e4e",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "stat_key": "citations",
+        "stat_qualifier": "",
+        "stat_value": "14",
+        "stat_date": "2019-03-13T15:45:03.950Z"
+    }
+},
+{
+    "model": "api.projectstatistics",
+    "pk": "239e55e9-e441-4183-9e08-aaf630859071",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "stat_key": "views",
+        "stat_qualifier": "",
+        "stat_value": "3589",
+        "stat_date": "2019-01-28T19:35:10.738Z"
+    }
+}
+]

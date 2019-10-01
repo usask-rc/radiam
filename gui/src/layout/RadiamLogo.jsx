@@ -1,0 +1,11 @@
+import React from "react";
+
+const RadiamLogo = props => (
+    <img
+        src={require("../_assets/RadiamLogoClear_NoBorder.png")}
+        alt="Radiam"
+        height={70}
+    />
+);
+
+export default RadiamLogo;

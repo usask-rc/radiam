@@ -1,0 +1,7 @@
+.coverage
+cover/
+uploads/*
+!uploads/readme.txt
+!uploads/avatars
+!uploads/avatars/stock
+!uploads/avatars/stock/*

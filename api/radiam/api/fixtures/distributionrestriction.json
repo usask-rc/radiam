@@ -1,0 +1,16 @@
+[
+{
+    "model": "api.distributionrestriction",
+    "pk": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+    "fields": {
+        "label": "distribution.restriction.none"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "365f998e-d525-4505-8728-90fb5c99d598",
+    "fields": {
+        "label": "distribution.restriction.embargo"
+    }
+}
+]

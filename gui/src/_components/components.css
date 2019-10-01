@@ -1,0 +1,17 @@
+.input-small {
+  display: inline-block;
+  width: 33%;
+  min-width: 200px !important;
+}
+
+.input-medium {
+  display: inline-block;
+  width: 66%;
+  min-width: 200px !important;
+}
+
+.input-large {
+  display: inline-block;
+  width: 90%;
+  min-width: 200px !important;
+}

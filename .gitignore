@@ -1,0 +1,32 @@
+# Ignore Mac created index files
+.DS_Store
+
+.vagrant/
+
+# Ignore vim files
+*.swp
+*.swo
+
+# Ignore Pycharm files
+.idea
+
+# Ignore log messages
+*.log
+
+#Ignore nose coverage HTML
+.cover
+.coverage
+
+chrome-user-data
+.vscode
+
+es
+lib
+node_modules/
+env/
+_tests/
+__tests__
+.babelrc
+
+uploads/*
+!uploads/readme.txt

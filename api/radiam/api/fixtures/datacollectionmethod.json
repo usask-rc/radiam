@@ -1,0 +1,16 @@
+[
+{
+    "model": "api.datacollectionmethod",
+    "pk": "a99a3a24-da63-4e46-94e9-c1e3a8c46fee",
+    "fields": {
+        "label": "datacollection.method.census"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "b5917e5d-919a-4f92-9d0f-3defdff85dc4",
+    "fields": {
+        "label": "datacollection.method.fieldwork"
+    }
+}
+]

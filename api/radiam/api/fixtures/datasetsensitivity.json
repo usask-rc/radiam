@@ -1,0 +1,10 @@
+[
+{
+    "model": "api.datasetsensitivity",
+    "pk": "327d59d2-e3fe-418c-8b9f-6807c0d5216a",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "sensitivity": "52723147-3796-428f-899e-2865ab676a0f"
+    }
+}
+]

@@ -1,0 +1,105 @@
+version: '3.6'
+
+services:
+
+  # Elasticsearch. See README for necessary host settings.
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data_vol:/usr/share/elasticsearch/data
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Postgres
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      - config/db/db_env
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres_data_vol:/var/lib/postgresql/data
+
+  # Memcached for Django
+  memcached:
+      image: memcached
+
+  # Radiam API
+  radiamapi:
+    # Uncomment and comment out image to use local radiam-api branch.
+    # build: ../radiam-api/api/
+    image: "${REGISTRY_HOST}/radiam-api"
+    command: gunicorn --bind :8000 --reload radiam.wsgi:application
+    healthcheck:
+      test: "curl -X OPTIONS http://localhost:8000 -H 'Origin: http://localhost:8000' -H 'Access-Control-Request-Headers: Origin, Accept, Content-Type' -H 'Access-Control-Request-Method: GET' || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - static_volume:/django/static
+      # Uncomment to use local radiam api branch.
+      # - ../radiam-api/api/:/code
+      - ./uploads:/code/uploads
+    depends_on:
+      - elasticsearch
+      - db
+      - memcached
+
+  # Radiam GUI
+  radiamgui:
+    container_name: radiamgui
+    build:
+      context: .
+      dockerfile: Dockerfile
+    healthcheck:
+      test: "curl -X OPTIONS http://localhost:3000 -H 'Origin: http://localhost:3000' -H 'Access-Control-Request-Headers: Origin, Accept, Content-Type' -H 'Access-Control-Request-Method: GET' || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - '.:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+
+  # Web front end for both API and GUI
+  nginx:
+    image: nginx:1.15
+    ports:
+      - "8100:80"
+    volumes:
+      - ./config/nginx/conf.d/local/:/etc/nginx/conf.d
+      - static_volume:/django/static
+      # Uncomment to use local radiam api branch and comment out the volume below.
+      # - ../radiam-api/api/uploads/:/django/uploads
+      - ./uploads/:/django/uploads
+    depends_on:
+      - radiamapi
+      - radiamgui
+
+volumes:
+      elasticsearch_data_vol:
+      postgres_data_vol:
+      static_volume:

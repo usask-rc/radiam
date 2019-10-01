@@ -1,0 +1,50 @@
+[
+{
+    "model": "api.researchgroup",
+    "pk": "23e69896-c60a-4e6c-a444-ba906ada91fb",
+    "fields": {
+        "parent_group": null,
+        "name": "admin",
+        "description": "Admin Parent Group",
+        "date_created": "2019-01-28T19:32:18.440Z",
+        "date_updated": "2019-01-28T19:32:18.440Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 1,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "348173de-c6b3-4ec8-ba84-f657f2a70a83",
+    "fields": {
+        "parent_group": null,
+        "name": "testgroup",
+        "description": "Test Group",
+        "date_created": "2019-01-28T19:33:53.282Z",
+        "date_updated": "2019-01-28T19:33:53.282Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 2,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "4182bcdb-98ae-40be-bcff-00584558d46f",
+    "fields": {
+        "parent_group": "23e69896-c60a-4e6c-a444-ba906ada91fb",
+        "name": "drc",
+        "description": "Derp Research Collective",
+        "date_created": "2019-01-28T19:33:13.903Z",
+        "date_updated": "2019-01-28T19:33:13.903Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 3,
+        "level": 0
+    }
+}
+]

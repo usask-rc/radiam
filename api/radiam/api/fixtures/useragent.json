@@ -1,0 +1,12 @@
+[
+{
+    "model": "api.useragent",
+    "pk": "12785dfb-1791-4771-953e-09febcb8b103",
+    "fields": {
+        "user": "41c3fc25-2ad5-4b8e-9ec4-be45df40ed55",
+        "location": "9fc371a8-6eba-41d2-a0b0-a9782cf61166",
+        "date_created": "2019-01-28T19:32:18.440Z",
+        "date_updated": "2019-01-28T19:32:18.440Z"
+    }
+}
+]

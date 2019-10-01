@@ -1,0 +1,10 @@
+[
+{
+    "model": "api.grouprole",
+    "pk": "d9ba1fc5-606f-4f16-81b1-8816095e5041",
+    "fields": {
+        "label": "testlabel",
+        "description": "this is a test label"
+    }
+}
+]
