@@ -20,53 +20,50 @@ class UserDetails extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { user: props.record, groupMembers: [], researchgroups: [] }
-        this.getUserGroups = this.getUserGroups.bind(this);
-        this.getUserDetails = this.getUserDetails.bind(this);
+        this.state = { groupMembers: [] }
     }
 
     componentDidMount() {
-        this.getUserDetails(this.props.id)
+        this.getAllRoles();
     }
 
-    getUserDetails() {
+    //TODO: make this asynchronous and put it in funcs.jsx
+    getAllRoles() {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = this.props.record
+        dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+        .then(groupRoles => {
 
-        dataProvider(GET_ONE, Constants.models.USERS, {
-            id: id, is_active: is_active
-        }).then(response => {
-            this.setState({ user: response.data })
-            return response.data
-        }).then(this.getUserGroups())
-    }
-    getUserGroups() {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = this.props.record
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-            filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 20 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
-        }).then(response => response.data)
-            .then(groupMembers => {
-                this.setState({ groupMembers });
+            const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+            const { id, is_active } = this.props.record
 
-                groupMembers.map(groupMember => {
-                    dataProvider(GET_ONE, Constants.models.GROUPS, {
-                        id: groupMember.group
-                    }).then(response => {
-                        return response.data
-                    }).then(researchgroup => {
-                        this.setState({ researchgroups: this.state.researchgroups.concat([researchgroup]) })
+            dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+                filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
+            }).then(response => response.data)
+                .then(groupMembers => {
+                    this.setState({ groupMembers });
 
+                    groupMembers.map(groupMember => {
+                        dataProvider(GET_ONE, Constants.models.GROUPS, {
+                            id: groupMember.group
+                        }).then(response => {
+                            return response.data
+                        }).then(researchgroup => {
+                            groupMember.group = researchgroup
+                            groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                            this.setState([...this.state.groupMembers, groupMember])
+                        })
+                            .catch(err => console.error("error in attempt to get researchgroup with associated groupmember: " + err))
+                        return groupMember
                     })
-                        .catch(err => console.error("error in attempt to get researchgroup with associated groupmember: " + err))
-                    return groupMember
-                })
+                return groupMembers
 
-            })
-            .catch(err => toastErrors("err in attempt to fetch all groupmembers of user: ", err))
+                })
+                .catch(err => toastErrors("err in attempt to fetch all groupmembers of user: ", err))
+        })
     }
 
     render() {
+        const {groupMembers} = this.state
 
         return (
                 <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
@@ -94,8 +91,7 @@ class UserDetails extends Component {
                         label={"en.models.generic.active"}
                         source={Constants.model_fields.ACTIVE}
                     />
-                    {/*TODO: the below classes designation is wrong, but I don't currently now how to fix this.*/}
-                    {this.state.researchgroups && this.state.researchgroups.length > 0 && <UserGroupsDisplay classes={styles} researchgroups={this.state.researchgroups} />}
+                    {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay classes={styles} groupMembers={groupMembers}/>}
                 </SimpleShowLayout>
         )
     }

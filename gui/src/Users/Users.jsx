@@ -77,7 +77,7 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=false` : `${basePath}/${record.id}/show?is_active=true`
+const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
 export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
   console.log("props in userList are: ", props)

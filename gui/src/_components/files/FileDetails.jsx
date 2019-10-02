@@ -7,6 +7,7 @@ import { LocationShow } from '../_fields/LocationShow';
 import { Grid, Typography } from '@material-ui/core';
 import { ReferenceField, translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { isObject } from 'util';
 
 const styles = theme => ({
   card: {
@@ -19,47 +20,48 @@ const styles = theme => ({
   },
 });
 
-//TODO:  'tika_metadata' string will likely be updated at some point.  This needs to become modular.
 const FileDetails = ({ classes, item, getJsonKeys }) => {
   return (
     <Grid className={classes.card} container spacing={1} direction="row">
-      {getJsonKeys(item).map(key => (
+      {getJsonKeys(item).map(key => {
+        
+      return(
         <React.Fragment key={key}>
-          {key !== 'tika_metadata' &&
-            key !== 'name' &&
+        {!isObject(item[key]) && 
+            key !== Constants.model_fields.NAME &&
             key !== 'key' &&
-            key !== 'children' && (
+            key !== 'children' ? (
               <React.Fragment>
                 <Grid item xs={12} s={2} md={2}>
                   <Typography className={classes.title}>{key}</Typography>
                 </Grid>
                 <Grid item xs={12} s={2} md={4}>
                   <React.Fragment>
-                    {key === 'location' ? (
+                    {key === Constants.model_fk_fields.LOCATION ? (
                       <ReferenceField
                         label={'en.models.projects.location'}
                         source={Constants.model_fk_fields.LOCATION}
                         reference={Constants.models.LOCATIONS}
-                        linkType="show"
-                        basePath="/projects"
-                        resource="projects"
+                        linkType={Constants.resource_operations.SHOW}
+                        basePath={`/${Constants.models.PROJECTS}`}
+                        resource={Constants.models.PROJECTS}
                         record={item}
                       >
                         <LocationShow />
                       </ReferenceField>
-                    ) : key === 'agent' ? (
+                    ) : key === Constants.model_fk_fields.AGENT ? (
                       <ReferenceField
                         label={'en.models.projects.agent'}
                         source={Constants.model_fk_fields.AGENT}
                         reference={Constants.models.AGENTS}
-                        linkType="show"
-                        basePath="/projects"
-                        resource="projects"
+                        linkType={Constants.resource_operations.SHOW}
+                        basePath={`/${Constants.models.PROJECTS}`}
+                        resource={Constants.models.PROJECTS}
                         record={item}
                       >
                         <AgentShow />
                       </ReferenceField>
-                    ) : key === 'filesize' ? (
+                    ) : key === Constants.model_fields.FILESIZE ? (
                       formatBytes(item[key], 2)
                     ) : (
                       item[key]
@@ -67,21 +69,24 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                   </React.Fragment>
                 </Grid>
               </React.Fragment>
-            )}
-        </React.Fragment>
-      ))}
-      {item['tika_metadata'] && (
+            ) : isObject(item[key]) && key !== 'children' ? 
+            
         <React.Fragment>
           <Typography
             className={classes.title}
-          >{`Extended Metadata: `}</Typography>
+          >{`${key}:`}
+          </Typography>
           <FileDetails
-            item={item['tika_metadata']}
+            item={item[key]}
             getJsonKeys={getJsonKeys}
             classes={classes}
           />
+        </React.Fragment> :
+        null
+        }
         </React.Fragment>
-      )}
+      
+      )})}
     </Grid>
   );
 };
