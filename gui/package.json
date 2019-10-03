@@ -20,6 +20,7 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^6.4.0",
     "eslint-loader": "^3.0.0",
+    "fast-deep-equal": "^2.0.1",
     "file-loader": "^4.2.0",
     "history": "^4.10.1",
     "html-webpack-plugin": "^4.0.0-beta.8",

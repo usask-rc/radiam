@@ -196,7 +196,7 @@ class PageThree extends Component {
       <React.Fragment>
       <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
         {record && 
-          <MapForm content_type={'project'} parentRecord={record} id={record.id} geoDataCallback={this.geoDataCallback}/>
+          <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
         }
       </SimpleForm>
       <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
