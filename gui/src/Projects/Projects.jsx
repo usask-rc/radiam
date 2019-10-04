@@ -28,6 +28,7 @@ import '../_components/components.css';
 import { FormDataConsumer } from 'ra-core';
 import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
+import RelatedDatasets from '../Datasets/RelatedDatasets';
 
 const styles = {
   actions: {
@@ -110,11 +111,13 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withStyles(styles)(
   ({ classes, permissions, ...props }) => {
+
     return (
       <Show {...props}>
         <TabbedShowLayout>
           <Tab label={'summary'}>
             <ProjectName label={'en.models.projects.name'} />
+            <RelatedDatasets projectID={props.id} {...props} />
             <TextField
               label={'en.models.projects.keywords'}
               source={Constants.model_fields.KEYWORDS}
@@ -163,34 +166,39 @@ export const ProjectTitle = ({ record }) => (
 
 export const ProjectEdit = withTranslate(
   withStyles(styles)(({ classes, permissions, translate, ...props }) => (
-    <Edit title={<ProjectTitle />} {...props}>
-      <FormDataConsumer>
-        {({ formData, ...rest }) => {
-          const { record, basePath, resource } = rest;
-          if (canEditProject({ permissions, record })) {
-            return (
-              <React.Fragment>
-                <ProjectStepper
-                  permissions={permissions}
-                  translate={translate}
-                  classes={classes}
-                  mode={"edit"}
-                  {...rest}
-                />
-                {permissions.is_admin && (
-                  <DeleteButton
-                    record={record}
-                    basePath={basePath}
-                    resource={resource}
+    <React.Fragment>
+      <Edit title={<ProjectTitle />} {...props}>
+        <FormDataConsumer>
+          {({ formData, ...rest }) => {
+            const { record, basePath, resource } = rest;
+            if (canEditProject({ permissions, record })) {
+              return (
+                <React.Fragment>
+      <RelatedDatasets projectID={props.id} {...props} />
+
+                  <ProjectStepper
+                    permissions={permissions}
+                    translate={translate}
+                    classes={classes}
+                    mode={"edit"}
+                    {...rest}
                   />
-                )}
-              </React.Fragment>
-            );
-          }
-          return null;
-        }}
-      </FormDataConsumer>
-    </Edit>
+                  {permissions.is_admin && (
+                    <DeleteButton
+                      record={record}
+                      basePath={basePath}
+                      resource={resource}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            }
+            return null;
+          }}
+        </FormDataConsumer>
+      </Edit>
+    </React.Fragment>
+
   ))
 );
 

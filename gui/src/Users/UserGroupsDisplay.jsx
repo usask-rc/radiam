@@ -18,7 +18,7 @@ const UserGroupsDisplay = ({ classes, groupMembers }) => {
                 }
 
                 return (
-                    <Chip className={classes.chip} variant="outlined" key={groupMember.group.id} 
+                    <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id} 
                     label={`${groupRoleValue}${groupMember.group.name}`}
                     href={`/#/${Constants.models.GROUPS}/${groupMember.group.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
                 )
