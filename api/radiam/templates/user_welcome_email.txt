@@ -1,6 +1,6 @@
-Hello {{ user.username }},
+Hello {{ user.first_name }},
 
-Welcome to Radiam.
+Welcome to Radiam. Your username is {{ user.username }}.
 
 To activate your account, you'll need to click the "Forgot Password?" button on the login page to set a password.
 
