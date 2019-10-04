@@ -99,22 +99,11 @@ const PageOne = ({ classes, values, handleNext, ...props }) =>
 {
   const [dirty, setDirty] = useState(false)
 
-  //TODO: case of returning to this page from a subsequent page and then leaving is not covered.  ADM-1569
-  /*
-  useEffect(() => {
-    Object.keys(props.record).map(key => {
-      if (props.record[key] !== props.record.value){
-        setDirty(true)
-      }
-    })
-  }, [])
-*/
+  //TODO: make the `on dirty` thing work here.  For some reason, this page gets marked as dirty on entry as handleChange is instantly triggered.  Weird.
   const handleChange=(data) => {
     setDirty(true)
   }
 
-  console.log("pageone props: ", props)
-  console.log("pageone values: ", values)
 return(
   <React.Fragment>
   <SimpleForm
@@ -122,7 +111,7 @@ return(
       handleNext={handleNext} />}
     asyncValidate={props.record.id ? null : asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
     asyncBlurFields={[Constants.model_fields.NAME]}
-    onChange={handleChange}
+    
   >
     {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={Constants.model_fields.ID} defaultValue={props.record.id} />}
     <TextInput
@@ -131,6 +120,7 @@ return(
       source={Constants.model_fields.NAME}
       validate={validateName}
       defaultValue={props.record.name || ""}
+      onChange={handleChange}
     />
     <ReferenceInput
       resource={"projectavatars"}
@@ -145,13 +135,16 @@ return(
     >
       <SelectInput
         source="avatar_image"
-        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />} />
+        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />}
+        onChange={handleChange}
+         />
     </ReferenceInput>
     <TextInput
       className="input-medium"
       label={"en.models.projects.keywords"}
       source={Constants.model_fields.KEYWORDS}
       defaultValue={props.record.keywords || ""}
+      onChange={handleChange}
     />
   </SimpleForm>
   <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
@@ -216,6 +209,7 @@ class PageTwo extends Component {
     this.state = { group: null, groupList: [], isFormDirty: false, userList: new Set() }
   }
   handleChange(event, index, id, value) {
+    console.log("handlechange in pagetwo trigger")
     this.setState({ group: index, groupList: [], isFormDirty: true, userList: new Set() })
     this.getAllParentGroups(index)
   }
@@ -362,9 +356,6 @@ export class ProjectStepper extends React.Component {
     const { classes, translate } = this.props;
     const steps = [translate('en.models.projects.steps.name'), translate('en.models.projects.steps.researchgroup'), translate('en.models.projects.steps.map')];
     const { activeStep } = this.state;
-
-    console.log("props in projectstepper are: ", this.props)
-    console.log("state in projectstepper is: ", this.state)
 
     return (
       <Stepper activeStep={activeStep} orientation="vertical">
