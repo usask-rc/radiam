@@ -16,7 +16,9 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { TextField, Divider, Button } from '@material-ui/core';
+import { TextField, Divider, Button, Collapse, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
+import { ExpandMore } from '@material-ui/icons';
+import { flexbox } from '@material-ui/system';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -30,6 +32,10 @@ const styles = {
   mapPopup: {
     width: '400px',
   },
+  geoTextArea: {
+    display: 'flex',
+    flexDirection: "column",
+  }
 };
 
 class LocationForm extends Component {
@@ -146,8 +152,22 @@ class LocationForm extends Component {
           id={this.props.id}
           geoDataCallback={this.geoDataCallback}
         />
-        <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
-        <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
+        <ExpansionPanel fullWidth>
+          <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
+            <Typography>{`Geo Text Entry - Experimental`}</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails className={styles.geoTextArea}>
+          <Grid container>
+          <Grid item xs={12}>
+            <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
+            </Grid>
+            <Grid item xs={12}>
+            <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
+            </Grid>
+            </Grid>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
         <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
       </SimpleForm>
     );
