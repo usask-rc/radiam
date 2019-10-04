@@ -29,6 +29,9 @@ import { FormDataConsumer } from 'ra-core';
 import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
+import { Drawer } from '@material-ui/core';
+import { DatasetCreate } from '../Datasets/Datasets';
+import { Route } from "react-router"
 
 const styles = {
   actions: {
@@ -174,8 +177,7 @@ export const ProjectEdit = withTranslate(
             if (canEditProject({ permissions, record })) {
               return (
                 <React.Fragment>
-      <RelatedDatasets projectID={props.id} {...props} />
-
+                  <RelatedDatasets projectID={props.id} {...props} />
                   <ProjectStepper
                     permissions={permissions}
                     translate={translate}
@@ -197,6 +199,12 @@ export const ProjectEdit = withTranslate(
           }}
         </FormDataConsumer>
       </Edit>
+      <Route path='/#/datasets/create' render={ () =>(
+        <Drawer open>
+          <DatasetCreate {...props} />
+        </Drawer>)}
+        />
+      
     </React.Fragment>
 
   ))
