@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Create,
+  CreateButton,
   Datagrid,
   Edit,
   Filter,
@@ -29,7 +30,7 @@ import { FormDataConsumer } from 'ra-core';
 import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { Drawer } from '@material-ui/core';
+import { Drawer, CardActions } from '@material-ui/core';
 import { DatasetCreate } from '../Datasets/Datasets';
 import { Route } from "react-router"
 
@@ -167,17 +168,26 @@ export const ProjectTitle = ({ record }) => (
   <span>Project {record ? `"${record.name}"` : ''}</span>
 );
 
+const TagCreateActions = ({id}) => 
+{
+  //create a dataset
+  console.log("props in tagcreateactions is: ", id)
+return(
+  <CardActions>
+    <RelatedDatasets projectID={id} />
+  </CardActions>
+)}
+
 export const ProjectEdit = withTranslate(
   withStyles(styles)(({ classes, permissions, translate, ...props }) => (
     <React.Fragment>
-      <Edit title={<ProjectTitle />} {...props}>
+      <Edit title={<ProjectTitle />} {...props} actions={<TagCreateActions {...props} />}>
         <FormDataConsumer>
           {({ formData, ...rest }) => {
             const { record, basePath, resource } = rest;
             if (canEditProject({ permissions, record })) {
               return (
                 <React.Fragment>
-                  <RelatedDatasets projectID={props.id} {...props} />
                   <ProjectStepper
                     permissions={permissions}
                     translate={translate}
@@ -199,7 +209,7 @@ export const ProjectEdit = withTranslate(
           }}
         </FormDataConsumer>
       </Edit>
-      <Route path='/#/datasets/create' render={ () =>(
+      <Route path='/datasets/create' render={ () =>(
         <Drawer open>
           <DatasetCreate {...props} />
         </Drawer>)}

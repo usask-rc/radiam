@@ -5,6 +5,7 @@ import '../_components/components.css';
 import { GET_LIST } from 'ra-core';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools';
 import { Chip, Typography } from '@material-ui/core';
+import { CreateButton } from 'ra-ui-materialui/lib/button';
 
 const RelatedDatasets = ({ projectID }) => {
     const styles = theme => ({
@@ -31,7 +32,8 @@ const RelatedDatasets = ({ projectID }) => {
   
     return(
       <div className={styles.relatedDSContainer}>
-      {datasets && <Typography component="p" variant="p">{`Related Datasets: `}</Typography>}
+
+      {datasets && datasets.length > 0 && <Typography component="p" variant="p">{`Related Datasets: `}</Typography> }
       {datasets && datasets.map(dataset => {
         return( //TODO: display number of files in each dataset in the chip
           <Chip className={styles.chipDisplay} variant="outlined" key={dataset.id}
@@ -40,6 +42,7 @@ const RelatedDatasets = ({ projectID }) => {
   
         )
       })}
+          <CreateButton basePath={"/datasets"} label={`New Dataset`}></CreateButton>
       </div>
     )
   }
