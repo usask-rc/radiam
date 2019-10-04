@@ -55,11 +55,9 @@ const styles = theme => ({
 //TODO: move api call to the central security provider file if possible once this functionality is completed.
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangePassword extends Component {
-
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.state = { password: "", newPassword: "", confirmPassword: ""}
   }
 
@@ -139,9 +137,9 @@ class ChangePassword extends Component {
     }
   };
 
-  handleChange(e) {
+  handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
-  }
+  };
 
   //TODO: the strings below aren't in the translation file - I can't figure out how to get them to translate properly here.
   //TODO: tags below (form, h4) should be converted to material-ui element.

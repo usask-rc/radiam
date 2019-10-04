@@ -20,13 +20,9 @@ const styles = theme => ({
     },
 });
 class UserEditForm extends Component {
-
     constructor(props) {
         super(props);
         this.state = { ...props.record, groupMembers: [], isFormDirty: false }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelectChange = this.handleSelectChange.bind(this);
     }
 
     componentDidMount(){
@@ -68,7 +64,7 @@ class UserEditForm extends Component {
         })
     }
 
-    handleSubmit() {
+    handleSubmit = () => {
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -109,17 +105,18 @@ class UserEditForm extends Component {
         else {
             toastErrors("Please enter your Username and Email Address.");
         }
-    }
+    };
 
-    handleChange(e) {
+    handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
         this.setState({isFormDirty: true})
-    }
+    };
+
     //strangely, the selects and date need a different change handler.
-    handleSelectChange(key_in_dict, value, prevValue, target) {
+    handleSelectChange = (key_in_dict, value, prevValue, target) => {
         this.setState({ [target]: value })
         this.setState({isFormDirty: true})
-    }
+    };
 
     render() {
         const {groupMembers} = this.state

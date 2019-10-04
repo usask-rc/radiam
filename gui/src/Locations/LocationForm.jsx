@@ -42,14 +42,13 @@ class LocationForm extends Component {
   constructor(props) {
     super(props);
     this.state = { geo: this.props.record.geo, geoText: "", isFormDirty: false };
-    this.geoDataCallback = this.geoDataCallback.bind(this);
   }
 
   componentDidMount(){
     this.setState({geoText: JSON.stringify(this.state.geo, null, 2)})
   }
 
-  geoDataCallback(geo) {
+  geoDataCallback = geo => {
     if (geo && Object.keys(geo).length > 0) {
       this.setState({ geo: geo });
     } else {
@@ -61,7 +60,7 @@ class LocationForm extends Component {
     if (this.state.geo !== this.props.record.geo){
         this.setState({isFormDirty: true})
     }
-  }
+  };
 
   //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
   handleSubmit = data => {
