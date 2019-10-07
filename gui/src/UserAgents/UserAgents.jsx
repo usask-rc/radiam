@@ -26,7 +26,8 @@ import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import { SimpleFormIterator } from "ra-ui-materialui/lib/form";
 import { ProjectName } from "../_components/_fields/ProjectName";
-import { regex, number, minValue } from "ra-core";
+import { regex, number, minValue, FormDataConsumer } from "ra-core";
+import { Grid, Typography } from "@material-ui/core";
 
 const filterStyles = {
   form: {
@@ -174,14 +175,15 @@ export const UserAgentCreate = props => {
           label={"en.models.agents.location"}
           source={Constants.model_fk_fields.LOCATION}
           reference={Constants.models.LOCATIONS}
+          filter={{location_type: Constants.LOCATIONTYPE_OSF}}
           validate={validateLocation}
         >
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
-        <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
-        <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
+        <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
+        <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
         <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
-        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`1.0.0`} />
         <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
       </SimpleForm>
     </Create>
@@ -190,31 +192,21 @@ export const UserAgentCreate = props => {
 
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
+
   return (
     <Edit title={<UserAgentTitle />} {...props}>
       <SimpleForm>
-        <ReferenceInput
-        label={"en.models.agents.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
-        validate={validateUser}
-        >
-        <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
-        </ReferenceInput>
-          <ReferenceInput
-          label={"en.models.agents.location"}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
-          validate={validateLocation}
-        >
-          <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
-        </ReferenceInput>
-
-        <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
-        <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
-        <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
-        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
-        <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+        <Grid container direction="row">
+          <Grid xs={12}>
+            <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
+          </Grid>
+          <Grid xs={12}>
+            <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+          </Grid>
+          <Grid xs={12}>
+            <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+          </Grid>
+        </Grid>
       </SimpleForm>
     </Edit>
   );
