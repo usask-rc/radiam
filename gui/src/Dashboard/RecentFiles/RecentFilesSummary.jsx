@@ -46,12 +46,11 @@ class RecentFilesSummary extends React.Component {
       redirect: false,
       files: [],
     };
-    this.handleRedirect = this.handleRedirect.bind(this);
   }
 
-  handleRedirect() {
+  handleRedirect = () => {
     this.setState({ redirect: true });
-  }
+  };
 
   //TODO: the filesummarybutton is too far to the left - i don't know the css that is causing this, but it requires a fix.
   render() {

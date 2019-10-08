@@ -80,24 +80,22 @@ class Login extends Component {
       token: "",
       reset_password: ""
     };
-    this.toggleForgotPassword = this.toggleForgotPassword.bind(this);
-    this.forgotPassword = this.forgotPassword.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
   handleSubmit(event) {
     this.submitForm();
     event.preventDefault();
   }
-  handleChange(e) {
+
+  handleChange = e => {
     // If you are using babel, you can use ES 6 dictionary syntax
     // let change = { [e.target.name] = e.target.value }
     let change = {};
     change[e.target.name] = e.target.value;
     this.setState(change);
-  }
+  };
 
-  forgotPassword() {
+  forgotPassword = () => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: this.state.email
@@ -109,11 +107,12 @@ class Login extends Component {
         toast.success("Check your email for a password reset link.")
       );
     this.toggleForgotPassword();
-  }
+  };
 
-  toggleForgotPassword() {
+  toggleForgotPassword = () => {
     this.setState(state => ({ forgotpassword: !state.forgotpassword }));
-  }
+  };
+
   login = auth =>
     this.props.userLogin(
       auth,

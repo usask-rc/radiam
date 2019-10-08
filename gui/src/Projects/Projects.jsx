@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Create,
+  CreateButton,
   Datagrid,
   Edit,
   Filter,
@@ -28,6 +29,10 @@ import '../_components/components.css';
 import { FormDataConsumer } from 'ra-core';
 import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
+import RelatedDatasets from '../Datasets/RelatedDatasets';
+import { Drawer, CardActions } from '@material-ui/core';
+import { DatasetCreate } from '../Datasets/Datasets';
+import { Route } from "react-router"
 
 const styles = {
   actions: {
@@ -110,11 +115,13 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withStyles(styles)(
   ({ classes, permissions, ...props }) => {
+
     return (
       <Show {...props}>
         <TabbedShowLayout>
           <Tab label={'summary'}>
             <ProjectName label={'en.models.projects.name'} />
+            <RelatedDatasets projectID={props.id} {...props} />
             <TextField
               label={'en.models.projects.keywords'}
               source={Constants.model_fields.KEYWORDS}
@@ -161,36 +168,55 @@ export const ProjectTitle = ({ record }) => (
   <span>Project {record ? `"${record.name}"` : ''}</span>
 );
 
+const TagCreateActions = ({id}) => 
+{
+  //create a dataset
+  console.log("props in tagcreateactions is: ", id)
+return(
+  <CardActions>
+    <RelatedDatasets projectID={id} />
+  </CardActions>
+)}
+
 export const ProjectEdit = withTranslate(
   withStyles(styles)(({ classes, permissions, translate, ...props }) => (
-    <Edit title={<ProjectTitle />} {...props}>
-      <FormDataConsumer>
-        {({ formData, ...rest }) => {
-          const { record, basePath, resource } = rest;
-          if (canEditProject({ permissions, record })) {
-            return (
-              <React.Fragment>
-                <ProjectStepper
-                  permissions={permissions}
-                  translate={translate}
-                  classes={classes}
-                  mode={"edit"}
-                  {...rest}
-                />
-                {permissions.is_admin && (
-                  <DeleteButton
-                    record={record}
-                    basePath={basePath}
-                    resource={resource}
+    <React.Fragment>
+      <Edit title={<ProjectTitle />} {...props} actions={<TagCreateActions {...props} />}>
+        <FormDataConsumer>
+          {({ formData, ...rest }) => {
+            const { record, basePath, resource } = rest;
+            if (canEditProject({ permissions, record })) {
+              return (
+                <React.Fragment>
+                  <ProjectStepper
+                    permissions={permissions}
+                    translate={translate}
+                    classes={classes}
+                    mode={"edit"}
+                    {...rest}
                   />
-                )}
-              </React.Fragment>
-            );
-          }
-          return null;
-        }}
-      </FormDataConsumer>
-    </Edit>
+                  {permissions.is_admin && (
+                    <DeleteButton
+                      record={record}
+                      basePath={basePath}
+                      resource={resource}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            }
+            return null;
+          }}
+        </FormDataConsumer>
+      </Edit>
+      <Route path='/datasets/create' render={ () =>(
+        <Drawer open>
+          <DatasetCreate {...props} />
+        </Drawer>)}
+        />
+      
+    </React.Fragment>
+
   ))
 );
 
