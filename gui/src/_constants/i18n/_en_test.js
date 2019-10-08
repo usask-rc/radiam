@@ -5,7 +5,8 @@ export default {
   en: {
     search: 'Search',
     language: 'Language',
-    loading: 'Loading',
+    loading: 'Loading...',
+    loading_error: 'Error loading information:',
     settings: {
       label: 'Settings',
       update_password: 'Update Account Password',
@@ -60,6 +61,7 @@ export default {
         search: 'Search',
         folders: 'Folders',
       },
+      file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
       grants: 'View Grants',
@@ -97,11 +99,20 @@ export default {
         date_expires: 'Expires At',
         date_membership_expires: 'Group Membership Expires At',
       },
-
       agents: {
         user: 'User',
         remote_user: 'Known As',
         location: 'Location',
+        remote_api_username: 'Remote API Username',
+        remote_api_token: 'Remote API Token',
+        crawl_minutes: 'Minutes between crawls',
+        version: 'Agent Version',
+        projects: 'Associated Project', 
+        rootdir: 'Project Root Directory',
+        remoteapiusername: 'Remote System Username',
+        remoteapitoken: 'Remote System Token',
+        active: 'Active?',
+        project_name: 'Name of Project'
       },
       datasets: {
         data_abstract: 'Data Abstract',
@@ -145,6 +156,7 @@ export default {
         host_name: 'Host Name',
         name: 'Name',
         notes: 'Notes',
+        osf_project: 'OSF Project',
         portal_url: 'Portal Url',
         type: 'Location Type',
       },
@@ -162,7 +174,7 @@ export default {
         steps: {
           name: 'Project Name',
           researchgroup: 'Project Group',
-          user: 'Project User',
+          map: 'Project Locations',
         },
         title: 'Data Title',
       },
@@ -219,9 +231,11 @@ export default {
         desktop: 'Desktop',
         instrument: 'Instrument',
         laptop: 'Laptop',
+        osf: 'OSF Project',
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
+        osf: 'OSF',
       },
     },
     distribution: {
@@ -327,7 +341,9 @@ export default {
       useragents: {
         locations: 'A location is required for this user agent.',
         user: 'A user is required for this user agent.',
+        version: 'Version Number is in format X.X.X ',
       },
     },
+    warnings: {}
   },
 };
