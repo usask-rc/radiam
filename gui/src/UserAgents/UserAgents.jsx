@@ -23,9 +23,6 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
-import { SimpleFormIterator } from "ra-ui-materialui/lib/form";
-import { ProjectName } from "../_components/_fields/ProjectName";
 import { regex, number, minValue, FormDataConsumer } from "ra-core";
 import { Grid, Typography } from "@material-ui/core";
 
@@ -190,12 +187,32 @@ export const UserAgentCreate = props => {
   )
 };
 
+
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
 
   return (
-    <Edit title={<UserAgentTitle />} {...props}>
+    <Edit {...props}>
       <SimpleForm>
+      <ReferenceField
+        linkType={false}
+        label={"en.models.agents.location"}
+        source={Constants.model_fk_fields.LOCATION}
+        reference={Constants.models.LOCATIONS}
+      >
+        <LocationShow/>
+      </ReferenceField>
+      <ReferenceField
+        linkType={false}
+        label={"en.models.agents.user"}
+        source={Constants.model_fk_fields.USER}
+        reference={Constants.models.USERS}
+        allowEmpty={false}
+      >
+        <UserShow />
+      </ReferenceField>
+      <React.Fragment>
+      
         <Grid container direction="row">
           <Grid xs={12}>
             <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
@@ -207,7 +224,19 @@ export const UserAgentEdit = props => {
             <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
           </Grid>
         </Grid>
+        </React.Fragment>
       </SimpleForm>
     </Edit>
+
   );
 }
+/*
+<ReferenceField
+        linkType={false}
+        label={"en.models.agents.location"}
+        source={Constants.model_fk_fields.LOCATION}
+        reference={Constants.models.LOCATIONS}
+      >
+        <TextField source={Constants.model_fields.DISPLAY_NAME} />
+      </ReferenceField>
+*/
