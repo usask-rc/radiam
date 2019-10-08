@@ -6,6 +6,7 @@ import { radiamRestProvider, httpClient } from "../../_tools";
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
+import englishMessages from "../../_constants/i18n/en"
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -119,7 +120,7 @@ class ChangeDetails extends Component {
 
                                         <TextField
                                             id={Constants.model_fields.USERNAME}
-                                            label={Constants.model_fields.USERNAME}
+                                            label={englishMessages.en.models.users.username}
                                             value={this.state.username}
                                             onChange={this.handleChange(Constants.model_fields.USERNAME)}
                                         />
@@ -128,7 +129,7 @@ class ChangeDetails extends Component {
 
                                         <TextField
                                             id={Constants.model_fields.FIRST_NAME}
-                                            label={Constants.model_fields.FIRST_NAME}
+                                            label={englishMessages.en.models.users.fname}
                                             value={this.state.first_name}
                                             onChange={this.handleChange(Constants.model_fields.FIRST_NAME)}
                                         />
@@ -137,7 +138,7 @@ class ChangeDetails extends Component {
 
                                         <TextField
                                             id={Constants.model_fields.LAST_NAME}
-                                            label={Constants.model_fields.LAST_NAME}
+                                            label={englishMessages.en.models.users.lname}
                                             value={this.state.last_name}
                                             onChange={this.handleChange(Constants.model_fields.LAST_NAME)}
                                         />
@@ -146,7 +147,7 @@ class ChangeDetails extends Component {
 
                                         <TextField
                                             id={Constants.model_fields.EMAIL}
-                                            label={Constants.model_fields.EMAIL}
+                                            label={englishMessages.en.models.users.email}
                                             value={this.state.email}
                                             onChange={this.handleChange(Constants.model_fields.EMAIL)}
                                             type={"email"} />
@@ -154,7 +155,7 @@ class ChangeDetails extends Component {
                                     <div className={styles.input}>
                                         <TextField
                                             id={Constants.model_fields.NOTES}
-                                            label={Constants.model_fields.NOTES}
+                                            label={englishMessages.en.models.users.notes}
                                             value={this.state.notes || ""}
                                             onChange={this.handleChange(Constants.model_fields.NOTES)}
                                         />
