@@ -1,3 +1,4 @@
+from uuid import UUID
 from django.contrib.contenttypes.models import ContentType
 
 from django.db.models import Q
@@ -13,6 +14,13 @@ from .models import (
     DataCollectionStatus, ProjectStatistics, UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_project_created
+
+def is_uuid4(uuid_string):
+    try:
+        UUID(uuid_string, version=4)
+    except ValueError:
+        return False
+    return True
 
 class ResearchGroupPKRelatedField(serializers.PrimaryKeyRelatedField):
     """
@@ -62,10 +70,13 @@ class NestedUserAgentProjectPKRelatedField(ProjectPKRelatedField):
         """
 
         try:
-            project = self.get_queryset().get(name=data)
+            if is_uuid4(data):
+                project = self.get_queryset().get(id=data)
+            else:
+                project = self.get_queryset().get(name=data)
             return project
         except Project.DoesNotExist:
-            msg = f'Project name \'{data}\' does not exist.'
+            msg = f'Project with id or name \'{data}\' does not exist.'
             raise serializers.ValidationError(msg)
 
 
