@@ -1,5 +1,12 @@
 **Radiam API Dev/Deploy Documentation**
 
+
+** Using docker and docker-compose: introductory tutorials **
+
+docker: https://docs.docker.com/get-started/
+
+docker compose: https://docs.docker.com/compose/gettingstarted/
+
 **Components:**
 
 Elasticsearch.

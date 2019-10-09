@@ -339,7 +339,7 @@ class UserAgentProjectConfig(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     agent = models.ForeignKey(UserAgent, on_delete=models.PROTECT, help_text="The User Agent")
     project = models.ForeignKey('Project', on_delete=models.PROTECT, help_text="The Project")
-    config = JSONField(help_text="JSON config key/value pairs")
+    config = JSONField(blank=True, null=True, help_text="JSON configuration for this project - key/value pairs")
 
     class Meta:
         db_table = "rdm_user_agent_project_config"
