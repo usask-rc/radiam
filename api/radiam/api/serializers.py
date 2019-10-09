@@ -257,7 +257,7 @@ class PasswordSerializer(serializers.Serializer):
 class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
     project = NestedUserAgentProjectPKRelatedField()
-    config = serializers.JSONField(required=True)
+    config = serializers.JSONField(required=False)
 
     class Meta:
         model = UserAgentProjectConfig
