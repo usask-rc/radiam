@@ -8,6 +8,7 @@ module.exports = Object.freeze({
     is_active: true,
     is_superuser: true,
     time_zone_id: null,
+    user_orcid_id: null,
     date_created: "2019-01-28T19:29:29.238000Z",
     date_updated: "2019-01-28T19:29:29.238000Z",
     notes: null

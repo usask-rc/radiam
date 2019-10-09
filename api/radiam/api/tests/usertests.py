@@ -82,6 +82,7 @@ class TestUserAPI(APITestCase):
             "email": "test.user@example.com",
             "is_active": True,
             "time_zone_id": "GMT+6",
+            "user_orcid_id": "0000-0002-5525-3342",
             "notes": "test. here are some notes about Test User"
         }
 
@@ -106,6 +107,7 @@ class TestUserAPI(APITestCase):
         self.assertIn('email', actual)
         self.assertIn('is_active', actual)
         self.assertIn('time_zone_id', actual)
+        self.assertIn('user_orcid_id', actual)
         self.assertIn('date_created', actual)
         self.assertIn('date_updated', actual)
         self.assertIn('notes', actual)
@@ -147,6 +149,7 @@ class TestUserAPI(APITestCase):
         self.assertIn('email', actual)
         self.assertIn('is_active', actual)
         self.assertIn('time_zone_id', actual)
+        self.assertIn('user_orcid_id', actual)
         self.assertIn('date_created', actual)
         self.assertIn('date_updated', actual)
         self.assertIn('notes', actual)
@@ -171,6 +174,7 @@ class TestUserAPI(APITestCase):
             "email": "bob.robb@example.com",
             "is_active": True,
             "time_zone_id": "GMT+6",
+            "user_orcid_id": "0000-0002-5525-3342",
             "notes": "test. here are some notes about Bob Robb"
         }
 
@@ -203,6 +207,7 @@ class TestUserAPI(APITestCase):
             "email": "test.user@example.com",
             "is_active": False,
             "time_zone_id": "GMT+6",
+            "user_orcid_id": "0000-0002-5525-3342",
             "notes": "test. here are some notes about Test User"
         }
 
@@ -227,6 +232,7 @@ class TestUserAPI(APITestCase):
         self.assertIn('email', actual)
         self.assertIn('is_active', actual)
         self.assertIn('time_zone_id', actual)
+        self.assertIn('user_orcid_id', actual)
         self.assertIn('date_created', actual)
         self.assertIn('date_updated', actual)
         self.assertIn('notes', actual)
@@ -408,6 +414,32 @@ class TestUserAPI(APITestCase):
 
         self.assertContains(response=response, text="", status_code=200)
         self.assertEqual("GMT+6", actual['time_zone_id'])
+        self.assertNotEqual(actual['date_created'], actual['date_updated'])
+
+    def test_update_user_orcid_id(self):
+        """
+        Try updating the Orcid id field using 'bob' (pk=3 in fixtures)
+        """
+        bob = User.objects.get(username='bobrobb')
+
+        body = {
+            "user_orcid_id": "0000-0002-5525-3342"
+        }
+
+        request = self.factory.patch(
+            reverse('user-detail', args=[bob.id]),
+            json.dumps(body),
+            content_type='application/json')
+        request.user = self.user
+        force_authenticate(request, user=request.user)
+
+        response = UserViewSet.as_view(
+            {'patch': 'partial_update'})(request, pk=bob.id)
+
+        actual = response.data
+
+        self.assertContains(response=response, text="", status_code=200)
+        self.assertEqual("0000-0002-5525-3342", actual['user_orcid_id'])
         self.assertNotEqual(actual['date_created'], actual['date_updated'])
 
     def test_update_notes(self):
