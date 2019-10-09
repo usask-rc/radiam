@@ -55,6 +55,7 @@ class User(AbstractUser, UserPermissionMixin):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    user_orcid_id = models.CharField(max_length=50, null=True, blank=True, help_text="The users ORCID identifier")
     time_zone_id = models.CharField(max_length=50, null=True, blank=True, help_text="The users time zone identifier")
     date_created = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was created")
     date_updated = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was last updated")

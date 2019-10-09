@@ -193,6 +193,7 @@ class SuperuserUserSerializer(BaseUserSerializer):
                   'is_active',
                   'is_superuser',
                   'time_zone_id',
+                  'user_orcid_id',
                   'date_created',
                   'date_updated',
                   'notes')
