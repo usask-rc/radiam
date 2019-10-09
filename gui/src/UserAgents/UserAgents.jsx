@@ -184,16 +184,31 @@ export const UserAgentCreate = props => {
             <TextInput source="project" label={"en.models.agents.project_name"} />
           </SimpleFormIterator>
         </ArrayInput>
+        
         <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
         <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
-        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`1.0.0`} />
+        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
         <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
       </SimpleForm>
     </Create>
   )
 };
-
+/*<ArrayInput source="project_config_list">
+          <SimpleFormIterator>
+            <TextInput source="project" label={"en.models.agents.project_name"} />
+          </SimpleFormIterator>
+        </ArrayInput>
+        
+        <ReferenceInput
+        label={"en.models.agents.projects"}
+        source={"project_config_list"}
+        reference={Constants.models.PROJECTS}>
+          <SelectInput source={Constants.model_fields.NAME}/>
+        </ReferenceInput>
+        
+        
+        */
 
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
