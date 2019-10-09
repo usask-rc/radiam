@@ -15,6 +15,7 @@ import {
   SelectInput,
   Show,
   SimpleForm,
+  SimpleFormIterator,
   SimpleShowLayout,
   TextField,
   TextInput,
@@ -25,6 +26,7 @@ import { locationSelect, LocationShow } from "../_components/_fields/LocationSho
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { regex, number, minValue, FormDataConsumer } from "ra-core";
 import { Grid, Typography } from "@material-ui/core";
+import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 
 const filterStyles = {
   form: {
@@ -177,6 +179,11 @@ export const UserAgentCreate = props => {
         >
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
+        <ArrayInput source="project_config_list">
+          <SimpleFormIterator>
+            <TextInput source="project" label={"en.models.agents.project_name"} />
+          </SimpleFormIterator>
+        </ArrayInput>
         <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
         <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
