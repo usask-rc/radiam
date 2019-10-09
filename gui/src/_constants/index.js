@@ -7,8 +7,9 @@ module.exports = Object.freeze({
   ROLE_DATA_MANAGER: "c4e21cc8-a446-4b38-9879-f2af71c227c3",
   ROLE_GROUP_ADMIN: "a59be619-fd9b-462b-8643-486e68f38613",
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+  LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
   ROLE_USER: "user",
-  VERSION: "1.0.13", //NOTE: this must be updated with every merge to master.
+  VERSION: "1.0.14", //NOTE: this must be updated with every merge to master.
   WEBTOKEN: "token",
   fields: {
     PASSWORD: "password",

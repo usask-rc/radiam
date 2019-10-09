@@ -55,6 +55,7 @@ class User(AbstractUser, UserPermissionMixin):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    user_orcid_id = models.CharField(max_length=50, null=True, blank=True, help_text="The users ORCID identifier")
     time_zone_id = models.CharField(max_length=50, null=True, blank=True, help_text="The users time zone identifier")
     date_created = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was created")
     date_updated = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was last updated")
@@ -339,7 +340,7 @@ class UserAgentProjectConfig(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     agent = models.ForeignKey(UserAgent, on_delete=models.PROTECT, help_text="The User Agent")
     project = models.ForeignKey('Project', on_delete=models.PROTECT, help_text="The Project")
-    config = JSONField(help_text="JSON config key/value pairs")
+    config = JSONField(blank=True, null=True, help_text="JSON configuration for this project - key/value pairs")
 
     class Meta:
         db_table = "rdm_user_agent_project_config"
