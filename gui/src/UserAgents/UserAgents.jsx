@@ -190,7 +190,7 @@ export const UserAgentCreate = props => {
         label={"en.models.agents.projects"}
         source={"project"}
         reference={Constants.models.PROJECTS}>
-          <SelectInput optionValue={"name"}/>
+          <SelectInput optionText={"name"}/>
         </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>

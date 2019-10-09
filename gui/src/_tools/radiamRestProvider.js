@@ -205,25 +205,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case GET_MANY:
         // Map a sub object that has '{ id: "theid"}' to just 'theid' e.g. project sensitivity level
         params.ids = params.ids.map(item => (item.id ? item.id : item));
-
-        console.log("GET_MANY values: ", apiUrl, resource, params)
-
-        //TODO: once (if) the ID/Name issue with UserAgents is fixed, this will have to be modified to adjust.  Currently, a GET_MANY call is triggered when we assign an associated project to a User Agent.  This line appropriately kills said call.
         
-        let query;
-        //36 is the length of generated ID keys.  For this temporary patch, we'll match against this length.
-        if (resource === `projects` && params.ids[0].length !== 36){
-          query={
-            ['name']: params.ids[0]
-          }
-
-        }
-        else{
-          query = {
+        const  query = {
             [`ids`]: params.ids.join(','),
-          };
-        }
-
+        };
 
         url = `${apiUrl}/${resource}/?${stringify(query)}`;
         break;
