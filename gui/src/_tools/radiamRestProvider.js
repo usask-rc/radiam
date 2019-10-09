@@ -205,10 +205,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case GET_MANY:
         // Map a sub object that has '{ id: "theid"}' to just 'theid' e.g. project sensitivity level
         params.ids = params.ids.map(item => (item.id ? item.id : item));
-
-        //TODO: userAgent (might) not currently support 'ids' as a lookup field.  If not, an edit is needed here to enforce the reference on a trawled project file.
-        const query = {
-          [`ids`]: params.ids.join(','),
+        
+        const  query = {
+            [`ids`]: params.ids.join(','),
         };
 
         url = `${apiUrl}/${resource}/?${stringify(query)}`;
