@@ -9,9 +9,11 @@ import {
   Filter,
   List,
   NumberInput,
+  ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
   required,
+  SelectArrayInput,
   SelectInput,
   Show,
   SimpleForm,
@@ -27,6 +29,7 @@ import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { regex, number, minValue, FormDataConsumer } from "ra-core";
 import { Grid, Typography } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
+import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 
 const filterStyles = {
   form: {
@@ -179,11 +182,19 @@ export const UserAgentCreate = props => {
         >
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
+       
         <ArrayInput source="project_config_list">
           <SimpleFormIterator>
-            <TextInput source="project" label={"en.models.agents.project_name"} />
+            
+          <ReferenceInput
+        label={"en.models.agents.projects"}
+        source={"project"}
+        reference={Constants.models.PROJECTS}>
+          <SelectInput optionValue={"name"}/>
+        </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
+    
         
         <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
@@ -207,7 +218,14 @@ export const UserAgentCreate = props => {
           <SelectInput source={Constants.model_fields.NAME}/>
         </ReferenceInput>
         
-        
+         <ReferenceArrayInput
+      allowEmpty
+      label={"en.models.projects.name"}
+      source={"project_config_list"}
+      reference={Constants.models.PROJECTS}
+      perPage={100}>
+            <SelectArrayInput optionText={"name"} optionValue={"name"}/>
+      </ReferenceArrayInput>
         */
 
 export const UserAgentEdit = props => {
