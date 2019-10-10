@@ -1,5 +1,7 @@
 import json
 
+from unittest import mock
+
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import force_authenticate
@@ -54,8 +56,8 @@ class TestSuperuserProjectPermissions(APITestCase):
             response=response,
             text="",
             status_code=200)
-
-    def test_superuser_write_project_list(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_superuser_write_project_list(self, m):
         """
         Test Superuser can write a Project list endpoint
         (ie: Create projects)
@@ -86,7 +88,8 @@ class TestSuperuserProjectPermissions(APITestCase):
             text="",
             status_code=201)
 
-    def test_superuser_write_project_detail(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_superuser_write_project_detail(self, m):
         """
         Test Superuser can write a Project detail endpoint
         (ie: Update an existing project)
@@ -158,7 +161,8 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-    def test_adminuser_write_project_list(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_adminuser_write_project_list(self, m):
         """
         Test Admin user can write a Project list endpoint
         (ie: Create projects)
@@ -189,7 +193,8 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=201)
 
-    def test_adminuser_write_project_detail(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_adminuser_write_project_detail(self, m):
         """
         Test Admin user can write a Project detail endpoint
         (ie: Update an existing project)
@@ -216,7 +221,8 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-    def test_adminuser_change_project_group(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_adminuser_change_project_group(self, m):
         """
         Test Admin user can change the group associated with a project
         """
@@ -243,8 +249,8 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-
-    def test_adminuser_change_project_group_denied(self):
+    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    def test_adminuser_change_project_group_denied(self, m):
         """
         Test Admin user cannot replace the group for a project with a
         group that they do not admin

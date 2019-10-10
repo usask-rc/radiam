@@ -20,3 +20,4 @@ coreapi
 pygments
 markdown
 gunicorn
+model_mommy

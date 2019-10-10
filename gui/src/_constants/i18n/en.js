@@ -3,9 +3,250 @@ import englishMessages from 'ra-language-english';
 export default {
   ...englishMessages,
   en: {
-    search: 'Search',
-    language: 'Language',
-    loading: 'Loading',
+    metadata: {
+      configure: "Config",
+      config: {
+        title: "Configure Additional Metadata",
+      },
+      default: "Default Value",
+      edit: {
+        title: "Edit Additional Metadata",
+      },
+      fields: "Choose Metadata Fields",
+      loading: "Loading additional metadata.",
+      no: "No Additional Metadata",
+      off: "Off",
+      on: "On",
+      order: "Order",
+      required: "Required",
+      schemas: "Choose Metadata Schemas",
+      show: {
+        title: "Additional Metadata",
+      },
+      visible: "Visible",
+      datacite: {
+        4.2: {
+          label: "Datacite 4.2",
+          short: "DC 4.2"
+        },
+        alternateIdentifiers: {
+          label: "Alternate Identifiers",
+          alternateIdentifier: {
+            label: "Alternate Identifier",
+            alternateIdentifierType: {
+              label: "Alternate Identifier Type",
+            },
+          },
+        },
+        contributors: {
+          label: "Contributors",
+          contributor: {
+            label: "Contributor",
+            affiliation: {
+              label: "Affiliation"
+            },
+            contributorName: {
+              label: "Contributor Name"
+            },
+            contributorType: {
+              label: "Contributor Type"
+            },
+            familyName: {
+              label: "Family Name"
+            },
+            givenName: {
+              label: "Given Name"
+            },
+            nameIdentifier: {
+              label: "Name Identifier",
+              nameIdentifierScheme: {
+                label: "Name Identifier Scheme"
+              },
+              schemeURI: {
+                label: "Scheme URI"
+              },
+            },
+          }
+        },
+        creators: {
+          label: "Creators",
+          creator: {
+            label: "Creator",
+            creatorName: {
+              label: "Creator Name",
+              nameType: {
+                label: "Name Type",
+                organizational: {
+                  label: "Organizational",
+                },
+                personal: {
+                  label: "Personal",
+                },
+              },
+            },
+            familyName: {
+              label: "Family Name"
+            },
+            givenName: {
+              label: "Given Name"
+            },
+            nameIdentifier: {
+              label: "Name Identifier",
+              nameIdentifierScheme: {
+                label: "Name Identifier Scheme",
+              },
+              schemeURI: {
+                label: "Scheme URI",
+              },
+            },
+          },
+        },
+        dates: {
+          label: "Dates",
+          date: {
+            label: "Date",
+            dateInformation: {
+              label: "Date Information",
+            },
+            dateType: {
+              label: "Date Type",
+            },
+          },
+        },
+        descriptions: {
+          label: "Descriptions",
+          description: {
+            label: "Description",
+            descriptionType: {
+              label: "Description Type"
+            },
+            xmlLang: {
+              label: "Description Language"
+            },
+          },
+        },
+        formats: {
+          label: "Formats",
+          format: {
+            label: "Format"
+          },
+        },
+        fundingReferences: {
+          label: "Funding References",
+          fundingReference: {
+            label: "Funding Reference",
+            awardNumber: {
+              label: "Award Number",
+            },
+            awardTitle: {
+              label: "Award Title",
+            },
+            funderIdentifier: {
+              label: "Funder Identifier",
+              funderIdentifierType: {
+                label: "Funder Identifier Type"
+              },
+            },
+            funderName: {
+              label: "Funder Name"
+            },
+          },
+        },
+        identifier: {
+          label: "Identifier"
+        },
+        language: {
+          label: "Language",
+          en: "English",
+          fr: "French",
+        },
+        publisher: {
+          label: "Publisher"
+        },
+        publicationYear: {
+          label: "Publication Year"
+        },
+        resourceType: {
+          label: "Resource Type",
+          resourceTypeGeneral: {
+            label: "Resource Type General"
+          },
+        },
+        relatedIdentifiers: {
+          label: "Related Identifiers",
+          relatedIdentifier: {
+            label: "Related Identifier",
+            relatedIdentifierType: {
+              label: "Related Identifier Type",
+            },
+            relatedMetadataScheme: {
+              label: "Related Metadata Scheme",
+            },
+            relationType: {
+              label: "Relation Type",
+            },
+            schemeURI: {
+              label: "Scheme URI",
+            },
+          },
+        },
+        rightsList: {
+          label: "Rights List",
+          rights: {
+            label: "Rights",
+            rightsURI: {
+              label: "Rights URI",
+            },
+            xmlLang: {
+              label: "Language",
+            },
+          },
+        },
+        sizes: {
+          label: "Sizes",
+          size: {
+            label: "Size",
+          },
+        },
+        subjects: {
+          label: "Subjects",
+          subject: {
+            label: "Subject",
+            schemeURI: {
+              label: "Scheme URI"
+            },
+            subjectScheme: {
+              label: "Subject Scheme"
+            },
+            xmlLang: {
+              label: "Subject Language",
+            },
+          }
+        },
+        titles : {
+          label: "Titles",
+          title: {
+            label: "Title",
+            titleType: {
+              label: "Title Type",
+              AlternativeTitle: "Alternative Title",
+              Other: "Other",
+              Subtitle: "Subtitle",
+              TranslatedTitle: "Translated Title",
+            },
+            xmlLang: {
+              label: "Title Language",
+            },
+          }
+        },
+        version: {
+          label: "Version",
+        },
+      }
+    },
+    search: "Search",
+    language: "Language",
+    loading: "Loading",
     settings: {
       label: 'Settings',
       update_password: 'Update Account Password',

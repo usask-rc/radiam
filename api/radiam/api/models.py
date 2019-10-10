@@ -17,7 +17,7 @@ from .search import RadiamService
 from .exceptions import ElasticSearchRequestError
 from .signals import (radiam_user_created, radiam_project_created,
     radiam_project_deleted)
-from .documents import GeoDataDoc
+from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
 
 from django_rest_passwordreset.signals import reset_password_token_created
 from django.dispatch import receiver
@@ -45,6 +45,43 @@ Notes:
         ...
         DataIndex.py
 """
+
+class ElasticSearchModel():
+    """
+    Add necessary operations for saving and deleting a model from elastic search
+    """
+    def save(self, *args, **kwargs):
+        """
+        Create the model and create an index in ES
+        """
+        rs = RadiamService(self.id)
+        if not rs.index_exists(self.id):
+            try:
+                rs.create_index(self.id)
+            except es_exceptions.RequestError as error:
+                raise ElasticSearchRequestError(error.info)
+            else:
+                self._save_metadata_doc()
+        else:
+            self._save_metadata_doc()
+
+    def delete(self, *args, **kwargs):
+        """
+        Delete the model and delete the index in ES
+        """
+        rs = RadiamService(self.id)
+        rs.delete_index(self.id)
+        self._delete_metadata_doc()
+
+    def _delete_metadata_doc(self):
+        """
+        Delete the corresponding MetadataDoc
+        """
+        try:
+            doc = self.MetadataDoc.get(self.id)
+            doc.delete()
+        except es_exceptions.NotFoundError:
+            raise Exception('Deleting non-existent doc')
 
 
 class User(AbstractUser, UserPermissionMixin):
@@ -348,7 +385,7 @@ class UserAgentProjectConfig(models.Model):
         ]
 
 
-class ResearchGroup(MPTTModel, ResearchGroupPermissionMixin):
+class ResearchGroup(MPTTModel, ElasticSearchModel, ResearchGroupPermissionMixin):
     """
     ResearchGroup
 
@@ -367,6 +404,8 @@ class ResearchGroup(MPTTModel, ResearchGroupPermissionMixin):
     date_updated = models.DateTimeField(blank=False, null=False, default=now, help_text="The date this group was last modified")
     is_active = models.BooleanField(default=True, help_text="Whether this group is active")
 
+    MetadataDoc = ResearchGroupMetadataDoc
+
     class Meta:
         db_table = "rdm_research_groups"
 
@@ -383,6 +422,33 @@ class ResearchGroup(MPTTModel, ResearchGroupPermissionMixin):
         """
         return objects.filter(Q())
 
+    def save(self, *args, **kwargs):
+        ElasticSearchModel.save(self, *args, **kwargs)
+        MPTTModel.save(self, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        ElasticSearchModel.delete(self, *args, **kwargs)
+        MPTTModel.delete(self, *args, **kwargs)
+
+    def _save_metadata_doc(self):
+        """
+        Save corresponding ResearchGroupMetadataDoc
+        """
+        fields = dict()
+        fields['name'] = self.name
+        fields['description'] = self.description
+        fields['date_created'] = self.date_created
+        fields['date_updated'] = self.date_updated
+        fields['is_active'] = self.is_active
+
+        try:
+            doc = ResearchGroupMetadataDoc.get(self.id)
+            doc.update(**fields)
+
+        except es_exceptions.NotFoundError:
+            fields['meta'] = { 'id': self.id }
+            doc = ResearchGroupMetadataDoc(**fields)
+            doc.save()
 
 class GroupRole(models.Model, SuperuserOnlyPermissionMixin):
     """
@@ -587,7 +653,7 @@ class ProjectAvatar(models.Model, ResearchGroupPermissionMixin):
         return "avatar_" + str(self.id)
 
 
-class Project(models.Model, ProjectPermissionMixin):
+class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
     """
     Project
     """
@@ -602,28 +668,10 @@ class Project(models.Model, ProjectPermissionMixin):
     date_updated = models.DateTimeField(blank=False, null=False, default=now, help_text="The date this project was last modified")
     geo = GenericRelation(GeoData, related_query_name="project")
 
-    def save(self, *args, **kwargs):
-        """
-        Create the model and create an index in ES
-        """
-        rs = RadiamService(self.id)
-        if (not rs.index_exists(self.id)):
-            try:
-                rs.create_index(self.id)
-            except es_exceptions.RequestError as error:
-                raise ElasticSearchRequestError(error.info)
-            else:
-                super().save(*args, **kwargs)
-        else:
-            super().save(*args, **kwargs)
+    MetadataDoc = ProjectMetadataDoc
 
-    def delete(self, *args, **kwargs):
-        """
-        Delete the model and delete the index in ES
-        """
-        rs = RadiamService(self.id)
-        rs.delete_index(self.id)
-        super().delete(*args, **kwargs)
+    class Meta:
+        db_table = "rdm_projects"
 
     def get_geo_data(self):
         ctype = ContentType.objects.get_for_model(self.__class__)
@@ -634,14 +682,55 @@ class Project(models.Model, ProjectPermissionMixin):
             return None
         return geo_data
 
-    class Meta:
-        db_table = "rdm_projects"
+    def save(self, *args, **kwargs):
+        ElasticSearchModel.save(self, *args, **kwargs)
+        models.Model.save(self, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        ElasticSearchModel.delete(self, *args, **kwargs)
+        models.Model.delete(self, *args, **kwargs)
+
+    def _save_metadata_doc(self):
+        """
+        Save corresponding ProjectMetadataDoc
+        """
+
+        try:
+            doc = ProjectMetadataDoc.get(self.id)
+            fields = dict()
+            fields['name'] = self.name
+            fields['group'] = self.group.name
+            fields['keywords'] = self.keywords
+            fields['date_created'] = self.date_created
+            fields['date_updated'] = self.date_updated
+
+            if self.primary_contact_user:
+                fields['primary_contact_user'] = self.primary_contact_user.username
+
+            doc.update(**fields)
+
+        except es_exceptions.NotFoundError:
+
+            fields = dict()
+            fields['meta'] = { 'id': self.id }
+            fields['name'] = self.name
+            fields['group'] = self.group.name
+            fields['keywords'] = self.keywords
+            fields['date_created'] = self.date_created
+            fields['date_updated'] = self.date_updated
+
+            if self.primary_contact_user:
+                fields['primary_contact_user'] = self.primary_contact_user.username
+
+            doc = ProjectMetadataDoc(**fields)
+
+            doc.save()
 
     def __str__(self):
         return self.name
 
 
-class Dataset(models.Model, DatasetPermissionMixin):
+class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
     """
     Dataset
     """
@@ -655,6 +744,53 @@ class Dataset(models.Model, DatasetPermissionMixin):
     date_created = models.DateTimeField(blank=False, null=False, default=now, help_text="The date this dataset was created")
     date_updated = models.DateTimeField(blank=False, null=False, default=now, help_text="The date this dataset was last modified")
     geo = GenericRelation(GeoData, related_query_name="dataset")
+
+    MetadataDoc = DatasetMetadataDoc
+
+    def save(self, *args, **kwargs):
+        ElasticSearchModel.save(self, *args, **kwargs)
+        models.Model.save(self, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        ElasticSearchModel.delete(self, *args, **kwargs)
+        models.Model.delete(self, *args, **kwargs)
+
+    def _save_metadata_doc(self):
+        """
+        Save corresponding DatasetMetadataDoc
+        """
+
+        try:
+            doc = DatasetMetadataDoc.get(self.id)
+            fields = dict()
+            fields['project'] = self.project.id
+            fields['title'] = self.title
+            fields['abstract'] = self.abstract
+            fields['study_site'] = self.study_site
+            fields['distribution_restriction'] = self.distribution_restriction.label
+            fields['data_collection_status'] = self.data_collection_status.label
+            fields['date_created'] = self.date_created
+            fields['date_updated'] = self.date_updated
+
+            doc.update(**fields)
+
+        except es_exceptions.NotFoundError:
+
+            fields = dict()
+            fields['meta'] = { 'id': self.id }
+
+            fields['project'] = self.project.id
+            fields['title'] = self.title
+            fields['abstract'] = self.abstract
+            fields['study_site'] = self.study_site
+            fields['distribution_restriction'] = self.distribution_restriction.label
+            fields['data_collection_status'] = self.data_collection_status.label
+            fields['date_created'] = self.date_created
+            fields['date_updated'] = self.date_updated
+
+            doc = DatasetMetadataDoc(**fields)
+
+            doc.save()
 
     def get_data_collection_methods(self):
         methods = []
@@ -696,6 +832,9 @@ class Dataset(models.Model, DatasetPermissionMixin):
     class Meta:
         db_table = "rdm_datasets"
 
+    def __str__(self):
+        return self.title
+
 
 class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
     """
@@ -710,3 +849,182 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
 
     class Meta:
         db_table = "rdm_data_project_statistics"
+
+class MetadataUIType(models.Model, MetadataSchemaPermissionMixin):
+    """
+    MetadataUIType
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    key = models.CharField(max_length=80, blank=False, null=False, help_text="A key that maps to an xml element")
+    label = models.CharField(max_length=80, blank=False, null=False, unique=True, help_text="A label identifying the type of UI input to use for this field")
+
+    class Meta:
+        db_table = "rdm_metadata_ui_types"
+
+    def __str__(self):
+        return self.label
+
+class MetadataValueType(models.Model, MetadataSchemaPermissionMixin):
+    """
+    MetadataValueType
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    key = models.CharField(max_length=80, blank=False, null=False, help_text="A key that maps to an xml element")
+    label = models.CharField(max_length=80, blank=False, null=False, unique=True, help_text="A label identifying the type of value to store for this field")
+
+    class Meta:
+        db_table = "rdm_metadata_value_types"
+
+    def __str__(self):
+        return self.label
+
+class ChoiceList(models.Model, MetadataSchemaPermissionMixin):
+    """
+    ChoiceList
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="A label identifying the contents of this list")
+
+    class Meta:
+        db_table = "rdm_choice_lists"
+
+    def __str__(self):
+        return self.label
+
+class ChoiceListValue(models.Model, MetadataSchemaPermissionMixin):
+    """
+    ChoiceListValue
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="A label identifying the contents of this list")
+    value = models.CharField(max_length=200, blank=False, null=False, help_text="The value to store for the metadata field if this choice is picked")
+    list = models.ForeignKey(ChoiceList, blank=False, null=False, on_delete=models.PROTECT, help_text="The list of this value")
+
+    class Meta:
+        db_table = "rdm_choice_list_values"
+
+    def __str__(self):
+        return self.label
+
+class Schema(models.Model, MetadataSchemaPermissionMixin):
+    """
+    Schema
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="A label identifying the schema")
+
+    class Meta:
+        db_table = "rdm_schemas"
+
+    def __str__(self):
+        return self.label
+
+class Field(models.Model, MetadataSchemaPermissionMixin):
+    """
+    Field
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label = models.CharField(max_length=100, blank=True, null=False, unique=True, help_text="A label identifying the schema")
+    help = models.CharField(max_length=100, blank=False, null=False, help_text="A key for additional help information about this field")
+    schema = models.ForeignKey(Schema, blank=False, null=False, on_delete=models.PROTECT, help_text="The schema of this metadata field")
+    parent = models.ForeignKey("self", blank=True, null=True, on_delete=models.PROTECT, help_text="The parent field of this metadata field")
+    metadata_ui_type = models.ForeignKey(MetadataUIType, blank=False, null=False, on_delete=models.PROTECT, help_text="The type of UI control to show to the user for this metadata field")
+    metadata_value_type = models.ForeignKey(MetadataValueType, blank=False, null=False, on_delete=models.PROTECT, help_text="The type of the value to store in the index")
+    many_values = models.BooleanField(default=False, help_text="Whether this metadata field stores multiple values")
+    default_order = models.IntegerField(default=-1, null=False, blank=False, help_text="The default order to display the field in the UI")
+    choice_list = models.ForeignKey(ChoiceList, blank=True, null=True, on_delete=models.PROTECT, help_text="A list of choices and values that cover the options for this metadata field.")
+    default_choice = models.ForeignKey(help_text='Set to the default value for a list', null=True, blank=True, on_delete=models.PROTECT, to='ChoiceListValue')
+    default_value = models.TextField(help_text='Set to the default value for this field', null=True, blank=True)
+
+    class Meta:
+        db_table = "rdm_fields"
+
+    def __str__(self):
+        return self.label
+
+class Entity(models.Model, MetadataSchemaPermissionMixin):
+    """
+    Entity
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    group = models.ForeignKey(ResearchGroup, blank=True, null=True, on_delete=models.PROTECT, help_text="The group represented by this entity")
+    project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.PROTECT, help_text="The project represented by this entity")
+    dataset = models.ForeignKey(Dataset, blank=True, null=True, on_delete=models.PROTECT, help_text="The dataset represented by this entity")
+    file = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True, blank=True, null=True, help_text="The file represented by this entity")
+    folder = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True, blank=True, null=True, help_text="The folder represented by this entity")
+
+    class Meta:
+        db_table = "rdm_entities"
+
+    def __str__(self):
+        if self.group:
+            return "Group: " + str(self.group)
+        elif self.project:
+            return "Project: " + str(self.project)
+        elif self.dataset:
+            return "Dataset: " + str(self.dataset)
+        elif self.folder:
+            return "Folder: " + str(self.folder)
+        elif self.file:
+            return "File: " + str(self.file)
+        else:
+            return self.id
+
+    def get_selected_schemas(self):
+        return SelectedSchema.objects.filter(entity=self)
+
+    def get_selected_fields(self):
+        return SelectedField.objects.filter(entity=self).order_by('order')
+
+    def get_schemas(self):
+        return Schema.objects.all()
+
+    def get_fields(self):
+        return Field.objects.all().order_by('default_order')
+
+    def get_metadata_ui_types(self):
+        return MetadataUIType.objects.all()
+
+    def get_metadata_value_types(self):
+        return MetadataValueType.objects.all()
+
+    def get_choice_lists(self):
+        return ChoiceList.objects.all()
+
+    def get_choice_list_values(self):
+        return ChoiceListValue.objects.all()
+
+class SelectedSchema(models.Model, MetadataSchemaPermissionMixin):
+    """
+    SelectedSchema
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.PROTECT, help_text="The entity that has selected this schema")
+    schema = models.ForeignKey(Schema, blank=False, null=False, on_delete=models.PROTECT, help_text="The schema chosen by this entity")
+
+    class Meta:
+        db_table = "rdm_selected_schemas"
+
+class SelectedField(models.Model, MetadataSchemaPermissionMixin):
+    """
+    SelectedField
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.PROTECT, help_text="The entity that has selected this field")
+    field = models.ForeignKey(Field, blank=False, null=False, on_delete=models.PROTECT, help_text="The field chosen by this entity")
+    default = models.TextField(null=True, blank=True, help_text="The default value for this field.")
+    required = models.BooleanField(default=False, help_text="Whether this metadata field is required")
+    visible = models.BooleanField(default=False, help_text="Whether this metadata field should be shown in the UI")
+    order = models.IntegerField(default=-1, null=False, blank=False, help_text="0 being the first metadata field to show moving down the list. If two have the same order they probably can be shown in either order.")
+
+    class Meta:
+        db_table = "rdm_selected_fields"

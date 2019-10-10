@@ -18,10 +18,15 @@ class AuthorizationException(APIException):
     default_detail = 'Unauthorized'
     default_code = 'unauthorized'
 
-class ProjectNotCreatedException(APIException):
+class ItemNotCreatedException(APIException):
     status_code = 400
     default_detail = "Project not created."
     default_code = 'bad request'
+
+class InternalErrorException(APIException):
+    status_code = 500
+    default_detail = "Internal Server Error"
+    default_code = 'internal server error'
 
 class ElasticSearchRequestError(Exception):
     """The Project could not be created"""

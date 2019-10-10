@@ -4,15 +4,66 @@ from django.db.models import Q
 from django.utils.timezone import now
 
 from rest_framework import serializers, exceptions
+from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueValidator
 import django.contrib.auth.password_validation as password_validators
 
+from radiam.api.documents import DatasetMetadataDoc
+from radiam.api.documents import ProjectMetadataDoc
+from radiam.api.documents import ResearchGroupMetadataDoc
+
+from .exceptions import ElasticSearchRequestError
+
 from .models import (
-    User, UserAgent, ResearchGroup, GeoData, GroupRole, GroupMember, GroupViewGrant,
-    Location, LocationType, Project, Dataset, ProjectAvatar, SensitivityLevel, DatasetSensitivity,
-    DataCollectionMethod, DatasetDataCollectionMethod, DistributionRestriction,
-    DataCollectionStatus, ProjectStatistics, UserAgentProjectConfig)
+    ChoiceList,
+    ChoiceListValue,
+    DataCollectionMethod,
+    DataCollectionStatus,
+    Dataset,
+    DatasetDataCollectionMethod,
+    DatasetSensitivity,
+    DistributionRestriction,
+    Entity,
+    Field,
+    GeoData,
+    GroupMember,
+    GroupRole,
+    GroupViewGrant,
+    Location,
+    LocationType,
+    MetadataUIType,
+    MetadataValueType,
+    Project,
+    ProjectAvatar,
+    ProjectStatistics,
+    ResearchGroup,
+    Schema,
+    SelectedField,
+    SelectedSchema,
+    SensitivityLevel,
+    User,
+    UserAgent,
+    UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_project_created
+
+class MetadataSerializer():
+    def to_representation(self, instance, ret):
+        try:
+            doc = self.MetadataDoc.get(instance.id)
+            metadata = doc.to_dict().get("metadata")
+            if metadata is not None:
+                ret.update({"metadata": metadata})
+            else:
+                ret.update({"metadata" : None})
+        except ElasticSearchRequestError as error:
+            print("Unable to get metadata from elastic search index due to elastic search error " + str(error))
+            ret.update({"metadata" : None})
+        except Exception as error:
+            print("Unable to get metadata from elastic search index because " + str(error))
+            ret.update({"metadata" : None})
+        return ret
 
 class ResearchGroupPKRelatedField(serializers.PrimaryKeyRelatedField):
     """
@@ -400,14 +451,15 @@ class ProjectUserAgentSerializer(serializers.ModelSerializer):
 
         return serializer.data
 
-
-class ResearchGroupSerializer(serializers.ModelSerializer):
+class ResearchGroupSerializer(serializers.ModelSerializer, MetadataSerializer):
     parent_group = ResearchGroupPKRelatedField(
         required=False,
         allow_null=True
     )
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
+
+    MetadataDoc = ResearchGroupMetadataDoc
 
     class Meta:
         model = ResearchGroup
@@ -418,6 +470,9 @@ class ResearchGroupSerializer(serializers.ModelSerializer):
                   'date_created',
                   'date_updated',
                   'is_active')
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        return MetadataSerializer.to_representation(self, instance, ret)
 
     def create(self, validated_data):
         researchgroup = ResearchGroup.objects.create(**validated_data)
@@ -801,7 +856,7 @@ class DatasetSensitivitySerializer(serializers.ModelSerializer):
                   'sensitivity')
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer, MetadataSerializer):
     group = ResearchGroupPKRelatedField()
     avatar = serializers.PrimaryKeyRelatedField(
         queryset=ProjectAvatar.objects.all(),
@@ -810,6 +865,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
+
+    MetadataDoc = ProjectMetadataDoc
 
     class Meta:
         model = Project
@@ -847,7 +904,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         """
         try:
             geodata = validated_data.pop("get_geo_data")
-            self._save_geodata(geodata, instance)
+            if (geodata is not None):
+                self._save_geodata(geodata, instance)
         except KeyError:
             pass
 
@@ -881,6 +939,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             geodata = GeoData.objects.create(geojson=geojson_geometry, object_id=instance.id, content_type=ctype)
             geodata.save()
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        return MetadataSerializer.to_representation(self, instance, ret)
 
 class ESDatasetSerializer(serializers.Serializer):
 
@@ -899,8 +960,7 @@ class ESDatasetSerializer(serializers.Serializer):
         representation.update(instance.to_dict())
         return representation
 
-
-class DatasetSerializer(serializers.ModelSerializer):
+class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
     project = ProjectPKRelatedField()
     data_collection_status = serializers.PrimaryKeyRelatedField(
@@ -915,6 +975,8 @@ class DatasetSerializer(serializers.ModelSerializer):
     date_updated = serializers.DateTimeField(read_only=True)
 
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
+
+    MetadataDoc = DatasetMetadataDoc
 
     class Meta:
         model = Dataset
@@ -977,7 +1039,8 @@ class DatasetSerializer(serializers.ModelSerializer):
 
         try:
             geodata = validated_data.pop("get_geo_data")
-            self._save_geodata(geodata, instance)
+            if (geodata is not None):
+                self._save_geodata(geodata, instance)
         except KeyError:
             pass
 
@@ -992,6 +1055,10 @@ class DatasetSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        return MetadataSerializer.to_representation(self, instance, ret)
 
     def _save_dataset_datacollectionmethods(self, data_collection_methods_list, instance):
         """
@@ -1066,3 +1133,224 @@ class ProjectStatisticsSerializer(serializers.ModelSerializer):
                   'stat_qualifier',
                   'stat_value')
 
+class MetadataUITypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MetadataUIType
+        fields = ('id',
+                  'key',
+                  'label')
+
+class MetadataValueTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MetadataValueType
+        fields = ('id',
+                  'key',
+                  'label')
+
+class ChoiceListValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChoiceListValue
+        fields = ('id',
+                  'label',
+                  'value',
+                  'list')
+
+class ChoiceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChoiceList
+        fields = ('id',
+                  'label')
+
+class SchemaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schema
+        fields = ('id',
+                  'label')
+
+class FieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Field
+        fields = ('id',
+                  'label',
+                  'help',
+                  'schema',
+                  'parent',
+                  'metadata_ui_type',
+                  'metadata_value_type',
+                  'many_values',
+                  'choice_list',
+                  'default_order',
+                  'default_choice',
+                  'default_value')
+
+class EntityUniqueOneItemValidator:
+    """
+    A validator that makes sure that only one entity per item is created.
+    Based upon https://github.com/encode/django-rest-framework/blob/master/rest_framework/validators.py
+    """
+    found_more_message = 'We found more than one of group, project, dataset, file or folder when trying to create or update this entity'
+    def __init__(self, queryset):
+        self.queryset = queryset
+        self.fields = ('group', 'project', 'dataset', 'file', 'folder')
+
+    def enforce_required_one_item(self, attrs):
+        found_one = False
+        found_more = False
+
+        unique_fields = {}
+        for field_name in self.fields:
+            if field_name in attrs:
+                value = attrs[field_name]
+                if not value == None and not found_one:
+                    found_one = True
+                    unique_fields[field_name] = self.found_more_message
+                elif not value == None and found_one:
+                    found_more = True
+                    unique_fields[field_name] = self.found_more_message
+
+        if found_more:
+            raise ValidationError(unique_fields, code='unique')
+
+        if not found_one:
+            raise ValidationError('There needs to be at least one group, project, dataset, file or folder when trying to create or update an entity', code='unique')
+
+    def set_context(self, serializer_field):
+         self.instance = getattr(serializer_field.parent, 'instance', None)
+
+    def qs_filter(self, queryset, **kwargs):
+        try:
+            return queryset.filter(**kwargs)
+        except (TypeError, ValueError, DataError):
+            return queryset.none()
+
+    def filter_queryset(self, attrs, queryset):
+        """
+        Filter the queryset to all instances matching the given attributes.
+        """
+        # If this is an update, then any unprovided field should
+        # have it's value set based on the existing instance attribute.
+        if self.instance is not None:
+            for field_name in self.fields:
+                if field_name not in attrs:
+                    attrs[field_name] = getattr(self.instance, field_name)
+
+        # Determine the filter keyword arguments and filter the queryset.
+        filter_kwargs = {
+            field_name: attrs[field_name]
+            for field_name in self.fields
+        }
+        return self.qs_filter(queryset, **filter_kwargs)
+
+    def exclude_current_instance(self, attrs, queryset):
+        """
+        If an instance is being updated, then do not include
+        that instance itself as a uniqueness conflict.
+        """
+        if self.instance is not None:
+            return queryset.exclude(pk=self.instance.pk)
+        return queryset
+
+    def __call__(self, attrs):
+        self.enforce_required_one_item(attrs)
+        queryset = self.queryset
+        queryset = self.filter_queryset(attrs, queryset)
+        queryset = self.exclude_current_instance(attrs, queryset)
+
+    def __repr__(self):
+        return '<%s(queryset=%s, field=%s, date_field=%s)>' % (
+            self.__class__.__name__,
+            smart_repr(self.queryset),
+            smart_repr(self.field),
+            smart_repr(self.date_field)
+        )
+
+
+class EntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ('id',
+                  'group',
+                  'project',
+                  'dataset',
+                  'file',
+                  'folder')
+        validators = [
+                        EntityUniqueOneItemValidator(
+                            queryset=Entity.objects.all()
+                        )
+                    ]
+
+    group = serializers.PrimaryKeyRelatedField(queryset=ResearchGroup.objects.all(),
+            allow_null=True,
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this group.")])
+
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(),
+            allow_null=True,
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this project.")])
+
+    dataset = serializers.PrimaryKeyRelatedField(queryset=Dataset.objects.all(),
+            allow_null=True,
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this dataset.")])
+
+class SelectedSchemaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SelectedSchema
+        fields = ('id',
+                  'entity',
+                  'schema')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=SelectedSchema.objects.all(),
+                fields=('entity', 'schema')
+            )
+        ]
+
+class SelectedFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SelectedField
+        fields = ('id',
+                  'entity',
+                  'field',
+                  'default',
+                  'required',
+                  'visible',
+                  'order')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=SelectedField.objects.all(),
+                fields=('entity', 'field')
+            )
+        ]
+
+class EntitySchemaFieldSerializer (serializers.Serializer):
+    class Meta:
+        model = Entity
+        fields = ('id',
+                  'group',
+                  'project',
+                  'dataset',
+                  'file',
+                  'folder',
+                  'selected_schemas',
+                  'selected_fields',
+                  'schemas',
+                  'fields',
+                  'metadata_ui_types',
+                  'metadata_value_types',
+                  'choice_lists',
+                  'choice_list_values')
+
+    id = serializers.CharField()
+    group = serializers.CharField()
+    project = serializers.CharField()
+    dataset = serializers.CharField()
+    file = serializers.CharField()
+    folder = serializers.CharField()
+    selected_schemas = SelectedSchemaSerializer(many=True, source="get_selected_schemas")
+    selected_fields = SelectedFieldSerializer(many=True, source="get_selected_fields")
+    schemas = SchemaSerializer(many=True, source="get_schemas")
+    fields = FieldSerializer(many=True, source="get_fields")
+    metadata_ui_types = MetadataUITypeSerializer(many=True, source="get_metadata_ui_types")
+    metadata_value_types = MetadataValueTypeSerializer(many=True, source="get_metadata_value_types")
+    choice_lists = ChoiceListSerializer(many=True, source="get_choice_lists")
+    choice_list_values = ChoiceListValueSerializer(many=True, source="get_choice_list_values")

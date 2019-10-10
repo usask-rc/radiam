@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import {
+  CardActions,
   Create,
   Datagrid,
   Edit,
@@ -9,26 +10,38 @@ import {
   ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
+  RefreshButton,
   required,
   SelectInput,
   Show,
+  ShowButton,
+  ShowController,
   SimpleForm,
   SimpleShowLayout,
   SingleFieldList,
   TextField,
   TextInput,
+  translate,
+  withTranslate,
 } from 'react-admin';
+import { Typography } from "@material-ui/core";
 import * as Constants from '../_constants/index';
 import CustomPagination from '../_components/CustomPagination';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
+import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Drawer from '@material-ui/core/Drawer';
+import SettingsIcon from '@material-ui/icons/Settings';
+import PropTypes from 'prop-types';
+import compose from "recompose/compose";
 import { Prompt } from "react-router"
 
 const listStyles = {
@@ -109,7 +122,7 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-export const DatasetShow = ({ classes, ...props }) => (
+export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show title={<DatasetTitle />} {...props}>
     <SimpleShowLayout>
         <TextField
@@ -172,10 +185,26 @@ export const DatasetShow = ({ classes, ...props }) => (
           </SingleFieldList>
         </ReferenceArrayField>
 
+        /** Needs a ShowController to get the record into the ShowMetadata **/
+        <ShowController translate={translate} {...props}>
+          { controllerProps => (
+            <ShowMetadata
+              type="dataset"
+              translate={translate}
+              record={controllerProps.record}
+              basePath={controllerProps.basePath}
+              resource={controllerProps.resource}
+              id={controllerProps.record.id}
+              props={props}
+            />
+          )}
+        </ShowController>
+
+
         <MapView/>
     </SimpleShowLayout>
   </Show>
-);
+));
 
 const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
 const validateDataCollectionMethod = required('en.validate.dataset.data_collection_method');
@@ -292,6 +321,13 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
+    { this.props.mode == "edit" && this.props.id && (
+      <React.Fragment>
+        <EditMetadata id={this.props.id} type="dataset"/>
+        <ConfigMetadata id={this.props.id} type="dataset" />
+      </React.Fragment>
+    )}
+
     {props.record && 
       <MapForm content_type={'dataset'} parentRecord={props.record} id={props.record.id} geoDataCallback={geoDataCallback}/>
     }
@@ -314,11 +350,23 @@ export const DatasetTitle = ({ record }) => {
   return <span>Dataset {record ? `"${record.name}"` : ''}</span>;
 };
 
-export const DatasetEdit = props => {
+export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit title={<DatasetTitle />} {...props} >
       <DatasetForm mode={"edit"} {...other} />
     </Edit>
   );
+});
+
+const enhance = compose(
+  translate,
+  withStyles(listStyles),
+);
+
+BaseDatasetEdit.propTypes = {
+  translate: PropTypes.func.isRequired,
 };
+
+
+export const DatasetEdit = enhance(BaseDatasetEdit);

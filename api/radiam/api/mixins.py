@@ -423,3 +423,40 @@ class DatasetDetailPermissionMixin(object):
             return True
         else:
             return False
+
+class MetadataSchemaPermissionMixin(object):
+    """
+    Schema mixin object to be used with the Schema model
+    """
+
+    @staticmethod
+    def has_read_permission(request):
+        """
+        Global 'Model' permission. All users can read the metadata schemas.
+        """
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        Global 'Model' permission. Superuser and Admin user can create new schemas.
+        """
+        if request.user.is_superuser or request.user.is_admin():
+            return True
+        else:
+            return False
+
+    def has_object_read_permission(self, request):
+        """
+        Object 'Instance' permission. All user can read instances
+        """
+        return True
+
+    def has_object_write_permission(self, request):
+        """
+        Object 'Instance' permission:
+        """
+        if request.user.is_superuser or request.user.is_project_admin(self):
+            return True
+        else:
+            return False
