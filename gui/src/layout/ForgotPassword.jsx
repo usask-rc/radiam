@@ -1,58 +1,70 @@
-import React, { Component } from 'react'
-import PropTypes from "prop-types";
-import { propTypes, reduxForm, Field } from "redux-form";
-import { connect } from "react-redux";
-import compose from "recompose/compose";
-import Avatar from "@material-ui/core/Avatar";
+import React, { Component, useState } from 'react'
+import { Field } from "redux-form";
 import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
-import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { translate } from "react-admin";
 import * as Constants from "../_constants/index";
 import "react-toastify/dist/ReactToastify.css";
+import { TextField } from '@material-ui/core';
 
 
+const validateEmail = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+  'Invalid email address' : undefined
 
-const ForgotPassword = ({classes, handleSubmit, handleChange, renderInput, forgotPassword, toggleForgotPassword, validateEmail}) => {
+const ForgotPassword = ({classes, translate, renderInput, forgotPassword, toggleForgotPassword}) => {
 
-    return(<React.Fragment>
-        <form onSubmit={handleSubmit(forgotPassword)}>
-          <div className={classes.form}>
+    const [email, setEmail] = useState('')
+
+    const handleChange = (event) => {
+        if (event.target.name === 'email' && validateEmail(event.target.value) === undefined){
+            setEmail(event.target.value)
+            console.log("email set to: ", email)
+        }
+        else if (event.targete.name === 'email'){
+            setEmail(null)
+        }
+    }
+    /*
+    const handleSubmit = (event) => {
+        if 
+    }*/
+
+    return (
+        <React.Fragment>
+            <div className={classes.form}>
             <div className={classes.input}>
-              <Field
+                <TextField
                 autoFocus
                 name={Constants.login_details.EMAIL}
-                component={renderInput}
                 onChange={handleChange}
                 label={translate("en.auth.email")}
-                validate={validateEmail}
-              />
+                validate={validateEmail}/>
             </div>
-          </div>
-          <CardActions className={classes.actions}>
-            <Button
-              variant="outlined"
-              type={Constants.fields.SUBMIT}
-              color="primary"
-              className={classes.button}
-              fullWidth
-            >
-              {translate("en.auth.send_email")}
-            </Button>
-          </CardActions>
-          <Button
+            </div>
+            <CardActions className={classes.actions}>
+        <Button
             variant="outlined"
-            color="inherit"
+            onClick={handleSubmit}
+            color="primary"
             className={classes.button}
-            onClick={toggleForgotPassword}
             fullWidth
-          >
-            {translate("en.auth.return_to_login")}
-          </Button>
-        </form>
-      </React.Fragment>)
+        >
+            {translate("en.auth.send_email")}
+        </Button>
+        </CardActions>
+        <Button
+        variant="outlined"
+        color="inherit"
+        className={classes.button}
+        onClick={toggleForgotPassword}
+        fullWidth
+        >
+        {translate("en.auth.return_to_login")}
+        </Button>
+        </React.Fragment>
+    )
 }
 
 export default ForgotPassword

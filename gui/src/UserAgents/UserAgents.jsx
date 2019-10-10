@@ -205,28 +205,6 @@ export const UserAgentCreate = props => {
     </Create>
   )
 };
-/*<ArrayInput source="project_config_list">
-          <SimpleFormIterator>
-            <TextInput source="project" label={"en.models.agents.project_name"} />
-          </SimpleFormIterator>
-        </ArrayInput>
-        
-        <ReferenceInput
-        label={"en.models.agents.projects"}
-        source={"project_config_list"}
-        reference={Constants.models.PROJECTS}>
-          <SelectInput source={Constants.model_fields.NAME}/>
-        </ReferenceInput>
-        
-         <ReferenceArrayInput
-      allowEmpty
-      label={"en.models.projects.name"}
-      source={"project_config_list"}
-      reference={Constants.models.PROJECTS}
-      perPage={100}>
-            <SelectArrayInput optionText={"name"} optionValue={"name"}/>
-      </ReferenceArrayInput>
-        */
 
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props

@@ -23,7 +23,6 @@ import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "@material-ui/core";
-import ForgotPassword from "./ForgotPassword";
 
 const styles = theme => ({
   actions: {
@@ -105,6 +104,21 @@ class Login extends Component {
   };
 
 
+  //TODO: the below Toasts need to be put in the Constants or the Translation file.
+  forgotPassword = () => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
+      email: this.state.email
+    })
+      .then(response =>
+        toast.success("Please check your email for a password reset link.")
+      )
+      .catch(err =>
+        toast.success("Please check your email for a password reset link.")
+      );
+    this.toggleForgotPassword();
+  };
+
   toggleForgotPassword = () => {
     this.setState(state => ({ forgotpassword: !state.forgotpassword }));
   };
@@ -176,7 +190,46 @@ class Login extends Component {
                 </div>
             </React.Fragment>
           ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
-              <ForgotPassword renderInput={renderInput} handleChange forgotPassword toggleForgotPassword validateEmail={validateEmail} {...this.props}/>
+              <React.Fragment>
+                <form onSubmit={handleSubmit(this.forgotPassword)}>
+                  <div className={classes.form}>
+                    <div className={classes.input}>
+                      <Field
+                        autoFocus
+                        name={Constants.login_details.EMAIL}
+                        component={renderInput}
+                        onChange={this.handleChange}
+                        label={translate("en.auth.email")}
+                        disabled={isLoading}
+                        validate={validateEmail}
+                      />
+                    </div>
+                  </div>
+                  <CardActions className={classes.actions}>
+                    <Button
+                      variant="outlined"
+                      type={Constants.fields.SUBMIT}
+                      color="primary"
+                      disabled={isLoading}
+                      className={classes.button}
+                      fullWidth
+                    >
+                      {isLoading && <CircularProgress size={25} thickness={2} />}
+                      {translate("en.auth.send_email")}
+                    </Button>
+                  </CardActions>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    disabled={isLoading}
+                    className={classes.button}
+                    onClick={this.toggleForgotPassword}
+                    fullWidth
+                  >
+                    {translate("en.auth.return_to_login")}
+                  </Button>
+                </form>
+              </React.Fragment>
             )}
         </Card>
         <ToastContainer />

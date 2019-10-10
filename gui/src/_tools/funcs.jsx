@@ -8,32 +8,9 @@ export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-    /*return (
-      window.location.protocol +
-      '//' +
-      window.location.hostname +
-      ':' +
-      Constants.API_PORT +
-      Constants.API_ENDPOINT
-    );*/
+    
   }
   return Constants.API_ENDPOINT;
-}
-
-export function largestCommonPrefix(f1, f2) {
-  for (var i = 0; i < f1.length; i++) {
-    if (f1[i] && f2[i]) {
-      if (f1[i] !== f2[i]) {
-        return f1.slice(0, i);
-      }
-    } else if (f1[i]) {
-      return f2;
-    } else if (f2[i]) {
-      return f1;
-    } else {
-      return f1;
-    }
-  }
 }
 
 export function toastErrors(data) {
