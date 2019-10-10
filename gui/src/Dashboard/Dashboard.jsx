@@ -12,14 +12,10 @@ import RecentFiles from './RecentFiles/RecentFiles';
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.getRecentUsers = this.getRecentUsers.bind(this);
-    this.getRecentGroups = this.getRecentGroups.bind(this);
-    this.getRecentProjects = this.getRecentProjects.bind(this);
-    this.handleDateLimitChange = this.handleDateLimitChange.bind(this);
     this.state = { loading: true, hasFiles: false };
   }
 
-  getRecentUsers() {
+  getRecentUsers = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -34,9 +30,9 @@ class Dashboard extends Component {
         this.setState({ newUsers });
         this.setState({ nbNewUsers: newUsers.reduce(nb => ++nb, 0) });
       });
-  }
+  };
 
-  getRecentGroups() {
+  getRecentGroups = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -53,11 +49,11 @@ class Dashboard extends Component {
         this.setState({ newGroups });
         this.setState({ nbNewGroups: newGroups.reduce(nb => ++nb, 0) });
       });
-  }
+  };
 
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
-  getRecentProjects(dateLimit = 21) {
+  getRecentProjects = (dateLimit = 21) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
@@ -112,7 +108,7 @@ class Dashboard extends Component {
         });
         this.setState({ projects });
       });
-  }
+  };
 
   //when component mounts, get the data we need to display on the front page.
   componentDidMount() {
@@ -121,9 +117,9 @@ class Dashboard extends Component {
     this.getRecentProjects();
   }
 
-  handleDateLimitChange(daysSince) {
+  handleDateLimitChange = daysSince => {
     this.getRecentProjects(daysSince)
-  }
+  };
 
   render() {
     return (

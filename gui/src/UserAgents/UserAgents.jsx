@@ -8,14 +8,16 @@ import {
   Edit,
   Filter,
   List,
-  LongTextInput,
+  NumberInput,
+  ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
-  ReferenceArrayInput,
   required,
+  SelectArrayInput,
   SelectInput,
   Show,
   SimpleForm,
+  SimpleFormIterator,
   SimpleShowLayout,
   TextField,
   TextInput,
@@ -24,12 +26,10 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { SelectArrayInput, FileInput, DisabledInput } from "ra-ui-materialui/lib/input";
-import { FileField } from "ra-ui-materialui/lib/field/FileField";
+import { regex, number, minValue, FormDataConsumer } from "ra-core";
+import { Grid, Typography } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
-import { SimpleFormIterator } from "ra-ui-materialui/lib/form";
-import { NumberInput } from "ra-ui-materialui/lib/input/NumberInput";
-import { ProjectName } from "../_components/_fields/ProjectName";
+import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 
 const filterStyles = {
   form: {
@@ -149,7 +149,9 @@ export const UserAgentShow = props => (
   </Show>
 );
 
-const validateLocation = required('en.validate.useragents.locations');
+const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
+const validateCrawlTime = [number(), minValue(1)]
+const validateLocation=required('en.validate.useragents.location')
 const validateUser = required('en.validate.useragents.user');
 
 export const UserAgentTitle = ({ record }) => {
@@ -158,85 +160,123 @@ export const UserAgentTitle = ({ record }) => {
 
 //TODO: some values must be moved to the Strings file.
 export const UserAgentCreate = props => {
-  function handleSubmit(data) {
-    console.log("data in onSave is: ", data)
 
-  }
-
-  function handleChange(data) {
-    console.log("handlechange data is: ", data)
-  }
-  console.log("useragentcreate")
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <SimpleForm {...props} save={handleSubmit} onChange={handleChange}>
-      <ReferenceInput
-      label={"en.models.agents.user"}
-      source={Constants.model_fk_fields.USER}
-      reference={Constants.models.USERS}
-      validate={validateUser}
-    >
-      <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
-    </ReferenceInput>
-      <ReferenceInput
-      label={"en.models.agents.location"}
-      source={Constants.model_fk_fields.LOCATION}
-      reference={Constants.models.LOCATIONS}
-      validate={validateLocation}
-    >
-      <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
-    </ReferenceInput>
-
-      <ArrayInput source="project_config_list">
-        <SimpleFormIterator>
-          <TextInput source="project" label={"en.models.agents.project_name"}/>
-          <TextInput source="config.rootdir" label={"en.models.agents.rootdir"} />
-        </SimpleFormIterator>
-      </ArrayInput>
-      <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
-      <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
-      <TextInput source="version" label={"en.models.agents.version"} />
-      <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-    </SimpleForm>
+      <SimpleForm {...props}>
+        <ReferenceInput
+        label={"en.models.agents.user"}
+        source={Constants.model_fk_fields.USER}
+        reference={Constants.models.USERS}
+        validate={validateUser}
+        >
+          <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
+        </ReferenceInput>
+        <ReferenceInput
+          label={"en.models.agents.location"}
+          source={Constants.model_fk_fields.LOCATION}
+          reference={Constants.models.LOCATIONS}
+          filter={{location_type: Constants.LOCATIONTYPE_OSF}}
+          validate={validateLocation}
+        >
+          <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
+        </ReferenceInput>
+       
+        <ArrayInput source="project_config_list">
+          <SimpleFormIterator>
+            
+          <ReferenceInput
+        label={"en.models.agents.projects"}
+        source={"project"}
+        reference={Constants.models.PROJECTS}>
+          <SelectInput optionText={"name"}/>
+        </ReferenceInput>
+          </SimpleFormIterator>
+        </ArrayInput>
+    
+        
+        <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
+        <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
+        <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
+        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
+        <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+      </SimpleForm>
     </Create>
   )
 };
+/*<ArrayInput source="project_config_list">
+          <SimpleFormIterator>
+            <TextInput source="project" label={"en.models.agents.project_name"} />
+          </SimpleFormIterator>
+        </ArrayInput>
+        
+        <ReferenceInput
+        label={"en.models.agents.projects"}
+        source={"project_config_list"}
+        reference={Constants.models.PROJECTS}>
+          <SelectInput source={Constants.model_fields.NAME}/>
+        </ReferenceInput>
+        
+         <ReferenceArrayInput
+      allowEmpty
+      label={"en.models.projects.name"}
+      source={"project_config_list"}
+      reference={Constants.models.PROJECTS}
+      perPage={100}>
+            <SelectArrayInput optionText={"name"} optionValue={"name"}/>
+      </ReferenceArrayInput>
+        */
 
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  return (
-    <Edit title={<UserAgentTitle />} {...props}>
-      <SimpleForm>
-      <ReferenceInput
-      label={"en.models.agents.user"}
-      source={Constants.model_fk_fields.USER}
-      reference={Constants.models.USERS}
-      validate={validateUser}
-    >
-      <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
-    </ReferenceInput>
-      <ReferenceInput
-      label={"en.models.agents.location"}
-      source={Constants.model_fk_fields.LOCATION}
-      reference={Constants.models.LOCATIONS}
-      validate={validateLocation}
-    >
-      <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
-    </ReferenceInput>
 
-      <ArrayInput source="project_config_list">
-        <SimpleFormIterator>
-        <ReferenceInput label={"en.models.agents.projects"}  reference={Constants.models.PROJECTS} source={Constants.model_fk_fields.PROJECT} allowEmpty>
-          <SelectInput source={Constants.model_fields.name} optionText={<ProjectName basePath={props.basePath} label={"en.models.projects.name"}/>}/>
-        </ReferenceInput>
-          <TextInput source="config.rootdir" label={"en.models.agents.rootdir"} />
-        </SimpleFormIterator>
-      </ArrayInput>
-      <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} />
-      <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"}/>
-      <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-    </SimpleForm>
+  return (
+    <Edit {...props}>
+      <SimpleForm>
+      <ReferenceField
+        linkType={false}
+        label={"en.models.agents.location"}
+        source={Constants.model_fk_fields.LOCATION}
+        reference={Constants.models.LOCATIONS}
+      >
+        <LocationShow/>
+      </ReferenceField>
+      <ReferenceField
+        linkType={false}
+        label={"en.models.agents.user"}
+        source={Constants.model_fk_fields.USER}
+        reference={Constants.models.USERS}
+        allowEmpty={false}
+      >
+        <UserShow />
+      </ReferenceField>
+      <React.Fragment>
+      
+        <Grid container direction="row">
+          <Grid xs={12}>
+            <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
+          </Grid>
+          <Grid xs={12}>
+            <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+          </Grid>
+          <Grid xs={12}>
+            <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+          </Grid>
+        </Grid>
+        </React.Fragment>
+      </SimpleForm>
     </Edit>
+
   );
 }
+/*
+<ReferenceField
+        linkType={false}
+        label={"en.models.agents.location"}
+        source={Constants.model_fk_fields.LOCATION}
+        reference={Constants.models.LOCATIONS}
+      >
+        <TextField source={Constants.model_fields.DISPLAY_NAME} />
+      </ReferenceField>
+*/

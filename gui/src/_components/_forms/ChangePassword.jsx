@@ -55,14 +55,11 @@ const styles = theme => ({
 //TODO: move api call to the central security provider file if possible once this functionality is completed.
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangePassword extends Component {
-
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.state = { password: "", newPassword: "", confirmPassword: ""}
   }
-
 
   changePassword(userID) {
     let headers = new Headers({ "Content-Type": "application/json" });
@@ -76,13 +73,13 @@ class ChangePassword extends Component {
       //TODO: no token?  Log the user out.
       //no idea how to do this when I have no access to History since authprovider is monopolized by the Admin component.
       toastErrors(
-        "No authentication token detected.  Please return to the login page, then return here and try again."
+        Constants.warnings.NO_AUTH_TOKEN
       );
       return;
     }
 
     const request = new Request(
-      getAPIEndpoint() + "/users/" + userID + "/set_password/",
+      `${getAPIEndpoint()}/${Constants.models.USERS}/${userID}/${Constants.paths.SET_PASSWORD}/`,
       {
         method: Constants.methods.POST,
         body: JSON.stringify({ ...this.state }),
@@ -115,7 +112,7 @@ class ChangePassword extends Component {
       })
       .catch(err => {
         toastErrors(
-          "You may have a connection issue.  Please try refreshing the page and trying again."
+          Constants.warnings.NO_CONNECTION
         );
       });
   }
@@ -124,7 +121,7 @@ class ChangePassword extends Component {
     event.preventDefault();
 
     //get uuid from storage
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     if (user && user.id) {
       //the endpoint we need is at /users/${user.id}/set_password/
       if (this.state.newPassword === this.state.confirmPassword) {
@@ -140,9 +137,9 @@ class ChangePassword extends Component {
     }
   };
 
-  handleChange(e) {
+  handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
-  }
+  };
 
   //TODO: the strings below aren't in the translation file - I can't figure out how to get them to translate properly here.
   //TODO: tags below (form, h4) should be converted to material-ui element.

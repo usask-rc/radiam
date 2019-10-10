@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {
   CardActions,
   Create,
+  CreateButton,
   Datagrid,
   Edit,
   Filter,
@@ -38,12 +39,15 @@ import { ProjectStepper } from "../_components/ProjectStepper.jsx";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
 import SettingsIcon from '@material-ui/icons/Settings';
 import compose from "recompose/compose";
 import { FormDataConsumer } from 'ra-core';
 import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
+import RelatedDatasets from '../Datasets/RelatedDatasets';
+import { Drawer } from '@material-ui/core';
+import { DatasetCreate } from '../Datasets/Datasets';
+import { Route } from "react-router"
 
 const styles = {
   actions: {
@@ -136,6 +140,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
         <TabbedShowLayout>
           <Tab label={'summary'}>
             <ProjectName label={'en.models.projects.name'} />
+            <RelatedDatasets projectID={props.id} {...props} />
             <TextField
               label={'en.models.projects.keywords'}
               source={Constants.model_fields.KEYWORDS}
@@ -170,9 +175,8 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             </ShowController>
             <MapView/>
           </Tab>
-          <Tab label={'files'} path={'files'}>
+          <Tab label={Constants.model_fields.FILES} path={Constants.model_fields.FILES}>
             <ProjectName label={'en.models.projects.name'} />
-
             <FilesTab projectID={props.id} />
           </Tab>
           <Tab label={'browse'} path={'browse'}>
@@ -273,6 +277,15 @@ const enhance = compose(
   translate,
   withStyles(styles),
 );
+const TagCreateActions = ({id}) => 
+{
+  //create a dataset
+  console.log("props in tagcreateactions is: ", id)
+return(
+  <CardActions>
+    <RelatedDatasets projectID={id} />
+  </CardActions>
+)};
 
 export const ProjectEdit = enhance(BaseProjectEdit);
 

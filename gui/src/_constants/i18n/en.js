@@ -244,9 +244,10 @@ export default {
         },
       }
     },
-    search: "Search",
-    language: "Language",
-    loading: "Loading",
+    search: 'Search',
+    language: 'Language',
+    loading: 'Loading...',
+    loading_error: 'Error loading information:',
     settings: {
       label: 'Settings',
       update_password: 'Update Account Password',
@@ -271,7 +272,7 @@ export default {
       dark: 'Dark',
     },
     sidebar: {
-      agents: 'User Agents',
+      agents: 'Agents',
       data_collection_method: 'Data Collection Methods',
       data_collection_status: 'Data Collection Statuses',
       datasets: 'Datasets',
@@ -288,7 +289,7 @@ export default {
       users: 'Users',
     },
     dashboard: {
-      agents: 'User Agents',
+      agents: 'Agents',
       agent: {
         available_at: 'Download the Radiam agent for ',
         description:
@@ -348,11 +349,11 @@ export default {
         crawl_minutes: 'Minutes between crawls',
         version: 'Agent Version',
         projects: 'Associated Project', 
-        rootdir: "Project Root Directory",
-        remoteapiusername: "Remote System Username",
-        remoteapitoken: "Remote System Token",
-        active: "Active?",
-        project_name: "Name of Project"
+        rootdir: 'Project Root Directory',
+        remoteapiusername: 'Remote System Username',
+        remoteapitoken: 'Remote System Token',
+        active: 'Active?',
+        project_name: 'Name of Project'
       },
       datasets: {
         data_abstract: 'Data Abstract',
@@ -579,8 +580,9 @@ export default {
         role: 'A Role is required if selecting a group.',
       },
       useragents: {
-        locations: 'A location is required for this user agent.',
-        user: 'A user is required for this user agent.',
+        locations: 'A location is required for this agent.',
+        user: 'A user is required for this agent.',
+        version: 'Version Number is in format X.X.X ',
       },
     },
     warnings: {}

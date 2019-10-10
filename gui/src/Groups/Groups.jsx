@@ -169,6 +169,11 @@ const GroupTitle = ({ record }) => {
 
 const validateName = required('en.validate.group.group_name');
 const validateDescription = required('en.validate.group.description');
+const validateParentGroup = (value, allValues) => {
+  if (value && allValues.id === value){
+    return 'A Group may not be a parent group of itself'
+  }
+}
 
 const asyncValidate = getAsyncValidateNotExists({id: Constants.model_fields.ID, name : Constants.model_fields.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, Constants.models.GROUPS);
 
@@ -220,6 +225,7 @@ return(
       label={"en.models.groups.parent_group"}
       source={Constants.model_fk_fields.PARENT_GROUP}
       reference={Constants.models.GROUPS}
+      validate={validateParentGroup}
       allowEmpty
     >
       <SelectInput

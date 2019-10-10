@@ -99,22 +99,11 @@ const PageOne = ({ classes, values, handleNext, ...props }) =>
 {
   const [dirty, setDirty] = useState(false)
 
-  //TODO: case of returning to this page from a subsequent page and then leaving is not covered.  ADM-1569
-  /*
-  useEffect(() => {
-    Object.keys(props.record).map(key => {
-      if (props.record[key] !== props.record.value){
-        setDirty(true)
-      }
-    })
-  }, [])
-*/
+  //TODO: make the `on dirty` thing work here.  For some reason, this page gets marked as dirty on entry as handleChange is instantly triggered.  Weird.
   const handleChange=(data) => {
     setDirty(true)
   }
 
-  console.log("pageone props: ", props)
-  console.log("pageone values: ", values)
 return(
   <React.Fragment>
   <SimpleForm
@@ -122,7 +111,7 @@ return(
       handleNext={handleNext} />}
     asyncValidate={props.record.id ? null : asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
     asyncBlurFields={[Constants.model_fields.NAME]}
-    onChange={handleChange}
+    
   >
     {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={Constants.model_fields.ID} defaultValue={props.record.id} />}
     <TextInput
@@ -131,6 +120,7 @@ return(
       source={Constants.model_fields.NAME}
       validate={validateName}
       defaultValue={props.record.name || ""}
+      onChange={handleChange}
     />
     <ReferenceInput
       resource={"projectavatars"}
@@ -145,13 +135,16 @@ return(
     >
       <SelectInput
         source="avatar_image"
-        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />} />
+        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />}
+        onChange={handleChange}
+         />
     </ReferenceInput>
     <TextInput
       className="input-medium"
       label={"en.models.projects.keywords"}
       source={Constants.model_fields.KEYWORDS}
       defaultValue={props.record.keywords || ""}
+      onChange={handleChange}
     />
   </SimpleForm>
   <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
@@ -164,11 +157,9 @@ class PageThree extends Component {
   constructor(props){
     super(props)
     this.state = {geo: this.props.record.geo, isDirty: false }
-    this.geoDataCallback = this.geoDataCallback.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  geoDataCallback(geo){
+  geoDataCallback = geo => {
     //send our geodata back up to the stepper, we don't have any reason to handle it here.
     console.log("receiving geodata from map in gDC: ", geo)
 
@@ -176,9 +167,9 @@ class PageThree extends Component {
       this.setState({geo: geo})
       this.setState({isFormDirty: true})
     }
-  }
+  };
 
-  handleSubmit(data) {
+  handleSubmit = data => {
     this.setState({isFormDirty: false}, () => {
       submitObjectWithGeo(data, this.state.geo, this.props)
     }
@@ -196,7 +187,7 @@ class PageThree extends Component {
       <React.Fragment>
       <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
         {record && 
-          <MapForm content_type={'project'} parentRecord={record} id={record.id} geoDataCallback={this.geoDataCallback}/>
+          <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
         }
       </SimpleForm>
       <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
@@ -210,15 +201,14 @@ class PageThree extends Component {
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.getAllParentGroups = this.getAllParentGroups.bind(this);
-    this.getUserList = this.getUserList.bind(this);
     this.state = { group: null, groupList: [], isFormDirty: false, userList: new Set() }
   }
-  handleChange(event, index, id, value) {
+
+  handleChange = (event, index, id, value) => {
+    console.log("handlechange in pagetwo trigger")
     this.setState({ group: index, groupList: [], isFormDirty: true, userList: new Set() })
     this.getAllParentGroups(index)
-  }
+  };
 
   componentDidMount() {
     //I don't know why this can't use dot notation, but apparently group appears in prop and can only be accessed in Dict notation.
@@ -235,7 +225,7 @@ class PageTwo extends Component {
     }
   }
 
-  getAllParentGroups(group_id) {
+  getAllParentGroups = group_id => {
     //get this group and any parent group
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
@@ -253,10 +243,10 @@ class PageTwo extends Component {
     }).catch(err => {
       console.error("Error in getAllParentGroups: ", err)
     })
-  }
+  };
 
   //TODO: this can result in duplicate users, but the functionality itself is just fine.  This eventually should be fixed but is just an aesthetic issue.
-  getUserList(group) {
+  getUserList = group => {
 
     const params = { filter: { group: group }, pagination: { page: 1, perPage: 100 }, sort: { field: "id", order: "DESC" } }
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -274,7 +264,8 @@ class PageTwo extends Component {
     }).catch(err => {
       console.error("in useeffect hook in pagethree, error is: ", err)
     })
-  }
+  };
+
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
@@ -362,9 +353,6 @@ export class ProjectStepper extends React.Component {
     const { classes, translate } = this.props;
     const steps = [translate('en.models.projects.steps.name'), translate('en.models.projects.steps.researchgroup'), translate('en.models.projects.steps.map')];
     const { activeStep } = this.state;
-
-    console.log("props in projectstepper are: ", this.props)
-    console.log("state in projectstepper is: ", this.state)
 
     return (
       <Stepper activeStep={activeStep} orientation="vertical">

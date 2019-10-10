@@ -329,7 +329,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
     )}
 
     {props.record && 
-      <MapForm content_type={'dataset'} parentRecord={props.record} id={props.record.id} geoDataCallback={geoDataCallback}/>
+      <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
     }
     <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
 

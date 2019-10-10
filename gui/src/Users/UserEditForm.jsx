@@ -1,27 +1,70 @@
 import React, { Component } from 'react';
 import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
-import { getAPIEndpoint } from '../_tools';
+import { getAPIEndpoint, radiamRestProvider, httpClient } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { email, maxLength, minLength, required } from 'ra-core';
+import { email, maxLength, minLength, required, GET_LIST, GET_ONE } from 'ra-core';
 import { toastErrors } from '../_tools/funcs';
 import { Prompt } from 'react-router';
+import UserGroupsDisplay from './UserGroupsDisplay';
 
 const validateUsername = [required('en.validate.user.username'), minLength(5), maxLength(20)];
 const validateEmail = [required('en.validate.user.email'), email()];
 
-//this exists to combine the User Creation form and the GroupMember Association form into a single page.
+//we want a horizontal display to match our other chip displays elsewhere in the application.
+const styles = theme => ({
+    chipDisplay: {
+        display: 'flex',
+        justifyContent: 'left',
+        flexWrap: 'wrap',
+    },
+});
 class UserEditForm extends Component {
-
     constructor(props) {
         super(props);
-        this.state = { ...props.record, isFormDirty: false }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelectChange = this.handleSelectChange.bind(this);
+        this.state = { ...props.record, groupMembers: [], isFormDirty: false }
     }
 
-    handleSubmit() {
+    componentDidMount(){
+        this.getAllRoles();
+    }
+
+    //TODO: make this asynchronous and put it in funcs.jsx
+    getAllRoles() {
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+        .then(groupRoles => {
+
+            const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+            const { id, is_active } = this.props.record
+
+            dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+                filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
+            }).then(response => response.data)
+                .then(groupMembers => {
+                    this.setState({ groupMembers });
+
+                    groupMembers.map(groupMember => {
+                        dataProvider(GET_ONE, Constants.models.GROUPS, {
+                            id: groupMember.group
+                        }).then(response => {
+                            return response.data
+                        }).then(researchgroup => {
+                            groupMember.group = researchgroup
+                            groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                            this.setState([...this.state.groupMembers, groupMember])
+                        })
+                            .catch(err => console.error("error in attempt to get researchgroup with associated groupmember: " + err))
+                        return groupMember
+                    })
+                return groupMembers
+
+                })
+                .catch(err => toastErrors("err in attempt to fetch all groupmembers of user: ", err))
+        })
+    }
+
+    handleSubmit = () => {
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -31,7 +74,7 @@ class UserEditForm extends Component {
         } else {
             //TODO: logout the user.
             toastErrors(
-                "No authentication token detected.  Please logout and back in to proceed."
+                Constants.warnings.NO_AUTH_TOKEN
             );
         }
 
@@ -62,19 +105,21 @@ class UserEditForm extends Component {
         else {
             toastErrors("Please enter your Username and Email Address.");
         }
-    }
+    };
 
-    handleChange(e) {
+    handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
         this.setState({isFormDirty: true})
-    }
+    };
+
     //strangely, the selects and date need a different change handler.
-    handleSelectChange(key_in_dict, value, prevValue, target) {
+    handleSelectChange = (key_in_dict, value, prevValue, target) => {
         this.setState({ [target]: value })
         this.setState({isFormDirty: true})
-    }
+    };
 
     render() {
+        const {groupMembers} = this.state
         return (<React.Fragment>
             <SimpleForm
                 onSubmit={this.handleSubmit}
@@ -121,6 +166,8 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
+                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay classes={styles} groupMembers={groupMembers}/>}
+
             </SimpleForm>
             <Toolbar>
                 <SaveButton

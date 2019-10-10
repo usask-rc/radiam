@@ -22,8 +22,34 @@ import { lightTheme } from "./themes";
 import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "@material-ui/core";
 
 const styles = theme => ({
+  actions: {
+    padding: "0 1em 1em 1em"
+  },
+  avatar: {
+    margin: "1em",
+    display: "flex",
+    justifyContent: "center"
+  },
+  card: {
+    minWidth: 300,
+    marginTop: "6em"
+  },
+  forgotContainer: {
+    alignItems: "center",
+    textAlign: "center",
+  },
+  form: {
+    padding: "0 1em 1em 1em"
+  },
+  icon: {
+    backgroundColor: theme.palette.secondary.main
+  },
+  input: {
+    marginTop: "1em"
+  },
   main: {
     display: "flex",
     flexDirection: "column",
@@ -33,28 +59,10 @@ const styles = theme => ({
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover"
   },
-  card: {
-    minWidth: 300,
-    marginTop: "6em"
-  },
-  avatar: {
-    margin: "1em",
-    display: "flex",
-    justifyContent: "center"
-  },
-  icon: {
-    backgroundColor: theme.palette.secondary.main
-  },
-  form: {
-    padding: "0 1em 1em 1em"
-  },
-  input: {
-    marginTop: "1em"
-  },
-  actions: {
-    padding: "0 1em 1em 1em"
-  }
 });
+const validateEmail = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+  'Invalid email address' : undefined
 
 // see http://redux-form.com/6.4.3/examples/material-ui/
 const renderInput = ({
@@ -80,40 +88,41 @@ class Login extends Component {
       token: "",
       reset_password: ""
     };
-    this.toggleForgotPassword = this.toggleForgotPassword.bind(this);
-    this.forgotPassword = this.forgotPassword.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
   handleSubmit(event) {
     this.submitForm();
     event.preventDefault();
   }
-  handleChange(e) {
+
+  handleChange = e => {
     // If you are using babel, you can use ES 6 dictionary syntax
     // let change = { [e.target.name] = e.target.value }
     let change = {};
     change[e.target.name] = e.target.value;
     this.setState(change);
-  }
+  };
 
-  forgotPassword() {
+
+  //TODO: the below Toasts need to be put in the Constants or the Translation file.
+  forgotPassword = () => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: this.state.email
     })
       .then(response =>
-        toast.success("Check your email for a password reset link.")
+        toast.success("Please check your email for a password reset link.")
       )
       .catch(err =>
-        toast.success("Check your email for a password reset link.")
+        toast.success("Please check your email for a password reset link.")
       );
     this.toggleForgotPassword();
-  }
+  };
 
-  toggleForgotPassword() {
+  toggleForgotPassword = () => {
     this.setState(state => ({ forgotpassword: !state.forgotpassword }));
-  }
+  };
+
   login = auth =>
     this.props.userLogin(
       auth,
@@ -170,18 +179,17 @@ class Login extends Component {
                   </Button>
                 </CardActions>
               </form>
-              <Button
-                variant="outlined"
-                color="inherit"
+              <div className={classes.forgotContainer}>
+              <Link
                 disabled={isLoading}
-                className={classes.button}
                 onClick={this.toggleForgotPassword}
                 fullWidth
               >
                 {translate("en.auth.forgot")}
-              </Button>
+                </Link>
+                </div>
             </React.Fragment>
-          ) : (
+          ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
               <React.Fragment>
                 <form onSubmit={handleSubmit(this.forgotPassword)}>
                   <div className={classes.form}>
@@ -193,6 +201,7 @@ class Login extends Component {
                         onChange={this.handleChange}
                         label={translate("en.auth.email")}
                         disabled={isLoading}
+                        validate={validateEmail}
                       />
                     </div>
                   </div>

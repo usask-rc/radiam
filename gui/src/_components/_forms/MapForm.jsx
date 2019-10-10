@@ -5,6 +5,7 @@ import L from "leaflet";
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
 import { withStyles } from '@material-ui/core';
+import equal from "fast-deep-equal"
 
 const styles = {
     mapDisplay: {
@@ -20,12 +21,18 @@ const styles = {
 class MapForm extends Component {
     constructor(props){
         super(props);
-        this.state = {geo: props.parentRecord ? props.parentRecord.geo : {}, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
+        this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
         this.updateGeo = this.updateGeo.bind(this)
         this._updateFeatures = this._updateFeatures.bind(this)
         this.featuresCallback = this.featuresCallback.bind(this)
         this.success = this.success.bind(this)
         this._onPopupClose = this._onPopupClose.bind(this)
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot){
+        if (!equal(prevState.geo, this.state.geo)){
+            console.log("geo has updated in mapform.  new state: ", this.state)
+        }
     }
 
     error(err) {

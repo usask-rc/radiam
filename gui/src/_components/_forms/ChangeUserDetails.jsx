@@ -6,6 +6,7 @@ import { radiamRestProvider, httpClient } from "../../_tools";
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
+import englishMessages from "../../_constants/i18n/en"
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -76,7 +77,7 @@ class ChangeDetails extends Component {
     getUserDetails() {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
-            const localID = JSON.parse(localStorage.getItem("user")).id
+            const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
 
             console.log("id as stored in local storage is: ", localID)
             if (response.data.id === localID) {
@@ -84,7 +85,7 @@ class ChangeDetails extends Component {
             }
             else {
                 //TODO: user in storage does not match.  Log the user out.  Figure out how to do that.
-                toastErrors("Could not authenticate.  Please log out and back in, then try again.")
+                toastErrors(Constants.warnings.NO_AUTH_TOKEN)
             }
         }).catch(err => {
             toastErrors("Could not connect to server.  Please refresh the page and then try again.")
@@ -119,44 +120,44 @@ class ChangeDetails extends Component {
 
                                         <TextField
                                             id={Constants.model_fields.USERNAME}
-                                            label={Constants.model_fields.USERNAME}
+                                            label={englishMessages.en.models.users.username}
                                             value={this.state.username}
-                                            onChange={this.handleChange('username')}
+                                            onChange={this.handleChange(Constants.model_fields.USERNAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
 
                                         <TextField
                                             id={Constants.model_fields.FIRST_NAME}
-                                            label={Constants.model_fields.FIRST_NAME}
+                                            label={englishMessages.en.models.users.fname}
                                             value={this.state.first_name}
-                                            onChange={this.handleChange('first_name')}
+                                            onChange={this.handleChange(Constants.model_fields.FIRST_NAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
 
                                         <TextField
                                             id={Constants.model_fields.LAST_NAME}
-                                            label={Constants.model_fields.LAST_NAME}
+                                            label={englishMessages.en.models.users.lname}
                                             value={this.state.last_name}
-                                            onChange={this.handleChange('last_name')}
+                                            onChange={this.handleChange(Constants.model_fields.LAST_NAME)}
                                         />
                                     </div>
                                     <div className={styles.input}>
 
                                         <TextField
                                             id={Constants.model_fields.EMAIL}
-                                            label={Constants.model_fields.EMAIL}
+                                            label={englishMessages.en.models.users.email}
                                             value={this.state.email}
-                                            onChange={this.handleChange('email')}
+                                            onChange={this.handleChange(Constants.model_fields.EMAIL)}
                                             type={"email"} />
                                     </div>
                                     <div className={styles.input}>
                                         <TextField
                                             id={Constants.model_fields.NOTES}
-                                            label={Constants.model_fields.NOTES}
+                                            label={englishMessages.en.models.users.notes}
                                             value={this.state.notes || ""}
-                                            onChange={this.handleChange('notes')}
+                                            onChange={this.handleChange(Constants.model_fields.NOTES)}
                                         />
                                     </div>
 

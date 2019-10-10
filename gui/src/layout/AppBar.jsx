@@ -48,7 +48,7 @@ const CustomAppBar = ({ classes, ...props }) => (
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${Constants.VERSION}`}</Typography>
     <span className={classes.spacer} />
-    <Typography className={classes.appBarText}>{localStorage.getItem("username")}</Typography>
+    <Typography className={classes.appBarText}>{localStorage.getItem(Constants.model_fields.USERNAME)}</Typography>
   </AppBar>
 );
 

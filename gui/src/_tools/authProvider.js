@@ -110,7 +110,7 @@ function getGroupRoles() {
 }
 
 function getUser(groupRoles) {
-  const username = localStorage.getItem("username");
+  const username = localStorage.getItem(Constants.model_fields.USERNAME);
   const request = getRequest("/users/?username=" + username);
   return fetch(request)
     .then(response => {
@@ -135,7 +135,7 @@ function getUser(groupRoles) {
         user.is_admin = false;
       }
       user.id = newUser.id;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     });
 }
@@ -170,7 +170,7 @@ function getGroupMemberships(user) {
         groupMemberships.push(groupMembership);
       }
       user.groupMemberships = groupMemberships;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {
       console.log("Unable to get memberships", error);
@@ -201,7 +201,7 @@ function getGroups(user) {
         groups.push(group);
       }
       user.groups = groups;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {
       console.log("Unable to get groups", error);
@@ -256,9 +256,9 @@ export default (type, params) => {
       });
   }
   if (type === AUTH_LOGOUT) {
-    localStorage.removeItem("groupRoles");
+    localStorage.removeItem(Constants.models.ROLES);
     localStorage.removeItem(Constants.WEBTOKEN);
-    localStorage.removeItem("user");
+    localStorage.removeItem(Constants.ROLE_USER);
     localStorage.removeItem(Constants.login_details.USERNAME);
 
     return Promise.resolve();
@@ -289,7 +289,7 @@ export default (type, params) => {
       );
   }
   if (type === AUTH_GET_PERMISSIONS) {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     return user ? Promise.resolve(user) : Promise.resolve({ role: Constants.ROLE_ANONYMOUS, is_admin: false });
   }
   return Promise.reject("Unknown method");

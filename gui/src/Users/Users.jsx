@@ -77,7 +77,7 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=false` : `${basePath}/${record.id}/show?is_active=true`
+const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
 export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
   console.log("props in userList are: ", props)
@@ -195,7 +195,7 @@ export const UserEdit = props => {
 //a form for superusers, this is gated in App.jsx.
 export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  if (props.id !== String(JSON.parse(localStorage.getItem("user")).id)) { //dont allow superusers to delete themselves
+  if (props.id !== String(JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id)) { //dont allow superusers to delete themselves
     return (
       <Edit title={<UserTitle />} {...props}>
         <UserEditForm {...other} />

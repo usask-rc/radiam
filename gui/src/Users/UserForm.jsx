@@ -16,16 +16,12 @@ const validateRole = required('en.validate.user.role');
 
 //this exists to combine the User Creation form and the GroupMember Association form into a single page.
 class UserFormWithAssoc extends Component {
-
     constructor(props) {
         super(props);
         this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: "", group_role: "", date_expires: null }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelectChange = this.handleSelectChange.bind(this);
     }
 
-    handleSubmit(event) {
+    handleSubmit = event => {
         this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
@@ -38,7 +34,7 @@ class UserFormWithAssoc extends Component {
         } else {
             //TODO: logout the user.
             toastErrors(
-                "No authentication token detected.  Please logout and back in to proceed."
+                Constants.warnings.NO_AUTH_TOKEN
             );
         }
 
@@ -46,11 +42,11 @@ class UserFormWithAssoc extends Component {
 
 
         if (date_expires) {
-            date_expires = translateDates(date_expires, "date_expires");
+            date_expires = translateDates(date_expires, Constants.model_fields.DATE_EXPIRES);
         }
 
         const request = new Request(
-            getAPIEndpoint() + "/users/", {
+            `${getAPIEndpoint()}/${Constants.models.USERS}/`, {
                 method: Constants.methods.POST,
                 body: JSON.stringify({ ...this.state }),
                 headers: headers
@@ -122,18 +118,19 @@ class UserFormWithAssoc extends Component {
             toastErrors("Please enter your Username and Email Address.");
         }
     })
-    }
+    };
 
-    handleChange(e) {
+    handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
         this.setState({isFormDirty: true})
-    }
+    };
+
     //strangely, the selects and date need a different change handler.
-    handleSelectChange(key_in_dict, value, prevValue, target) {
+    handleSelectChange = (key_in_dict, value, prevValue, target) => {
         this.setState({ [target]: value })
         this.setState({isFormDirty: true})
 
-    }
+    };
 
 
     render() {
