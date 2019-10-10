@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
     # Migration script to insert default metadata dependencies for Projects, Datasets, Files and Folders
 
     dependencies = [
-        ('api', '0008_add_metadata'),
+        ('api', '0009_add_metadata'),
     ]
 
     operations = [

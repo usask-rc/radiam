@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
     # Migration script to insert Datacite 4.2 metadata schema
 
     dependencies = [
-        ('api', '0009_default_metadata'),
+        ('api', '0010_default_metadata'),
     ]
 
     operations = [

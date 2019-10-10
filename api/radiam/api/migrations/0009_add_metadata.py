@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('api', '0007_auto_20190920_0546'),
+        ('api', '0008_user_user_orcid_id'),
     ]
 
     operations = [
