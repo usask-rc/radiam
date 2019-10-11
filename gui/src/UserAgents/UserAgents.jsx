@@ -16,6 +16,7 @@ import {
   SelectArrayInput,
   SelectInput,
   Show,
+  ShowView,
   SimpleForm,
   SimpleFormIterator,
   SimpleShowLayout,
@@ -26,7 +27,7 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { regex, number, minValue, FormDataConsumer } from "ra-core";
+import { regex, number, minValue, FormDataConsumer, ShowController } from "ra-core";
 import { Grid, Typography } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
@@ -102,12 +103,22 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
       >
         <LocationShow />
       </ReferenceField>
+      
     </Datagrid>
   </List>
 ));
 
-export const UserAgentShow = props => (
-  <Show title={<UserAgentTitle />} {...props}>
+export const UserAgentShow = props => {
+console.log("props in useragentshow are; ", props);
+return(
+  <ShowController {...props}>
+    {controllerProps => 
+    {
+
+      console.log("controllerProps is: ", controllerProps)
+
+    return(
+  <ShowView title={<UserAgentTitle />} {...props} {...controllerProps}>
     <SimpleShowLayout>
       <ReferenceField
         linkType={false}
@@ -125,14 +136,21 @@ export const UserAgentShow = props => (
       >
         <LocationShow />
       </ReferenceField>
+
+      {controllerProps.record && controllerProps.record.remote_api_username && controllerProps.record.remote_api_token && 
+      <React.Fragment>
       <TextField
         label={"en.models.agents.remote_api_username"}
         source={Constants.model_fields.REMOTE_API_USERNAME}
       />
+      
       <TextField
         label={"en.models.agents.remote_api_token"}
         source={Constants.model_fields.REMOTE_API_TOKEN}
       />
+      </React.Fragment>
+      }
+    
       <TextField
         label={"en.models.agents.crawl_minutes"}
         source={Constants.model_fields.CRAWL_MINUTES}
@@ -146,8 +164,10 @@ export const UserAgentShow = props => (
         source={Constants.model_fields.ACTIVE}
       />
     </SimpleShowLayout>
-  </Show>
-);
+  </ShowView>)}
+}
+  </ShowController>
+)};
 
 const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
 const validateCrawlTime = [number(), minValue(1)]
