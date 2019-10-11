@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chip, Typography } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import * as Constants from "../_constants/index"
 //TODO: some text here needs to be moved to the constants file
 //TODO: eventually want the ability to remove associations from this page.

@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-admin";
 import * as Constants from "../_constants/index"
-import { getAPIEndpoint, radiamRestProvider, httpClient } from '../_tools';
-import { GET_LIST, GET_ONE, } from 'ra-core';
-import { toastErrors, getUserGroups } from '../_tools/funcs';
+import { getUserGroups } from '../_tools/funcs';
 import UserGroupsDisplay from './UserGroupsDisplay';
 import { withStyles } from '@material-ui/styles';
-import { isObject } from 'util';
 
 //we want a horizontal display to match our other chip displays elsewhere in the application.
 const styles = theme => ({
@@ -31,8 +28,6 @@ class UserDetails extends Component {
 
     render() {
         const {groupMembers} = this.state
-
-        console.log("groupMembers in render is: ", groupMembers)
 
         return (
                 <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
