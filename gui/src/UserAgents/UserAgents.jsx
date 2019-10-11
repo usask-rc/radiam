@@ -1,14 +1,17 @@
 import React from "react";
 import CustomPagination from "../_components/CustomPagination";
 import {
+  ArrayField,
   BooleanField,
   BooleanInput,
+  ChipField,
   Create,
   Datagrid,
   Edit,
   Filter,
   List,
   NumberInput,
+  ReferenceArrayField,
   ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
@@ -20,6 +23,7 @@ import {
   SimpleForm,
   SimpleFormIterator,
   SimpleShowLayout,
+  SingleFieldList,
   TextField,
   TextInput,
 } from "react-admin";
@@ -136,6 +140,15 @@ return(
       >
         <LocationShow />
       </ReferenceField>
+     {controllerProps.record && controllerProps.record.project_config_list && 
+      <ArrayField source={"project_config_list"} label={"Target Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"project"} reference={Constants.models.PROJECTS}>
+            <ChipField source="name" />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+      }
 
       {controllerProps.record && controllerProps.record.remote_api_username && controllerProps.record.remote_api_token && 
       <React.Fragment>
@@ -252,8 +265,21 @@ export const UserAgentEdit = props => {
       >
         <UserShow />
       </ReferenceField>
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+      if (formData && formData.remote_api_token && formData.remote_api_username){
+        formData.project_config_list.map(project => {
+          const newProj = project
+          delete newProj.config
+          return newProj
+        })
+      }
+      console.log("formData in this form is: ", formData)
 
-      <ArrayInput source="project_config_list">
+        return(
+          <React.Fragment>
+          <ArrayInput source="project_config_list">
           <SimpleFormIterator disableRemove disableAdd>
             <ReferenceInput
             label={"en.models.agents.projects"}
@@ -261,17 +287,10 @@ export const UserAgentEdit = props => {
             reference={Constants.models.PROJECTS}>
               <SelectInput optionText={"name"} disabled/>
             </ReferenceInput>
+            {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
           </SimpleFormIterator>
         </ArrayInput>
-
-      <FormDataConsumer>
-      {({formData, ...rest}) => 
-      {
-      if (formData && formData.remote_api_token && formData.remote_api_username){
-        formData.project_config_list.map(project => delete project.config)
-      }
-
-        return(<Grid container direction="row">
+          <Grid container direction="row">
           <Grid xs={12}>
             <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
           </Grid>
@@ -281,7 +300,8 @@ export const UserAgentEdit = props => {
           <Grid xs={12}>
             <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
           </Grid>
-        </Grid>)
+        </Grid>
+        </React.Fragment>)
       }
       }
       </FormDataConsumer>

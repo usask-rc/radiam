@@ -22,8 +22,10 @@ const RelatedDatasets = ({ record }) => {
     const [datasets, setDatasets] = useState([])
   
     useEffect(() => {
-      getRelatedDatasets(setDatasets, record)
-    }, [])
+      if (record){
+        getRelatedDatasets(setDatasets, record)
+      }
+    }, [record])
   
     return(
       <div className={styles.relatedDSContainer}>
