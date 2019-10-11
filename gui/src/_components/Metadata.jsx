@@ -531,7 +531,16 @@ class MetadataComponent extends Component {
           this.getEntitySchemasFields(id, type, fromParent);
         }).catch(error => {
           console.error(error);
-          this.setState({ error: error});
+          if (error.status === 400 &&
+              error.message === "Bad Request" &&
+              Array.isArray(error.body[type]) &&
+              error.body[type].includes("There is already an entity with this group.")) {
+            // Handling already created entity
+            this.getEntitySchemasFields(id, type, fromParent);
+            return;
+          } else {
+            this.setState({ error: error});
+          }
         });
 
       }
