@@ -321,14 +321,14 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { this.props.mode == "edit" && this.props.id && (
+    { props.mode == "edit" && props.id && (
       <React.Fragment>
-        <EditMetadata id={this.props.id} type="dataset"/>
-        <ConfigMetadata id={this.props.id} type="dataset" />
+        <EditMetadata id={props.id} type="dataset"/>
+        <ConfigMetadata id={props.id} type="dataset" />
       </React.Fragment>
     )}
 
-    {props.record && 
+    { props.record && 
       <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
     }
     <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
