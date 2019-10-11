@@ -131,6 +131,7 @@ module.exports = Object.freeze({
     LOCATION_TYPE: "location_type",
     NAME: "name",
     NOTES: "notes",
+    ORCID_ID: "user_orcid_id",
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
     REMOTE_USER: "remote_user",

@@ -97,7 +97,7 @@ class ChangeDetails extends Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "" }
+        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
     }
 
     componentDidMount() {
@@ -151,6 +151,15 @@ class ChangeDetails extends Component {
                                             value={this.state.email}
                                             onChange={this.handleChange(Constants.model_fields.EMAIL)}
                                             type={"email"} />
+                                    </div>
+                                    <div className={styles.input}>
+
+                                        <TextField
+                                            id={Constants.model_fields.ORCID_ID}
+                                            label={englishMessages.en.models.users.user_orcid_id}
+                                            value={this.state.user_orcid_id}
+                                            onChange={this.handleChange(Constants.model_fields.ORCID_ID)}
+                                        />
                                     </div>
                                     <div className={styles.input}>
                                         <TextField
