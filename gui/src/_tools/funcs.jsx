@@ -38,19 +38,59 @@ export function toastErrors(data) {
     toast.error(data);
   }
 }
-export function getRelatedDatasets(setDatasets, projectID){
+export function getRelatedDatasets(setDatasets, record){
   return new Promise((resolve, reject) => {
 
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.DATASETS, 
-      {filter: { project: projectID, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
+      {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
     .then(assocDatasets => {
       resolve(setDatasets(assocDatasets))
     })
   })
 }
 
+export function getGroupUsers(setGroupMembers, record) {
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
 
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+    .then(groupRoles => {
+
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        const { id, is_active } = record
+
+        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+        }).then(response => {
+          return response.data})
+            .then(groupMembers => {
+                groupMembers.map(groupMember => {
+                    dataProvider(GET_ONE, Constants.models.USERS, {
+                        id: groupMember.user
+                    }).then(response => {
+                        return response.data
+                    }).then(user => {
+                        groupMember.user = user
+                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                        groupUsers = [...groupUsers, groupMember]
+                        if (groupUsers.length === groupMembers.length){
+                          setGroupMembers(groupMembers)
+                        }
+
+                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
+                    return groupMember
+                  })
+                  return groupMembers
+            })
+            .catch(err => {
+              reject("error in in get groupmembers: ", err)
+            })
+      return groupRoles
+    })
+  })
+}
 
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {

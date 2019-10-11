@@ -8,7 +8,7 @@ import { Chip, Typography } from '@material-ui/core';
 import { CreateButton } from 'ra-ui-materialui/lib/button';
 import { getRelatedDatasets } from '../_tools/funcs';
 
-const RelatedDatasets = ({ projectID }) => {
+const RelatedDatasets = ({ record }) => {
     const styles = theme => ({
         chipDisplay: {
             display: 'flex',
@@ -24,7 +24,7 @@ const RelatedDatasets = ({ projectID }) => {
     const [datasets, setDatasets] = useState([])
   
     useEffect(() => {
-      getRelatedDatasets(setDatasets, projectID)
+      getRelatedDatasets(setDatasets, record)
     }, [])
   
     return(

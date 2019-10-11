@@ -24,9 +24,11 @@ import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt } from 'react-router';
+import RelatedUsers from "./RelatedUsers";
+import { CardActions } from "@material-ui/core";
 
 
-const listStyles = {
+const styles = {
   actions: {
     backgroundColor: "inherit"
   },
@@ -65,7 +67,7 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-export const GroupList = withStyles(listStyles)(({ classes, ...props }) => (
+export const GroupList = withStyles(styles)(({ classes, ...props }) => (
   <List
     {...props}
     classes={{
@@ -104,9 +106,14 @@ export const GroupList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-export const GroupShow = props => (
+export const GroupShow = withStyles(styles)(
+  ({ classes, permissions, ...props }) => {
+
+    return(
   <Show title={<GroupTitle />} {...props}>
     <SimpleShowLayout>
+    <RelatedUsers {...props} />
+    
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -133,7 +140,7 @@ export const GroupShow = props => (
       </ReferenceField>
     </SimpleShowLayout>
   </Show>
-);
+)});
 
 export const GroupTitle = ({ record }) => {
   return <span>{record ? `"${record.name}"` : ""}</span>;
@@ -219,10 +226,19 @@ export const GroupCreate = props => {
   );
 }
 
+
+const UserCreateActions = ({record}) => {
+  return(
+    <CardActions>
+      <RelatedUsers record={record} />
+    </CardActions>
+  )
+}
+
 export const GroupEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
-    <Edit title={<GroupTitle />} {...props}>
+    <Edit title={<GroupTitle />} actions={<UserCreateActions {...props} />} {...props}>
       <GroupForm {...other} />
     </Edit>
   );
