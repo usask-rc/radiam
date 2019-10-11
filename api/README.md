@@ -37,6 +37,10 @@ cd api/
 docker-compose up -d --build
 # Create admin user (will prompt for password)
 docker-compose -f docker-compose.yml -f oneshot.yml run create_admin_user
+
+## Create admin user manually
+docker exec -it radiam_radiamapi_1 /bin/bash
+python manage.py createsuperuser
 ```
 
 *Case 2*: Changes (yours or from git) to Django code (/radiam directory):
