@@ -3,6 +3,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import React, { Component } from "react";
+import RelatedUsers from "../Groups/RelatedUsers";
 import {
   ArrayInput,
   BooleanField,
@@ -1448,7 +1449,7 @@ class BaseMetadataEditActions extends Component {
   };
 
   render() {
-    const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, resource, selectedIds, showFilter, translate } = this.props;
+    const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
     return <CardActions>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1466,6 +1467,9 @@ class BaseMetadataEditActions extends Component {
         }) }
         { data && <ShowButton basePath={basePath} record={data} /> }
         <RefreshButton />
+        { showRelatedUsers && record &&
+          <RelatedUsers record={record} />
+        }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </CardActions>
   }

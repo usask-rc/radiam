@@ -9,7 +9,6 @@ module.exports = Object.freeze({
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
   LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
   ROLE_USER: "user",
-  VERSION: "1.0.14", //NOTE: this must be updated with every merge to master.
   WEBTOKEN: "token",
   fields: {
     PASSWORD: "password",
@@ -131,6 +130,7 @@ module.exports = Object.freeze({
     LOCATION_TYPE: "location_type",
     NAME: "name",
     NOTES: "notes",
+    ORCID_ID: "user_orcid_id",
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
     REMOTE_USER: "remote_user",

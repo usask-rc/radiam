@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {
   CardActions,
   Create,
-  CreateButton,
   Datagrid,
   Edit,
   Filter,
@@ -277,13 +276,12 @@ const enhance = compose(
   translate,
   withStyles(styles),
 );
-const TagCreateActions = ({id}) => 
+
+const TagCreateActions = ({record}) =>
 {
-  //create a dataset
-  console.log("props in tagcreateactions is: ", id)
 return(
   <CardActions>
-    <RelatedDatasets projectID={id} />
+    <RelatedDatasets record={record} />
   </CardActions>
 )};
 

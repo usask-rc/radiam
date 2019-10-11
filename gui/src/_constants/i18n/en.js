@@ -437,6 +437,7 @@ export default {
         lname: 'Last Name',
         email: 'Email',
         username: 'Username',
+        user_orcid_id: 'ORCID Identifier',
         notes: 'Notes',
         active: 'Active',
       },

@@ -273,6 +273,8 @@ class SuperuserUserSerializer(BaseUserSerializer):
                                 'is_active', instance.is_active)
         instance.is_superuser = validated_data.get(
                                 'is_superuser', instance.is_superuser)
+        instance.user_orcid_id = validated_data.get(
+                                'user_orcid_id', instance.is_superuser)
         instance.time_zone_id = validated_data.get(
                                 'time_zone_id', instance.time_zone_id)
         instance.date_updated = now()

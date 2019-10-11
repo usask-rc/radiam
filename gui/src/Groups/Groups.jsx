@@ -35,9 +35,11 @@ import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
 import compose from "recompose/compose";
 import { Prompt } from 'react-router';
+import { CardActions } from "@material-ui/core";
+import RelatedUsers from "./RelatedUsers";
 
 
-const listStyles = {
+const styles = {
   actions: {
     backgroundColor: "inherit"
   },
@@ -78,7 +80,7 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-export const GroupList = withStyles(listStyles)(({ classes, ...props }) => (
+export const GroupList = withStyles(styles)(({ classes, ...props }) => (
   <List
     {...props}
     classes={{
@@ -117,9 +119,12 @@ export const GroupList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-export const GroupShow = withTranslate(({ translate, ...props}) => (
+export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
+    return(
   <Show title={<GroupTitle />} {...props}>
     <SimpleShowLayout>
+    <RelatedUsers {...props} />
+
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -161,7 +166,7 @@ export const GroupShow = withTranslate(({ translate, ...props}) => (
       </ShowController>
     </SimpleShowLayout>
   </Show>
-));
+)}));
 
 const GroupTitle = ({ record }) => {
   return <span>{record ? `"${record.name}"` : ""}</span>;
@@ -261,9 +266,9 @@ class BaseGroupEdit extends Component {
     };
 
 
-    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, translate, ...others } = this.props;
+    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 
-    return <Edit basePath={basePath} title={<GroupTitle />} actions={<MetadataEditActions />} {...others}>
+    return <Edit basePath={basePath} title={<GroupTitle />} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
       <SimpleForm
         basePath={basePath}
         toolbar={<EditToolbar />}
@@ -308,7 +313,7 @@ class BaseGroupEdit extends Component {
 
 const enhance = compose(
   translate,
-  withStyles(listStyles),
+  withStyles(styles),
 );
 
 BaseGroupEdit.propTypes = {

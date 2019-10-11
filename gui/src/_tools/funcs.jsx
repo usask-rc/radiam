@@ -1,6 +1,10 @@
 import * as Constants from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
+import { useState } from 'react';
+import radiamRestProvider from './radiamRestProvider';
+import { httpClient } from '.';
+import { GET_LIST, GET_ONE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
 //TODO: move '/api' to constants as the url for where the api is hosted.
@@ -8,32 +12,9 @@ export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-    /*return (
-      window.location.protocol +
-      '//' +
-      window.location.hostname +
-      ':' +
-      Constants.API_PORT +
-      Constants.API_ENDPOINT
-    );*/
+    
   }
   return Constants.API_ENDPOINT;
-}
-
-export function largestCommonPrefix(f1, f2) {
-  for (var i = 0; i < f1.length; i++) {
-    if (f1[i] && f2[i]) {
-      if (f1[i] !== f2[i]) {
-        return f1.slice(0, i);
-      }
-    } else if (f1[i]) {
-      return f2;
-    } else if (f2[i]) {
-      return f1;
-    } else {
-      return f1;
-    }
-  }
 }
 
 export function toastErrors(data) {
@@ -56,6 +37,102 @@ export function toastErrors(data) {
     console.log('Error in toastErrors - what type of object is this?');
     toast.error(data);
   }
+}
+export function getRelatedDatasets(setDatasets, record){
+  return new Promise((resolve, reject) => {
+
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.DATASETS, 
+      {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
+    .then(assocDatasets => {
+      resolve(setDatasets(assocDatasets))
+    })
+  })
+}
+
+export function getGroupUsers(setGroupMembers, record) {
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
+
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+    .then(groupRoles => {
+
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        const { id, is_active } = record
+
+        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+        }).then(response => {
+          return response.data})
+            .then(groupMembers => {
+                groupMembers.map(groupMember => {
+                    dataProvider(GET_ONE, Constants.models.USERS, {
+                        id: groupMember.user
+                    }).then(response => {
+                        return response.data
+                    }).then(user => {
+                        groupMember.user = user
+                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                        groupUsers = [...groupUsers, groupMember]
+                        if (groupUsers.length === groupMembers.length){
+                          setGroupMembers(groupMembers)
+                        }
+
+                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
+                    return groupMember
+                  })
+                  return groupMembers
+            })
+            .catch(err => {
+              reject("error in in get groupmembers: ", err)
+            })
+      return groupRoles
+    })
+  })
+}
+
+export function getUserGroups(record) {
+  return new Promise((resolve, reject) => {
+  
+    let userGroupMembers = []
+
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+    .then(groupRoles => {
+
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        const { id, is_active } = record
+
+        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+            filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
+        }).then(response => {
+          return response.data})
+            .then(groupMembers => {
+                groupMembers.map(groupMember => {
+                    dataProvider(GET_ONE, Constants.models.GROUPS, {
+                        id: groupMember.group
+                    }).then(response => {
+                        return response.data
+                    }).then(researchgroup => {
+                        groupMember.group = researchgroup
+                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                        userGroupMembers = [...userGroupMembers, groupMember]
+                        if (userGroupMembers.length === groupMembers.length){
+                          resolve(groupMembers)
+                        }
+
+                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
+                    return groupMember
+                  })
+                  return groupMembers
+            })
+            .catch(err => {
+              reject("error in in get groupmembers: ", err)
+            })
+      return groupRoles
+    })
+  })
 }
 
 export function submitObjectWithGeo(formData, geo, props){

@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-admin";
 import * as Constants from "../_constants/index"
-import { getAPIEndpoint, radiamRestProvider, httpClient } from '../_tools';
-import { GET_LIST, GET_ONE, } from 'ra-core';
-import { toastErrors } from '../_tools/funcs';
+import { getUserGroups } from '../_tools/funcs';
 import UserGroupsDisplay from './UserGroupsDisplay';
 import { withStyles } from '@material-ui/styles';
 
@@ -23,43 +21,9 @@ class UserDetails extends Component {
         this.state = { groupMembers: [] }
     }
 
-    componentDidMount() {
-        this.getAllRoles();
-    }
-
-    //TODO: make this asynchronous and put it in funcs.jsx
-    getAllRoles() {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
-        .then(groupRoles => {
-
-            const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-            const { id, is_active } = this.props.record
-
-            dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-                filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
-            }).then(response => response.data)
-                .then(groupMembers => {
-                    this.setState({ groupMembers });
-
-                    groupMembers.map(groupMember => {
-                        dataProvider(GET_ONE, Constants.models.GROUPS, {
-                            id: groupMember.group
-                        }).then(response => {
-                            return response.data
-                        }).then(researchgroup => {
-                            groupMember.group = researchgroup
-                            groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
-                            this.setState([...this.state.groupMembers, groupMember])
-                        })
-                            .catch(err => console.error("error in attempt to get researchgroup with associated groupmember: " + err))
-                        return groupMember
-                    })
-                return groupMembers
-
-                })
-                .catch(err => toastErrors("err in attempt to fetch all groupmembers of user: ", err))
-        })
+    async componentDidMount() {
+        let abc = await getUserGroups(this.props.record)
+        this.setState({groupMembers: abc})
     }
 
     render() {
