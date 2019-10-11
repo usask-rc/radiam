@@ -4,9 +4,6 @@ FROM node:8.15
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 
-# Add version file to container filesystem
-COPY VERSION /etc/version
-
 # add `/usr/src/app/node_modules/.bin` to $PATH
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
@@ -20,7 +17,13 @@ RUN npm install
 RUN npm install react-scripts@1.1.1 -g
 
 COPY ./ /usr/src/app
- 
+
+# Add version file to container filesystem
+COPY VERSION /etc/version
+
+# Create a copy of the container version file as a JSON file in the React app root 
+RUN VER=`cat /etc/version` && echo "{\"version\":\"$VER\"}" > /usr/src/app/src/version.json
+
 RUN npm run build
 
 # start app

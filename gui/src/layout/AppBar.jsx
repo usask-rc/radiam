@@ -1,4 +1,5 @@
 import React from "react";
+import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
@@ -44,7 +45,7 @@ const CustomUserMenu = translate(({ translate, ...props }) => (
 const CustomAppBar = ({ classes, ...props }) => (
   <AppBar {...props} userMenu={<CustomUserMenu />}>
     <RadiamLogo className={classes.logo} />
-    <Typography className={classes.versionText}>{`V${Constants.VERSION}`}</Typography>
+    <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />
     <Typography className={classes.appBarText}>{localStorage.getItem(Constants.model_fields.USERNAME)}</Typography>
   </AppBar>
