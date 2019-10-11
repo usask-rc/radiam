@@ -2,9 +2,7 @@ import React from "react";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
-
 import * as Constants from "../_constants/index"
-
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
 

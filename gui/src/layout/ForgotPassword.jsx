@@ -13,6 +13,8 @@ const validateEmail = value =>
   value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
   'Invalid email address' : undefined
 
+
+  //TODO: return here once we figure out how to get rid of the `this.submitForm()` in the parent (Login.jsx) file.
 const ForgotPassword = ({classes, translate, renderInput, forgotPassword, toggleForgotPassword}) => {
 
     const [email, setEmail] = useState('')
