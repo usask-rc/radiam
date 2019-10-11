@@ -1,23 +1,19 @@
-import unittest
 import json
-import time
+from unittest import mock
 
-from django.test import TestCase
+from elasticsearch import exceptions as es_exceptions
+
 from rest_framework.test import APIRequestFactory
-from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 
-from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 
 from radiam.api.models import (
     User, ResearchGroup, Project, Dataset, DistributionRestriction, DataCollectionMethod,
     DataCollectionStatus, SensitivityLevel)
+from radiam.api.documents import DatasetMetadataDoc
 from radiam.api.views import DatasetViewSet
 from .elasticsearch.basesearchtestcase import BaseSearchTestCase
-from .elasticsearch.testdata import *
-
-from radiam.api.search import _SearchService, _IndexService
 
 class TestDatasetAPI(BaseSearchTestCase):
     fixtures = ['researchgroups',
@@ -44,7 +40,8 @@ class TestDatasetAPI(BaseSearchTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertLess(0, response.data['count'])
 
-    def test_dataset_create(self):
+    @mock.patch("radiam.api.models.Dataset._save_dataset_metadata_doc")
+    def test_dataset_create(self, mock_save_dataset_metadata_doc):
         """
         Test that a new dataset is created
         """
@@ -355,3 +352,44 @@ class TestDatasetAPI(BaseSearchTestCase):
             text = updated_sensitivity_level.id,
             status_code = 200)
 
+    @mock.patch("radiam.api.models.DatasetMetadataDoc.get")
+    def test_save_dataset_metadata_doc_update(self, mock_dataset_metadata_doc_get):
+        """
+        Test that _save_dataset_metadata_doc updates an existing
+        DatasetMetadataDoc.
+        """
+        mock_dataset_metadata_doc = mock.MagicMock(spec=DatasetMetadataDoc)
+        mock_dataset_metadata_doc_get.return_value = mock_dataset_metadata_doc
+
+        id = '7492d321-10c7-4cba-9891-e5db63b20bce'
+        dataset = Dataset.objects.get(id=id)
+
+        dataset._save_dataset_metadata_doc()
+
+        mock_dataset_metadata_doc_get.assert_called_once()
+        mock_dataset_metadata_doc.update.assert_called_once_with(
+            title=dataset.title,
+            abstract=dataset.abstract,
+            data_collection_status=dataset.data_collection_status.label,
+            distribution_restriction=dataset.distribution_restriction.label,
+            project=dataset.project_id,
+            study_site=dataset.study_site,
+            date_created=dataset.date_created,
+            date_updated=dataset.date_updated
+        )
+
+    @mock.patch("radiam.api.models.DatasetMetadataDoc.save")
+    @mock.patch("radiam.api.models.DatasetMetadataDoc.get")
+    def test_save_dataset_metadata_doc_create(self, mock_get, mock_save):
+        """
+        Test _save_dataset_metadata_doc creates a new DatasetMetadataDoc objects
+        """
+
+        mock_get.side_effect = es_exceptions.NotFoundError
+
+        id = '7492d321-10c7-4cba-9891-e5db63b20bce'
+        dataset = Dataset.objects.get(id=id)
+        dataset._save_dataset_metadata_doc()
+
+        mock_get.assert_called_once()
+        mock_save.assert_called_once()

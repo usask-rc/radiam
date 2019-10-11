@@ -47,8 +47,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
-        console.log("params are: ", params, "and resource is: ", resource)
-
         if (
           params &&
           params.filter &&
@@ -93,7 +91,20 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
           }
 
-          url = url + `?${page}&${sort}`;
+          url = `${apiUrl}/${resource}/?`;
+          if (page && sort) {
+            url = `${url}${page}&${sort}`;
+          } else if (page) {
+            url = `${url}${page}`;
+          } else if (sort) {
+            url = `${url}${sort}`;
+          }
+          if (params.query) {
+            url = url + `&${stringify(params.query)}`;
+          }
+        }
+        else {
+          url = `${apiUrl}/${resource}/`;
         }
 
         if (params && params.q) {

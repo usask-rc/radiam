@@ -158,7 +158,6 @@ class TestGeoDataAPI(BaseTestCase):
         mock_save.assert_called_once()
 
 
-
 class TestGeoDataSerializers(BaseTestCase):
     """
     Test GeoData serializer

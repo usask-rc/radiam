@@ -13,5 +13,5 @@ from .sortingtests import *
 from .useragenttests import *
 from .geodatatests import *
 from .permissionsunittests import *
-
+from .servicestests import *
 from .search import *

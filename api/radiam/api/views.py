@@ -1,3 +1,6 @@
+from elasticsearch_dsl import Search
+from elasticsearch import exceptions as es_exceptions
+
 from rest_framework.parsers import JSONParser
 
 # from django.contrib.auth.models import User, Group
@@ -16,33 +19,87 @@ from dry_rest_permissions.generics import (
     DRYPermissions, DRYGlobalPermissions, DRYObjectPermissions )
 
 from radiam.api.serializers import (
-    UserSerializer, SuperuserUserSerializer, PasswordSerializer,
-    UserAgentSerializer, ResearchGroupSerializer,
-    GroupRoleSerializer, GroupMemberSerializer, GroupViewGrantSerializer,
-    LocationSerializer, LocationTypeSerializer, ProjectSerializer, ProjectAvatarSerializer,
-    DatasetSerializer, ESDatasetSerializer, ProjectStatisticsSerializer,
-    DatasetDataCollectionMethodSerializer, DataCollectionStatusSerializer,
-    DataCollectionMethodSerializer, DistributionRestrictionSerializer,
-    SensitivityLevelSerializer,DatasetSensitivitySerializer, GeoDataSerializer,
-    ProjectUserAgentSerializer
-)
+    ChoiceListSerializer,
+    ChoiceListValueSerializer,
+    DataCollectionMethodSerializer,
+    DataCollectionStatusSerializer,
+    DatasetSensitivitySerializer,
+    DatasetSerializer,
+    DatasetDataCollectionMethodSerializer,
+    DistributionRestrictionSerializer,
+    ESDatasetSerializer,
+    EntitySerializer,
+    EntitySchemaFieldSerializer,
+    FieldSerializer,
+    GeoDataSerializer,
+    GroupMemberSerializer,
+    GroupRoleSerializer,
+    GroupViewGrantSerializer,
+    LocationSerializer,
+    LocationTypeSerializer,
+    MetadataUITypeSerializer,
+    MetadataValueTypeSerializer,
+    PasswordSerializer,
+    ProjectSerializer,
+    ProjectAvatarSerializer,
+    ProjectStatisticsSerializer,
+    ProjectUserAgentSerializer,
+    ResearchGroupSerializer,
+    SchemaSerializer,
+    SelectedFieldSerializer,
+    SelectedSchemaSerializer,
+    SensitivityLevelSerializer,
+    SuperuserUserSerializer,
+    UserSerializer,
+    UserAgentSerializer)
 
 # from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
 from radiam.api.filters import *
 
 from .models import (
-    User, UserAgent, ResearchGroup, GroupRole, GroupMember, GroupViewGrant,
-    Location, LocationType, Project, Dataset, ProjectAvatar, SensitivityLevel, DatasetSensitivity,
-    DataCollectionMethod, DatasetDataCollectionMethod, DistributionRestriction,
-    DataCollectionStatus, ProjectStatistics, GeoData
-)
+    ChoiceList,
+    ChoiceListValue,
+    DataCollectionMethod,
+    DataCollectionStatus,
+    Dataset,
+    DatasetSensitivity,
+    DatasetDataCollectionMethod,
+    DistributionRestriction,
+    Entity,
+    Field,
+    GeoData,
+    GroupMember,
+    GroupRole,
+    GroupViewGrant,
+    Location,
+    LocationType,
+    MetadataUIType,
+    MetadataValueType,
+    Project,
+    ProjectAvatar,
+    ProjectStatistics,
+    ResearchGroup,
+    Schema,
+    SelectedField,
+    SelectedSchema,
+    SensitivityLevel,
+    User,
+    UserAgent)
+
 from .signals import radiam_user_created, radiam_project_created, radiam_project_deleted
 
+
+
+from radiam.api.documents import DatasetMetadataDoc
+from radiam.api.documents import ProjectMetadataDoc
+from radiam.api.documents import ResearchGroupMetadataDoc
 from radiam.api.search.documents import ESDataset
-from .exceptions import BadRequestException, ProjectNotFoundException, \
-    ProjectNotCreatedException, ElasticSearchRequestError
+from .exceptions import BadRequestException, InternalErrorException, ProjectNotFoundException, \
+    ItemNotCreatedException, ElasticSearchRequestError
 from .permissions import IsSuperuserOrSelf
+
+from .services import SearchService, GeoSearchService
 
 from .search import RadiamService, _SearchService, _IndexService
 from .search.pagination import PageNumberPagination
@@ -126,6 +183,72 @@ class RadiamViewSet(viewsets.ModelViewSet):
         appendCorsHeader(response, ResearchGroup)
         return response
 
+class MetadataViewset():
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            instance = serializer.save()
+            doc = self.MetadataDoc.get(instance.id)
+            fields = dict()
+            if 'metadata' in request.data.keys() and request.data['metadata'] is not None:
+                fields['metadata'] = request.data['metadata']
+            else:
+                fields['metadata'] = {}
+            doc.update(**fields)
+        except ElasticSearchRequestError as error:
+            raise ItemNotCreatedException(detail=error.info['error']['root_cause'][0]['reason'])
+        except Exception as error:
+            raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+        else:
+            #success
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def sanitize_empty_values(self, metadata):
+        """
+        Prevent errors with elastic search for empty string values.
+        When an empty string is passed to a date or number type it causes an error instead of removing the data.
+        This function trims strings down to an empty string and then replace them with None.
+        """
+        if isinstance(metadata, dict):
+            sanitized = dict()
+            for key, value in metadata.items():
+                if isinstance(value, dict):
+                    sanitized[key] = self.sanitize_empty_values(value)
+                elif key == 'value' and isinstance(value, str) and value.strip() == "":
+                    sanitized[key] = None
+                else:
+                    sanitized[key] = value
+            return sanitized
+        else:
+            print("Passed a non dictionary to sanitize_empty_values which seems wrong. Returning " + str(metadata))
+            return metadata
+
+    def update(self, request, pk):
+        if pk is not None and self.request.data is not None:
+            metadata = self.request.data.get("metadata")
+            metadata = self.sanitize_empty_values(metadata)
+            parser_classes = (JSONParser,)
+            try:
+                try:
+                    doc = self.MetadataDoc.get(pk)
+                    fields = dict()
+                    fields['metadata'] = metadata
+                    doc.update(**fields)
+                except es_exceptions.NotFoundError:
+                    fields = dict()
+                    fields['meta'] = { 'id': pk }
+                    fields['metadata'] = metadata
+
+                doc = self.MetadataDoc(**fields)
+
+                doc.save()
+            except Exception as error:
+                raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+
+            return None
 
 class RadiamOrderingFilter(OrderingFilter):
     """
@@ -157,6 +280,107 @@ class RadiamOrderingFilter(OrderingFilter):
 
         # No ordering was included, or all the ordering fields were invalid
         return self.get_default_ordering(view)
+
+
+class GeoSearchMixin(object):
+    """
+    Mixin that contains Application-side join search for geo-queries.
+
+    Provides a /search action on a ViewSet that will accept a search query for
+    index 'self.search_index', and a geoquery to be run on 'geodata'. An
+    'Application-side join' is performed by filtering the search_query results
+    by the id's returned in geoquery.
+
+    request.data =
+    {
+        "search_query":{
+            ... (valid Elasticsearch query)
+        },
+        "geoquery": {
+            ... (valid Elasticsearch query with a geoquery filter context
+        }
+    }
+    """
+
+    @action(methods=['get'],
+            detail=False,
+            url_name='search')
+    def search(self, request):
+        self.geo_query_key = 'geo_query'
+
+        if self.geo_query_key in request.data:
+            geosearch_service = GeoSearchService(
+                self.search_index,
+                'query',
+                'geo_query',
+                'geodata'
+            )
+            results = geosearch_service.search(request.data)
+        else:
+            search_service = SearchService(
+                self.search_index,
+                'query'
+            )
+            results = search_service.search(request.data)
+
+        self.queryset = self.filter_queryset_by_ids(
+            self.get_queryset(),
+            results
+        )
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
+    def filter_queryset_by_ids(self, queryset, results):
+        ids = [r.meta.id for r in results.hits]
+        return queryset.filter(id__in=ids)
+
+        return queryset
+    # def _perform_search(self, data):
+    #     """
+    #     Perform the search without a geoquery filter.
+    #     """
+    #     search = Search.from_dict(data.pop('query'))
+    #     search = search.index(self.search_index)
+    #
+    #     return search.execute()
+
+    # def _perform_geoquery_search(self, data):
+    #     """
+    #     Perform the search, filtering results by id's of 'hits' from the
+    #     geoquery.
+    #     """
+    #     search = Search.from_dict(data.pop('query'))
+    #     search = search.index(self.search_index)
+    #
+    #     geo_query = data.pop(self.geo_query_key)
+    #     ids = self._get_ids_from_geoquery(geo_query)
+    #
+    #     search = search.filter("terms", _id=ids)
+    #
+    #     return search.execute()
+
+    # def _get_ids_from_geoquery(self, geo_query):
+    #     """
+    #     Return a list of id's of 'hits' in the geoquery results.
+    #     """
+    #     # geo_search = Search()
+    #     geo_search = self._get_search()
+    #     geo_search = geo_search.from_dict(geo_query)
+    #     geo_search = geo_search.index('geodata')
+    #     geo_results = geo_search.execute()
+    #
+    #     print(geo_results)
+    #     # print(geo_results.__class__)
+    #
+    #     ids = [ r.object_id for r in geo_results ]
+    #
+    #     return ids
+
+    # def _get_search(self):
+    #     return Search()
 
 
 class UserViewSet(RadiamViewSet):
@@ -275,7 +499,7 @@ class ResearchGroupOrderingFilter(RadiamOrderingFilter):
         return [parent_group]
 
 
-class ResearchGroupViewSet(RadiamViewSet):
+class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     """
     API endpoint that allows groups to be viewed or edited.
     """
@@ -298,6 +522,18 @@ class ResearchGroupViewSet(RadiamViewSet):
         RadiamAuthResearchGroupFilter,
         ResearchGroupOrderingFilter,
     )
+
+    MetadataDoc = ResearchGroupMetadataDoc
+
+    def create(self, request, *args, **kwargs):
+        return MetadataViewset.create(self, request, *args, **kwargs)
+
+    def update(self, request, pk):
+        response = MetadataViewset.update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().update(request, pk)
 
 
 class GroupRoleViewSet(RadiamViewSet):
@@ -346,12 +582,14 @@ class DatasetOrderingFilter(RadiamOrderingFilter):
         return [project]
 
 
-class DatasetViewSet(RadiamViewSet):
+class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     """
     API endpoint that allows datasets to be viewed or edited.
     """
     queryset = Dataset.objects.all().order_by('date_updated')
     serializer_class = DatasetSerializer
+
+    search_index = 'dataset_metadata'
 
     filter_backends = (
         DjangoFilterBackend,
@@ -362,6 +600,54 @@ class DatasetViewSet(RadiamViewSet):
     ordering_fields=('title', 'study_site', 'project', 'date_created', 'date_updated')
     ordering = ('title', )
     permission_classes = (IsAuthenticated, DRYPermissions,)
+
+    MetadataDoc = DatasetMetadataDoc
+
+    def create(self, request, *args, **kwargs):
+        return MetadataViewset.create(self, request, *args, **kwargs)
+
+    def update(self, request, pk):
+        response = MetadataViewset.update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().update(request, pk)
+
+    def destroy(self, request, pk, *args, **kwargs):
+        dataset = Dataset.objects.get(id=pk)
+        # TODO Need to delete the elastic search record
+        return super().destroy(request, pk, *args, **kwargs)
+
+    # @action(methods=['get'],
+    #         detail=False,
+    #         url_name='search')
+    # def search(self, request):
+    #
+    #     geo_query_key = 'geo_query'
+    #
+    #     query = request.data.pop('query')
+    #
+    #     search = Search.from_dict(query)
+    #     search = search.index('dataset_metadata')
+    #
+    #     if geo_query_key in request.data:
+    #         # if a geo_query is sent, restrict the doc query
+    #         # by id's of geo-hits
+    #         geo_query = request.data.pop(geo_query_key)
+    #         ids = self._get_ids_from_geoquery(geo_query)
+    #
+    #         search = search.filter("terms", _id=ids)
+    #
+    #     results = search.execute()
+    #
+    #     project_ids = [ r.meta.id for r in results.hits ]
+    #
+    #     self.queryset = self.get_queryset().filter(id__in=project_ids)
+    #
+    #     page = self.paginate_queryset(self.queryset)
+    #     serializer = self.get_serializer(page, many=True)
+    #
+    #     return self.get_paginated_response(serializer.data)
 
 
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
@@ -528,12 +814,15 @@ class ProjectOrderingFilter(RadiamOrderingFilter):
         return [group, primary_contact_user]
 
 
-class ProjectViewSet(RadiamViewSet):
+class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     """
     API endpoint that allows projects to be viewed or edited.
     """
     queryset = Project.objects.all().order_by('date_updated')
     serializer_class = ProjectSerializer
+    search_index = 'project_metadata'
+
+    parser_classes = (JSONParser,)
 
     filter_backends = (
         DjangoFilterBackend,
@@ -545,21 +834,7 @@ class ProjectViewSet(RadiamViewSet):
     ordering = ('name', )
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            self.perform_create(serializer)
-        except ElasticSearchRequestError as error:
-            raise ProjectNotCreatedException(detail=error.info['error']['root_cause'][0]['reason'])
-        else:
-            #success
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        serializer.save()
+    MetadataDoc = ProjectMetadataDoc
 
     def destroy(self, request, pk, *args, **kwargs):
         project = Project.objects.get(id=pk)
@@ -582,6 +857,15 @@ class ProjectViewSet(RadiamViewSet):
 
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        return MetadataViewset.create(self, request, *args, **kwargs)
+
+    def update(self, request, pk):
+        response = MetadataViewset.update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().update(request, pk)
 
 class ProjectAvatarViewSet(RadiamViewSet):
     """
@@ -591,6 +875,7 @@ class ProjectAvatarViewSet(RadiamViewSet):
     serializer_class = ProjectAvatarSerializer
 
     permission_classes = (IsAuthenticated, DRYPermissions,)
+
 
 class SearchViewSet(viewsets.GenericViewSet):
     """
@@ -768,3 +1053,94 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         result = radiam_service.delete_doc(project_id, pk)
 
         return Response(result)
+
+class MetadataUITypeViewSet(RadiamViewSet):
+    queryset = MetadataUIType.objects.all().order_by('key')
+    serializer_class = MetadataUITypeSerializer
+
+    filter_fields=('label', 'key', 'id')
+    ordering_fields=('label', 'key')
+    ordering = ('key', 'label')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class MetadataValueTypeViewSet(RadiamViewSet):
+    queryset = MetadataValueType.objects.all().order_by('key')
+    serializer_class = MetadataValueTypeSerializer
+
+    filter_fields=('label', 'key', 'id')
+    ordering_fields=('label', 'key')
+    ordering = ('key', 'label')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class ChoiceListValueViewSet(RadiamViewSet):
+    queryset = ChoiceListValue.objects.all().order_by('label')
+    serializer_class = ChoiceListValueSerializer
+
+    filter_fields=('label', 'value', 'list', 'id')
+    ordering_fields=('label', 'value', 'list')
+    ordering = ('list', 'value', 'label')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class ChoiceListViewSet(RadiamViewSet):
+    queryset = ChoiceList.objects.all().order_by('label')
+    serializer_class = ChoiceListSerializer
+
+    filter_fields=('label', 'id')
+    ordering_fields=('label', )
+    ordering = ('label')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class SchemaViewSet(RadiamViewSet):
+    queryset = Schema.objects.all().order_by('label')
+    serializer_class = SchemaSerializer
+
+    filter_fields=('label', 'id')
+    ordering_fields=('label', )
+    ordering = ('label', )
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class FieldViewSet(RadiamViewSet):
+    queryset = Field.objects.all().order_by('schema', 'label')
+    serializer_class = FieldSerializer
+
+    filter_fields=('label', 'schema', 'parent', 'metadata_ui_type', 'metadata_value_type', 'many_values', 'choice_list', 'default_choice', 'default_value',)
+    ordering_fields=('label', 'schema', 'parent', 'metadata_ui_type', 'metadata_value_type', 'many_values', 'choice_list', 'default_order', 'default_choice', 'default_value', )
+    ordering = ('schema', 'label', )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class EntityViewSet(RadiamViewSet):
+    queryset = Entity.objects.all()
+    serializer_class = EntitySerializer
+
+    filter_fields=('group', 'project', 'dataset', 'file', 'folder', )
+    ordering_fields=('group', 'project', 'dataset', 'file', 'folder', )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class SelectedSchemaViewSet(RadiamViewSet):
+    queryset = SelectedSchema.objects.all()
+    serializer_class = SelectedSchemaSerializer
+
+    filter_fields=('entity', 'schema', )
+    ordering_fields=('entity', 'schema', )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class SelectedFieldViewSet(RadiamViewSet):
+    queryset = SelectedField.objects.all()
+    serializer_class = SelectedFieldSerializer
+
+    filter_fields=('entity', 'field', 'default', 'required', 'visible', 'order', )
+    ordering_fields=('entity', 'field', 'default', 'required', 'visible', 'order', )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class EntitySchemaFieldViewSet(RadiamViewSet):
+    queryset = Entity.objects.all()
+    serializer_class = EntitySchemaFieldSerializer
+
+    filter_fields=('group', 'project', 'dataset', 'file', 'folder', )
+    ordering_fields=('group', 'project', 'dataset', 'file', 'folder', )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)

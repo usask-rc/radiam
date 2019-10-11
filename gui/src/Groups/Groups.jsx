@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { Component, useEffect, useState } from "react";
 import {
   BooleanField,
   BooleanInput,
+  CreateButton,
   Create,
   Datagrid,
   DateInput,
   Edit,
+  ExportButton,
   Filter,
   List,
   ReferenceField,
@@ -13,19 +15,28 @@ import {
   required,
   SelectInput,
   Show,
+  ShowController,
   SimpleForm,
   SimpleShowLayout,
   TextField,
   TextInput,
+  translate,
+  withTranslate,
 } from "react-admin";
+import { Typography } from "@material-ui/core";
 import { EditToolbar } from "../_components";
+import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import Button from '@material-ui/core/Button';
+import Drawer from '@material-ui/core/Drawer';
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
+import PropTypes from 'prop-types';
+import compose from "recompose/compose";
 import { Prompt } from 'react-router';
-import RelatedUsers from "./RelatedUsers";
 import { CardActions } from "@material-ui/core";
+import RelatedUsers from "./RelatedUsers";
 
 
 const styles = {
@@ -44,6 +55,8 @@ const filterStyles = {
     backgroundColor: "inherit"
   }
 };
+
+
 
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
@@ -106,14 +119,12 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
   </List>
 ));
 
-export const GroupShow = withStyles(styles)(
-  ({ classes, permissions, ...props }) => {
-
+export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
     return(
   <Show title={<GroupTitle />} {...props}>
     <SimpleShowLayout>
     <RelatedUsers {...props} />
-    
+
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -138,11 +149,26 @@ export const GroupShow = withStyles(styles)(
           source={Constants.model_fields.NAME}
         />
       </ReferenceField>
+
+      /** Needs a ShowController to get the record into the ShowMetadata **/
+      <ShowController translate={translate} {...props}>
+        { controllerProps => (
+          <ShowMetadata
+            type="group"
+            translate={translate}
+            record={controllerProps.record}
+            basePath={controllerProps.basePath}
+            resource={controllerProps.resource}
+            id={controllerProps.record.id}
+            props={props}
+          />
+        )}
+      </ShowController>
     </SimpleShowLayout>
   </Show>
-)});
+)}));
 
-export const GroupTitle = ({ record }) => {
+const GroupTitle = ({ record }) => {
   return <span>{record ? `"${record.name}"` : ""}</span>;
 };
 
@@ -226,20 +252,73 @@ export const GroupCreate = props => {
   );
 }
 
+class BaseGroupEdit extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      config: false,
+    };
+  }
 
-const UserCreateActions = ({record}) => {
-  return(
-    <CardActions>
-      <RelatedUsers record={record} />
-    </CardActions>
-  )
-}
+  render() {
+    const closeDrawer = () => event => {
+      this.setState({ config:  false});
+    };
 
-export const GroupEdit = props => {
-  const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  return (
-    <Edit title={<GroupTitle />} actions={<UserCreateActions {...props} />} {...props}>
-      <GroupForm {...other} />
+
+    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
+
+    return <Edit basePath={basePath} title={<GroupTitle />} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
+      <SimpleForm
+        basePath={basePath}
+        toolbar={<EditToolbar />}
+        redirect={Constants.resource_operations.LIST}
+      >
+        <TextInput
+          label={"en.models.groups.name"}
+          source={Constants.model_fields.NAME}
+          validate={validateName}
+        />
+        <TextInput
+          label={"en.models.groups.description"}
+          source={Constants.model_fields.DESCRIPTION}
+          validate={validateDescription}
+        />
+        <BooleanInput
+          label={"en.models.generic.active"}
+          defaultValue={true}
+          source={Constants.model_fields.ACTIVE}
+        />
+        <ReferenceInput
+          label={"en.models.groups.parent_group"}
+          source={Constants.model_fk_fields.PARENT_GROUP}
+          reference={Constants.models.GROUPS}
+          allowEmpty
+        >
+          <SelectInput
+            label={"en.models.groups.name"}
+            optionText={Constants.model_fields.NAME}
+          />
+        </ReferenceInput>
+        { this.props.id && (
+          <React.Fragment>
+            <EditMetadata id={this.props.id} type="group"/>
+            <ConfigMetadata id={this.props.id} type="group"/>
+          </React.Fragment>
+          )}
+      </SimpleForm>
     </Edit>
-  );
-}
+  }
+};
+
+const enhance = compose(
+  translate,
+  withStyles(styles),
+);
+
+BaseGroupEdit.propTypes = {
+  translate: PropTypes.func.isRequired,
+};
+
+
+export const GroupEdit = enhance(BaseGroupEdit);

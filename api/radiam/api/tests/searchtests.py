@@ -210,8 +210,6 @@ class TestSearchAPI(BaseSearchTestCase):
         response = SearchViewSet.as_view(
             {'get': 'list'})(request, project_id=project_id)
 
-        # print(response.data[])
-
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), PAGE_SIZE)
 
@@ -222,4 +220,3 @@ class TestSearchAPI(BaseSearchTestCase):
         the next test.
         """
         super().tearDown()
-
