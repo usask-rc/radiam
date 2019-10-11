@@ -164,7 +164,7 @@ export const UserAgentCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <SimpleForm {...props}>
+      <SimpleForm {...props} redirect={Constants.resource_operations.LIST}>
         <ReferenceInput
         label={"en.models.agents.user"}
         source={Constants.model_fk_fields.USER}
@@ -185,13 +185,12 @@ export const UserAgentCreate = props => {
        
         <ArrayInput source="project_config_list">
           <SimpleFormIterator>
-            
-          <ReferenceInput
-        label={"en.models.agents.projects"}
-        source={"project"}
-        reference={Constants.models.PROJECTS}>
-          <SelectInput optionText={"name"}/>
-        </ReferenceInput>
+            <ReferenceInput
+            label={"en.models.agents.projects"}
+            source={"project"}
+            reference={Constants.models.PROJECTS}>
+              <SelectInput optionText={"name"}/>
+            </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
     
@@ -206,9 +205,13 @@ export const UserAgentCreate = props => {
   )
 };
 
+const WithProps = ({children, ...props}) => children(props)
+
+//TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-
+  console.log("props in useragentedit are: ", props)
+  console.log("props in useragentedit other is: ", other)
   return (
     <Edit {...props}>
       <SimpleForm>
@@ -229,9 +232,26 @@ export const UserAgentEdit = props => {
       >
         <UserShow />
       </ReferenceField>
-      <React.Fragment>
-      
-        <Grid container direction="row">
+
+      <ArrayInput source="project_config_list">
+          <SimpleFormIterator>
+            <ReferenceInput
+            label={"en.models.agents.projects"}
+            source={"project"}
+            reference={Constants.models.PROJECTS}>
+              <SelectInput optionText={"name"} disabled/>
+            </ReferenceInput>
+          </SimpleFormIterator>
+        </ArrayInput>
+
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+      if (formData && formData.remote_api_token && formData.remote_api_username){
+        formData.project_config_list.map(project => delete project.config)
+      }
+
+        return(<Grid container direction="row">
           <Grid xs={12}>
             <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
           </Grid>
@@ -241,8 +261,10 @@ export const UserAgentEdit = props => {
           <Grid xs={12}>
             <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
           </Grid>
-        </Grid>
-        </React.Fragment>
+        </Grid>)
+      }
+      }
+      </FormDataConsumer>
       </SimpleForm>
     </Edit>
 
