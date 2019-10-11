@@ -69,7 +69,9 @@ const renderInput = ({
   meta: { touched, error } = {},
   input: { ...inputProps },
   ...props
-}) => (
+}) => 
+{
+return(
     <TextField
       error={!!(touched && error)}
       helperText={touched && error}
@@ -77,7 +79,7 @@ const renderInput = ({
       {...props}
       fullWidth
     />
-  );
+  )};
 
 class Login extends Component {
   constructor(props) {
@@ -120,7 +122,7 @@ class Login extends Component {
   };
 
   toggleForgotPassword = () => {
-    this.setState(state => ({ forgotpassword: !state.forgotpassword }));
+    this.setState({forgotpassword: !this.state.forgotpassword });
   };
 
   login = auth =>
@@ -129,6 +131,7 @@ class Login extends Component {
       this.props.location.state ? this.props.location.state.nextPathname : "/"
     );
 
+  //TODO: these pages can be extracted into their own classes... somehow.  The `submitForm()` is preventing it, and needs to be looked into.
   render() {
     const { classes, handleSubmit, isLoading, translate } = this.props;
     return (
@@ -139,9 +142,6 @@ class Login extends Component {
               <LockIcon />
             </Avatar>
           </div>
-          {
-            //TODO: this can be extracted into its own class, but I'm not sure about how to do this currently.
-          }
           {!this.state.forgotpassword ? (
             <React.Fragment>
               <form onSubmit={handleSubmit(this.login)}>
@@ -180,14 +180,14 @@ class Login extends Component {
                 </CardActions>
               </form>
               <div className={classes.forgotContainer}>
-              <Link
-                disabled={isLoading}
-                onClick={this.toggleForgotPassword}
-                fullWidth
-              >
-                {translate("en.auth.forgot")}
+                <Link
+                  onClick={this.toggleForgotPassword}
+                  fullWidth
+                >
+                  {translate("en.auth.forgot")}
                 </Link>
-                </div>
+              </div>
+              
             </React.Fragment>
           ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
               <React.Fragment>
