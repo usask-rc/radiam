@@ -234,7 +234,7 @@ export const UserAgentEdit = props => {
       </ReferenceField>
 
       <ArrayInput source="project_config_list">
-          <SimpleFormIterator>
+          <SimpleFormIterator disableRemove disableAdd>
             <ReferenceInput
             label={"en.models.agents.projects"}
             source={"project"}
