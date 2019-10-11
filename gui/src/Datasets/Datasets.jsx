@@ -353,7 +353,7 @@ export const DatasetTitle = ({ record }) => {
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<DatasetTitle />} {...props} >
+    <Edit title={<DatasetTitle />} actions={<MetadataEditActions />} {...props} >
       <DatasetForm mode={"edit"} {...other} />
     </Edit>
   );
