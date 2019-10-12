@@ -63,6 +63,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
+  //TODO: extract this into funcs.jsx
   useEffect(() => {
     const params = {
       q: search,
