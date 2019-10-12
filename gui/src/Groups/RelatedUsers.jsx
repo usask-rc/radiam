@@ -24,7 +24,6 @@ const RelatedUsers = (record) => {
       getGroupUsers(setGroupMembers, record)
     }, [])
 
-    console.log("groupMembers is: ", groupMembers)
     return(
       <div className={styles.relatedDSContainer}>
       {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="p">{`Group Users: `}</Typography> }

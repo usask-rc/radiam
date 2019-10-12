@@ -46,8 +46,115 @@ export function getRelatedDatasets(setDatasets, record){
       {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
     .then(assocDatasets => {
       resolve(setDatasets(assocDatasets))
-    })
+    }).catch(err => reject(err))
   })
+}
+
+export function getFolderFiles(setFiles, folderPath, projectID){
+  //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
+  const params = {
+    //folderPath may or may not contain an item itself.
+    filter: { path_parent: folderPath },
+    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    sort: { field: 'last_modified', order: 'ASC' },
+  };
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
+  return new Promise((resolve, reject) => {
+    
+    dataProvider(
+      GET_LIST,
+      Constants.models.PROJECTS + '/' + projectID + '/search',
+      params
+    )
+      .then(response => {
+        let fileList = [];
+        response.data.map(file => {
+          const newFile = file;
+          newFile.children = [];
+          newFile.key = file.id;
+          fileList = [...fileList, newFile];
+          return file;
+        });
+
+        fileList.sort(function (a, b) {
+          if (a.items) {
+            if (b.items) {
+              if (a.name < b.name) {
+                return -1;
+              }
+              return 1;
+            }
+            return -1;
+          } else {
+            if (b.items) {
+              return 1;
+            }
+            if (a.name < b.name) {
+              return -1;
+            }
+            return 1;
+          }
+        });
+        resolve(setFiles(fileList));
+      })
+      .catch(error => {
+        //setStatus(status => (status = { loading: false, error: error }));
+        console.log('error in fetch from API: ', error);
+        reject(error)
+      });
+  });
+}
+
+export function getRootPaths(setListOfRootPaths, setStatus, projectID){
+  const params = {
+    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    sort: { field: 'last_modified', order: 'ASC' },
+  };
+
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
+  return new Promise((resolve, reject) => {
+
+    dataProvider(
+      GET_LIST,
+      Constants.models.PROJECTS + '/' + projectID + '/search',
+      params
+    )
+      .then(response => {
+
+        let rootList = {}
+
+        response.data.map(file => {
+          //new location that we haven't seen yet.  Add it to the dictionary.
+          if (typeof file.location !== "undefined") {
+            if (!rootList || !rootList[file.location]) {
+              rootList[file.location] = file.path_parent;
+            }
+            //we've seen this location before.  Compare for the shorter string.
+            else {
+              //take the smaller value of the two.  They must share a parent path as they are in the same location.
+              if (rootList[file.location].length > file.path_parent) {
+                rootList[file.location] = file.path_parent
+              }
+            }
+          }
+          return file;
+        })
+
+        let rootPaths = []
+
+        //create dummy root folder items.
+        for (var key in rootList) {
+          rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
+        }
+        resolve(setListOfRootPaths(rootPaths))
+
+      })
+      .catch(error => {
+        reject(setStatus({ loading: false, error: error }));
+      });
+  });
 }
 
 export function getGroupUsers(setGroupMembers, record) {

@@ -19,6 +19,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
+import { getFolderFiles } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -131,59 +132,8 @@ function FolderView({ projectID, item, classes, ...props }) {
   const [folderPath, setFolderPath] = useState(item.path);
   const [parentList, setParentList] = useState([item]);
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   useEffect(() => {
-    //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
-    const params = {
-      //folderPath may or may not contain an item itself.
-      filter: { path_parent: folderPath },
-      pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
-      sort: { field: 'last_modified', order: 'ASC' },
-    };
-
-    const fetchData = async () => {
-      await dataProvider(
-        GET_LIST,
-        Constants.models.PROJECTS + '/' + projectID + '/search',
-        params
-      )
-        .then(response => {
-          let fileList = [];
-          response.data.map(file => {
-            const newFile = file;
-            newFile.children = [];
-            newFile.key = file.id;
-            fileList = [...fileList, newFile];
-            return file;
-          });
-
-          fileList.sort(function (a, b) {
-            if (a.items) {
-              if (b.items) {
-                if (a.name < b.name) {
-                  return -1;
-                }
-                return 1;
-              }
-              return -1;
-            } else {
-              if (b.items) {
-                return 1;
-              }
-              if (a.name < b.name) {
-                return -1;
-              }
-              return 1;
-            }
-          });
-          setFiles(fileList);
-        })
-        .catch(error => {
-          //setStatus(status => (status = { loading: false, error: error }));
-          console.log('error in fetch from API: ', error);
-        });
-    };
-    fetchData();
+    getFolderFiles(setFiles, folderPath, projectID)
   }, [folderPath]);
 
   // className={classes.fileDisplay}
