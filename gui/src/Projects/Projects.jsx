@@ -198,11 +198,11 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           validate={validateName} />
       </div>
         <ReferenceInput
-          resource="projectavatars"
+          resource={Constants.models.PROJECTAVATARS}
           className="input-small"
-          label="Avatar"
-          source={"avatar"} reference="projectavatars">
-            <SelectInput source="avatar_image" optionText={<ImageField classes={{image: classes.image}} source="avatar_image" />}/>
+          label={Constants.model_fields.AVATAR} 
+          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
+            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
         </ReferenceInput>
       <div>
         <TextInput

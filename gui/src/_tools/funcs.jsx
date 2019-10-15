@@ -1,10 +1,9 @@
 import * as Constants from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, GET_MANY } from 'ra-core';
+import { GET_LIST, GET_ONE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
 //TODO: move '/api' to constants as the url for where the api is hosted.

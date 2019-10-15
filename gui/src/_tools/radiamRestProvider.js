@@ -114,7 +114,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       }
 
       case 'CURRENT_USER': {
-        url = `${apiUrl}/users/current/`;
+        url = `${apiUrl}/${Constants.models.USERS}/current/`;
 
         options.method = Constants.methods.GET;
         break;

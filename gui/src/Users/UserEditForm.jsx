@@ -56,7 +56,7 @@ class UserEditForm extends Component {
             this.setState({isFormDirty: false}, () => {
             return fetch(request).then(response => {
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
-                    this.props.history.push("/users");
+                    this.props.history.push(`/${Constants.models.USERS}`);
                     return response.json();
                 }
                 throw new Error(response.statusText);
@@ -113,7 +113,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.last_name}
                 />
                 <TextInput
-                    type="email"
+                    type={Constants.model_fields.EMAIL}
                     label={"en.models.users.email"}
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}

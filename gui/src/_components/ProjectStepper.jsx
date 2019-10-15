@@ -123,19 +123,19 @@ return(
       onChange={handleChange}
     />
     <ReferenceInput
-      resource={"projectavatars"}
+      resource={Constants.models.PROJECTAVATARS}
       className="input-small"
       label="en.models.projects.avatar"
       validate={validateAvatar}
       allowEmpty={false}
       perPage={1000}
       sort={{ field: 'random', order: 'ASC' }}
-      source={"avatar"} reference="projectavatars"
+      source={Constants.model_fields.AVATAR} reference={Constants.models.PROJECTAVATARS}
       defaultValue={props.record.avatar || ""}
     >
       <SelectInput
-        source="avatar_image"
-        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />}
+        source={Constants.model_fields.AVATAR_IMAGE}
+        optionText={<ImageField classes={{ image: classes.image }} source={Constants.model_fields.AVATAR_IMAGE} />}
         onChange={handleChange}
          />
     </ReferenceInput>
@@ -248,7 +248,7 @@ class PageTwo extends Component {
   //TODO: this can result in duplicate users, but the functionality itself is just fine.  This eventually should be fixed but is just an aesthetic issue.
   getUserList = group => {
 
-    const params = { filter: { group: group }, pagination: { page: 1, perPage: 100 }, sort: { field: "id", order: "DESC" } }
+    const params = { filter: { group: group }, pagination: { page: 1, perPage: 100 }, sort: { field: Constants.model_fields.ID, order: "DESC" } }
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
     dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, params).then(response => {
@@ -296,7 +296,7 @@ class PageTwo extends Component {
             placeholder={`Primary Contact`}
             validate={validatePrimaryContactUser}
             className="input-small"
-            users={userList} id={"primary_contact_user"} name={"primary_contact_user"}
+            users={userList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
             defaultValue={primary_contact_user} />
         }
       </div>
@@ -309,8 +309,8 @@ class PageTwo extends Component {
 
 const renderUserInput = ({ input, users }) => {
   return (<React.Fragment>
-    <InputLabel htmlFor="primary_contact_user">{`Primary Contact`}</InputLabel>
-    <Select id={"primary_contact_user"} name={"primary_contact_user"}
+    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
       {...input}
     >
       {users && [...users].map(user => {

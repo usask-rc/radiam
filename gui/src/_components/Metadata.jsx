@@ -415,13 +415,13 @@ class MetadataComponent extends Component {
   getParentEntitySchemasFields = (id, type) => {
     if (type && id) {
       switch (type) {
-        case "group":
+        case Constants.model_fk_fields.GROUP:
           this.getGroupParentEntitySchemaFields(id);
           break;
-        case "project":
+        case Constants.model_fk_fields.PROJECT:
           this.getProjectParentEntitySchemaFields(id);
           break;
-        case "dataset":
+        case Constants.model_fk_fields.DATASET:
           this.getDatasetParentEntitySchemaFields(id);
           break;
         default:
@@ -443,7 +443,7 @@ class MetadataComponent extends Component {
         params
       ).then(response => {
         if (response && response.data && response.data.parent_group) {
-          this.getEntitySchemasFields(response.data.parent_group, "group", true);
+          this.getEntitySchemasFields(response.data.parent_group, Constants.model_fk_fields.GROUP, true);
         } else {
           // There are no more parents to check.
           return;
@@ -469,7 +469,7 @@ class MetadataComponent extends Component {
         params
       ).then(response => {
         if (response && response.data && response.data.group) {
-          this.getEntitySchemasFields(response.data.group, "group", true);
+          this.getEntitySchemasFields(response.data.group, Constants.model_fk_fields.GROUP, true);
         } else {
           // There are no more parents to check.
           console.error("Every project should have a group, how did we not find one?");
@@ -1204,7 +1204,7 @@ class BaseEditMetadata extends MetadataComponent {
           type ==="container" ||
           type ==="date" ||
           type ==="dateYear" ||
-          type ==="email" ||
+          type === Constants.model_fields.EMAIL ||
           type ==="float" ||
           type ==="integer" ||
           type ==="text" ||
@@ -1249,7 +1249,7 @@ class BaseEditMetadata extends MetadataComponent {
                       validate={ field.required ? validateRequired : null }
                     />
 
-                : type ==="email" ?
+                : type === Constants.model_fields.EMAIL ?
                     <TextInput
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
@@ -1329,7 +1329,7 @@ class BaseEditMetadata extends MetadataComponent {
                       className={ field.visible ? null : classes.invisible }
                       validate={ field.required ? validateRequired : null }
                     />
-                : type ==="email" ?
+                : type === Constants.model_fields.EMAIL ?
                     <TextInput
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
@@ -1568,7 +1568,7 @@ class BaseShowMetadata extends MetadataComponent {
           type ==="container" ||
           type ==="date" ||
           type ==="dateYear" ||
-          type ==="email" ||
+          type === Constants.model_fields.EMAIL ||
           type ==="float" ||
           type ==="integer" ||
           type ==="text" ||
@@ -1633,7 +1633,7 @@ class BaseShowMetadata extends MetadataComponent {
                           />
                         </div>
 
-                    : type ==="email" ?
+                    : type === Constants.model_fields.EMAIL ?
                         <div>
                           <Typography className={classes.label}>{translate(field.label + ".label")}</Typography>
                           <EmailField
@@ -1710,7 +1710,7 @@ class BaseShowMetadata extends MetadataComponent {
         } else {
             return (<div className={classes.container} key={"text-container-" + field.id}>
             <React.Fragment>
-              { (type === "boolean" || type === "date" || type === "dateYear" || type === "email" || type === "float" || type === "integer" || type === "text" || type === "url") &&
+              { (type === "boolean" || type === "date" || type === "dateYear" || type === Constants.model_fields.EMAIL || type === "float" || type === "integer" || type === "text" || type === "url") &&
                 <Typography className={classes.label}>{translate(field.label + ".label")}</Typography>
               }
               {   type ==="boolean" ?
@@ -1736,7 +1736,7 @@ class BaseShowMetadata extends MetadataComponent {
                       source={this.getSource(field, parentPath)}
                       record={this.props.record}
                     />
-                : type ==="email" ?
+                : type === Constants.model_fields.EMAIL ?
                     <EmailField
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}

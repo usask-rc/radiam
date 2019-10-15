@@ -8,7 +8,7 @@ const ProjectCardHeader = ({ classes, project }) =>
         <div className={classes.headerDiv}>
             <ReferenceField
                 record={project}
-                basePath="projects"
+                basePath={Constants.models.PROJECTS}
                 linkType={false}
                 source={'avatar'}
                 reference={'projectavatars'}
@@ -16,7 +16,7 @@ const ProjectCardHeader = ({ classes, project }) =>
             >
                 <ImageField
                     classes={{ image: classes.image }}
-                    source="avatar_image"
+                    source={Constants.model_fields.AVATAR_IMAGE}
                 />
             </ReferenceField>
         </div>

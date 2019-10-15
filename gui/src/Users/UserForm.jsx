@@ -80,7 +80,7 @@ class UserFormWithAssoc extends Component {
                                 throw new Error(response.statusText);
                             })
                                 .then(data => {
-                                    this.props.history.push("/users");
+                                    this.props.history.push(`/${Constants.models.USERS}`);
                                 })
                                 .catch(err => {
                                     toastErrors(err)
@@ -89,11 +89,11 @@ class UserFormWithAssoc extends Component {
                         }
                         else if (group_role || group) {
                             toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
-                            this.props.history.push("/users");
+                            this.props.history.push(`/${Constants.models.USERS}`);
                         }
                         else {
                             toast.success("User: " + username + " was successfully created.")
-                            this.props.history.push("/users");
+                            this.props.history.push(`/${Constants.models.USERS}`);
                         }
 
                     }
@@ -159,7 +159,7 @@ class UserFormWithAssoc extends Component {
                     onChange={this.handleChange}
                 />
                 <TextInput
-                    type="email"
+                    type={Constants.model_fields.EMAIL}
                     label={"en.models.users.email"}
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}

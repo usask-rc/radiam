@@ -154,7 +154,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
       <ShowController translate={translate} {...props}>
         { controllerProps => (
           <ShowMetadata
-            type="group"
+            type=Constants.model_fk_fields.GROUP
             translate={translate}
             record={controllerProps.record}
             basePath={controllerProps.basePath}
@@ -302,8 +302,8 @@ class BaseGroupEdit extends Component {
         </ReferenceInput>
         { this.props.id && (
           <React.Fragment>
-            <EditMetadata id={this.props.id} type="group"/>
-            <ConfigMetadata id={this.props.id} type="group"/>
+            <EditMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
+            <ConfigMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
           </React.Fragment>
           )}
       </SimpleForm>

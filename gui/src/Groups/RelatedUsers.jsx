@@ -44,7 +44,7 @@ const RelatedUsers = (record) => {
   
         )
       })}
-          <CreateButton basePath={"/users"} label={`New User`}></CreateButton>
+          <CreateButton basePath={`/${Constants.models.USERS}`} label={`New User`}></CreateButton>
       </div>
     )
   }
