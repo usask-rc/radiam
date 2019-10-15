@@ -154,7 +154,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
       <ShowController translate={translate} {...props}>
         { controllerProps => (
           <ShowMetadata
-            type=Constants.model_fk_fields.GROUP
+            type={Constants.model_fk_fields.GROUP}
             translate={translate}
             record={controllerProps.record}
             basePath={controllerProps.basePath}
