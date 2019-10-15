@@ -10,15 +10,13 @@ import {
 
 import { compose } from 'recompose';
 import * as Constants from '../_constants/index';
-import {Field} from "redux-form";
 import MapForm from '../_components/_forms/MapForm';
 import { Prompt } from 'react-router';
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { TextField, Divider, Button, Collapse, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
+import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
-import { flexbox } from '@material-ui/system';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -144,9 +142,9 @@ class LocationForm extends Component {
           label={'en.models.locations.portal_url'}
           source="portal_url"
         />
-        <LongTextInput label={'en.models.locations.notes'} source="notes" />
+        <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
         <MapForm
-          content_type={'location'}
+          content_type={Constants.model_fk_fields.LOCATION}
           recordGeo={this.state.geo}
           id={this.props.id}
           geoDataCallback={this.geoDataCallback}

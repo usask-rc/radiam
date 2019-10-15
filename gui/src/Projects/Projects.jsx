@@ -9,11 +9,9 @@ import {
   List,
   ReferenceField,
   ReferenceInput,
-  RefreshButton,
   required,
   SelectInput,
   Show,
-  ShowButton,
   ShowController,
   SimpleForm,
   Tab,
@@ -25,8 +23,6 @@ import {
 } from 'react-admin';
 
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import Divider from '@material-ui/core/Divider';
 import { CardContentInner } from "ra-ui-materialui";
 import * as Constants from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
@@ -37,16 +33,9 @@ import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
-import Button from '@material-ui/core/Button';
-import SettingsIcon from '@material-ui/icons/Settings';
 import compose from "recompose/compose";
-import { FormDataConsumer } from 'ra-core';
-import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { Drawer } from '@material-ui/core';
-import { DatasetCreate } from '../Datasets/Datasets';
-import { Route } from "react-router"
 
 const styles = {
   actions: {
