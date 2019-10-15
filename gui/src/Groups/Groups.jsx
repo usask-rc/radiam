@@ -2,12 +2,10 @@ import React, { Component, useEffect, useState } from "react";
 import {
   BooleanField,
   BooleanInput,
-  CreateButton,
   Create,
   Datagrid,
   DateInput,
   Edit,
-  ExportButton,
   Filter,
   List,
   ReferenceField,
@@ -23,11 +21,8 @@ import {
   translate,
   withTranslate,
 } from "react-admin";
-import { Typography } from "@material-ui/core";
 import { EditToolbar } from "../_components";
 import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
@@ -35,7 +30,6 @@ import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
 import compose from "recompose/compose";
 import { Prompt } from 'react-router';
-import { CardActions } from "@material-ui/core";
 import RelatedUsers from "./RelatedUsers";
 
 

@@ -155,7 +155,7 @@ class ResetPassword extends Component {
                   <div className={classes.input}>
                     <TextField
                       id={Constants.login_details.PASSWORD}
-                      label={Constants.login_details.PASSWORD}}
+                      label={Constants.login_details.PASSWORD}
                       onChange={this.handleChange(Constants.login_details.PASSWORD)}
                       value={password}
                       fullWidth
