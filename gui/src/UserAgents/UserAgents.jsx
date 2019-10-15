@@ -11,14 +11,10 @@ import {
   Filter,
   List,
   NumberInput,
-  ReferenceArrayField,
-  ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
   required,
-  SelectArrayInput,
   SelectInput,
-  Show,
   ShowView,
   SimpleForm,
   SimpleFormIterator,
@@ -32,9 +28,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { regex, number, minValue, FormDataConsumer, ShowController } from "ra-core";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
-import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 
 const filterStyles = {
   form: {
@@ -141,10 +136,10 @@ return(
         <LocationShow />
       </ReferenceField>
      {controllerProps.record && controllerProps.record.project_config_list && 
-      <ArrayField source={"project_config_list"} label={"Target Projects"}>
+      <ArrayField source={Constants.model_fields.PROJECT_CONFIG_LIST} label={"Target Projects"}>
         <SingleFieldList>
-          <ReferenceField source={"project"} reference={Constants.models.PROJECTS}>
-            <ChipField source="name" />
+          <ReferenceField source={Constants.model_fk_fields.PROJECT} reference={Constants.models.PROJECTS}>
+            <ChipField source={Constants.model_fields.NAME} />
           </ReferenceField>
         </SingleFieldList>
       </ArrayField>
@@ -216,13 +211,13 @@ export const UserAgentCreate = props => {
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
        
-        <ArrayInput source="project_config_list">
+        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
           <SimpleFormIterator>
             <ReferenceInput
             label={"en.models.agents.projects"}
-            source={"project"}
+            source={Constants.model_fk_fields.PROJECT}
             reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={"name"}/>
+              <SelectInput optionText={Constants.model_fields.NAME}/>
             </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
@@ -279,13 +274,13 @@ export const UserAgentEdit = props => {
 
         return(
           <React.Fragment>
-          <ArrayInput source="project_config_list">
+          <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
           <SimpleFormIterator disableRemove disableAdd>
             <ReferenceInput
             label={"en.models.agents.projects"}
-            source={"project"}
+            source={Constants.model_fk_fields.PROJECT}
             reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={"name"} disabled/>
+              <SelectInput optionText={Constants.model_fields.NAME} disabled/>
             </ReferenceInput>
             {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
           </SimpleFormIterator>

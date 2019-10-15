@@ -495,7 +495,7 @@ class MetadataComponent extends Component {
         params
       ).then(response => {
         if (response && response.data && response.data.project) {
-          this.getEntitySchemasFields(response.data.project, "project", true);
+          this.getEntitySchemasFields(response.data.project, Constants.model_fk_fields.PROJECT, true);
         } else {
           // There are no more parents to check.
           console.error("Every dataset should have a project, how did we not find one with " + id);

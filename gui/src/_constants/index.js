@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-  API_ENDPOINT: "/api",
+  API_ENDPOINT: "api",
   API_PORT: "8100",
   AVATAR_HEIGHT: "36px",
   I18N_TLE: "en", //TODO: modularize this or remove it.
@@ -133,6 +133,7 @@ module.exports = Object.freeze({
     ORCID_ID: "user_orcid_id",
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
+    PROJECT_CONFIG_LIST: "project_config_list",
     REMOTE_USER: "remote_user",
     SENSITIVITY_LEVEL: "sensitivity_level",
     STUDY_SITE: "study_site",

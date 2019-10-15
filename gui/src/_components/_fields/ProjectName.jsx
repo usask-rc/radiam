@@ -65,14 +65,14 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
 
 ProjectName.defaultProps = {
   addLabel: true,
-  sortBy: "name",
+  sortBy: Constants.model_fields.NAME,
 };
 
 const EnhancedProjectName = withStyles(styles)(ProjectName);
 
 EnhancedProjectName.defaultProps = {
   addLabel: true,
-  sortBy: "name",
+  sortBy: Constants.model_fields.NAME,
 };
 
 EnhancedProjectName.displayName = 'EnhancedProjectName';

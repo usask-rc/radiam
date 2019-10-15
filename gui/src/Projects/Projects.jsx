@@ -151,7 +151,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <ShowController translate={translate} {...props}>
               { controllerProps => (
                 <ShowMetadata
-                  type="project"
+                  type={Constants.model_fk_fields.PROJECT}
                   translate={translate}
                   record={controllerProps.record}
                   basePath={controllerProps.basePath}
@@ -221,8 +221,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
         </ReferenceInput>
         { record.id && (
           <React.Fragment>
-            <EditMetadata id={record.id} type="project"/>
-            <ConfigMetadata id={record.id} type="project"/>
+            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+            <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </React.Fragment>
           )}
       </div>
