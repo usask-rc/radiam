@@ -151,15 +151,15 @@ const App = props => {
             options={{ label: 'en.sidebar.groups' }}
             list={GroupList}
             show={GroupShow}
-            create={
-              permissions.is_admin || permissions.is_group_admin
-                ? GroupCreate
-                : null
-            }
             edit={
-              permissions.is_admin || permissions.is_group_amin
+              permissions.is_admin || permissions.is_group_admin
                 ? GroupEdit
                 : null
+            }
+            create={
+              permissions.is_amdin || permissions.is_group_admin 
+              ? GroupCreate 
+              : null
             }
           />,
 

@@ -2,6 +2,7 @@ import React, { Component, useEffect, useState } from "react";
 import {
   BooleanField,
   BooleanInput,
+  CardActions,
   Create,
   Datagrid,
   DateInput,
@@ -21,16 +22,18 @@ import {
   translate,
   withTranslate,
 } from "react-admin";
-import { EditToolbar } from "../_components";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import { withStyles } from "@material-ui/core/styles";
+import compose from "recompose/compose";
+import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
+import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import compose from "recompose/compose";
-import { Prompt } from 'react-router';
+import { Prompt, Route } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
+import { withStyles } from "@material-ui/core/styles";
+import { CreateButton } from "ra-ui-materialui/lib/button";
+import { Drawer } from "@material-ui/core";
 
 
 const styles = {
@@ -74,7 +77,14 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
+const GroupListActions = ({ basePath }) => (
+  <CardActions>
+    <CreateButton basePath={basePath} />
+  </CardActions>
+)
+
 export const GroupList = withStyles(styles)(({ classes, ...props }) => (
+  <React.Fragment>
   <List
     {...props}
     classes={{
@@ -111,6 +121,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
       </ReferenceField>
     </Datagrid>
   </List>
+  </React.Fragment>
 ));
 
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {

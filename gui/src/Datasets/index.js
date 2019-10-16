@@ -1,7 +1,8 @@
-import  { DatasetList, DatasetCreate, DatasetEdit, DatasetShow } from "./Datasets"
+import  { DatasetEdit, DatasetShow, DatasetCreate } from "./Datasets"
+import { DatasetList } from "./DatasetList";
 export default {
-    list: DatasetList,
     create: DatasetCreate,
+    list: DatasetList,
     edit: DatasetEdit,
     show: DatasetShow,
 }

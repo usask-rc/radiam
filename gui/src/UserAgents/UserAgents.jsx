@@ -270,7 +270,6 @@ export const UserAgentEdit = props => {
           return newProj
         })
       }
-      console.log("formData in this form is: ", formData)
 
         return(
           <React.Fragment>
@@ -305,13 +304,3 @@ export const UserAgentEdit = props => {
 
   );
 }
-/*
-<ReferenceField
-        linkType={false}
-        label={"en.models.agents.location"}
-        source={Constants.model_fk_fields.LOCATION}
-        reference={Constants.models.LOCATIONS}
-      >
-        <TextField source={Constants.model_fields.DISPLAY_NAME} />
-      </ReferenceField>
-*/
