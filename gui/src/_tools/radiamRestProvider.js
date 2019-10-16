@@ -175,7 +175,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         options.method = 'PUT';
         if (
-          resource === 'projectavatars' &&
+          resource === Constants.models.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);
@@ -194,7 +194,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/`;
         options.method = Constants.methods.POST;
         if (
-          resource === 'projectavatars' &&
+          resource === Constants.models.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);

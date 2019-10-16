@@ -196,45 +196,46 @@ const GroupForm = props =>
   function handleChange(data){
     setIsFormDirty(true)
   }
-return(
-  <SimpleForm
-    {...props}
-    toolbar={<EditToolbar />}
-    asyncValidate={asyncValidate}
-    asyncBlurFields={[ Constants.model_fields.NAME ]}
-    onChange={handleChange}
-    save={handleSubmit}
-  >
-    <TextInput
-      label={"en.models.groups.name"}
-      source={Constants.model_fields.NAME}
-      validate={validateName}
-    />
-    <TextInput
-      label={"en.models.groups.description"}
-      source={Constants.model_fields.DESCRIPTION}
-      validate={validateDescription}
-    />
-    <BooleanInput
-      label={"en.models.generic.active"}
-      defaultValue={true}
-      source={Constants.model_fields.ACTIVE}
-    />
-    <ReferenceInput
-      label={"en.models.groups.parent_group"}
-      source={Constants.model_fk_fields.PARENT_GROUP}
-      reference={Constants.models.GROUPS}
-      validate={validateParentGroup}
-      allowEmpty
+
+  return(
+    <SimpleForm
+      {...props}
+      toolbar={<EditToolbar />}
+      asyncValidate={asyncValidate}
+      asyncBlurFields={[ Constants.model_fields.NAME ]}
+      onChange={handleChange}
+      save={handleSubmit}
     >
-      <SelectInput
+      <TextInput
         label={"en.models.groups.name"}
-        optionText={Constants.model_fields.NAME}
+        source={Constants.model_fields.NAME}
+        validate={validateName}
       />
-    </ReferenceInput>
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-  </SimpleForm>
-)
+      <TextInput
+        label={"en.models.groups.description"}
+        source={Constants.model_fields.DESCRIPTION}
+        validate={validateDescription}
+      />
+      <BooleanInput
+        label={"en.models.generic.active"}
+        defaultValue={true}
+        source={Constants.model_fields.ACTIVE}
+      />
+      <ReferenceInput
+        label={"en.models.groups.parent_group"}
+        source={Constants.model_fk_fields.PARENT_GROUP}
+        reference={Constants.models.GROUPS}
+        validate={validateParentGroup}
+        allowEmpty
+      >
+        <SelectInput
+          label={"en.models.groups.name"}
+          optionText={Constants.model_fields.NAME}
+        />
+      </ReferenceInput>
+      <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    </SimpleForm>
+  )
 };
 
 export const GroupCreate = props => {

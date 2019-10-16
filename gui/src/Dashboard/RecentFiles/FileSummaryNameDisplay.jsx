@@ -12,8 +12,8 @@ const FileSummaryNameDisplay = ({ classes, avatar, name, id }) => (
                 <ReferenceField
                     basePath={Constants.models.PROJECTS}
                     linkType={false}
-                    source={'avatar'}
-                    reference={'projectavatars'}
+                    source={Constants.model_fields.AVATAR}
+                    reference={Constants.models.PROJECTAVATARS}
                     record={{ avatar: avatar }}
                     allowEmpty
                 >

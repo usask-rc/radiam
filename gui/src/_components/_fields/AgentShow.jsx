@@ -7,7 +7,7 @@ import * as Constants from "../../_constants/index";
 export const agentSelect = choice => choice.location ?
     `${choice.location}` : `${choice.user}`;
 
-//i dont know how necessary this is - but this is the equivalent display item for Location Show, to display Agent data on a File display.  It is not completed yet.
+//TODO: once we finally get some fresh data, test to make sure this AgentShow is displaying on project files.
 export const AgentShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = ({
     className,
     allowEmpty,
@@ -16,11 +16,8 @@ export const AgentShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
     record = {},
     ...rest
 }) => {
-    console.log("in agentshow, rest is: ", rest)
     const display_location = get(record, Constants.model_fields.LOCATION);
     const display_user = get(record, Constants.model_fk_fields.USER);
-
-    console.log("in agentshow, disp loc and disp user are:" , display_location, display_user)
     if (display_location) {
         return (
             <Typography

@@ -2,6 +2,7 @@ import React from 'react';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
 import { Link, Typography } from '@material-ui/core';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
+import * as Constants from "../../_constants/index"
 
 const ProjectCardHeader = ({ classes, project }) =>
     (<Typography className={classes.headlineTop} variant="h5" component="h5">
@@ -10,8 +11,8 @@ const ProjectCardHeader = ({ classes, project }) =>
                 record={project}
                 basePath={Constants.models.PROJECTS}
                 linkType={false}
-                source={'avatar'}
-                reference={'projectavatars'}
+                source={Constants.model_fields.AVATAR}
+                reference={Constants.models.PROJECTAVATARS}
                 allowEmpty
             >
                 <ImageField

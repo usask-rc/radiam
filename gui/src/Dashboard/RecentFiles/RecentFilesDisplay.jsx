@@ -143,8 +143,8 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
                     record={item}
                     basePath={Constants.models.PROJECTS}
                     linkType={false}
-                    source={'avatar'}
-                    reference={'projectavatars'}
+                    source={Constants.model_fields.AVATAR}
+                    reference={Constants.models.PROJECTAVATARS}
                     className={classes.projectName}
                     allowEmpty
                   >
