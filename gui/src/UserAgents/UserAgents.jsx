@@ -188,7 +188,7 @@ export const UserAgentTitle = ({ record }) => {
 
 //TODO: some values must be moved to the Strings file.
 export const UserAgentCreate = props => {
-
+  console.log("props in useragentcreate are: ", props)
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>

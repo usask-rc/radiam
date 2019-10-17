@@ -61,10 +61,13 @@ class LocationForm extends Component {
   };
 
   //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
-  handleSubmit = data => {
-      this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, this.state.geo, this.props);
-      })
+  handleSubmit = (data) => {
+    console.log("data in handlesubmit locform is: ", data)
+    
+    this.setState({isFormDirty: false}, () => {
+        submitObjectWithGeo(data, this.state.geo, this.props, data.location_type === Constants.LOCATIONTYPE_OSF ? `/${Constants.models.AGENTS}/create` : `/${Constants.models.LOCATIONS}`);
+    })
+    
   };
 
   handleChange = data => {
@@ -105,7 +108,6 @@ class LocationForm extends Component {
     return (
       <SimpleForm
         {...rest}
-        redirect={Constants.resource_operations.LIST}
         save={this.handleSubmit}
         name={`locationForm`}
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.

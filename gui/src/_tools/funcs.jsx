@@ -241,17 +241,17 @@ export function getUserGroups(record) {
   })
 }
 
-export function submitObjectWithGeo(formData, geo, props){
+export function submitObjectWithGeo(formData, geo, props, redirect=Constants.resource_operations.LIST ){
   console.log("formData heading into submitobjectwithgeo is: ", formData)
   if (formData.id){
-    updateObjectWithGeo(formData, geo, props)
+    updateObjectWithGeo(formData, geo, props, redirect)
   }
   else{
-    createObjectWithGeo(formData, geo, props);
+    createObjectWithGeo(formData, geo, props, redirect);
   }
 }
 
-function updateObjectWithGeo(formData, geo, props){
+function updateObjectWithGeo(formData, geo, props, redirect){
   if (geo && Object.keys(geo).length > 0){
     formData.geo = geo
   }
@@ -266,10 +266,10 @@ function updateObjectWithGeo(formData, geo, props){
               }
       }
   }
-  props.save(formData, Constants.resource_operations.LIST);
+  props.save(formData, redirect);
 }
 
-export function createObjectWithGeo(formData, geo, props){
+export function createObjectWithGeo(formData, geo, props, redirect){
   let headers = new Headers({ "Content-Type": "application/json" });
   const token = localStorage.getItem(Constants.WEBTOKEN);
   
@@ -326,7 +326,7 @@ export function createObjectWithGeo(formData, geo, props){
         })
         .then(data => {  
             console.log("data after update is: ", data)
-            props.history.push(`/${props.resource}/`)
+            props.history.push(`${redirect}/`)
         })
       }
       )

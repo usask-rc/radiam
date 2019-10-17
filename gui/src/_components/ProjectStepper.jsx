@@ -136,8 +136,7 @@ return(
       <SelectInput
         source={Constants.model_fields.AVATAR_IMAGE}
         optionText={<ImageField classes={{ image: classes.image }} source={Constants.model_fields.AVATAR_IMAGE} />}
-        onChange={handleChange}
-         />
+        onChange={handleChange}/>
     </ReferenceInput>
     <TextInput
       className="input-medium"
@@ -169,13 +168,12 @@ class PageThree extends Component {
     }
   };
 
-  handleSubmit = data => {
+  handleSubmit = (data, redirect) => {
     this.setState({isFormDirty: false}, () => {
-      submitObjectWithGeo(data, this.state.geo, this.props)
+      submitObjectWithGeo(data, this.state.geo, this.props, redirect)
     }
     )
   };
-
 
   handleChange = data => {
     this.setState({isFormDirty: true})
@@ -185,15 +183,13 @@ class PageThree extends Component {
     const { handleBack, record } = this.props
     return(
       <React.Fragment>
-      <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
-        {record && 
-          <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
-        }
-      </SimpleForm>
-      <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-
-</React.Fragment>
-
+        <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
+          {record && 
+            <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
+          }
+        </SimpleForm>
+        <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+      </React.Fragment>
     )
   }
 }
