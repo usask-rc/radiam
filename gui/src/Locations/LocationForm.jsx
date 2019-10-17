@@ -17,6 +17,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
+import { FormDataConsumer } from 'ra-core';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -113,44 +114,74 @@ class LocationForm extends Component {
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+        return(
+          <Grid container>
+          <Grid xs={12}>
         <TextInput
           label={'en.models.locations.display_name'}
           source={Constants.model_fields.DISPLAY_NAME}
         />
+        </Grid>
+        <Grid xs={12}>
         <TextInput
           label={'en.models.locations.host_name'}
           source={Constants.model_fields.HOST_NAME}
           validate={validateHostname}
         />
+        </Grid>
+        <Grid xs={12}>
         <ReferenceInput
           label={'en.models.locations.type'}
           source={Constants.model_fk_fields.LOCATION_TYPE}
           reference={Constants.models.LOCATIONTYPES}
           validate={validateLocationType}
+          defaultValue={Constants.LOCATIONTYPE_OSF}
         >
           <TranslationSelect optionText={Constants.model_fields.LABEL} />
         </ReferenceInput>
-        <TextInput
-          label={'en.models.locations.globus_endpoint'}
-          source="globus_endpoint"
-          validate={validateGlobusEndpoint}
-        />
-        <LongTextInput
-          label={'en.models.locations.globus_path'}
-          source="globus_path"
-        />
-        <TextInput label={"en.models.locations.osf_project"} source="osf_project" />
+        </Grid>
+        <React.Fragment>
+          <Grid xs={12}>
+            <TextInput
+              label={'en.models.locations.globus_endpoint'}
+              source="globus_endpoint"
+              validate={validateGlobusEndpoint}
+            />
+          </Grid>
+          <Grid xs={12}>
+            <LongTextInput
+              label={'en.models.locations.globus_path'}
+              source="globus_path"
+            />
+          </Grid>
+        </React.Fragment>
+        {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
+        <Grid xs={12}>
+          <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
+        </Grid>
+        }
+        <Grid xs={12}>
         <LongTextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
+          defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "https://osf.io" : ""}
         />
+        </Grid>
+        <Grid xs={12}>
         <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
+        </Grid>
+        <Grid xs={12}>
         <MapForm
           content_type={Constants.model_fk_fields.LOCATION}
           recordGeo={this.state.geo}
           id={this.props.id}
           geoDataCallback={this.geoDataCallback}
         />
+        </Grid>
+        <Grid xs={12}>
         <ExpansionPanel fullWidth>
           <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
             <Typography>{`Geo Text Entry - Experimental`}</Typography>
@@ -166,6 +197,12 @@ class LocationForm extends Component {
             </Grid>
           </ExpansionPanelDetails>
         </ExpansionPanel>
+        </Grid>
+        </Grid>
+        )
+      }
+      }
+      </FormDataConsumer>
 
         <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
       </SimpleForm>

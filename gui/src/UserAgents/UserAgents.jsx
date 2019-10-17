@@ -191,8 +191,14 @@ export const UserAgentCreate = props => {
   console.log("props in useragentcreate are: ", props)
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
-    <Create {...props}>
-      <SimpleForm {...props} redirect={Constants.resource_operations.LIST}>
+    <Create {...other}>
+      <SimpleForm {...other} redirect={Constants.resource_operations.LIST}>
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+        return(
+        <Grid container direction="row">
+        <Grid xs={12}>  
         <ReferenceInput
         label={"en.models.agents.user"}
         source={Constants.model_fk_fields.USER}
@@ -201,6 +207,8 @@ export const UserAgentCreate = props => {
         >
           <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
         </ReferenceInput>
+        </Grid>
+        <Grid xs={12}>
         <ReferenceInput
           label={"en.models.agents.location"}
           source={Constants.model_fk_fields.LOCATION}
@@ -210,7 +218,8 @@ export const UserAgentCreate = props => {
         >
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
-       
+        </Grid>
+        <Grid xs={12}>
         <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
           <SimpleFormIterator>
             <ReferenceInput
@@ -221,13 +230,27 @@ export const UserAgentCreate = props => {
             </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
-    
-        
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
+        </Grid>
+        <Grid xs={12}>
         <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
+        </Grid>
+        <Grid xs={12}>
         <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+        </Grid>
+        </Grid>
+        )
+      }
+      }
+        </FormDataConsumer>
       </SimpleForm>
     </Create>
   )
