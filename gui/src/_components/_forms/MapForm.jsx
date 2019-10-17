@@ -21,6 +21,7 @@ const styles = {
 class MapForm extends Component {
     constructor(props){
         super(props);
+        console.log("imported props from parent in MapForm is: ", this.props)
         this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
         this.updateGeo = this.updateGeo.bind(this)
         this._updateFeatures = this._updateFeatures.bind(this)
@@ -249,7 +250,7 @@ class MapForm extends Component {
             return;
         }
         
-            if (this.state.geo && this.state.geo.geojson && this.state.geo.geojson.features.length > 0){
+            if (this.state.geo && this.state.geo.geojson && this.state.geo.geojson.features && this.state.geo.geojson.features.length > 0){
 
                 //features must be loaded in one at a time, not in bulk.
                 let localFeatures = {}

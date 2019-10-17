@@ -10,25 +10,12 @@ import {
 
 import { compose } from 'recompose';
 import * as Constants from '../_constants/index';
-import { Field } from 'redux-form';
 import MapForm from '../_components/_forms/MapForm';
 import { Prompt } from 'react-router';
-import { submitObjectWithGeo } from '../_tools/funcs';
+import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import {
-  TextField,
-  Divider,
-  Button,
-  Collapse,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  Typography,
-  Grid,
-} from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
-import { flexbox } from '@material-ui/system';
+
 import GeoJSONTextArea from '../_components/_fragments/GeoJSONTextArea';
 
 const validateHostname = required('en.validate.locations.host_name');
@@ -37,6 +24,7 @@ const validateGlobusEndpoint = regex(
   /[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{8}/,
   'en.validate.locations.globus_endpoint'
 );
+const GJV = require("geojson-validation")
 
 const styles = {
   mapPopup: {
@@ -55,6 +43,7 @@ class LocationForm extends Component {
       geo: this.props.record.geo,
       geoText: '',
       isFormDirty: false,
+      mapFormKey: 0,
     };
   }
 
@@ -98,13 +87,34 @@ class LocationForm extends Component {
     let parseGeoText;
     try {
       parseGeoText = JSON.parse(this.state.geoText);
-      console.log('parsegeotext: ', parseGeoText);
 
-      //remove values we cant put on the map and warn the user they won't display properly.
-      //write it to geo
-      this.setState({ geo: parseGeoText });
+      if (parseGeoText && GJV.valid(parseGeoText.geojson)){
+
+        const newGeo = this.state.geo
+        newGeo.geojson = parseGeoText.geojson
+
+        //check for unsupported types - Multi____
+
+        //TODO: the belong code doesn't belong on the text validator, it belongs on the map prior to a display attempt.
+        /*
+        parseGeoText.geojson.features.map(feature => {
+          const type = feature.geometry.type
+          //TODO:could just do a splice on the first 5 letters honestly
+          if (type === "MultiPolygon" || type === "MultiPoint" || type === "MultiLineString"){
+
+          }
+        })*/
+
+        this.setState({ geo: newGeo }, this.setState({mapFormKey: this.state.mapFormKey + 1}));
+      }
+      else{
+        console.log("Invalid geoJSON provided to form - If there's a plugin that identifies the mistake in-page, please insert it here.")
+        //toastErrors("Invalid JSON given to Text Entry Field")
+        alert(`Invalid geoJSON provided.  Check out a site like http://geojsonlint.com/ to find the error.  GeoJSON:${JSON.stringify(parseGeoText.geojson)}`)
+      }
+
     } catch (e) {
-      alert(e);
+      toastErrors("Invalid JSON given to Text Entry: ", e)
     }
     //check for difference between text and map
     //check for valid geoJSON
@@ -161,6 +171,7 @@ class LocationForm extends Component {
         />
         <LongTextInput label={'en.models.locations.notes'} source="notes" />
         <MapForm
+          key={this.state.mapFormKey}
           content_type={'location'}
           recordGeo={this.state.geo}
           id={this.props.id}

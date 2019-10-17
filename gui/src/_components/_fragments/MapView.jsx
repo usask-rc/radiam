@@ -71,7 +71,7 @@ const MapView = ({ classes, record }) => {
         
         const _editableFG = ref;
 
-            if (record.geo && record.geo.geojson && record.geo.geojson.features.length > 0){
+            if (record.geo && record.geo.geojson && record.geo.geojson.features && record.geo.geojson.features.length > 0){
                 //features must be loaded in one at a time, not in bulk.
                 let localFeatures = {}
                 let output = {}
@@ -116,7 +116,7 @@ const MapView = ({ classes, record }) => {
         if (mapLoading){
             let latLng = [pos.coords.latitude, pos.coords.longitude]
 
-            if (record.geo && record.geo.geojson && record.geo.geojson.features.length > 0) {
+            if (record.geo && record.geo.geojson && record.geo.geojson.features && record.geo.geojson.features.length > 0) {
                 const firstFeature = record.geo.geojson.features[0]
 
                 if (firstFeature.geometry.type === 'Point'){
