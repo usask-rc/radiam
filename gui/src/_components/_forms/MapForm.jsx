@@ -261,11 +261,24 @@ class MapForm extends Component {
                 
                     leafletGeoJSON.eachLayer(layer => 
                         {
-                            //add layer to the map
-                            output = ref.leafletElement.addLayer(layer)
-                            layer.on({
-                                click: this._onLayerClick.bind(this)
-                            })
+                            const layerType = layer.feature.geometry.type
+
+                            if (layerType === "LineString" || layerType === "Polygon" || layerType === "Point")
+                            {
+                                //add layer to the map
+                                output = ref.leafletElement.addLayer(layer)
+                                layer.on({
+                                    click: this._onLayerClick.bind(this)
+                                })
+                            }
+                            else{
+                                alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
+                                console.log("Unsupported type - we still want this in our data but it won't display...")
+                                output = ref.leafletElement.addLayer(layer)
+                                layer.on({
+                                    click: this._onLayerClick.bind(this)
+                                })
+                            }
                         }
                         );
                     })
@@ -331,7 +344,7 @@ class MapForm extends Component {
                     position={this.state.location}
                     onClose={this._onPopupClose}
                     >
-                        <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
+                    <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
                 </Popup>
                 }
             </Map>
@@ -340,7 +353,6 @@ class MapForm extends Component {
         )
     }
 }
- 
-const enhance = compose(withStyles(styles));
 
+const enhance = compose(withStyles(styles));
 export default enhance(MapForm);

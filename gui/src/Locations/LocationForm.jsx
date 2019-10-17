@@ -96,6 +96,13 @@ class LocationForm extends Component {
         //check for unsupported types - Multi____
 
         //TODO: the belong code doesn't belong on the text validator, it belongs on the map prior to a display attempt.
+        //1. parse for validity (already done by this point)
+        //2. TODO: send to the map display for processing
+          //a. Update State
+          //b. Modify Key to force a refresh
+          //c. Map Values are now imported.  Scan them for these irregularities.
+        //3. TODO: display alert
+        //4. TODO: check to ensure data still exists in map when exported.
         /*
         parseGeoText.geojson.features.map(feature => {
           const type = feature.geometry.type
