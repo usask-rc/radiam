@@ -176,7 +176,9 @@ class PageThree extends Component {
   };
 
   handleChange = data => {
-    this.setState({isFormDirty: true})
+    if (data && data.timeStamp){
+      this.setState({isFormDirty: true})
+    }
   }
 
   render(){

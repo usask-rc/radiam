@@ -72,7 +72,10 @@ class LocationForm extends Component {
   };
 
   handleChange = data => {
+    //start marking form as dirty only when the user makes changes.  This property is case sensitive.
+    if (data && data.timeStamp){
     this.setState({isFormDirty: true})
+    }
   }
 
   handleInput = event => {
