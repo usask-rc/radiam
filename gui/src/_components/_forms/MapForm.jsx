@@ -42,7 +42,8 @@ class MapForm extends Component {
 
     //here is where we handle different data management cases for features
     featuresCallback = (layer) => {
-        console.log("feature sent to featurescallback is: ", layer)
+        console.log("features sent to featurescallback is: ", layer)
+        console.log("list of features is: ", this.state.features)
         if (typeof layer === 'string'){
             const featureList = {...this.state.features};
             delete featureList[layer]
@@ -210,6 +211,7 @@ class MapForm extends Component {
     };
 
     _onDeleted = e => {
+        console.log("ondeleted event e:" ,e)
         Object.keys(e.layers._layers).map(key => {
             this.featuresCallback(key)
         })
@@ -306,7 +308,7 @@ class MapForm extends Component {
 
 
                 if (notDisplayedFeatures.length > 0){
-                    alert(`Some geoJSON features exist in geoJSON that cannot be modified via the map.  They are of type 'Multi'.  The Property Names (should they exist) / Types in question are: \n${notDisplayedFeatures} \nand may be modified in the textArea beneath the map.`)
+                    alert("Warning - There is at least one Multi____ feature in your geoJSON dataset.  Editing or Removing these values using the Map View is still experimental and likely will not work.")
                 }
                 this.setState({features: localFeatures}, () =>
                 console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
