@@ -247,11 +247,11 @@ export function submitObjectWithGeo(formData, geo, props, redirect=Constants.res
     updateObjectWithGeo(formData, geo, props, redirect)
   }
   else{
-    createObjectWithGeo(formData, geo, props, redirect);
+    createObjectWithGeo(formData, geo, props);
   }
 }
 
-function updateObjectWithGeo(formData, geo, props, redirect){
+function updateObjectWithGeo(formData, geo, props){
   if (geo && Object.keys(geo).length > 0){
     formData.geo = geo
   }
@@ -266,7 +266,7 @@ function updateObjectWithGeo(formData, geo, props, redirect){
               }
       }
   }
-  props.save(formData, redirect);
+  props.save(formData, Constants.resource_operations.LIST);
 }
 
 export function createObjectWithGeo(formData, geo, props, redirect){
