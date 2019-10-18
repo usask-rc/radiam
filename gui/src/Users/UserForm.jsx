@@ -9,7 +9,7 @@ import { required, email, minLength, maxLength } from 'ra-core';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt } from 'react-router';
 
-const validateUsername = [required('en.validate.user.username'), minLength(5), maxLength(20)];
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
 const validateGroup = required('en.validate.user.group');
 const validateRole = required('en.validate.user.role');

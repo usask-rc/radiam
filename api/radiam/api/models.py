@@ -24,6 +24,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
+from django.core.validators import RegexValidator
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -98,6 +99,17 @@ class User(AbstractUser, UserPermissionMixin):
     date_created = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was created")
     date_updated = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this user object was last updated")
     notes = models.CharField(max_length=5000, null=True, blank=True, help_text="Notes about this user")
+    username = models.CharField(
+        validators=[
+            RegexValidator(
+                regex=r"^[a-z0-9]{3,12}$",
+                message=
+                'Usernames must be between 3 and 12 characters long, alphanumeric, and contain no upper case characters'
+            )
+        ],
+        max_length=12,
+        unique=True,
+    )
 
     class Meta:
         db_table = "rdm_user"
