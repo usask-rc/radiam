@@ -41,10 +41,13 @@ class TestDatasetAPI(BaseSearchTestCase):
         self.assertLess(0, response.data['count'])
 
     @mock.patch("radiam.api.models.Dataset._save_metadata_doc")
-    def test_dataset_create(self, mock_save_metadata_doc):
+    @mock.patch("radiam.api.views.DatasetViewSet.MetadataDoc")
+    def test_dataset_create(self, mock_save_metadata_doc, doc):
         """
         Test that a new dataset is created
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
 
         distribution_restriction = DistributionRestriction.objects.get(label='distribution.restriction.none')
         data_collection_status = DataCollectionStatus.objects.get(label='datacollection.status.inprogress')

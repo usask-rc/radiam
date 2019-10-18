@@ -80,14 +80,12 @@ class TestSuperuserResearchGroupPermissions(APITestCase):
             status_code=200)
 
     @mock.patch("radiam.api.documents.ResearchGroupMetadataDoc")
-    @mock.patch("radiam.api.documents.ResearchGroupMetadataDoc.get")
-    def test_superuser_write_researchgroup_detail(self, doc, get):
+    def test_superuser_write_researchgroup_detail(self, doc):
         """
         Test Superuser can update an existing research group
         """
-        get.return_value = doc
+        doc.get.return_value = doc
         doc.update.return_value = None
-        doc.save.return_value = None
 
         detail_researchgroup = ResearchGroup.objects.get(name='Test Research Group 1')
 

@@ -226,7 +226,7 @@ class MetadataViewset():
             print("Passed a non dictionary to sanitize_empty_values which seems wrong. Returning " + str(metadata))
             return metadata
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         if pk is not None and self.request.data is not None:
             metadata = self.request.data.get("metadata")
             if metadata is None:
@@ -252,8 +252,8 @@ class MetadataViewset():
 
             return None
 
-    def partial_update(self, request, pk):
-        return self.update(request, pk)
+    def partial_update(self, request, pk, **kwargs):
+        return MetadataViewset.update(self, request, pk, **kwargs)
 
 class RadiamOrderingFilter(OrderingFilter):
     """
@@ -541,6 +541,7 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
             return super().update(request, pk, **kwargs)
 
     def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
         response = MetadataViewset.partial_update(self, request, pk)
         if response is not None:
             return response
@@ -618,19 +619,20 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     def create(self, request, *args, **kwargs):
         return MetadataViewset.create(self, request, *args, **kwargs)
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         response = MetadataViewset.update(self, request, pk)
         if response is not None:
             return response
         else:
             return super().update(request, pk)
 
-    def partial_update(self, request, pk):
-        response = MetadataViewset.partial_update(self, request, pk)
+    def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
+        response = MetadataViewset.partial_update(self, request, pk, **kwargs)
         if response is not None:
             return response
         else:
-            return super().partial_update(request, pk)
+            return super().update(request, pk, **kwargs)
 
     def destroy(self, request, pk, *args, **kwargs):
         dataset = Dataset.objects.get(id=pk)
@@ -886,12 +888,13 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         else:
             return super().update(request, pk)
 
-    def partial_update(self, request, pk):
-        response = MetadataViewset.partial_update(self, request, pk)
+    def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
+        response = MetadataViewset.partial_update(self, request, pk, **kwargs)
         if response is not None:
             return response
         else:
-            return super().partial_update(request, pk)
+            return super().update(request, pk, **kwargs)
 
 class ProjectAvatarViewSet(RadiamViewSet):
     """
