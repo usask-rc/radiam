@@ -877,6 +877,35 @@ class ProjectAvatarViewSet(RadiamViewSet):
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
 
+class UserAgentTokenViewSet(viewsets.GenericViewSet):
+    """
+    Generate and return a new JWT access and refresh token set for this user agent
+    """
+    serializer_class = UserAgentSerializer
+
+    def list(self, request, useragent_id, action):
+        # Restricted to internal Docker network requests
+        if 'HTTP_X_FORWARDED_FOR' not in request.META or not request.META['HTTP_X_FORWARDED_FOR'].startswith("172"):
+            data = {"error":"401","access_token":"","refresh_token":""}
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+
+        useragent = UserAgent.objects.get(id=useragent_id)
+
+        if action and action == "new":
+            useragent.generate_tokens()
+            useragent.save()
+
+        data = {
+            "id": useragent_id,
+            "user_id": useragent.user_id,
+            "access_token": useragent.local_access_token,
+            "refresh_token": useragent.local_refresh_token,
+            "host": request.META.get('HTTP_X_FORWARDED_FOR')
+        }
+
+        return Response(data)
+
+
 class SearchViewSet(viewsets.GenericViewSet):
     """
     Elasticsearch Search

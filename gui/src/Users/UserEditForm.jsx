@@ -8,7 +8,7 @@ import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt } from 'react-router';
 import UserGroupsDisplay from './UserGroupsDisplay';
 
-const validateUsername = [required('en.validate.user.username'), minLength(5), maxLength(20)];
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
 
 //we want a horizontal display to match our other chip displays elsewhere in the application.
