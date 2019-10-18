@@ -255,6 +255,7 @@ class MapForm extends Component {
                 //features must be loaded in one at a time, not in bulk.
                 let localFeatures = {}
                 let output = {}
+                let notDisplayedFeatures = []
 
                 this.state.geo.geojson.features.map(feature => {
                     let leafletGeoJSON = new L.GeoJSON(feature);
@@ -262,6 +263,7 @@ class MapForm extends Component {
                     leafletGeoJSON.eachLayer(layer => 
                         {
                             const layerType = layer.feature.geometry.type
+                console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
 
                             if (layerType === "LineString" || layerType === "Polygon" || layerType === "Point")
                             {
@@ -272,8 +274,9 @@ class MapForm extends Component {
                                 })
                             }
                             else{
-                                alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
-                                console.log("Unsupported type - we still want this in our data but it won't display...")
+                                //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
+                                notDisplayedFeatures = [...notDisplayedFeatures, layer.feature.properties.name ? layer.feature.properties.name : layer.feature.geometry.type]
+                                console.log("feature to not display is: ", layer.feature.properties.name)
                                 output = ref.leafletElement.addLayer(layer)
                                 layer.on({
                                     click: this._onLayerClick.bind(this)
@@ -287,7 +290,14 @@ class MapForm extends Component {
                     output._layers[key].feature.id = key
                     localFeatures[key] = output._layers[key].feature
                 })
-                this.setState({features: localFeatures})                
+
+
+                if (notDisplayedFeatures.length>0){
+                    alert(`Some geoJSON features exist in geoJSON that cannot be modified via the map.  They are of type 'Multi'.  The Property Names (should they exist) or Types in question are: ${notDisplayedFeatures} and may be modified in the textArea beneath the map.`)
+                }
+                this.setState({features: localFeatures}, () =>
+                console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
+                )                
             }
         this.setState({mapLoading: false})
         

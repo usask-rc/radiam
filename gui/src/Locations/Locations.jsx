@@ -210,7 +210,7 @@ export const LocationEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit title={<LocationTitle />} {...props} >
-      <LocationForm {...other} mode={"edit"} />
+      <LocationForm {...other} mode={Constants.resource_operations.EDIT} />
     </Edit>
   );
 };

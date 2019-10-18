@@ -33,12 +33,6 @@ import {
   DataCollectionStatusCreate,
 } from '../DataCollectionStatus/DataCollectionStatus';
 import {
-  DatasetList,
-  DatasetShow,
-  DatasetEdit,
-  DatasetCreate,
-} from '../Datasets/Datasets';
-import {
   DistributionRestrictionList,
   DistributionRestrictionShow,
   DistributionRestrictionEdit,
@@ -64,12 +58,6 @@ import {
   GroupViewGrantCreate,
 } from '../GroupViewGrants/GroupViewGrants';
 import {
-  LocationList,
-  LocationShow,
-  LocationEdit,
-  LocationCreate,
-} from '../Locations/Locations';
-import {
   LocationTypeCreate,
   LocationTypeEdit,
   LocationTypeList,
@@ -81,12 +69,6 @@ import {
   ProjectEdit,
   ProjectCreate,
 } from '../Projects/Projects';
-import {
-  ProjectAvatarsCreate,
-  ProjectAvatarsEdit,
-  ProjectAvatarsList,
-  ProjectAvatarsShow,
-} from '../ProjectAvatars/ProjectAvatars';
 import {
   SensitivityLevelList,
   SensitivityLevelShow,
@@ -115,6 +97,9 @@ import customRoutes from '../_tools/customRoutes';
 import Login from '../layout/Login';
 import 'moment-timezone';
 import { ToastContainer } from 'react-toastify';
+import datasets from "../Datasets"
+import locations from "../Locations"
+import projectavatars from "../ProjectAvatars"
 
 const i18nProvider = locale => {
   return englishMessages;
@@ -166,15 +151,15 @@ const App = props => {
             options={{ label: 'en.sidebar.groups' }}
             list={GroupList}
             show={GroupShow}
-            create={
-              permissions.is_admin || permissions.is_group_admin
-                ? GroupCreate
-                : null
-            }
             edit={
-              permissions.is_admin || permissions.is_group_amin
+              permissions.is_admin || permissions.is_group_admin
                 ? GroupEdit
                 : null
+            }
+            create={
+              permissions.is_amdin || permissions.is_group_admin 
+              ? GroupCreate 
+              : null
             }
           />,
 
@@ -222,10 +207,7 @@ const App = props => {
             name={Constants.models.LOCATIONS}
             icon={AddLocation}
             options={{ label: 'en.sidebar.locations' }}
-            list={LocationList}
-            show={LocationShow}
-            create={LocationCreate}
-            edit={LocationEdit} //'anyone within a group should be able to edit a location'. - was previously only admins.
+            {...locations}
           />,
 
           <Resource
@@ -250,20 +232,14 @@ const App = props => {
             name={'datasets'}
             icon={InsertChart}
             options={{ label: 'en.sidebar.datasets' }}
-            list={DatasetList}
-            show={DatasetShow}
-            create={DatasetCreate}
-            edit={DatasetEdit}
+            {...datasets}
           />,
 
           <Resource
-            name={'projectavatars'}
+            name={Constants.models.PROJECTAVATARS}
             icon={FlipToFront}
             options={{ label: 'en.sidebar.projectavatars' }}
-            list={ProjectAvatarsList}
-            show={ProjectAvatarsShow}
-            create={ProjectAvatarsCreate}
-            edit={ProjectAvatarsEdit}
+            {...projectavatars}
           />,
 
           <Resource

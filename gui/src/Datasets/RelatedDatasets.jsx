@@ -38,7 +38,7 @@ const RelatedDatasets = ({ record }) => {
   
         )
       })}
-          <CreateButton basePath={"/datasets"} label={`New Dataset`}></CreateButton>
+          <CreateButton basePath={`/${Constants.models.DATASETS}`} label={`New Dataset`}></CreateButton>
       </div>
     )
   }

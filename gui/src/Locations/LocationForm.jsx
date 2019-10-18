@@ -15,8 +15,9 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-
-import GeoJSONTextArea from '../_components/_fragments/GeoJSONTextArea';
+import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
+import { ExpandMore } from '@material-ui/icons';
+import { FormDataConsumer } from 'ra-core';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -66,15 +67,21 @@ class LocationForm extends Component {
   };
 
   //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
-  handleSubmit = data => {
-    this.setState({ isFormDirty: false }, () => {
-      submitObjectWithGeo(data, this.state.geo, this.props);
-    });
+  handleSubmit = (data) => {
+    console.log("data in handlesubmit locform is: ", data)
+    
+    this.setState({isFormDirty: false}, () => {
+        submitObjectWithGeo(data, this.state.geo, this.props, data.location_type === Constants.LOCATIONTYPE_OSF ? `/${Constants.models.AGENTS}/create` : `/${Constants.models.LOCATIONS}`);
+    })
+    
   };
 
   handleChange = data => {
-    this.setState({ isFormDirty: true });
-  };
+    //start marking form as dirty only when the user makes changes.  This property is case sensitive.
+    if (data && data.timeStamp){
+    this.setState({isFormDirty: true})
+    }
+  }
 
   handleInput = event => {
     console.log('event.t.v in handleinput is: ', event.target.value);
@@ -136,65 +143,102 @@ class LocationForm extends Component {
     return (
       <SimpleForm
         {...rest}
-        redirect={Constants.resource_operations.LIST}
         save={this.handleSubmit}
         name={`locationForm`}
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+        return(
+          <Grid container>
+          <Grid xs={12}>
         <TextInput
           label={'en.models.locations.display_name'}
           source={Constants.model_fields.DISPLAY_NAME}
         />
+        </Grid>
+        <Grid xs={12}>
         <TextInput
           label={'en.models.locations.host_name'}
           source={Constants.model_fields.HOST_NAME}
           validate={validateHostname}
         />
+        </Grid>
+        <Grid xs={12}>
         <ReferenceInput
           label={'en.models.locations.type'}
           source={Constants.model_fk_fields.LOCATION_TYPE}
           reference={Constants.models.LOCATIONTYPES}
           validate={validateLocationType}
+          defaultValue={Constants.LOCATIONTYPE_OSF}
         >
           <TranslationSelect optionText={Constants.model_fields.LABEL} />
         </ReferenceInput>
-        <TextInput
-          label={'en.models.locations.globus_endpoint'}
-          source="globus_endpoint"
-          validate={validateGlobusEndpoint}
-        />
-        <LongTextInput
-          label={'en.models.locations.globus_path'}
-          source="globus_path"
-        />
-        <TextInput
-          label={'en.models.locations.osf_project'}
-          source="osf_project"
-        />
+        </Grid>
+        <React.Fragment>
+          <Grid xs={12}>
+            <TextInput
+              label={'en.models.locations.globus_endpoint'}
+              source="globus_endpoint"
+              validate={validateGlobusEndpoint}
+            />
+          </Grid>
+          <Grid xs={12}>
+            <LongTextInput
+              label={'en.models.locations.globus_path'}
+              source="globus_path"
+            />
+          </Grid>
+        </React.Fragment>
+        {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
+        <Grid xs={12}>
+          <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
+        </Grid>
+        }
+        <Grid xs={12}>
         <LongTextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
+          defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "https://osf.io" : ""}
         />
-        <LongTextInput label={'en.models.locations.notes'} source="notes" />
+        </Grid>
+        <Grid xs={12}>
+        <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
+        </Grid>
+        <Grid xs={12}>
         <MapForm
-          key={this.state.mapFormKey}
-          content_type={'location'}
+          content_type={Constants.model_fk_fields.LOCATION}
           recordGeo={this.state.geo}
           id={this.props.id}
           geoDataCallback={this.geoDataCallback}
         />
-        <GeoJSONTextArea
-          styles={styles}
-          mapTextToGeo={this.mapTextToGeo}
-          geoText={this.state.geoText}
-          handleInput={this.handleInput}
-        />
+        </Grid>
+        <Grid xs={12}>
+        <ExpansionPanel fullWidth>
+          <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
+            <Typography>{`Geo Text Entry - Experimental`}</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails className={styles.geoTextArea}>
+          <Grid container>
+          <Grid item xs={12}>
+            <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
+            </Grid>
+            <Grid item xs={12}>
+            <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
+            </Grid>
+            </Grid>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+        </Grid>
+        </Grid>
+        )
+      }
+      }
+      </FormDataConsumer>
 
-        <Prompt
-          when={isFormDirty}
-          message={Constants.warnings.UNSAVED_CHANGES}
-        />
+        <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
       </SimpleForm>
     );
   }

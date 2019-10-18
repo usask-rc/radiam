@@ -13,8 +13,7 @@ import {
 } from '@material-ui/core';
 import FileSummary from '../../_components/files/FileSummary';
 import FolderDisplay from './FolderDisplay';
-import { getAPIEndpoint, httpClient,radiamRestProvider } from '../../_tools';
-import { GET_LIST, translate } from 'ra-core';
+import { translate } from 'ra-core';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
@@ -152,9 +151,9 @@ function FolderView({ projectID, item, classes, ...props }) {
             label={'en.models.agents.location'}
             source={Constants.model_fk_fields.LOCATION}
             reference={Constants.models.LOCATIONS}
-            linkType="show"
-            basePath="/projects"
-            resource="projects"
+            linkType={Constants.resource_operations.SHOW}
+            basePath={`/${Constants.models.PROJECTS}`}
+            resource={Constants.models.PROJECTS}
             record={files[0]}
           >
             <LocationShow />

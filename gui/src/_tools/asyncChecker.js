@@ -18,7 +18,7 @@ export function getAsyncValidateNotExists(checkField, endpoint_path) {
             }
             else{
               let rejection = {};
-              rejection[checkField["name"]] = checkField["reject"];
+              rejection[checkField[Constants.model_fields.NAME]] = checkField["reject"];
               reject(rejection);
             }
           } else {
@@ -47,8 +47,8 @@ export function getAsyncValidateTwoNotExists(one, two, endpoint_path) {
             }
             else{
               let rejection = {};
-              rejection[one["name"]] = one["reject"];
-              rejection[two["name"]] = two["reject"];
+              rejection[one[Constants.model_fields.NAME]] = one["reject"];
+              rejection[two[Constants.model_fields.NAME]] = two["reject"];
               reject(rejection);
             }
 

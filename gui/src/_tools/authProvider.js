@@ -80,7 +80,7 @@ function getRequest(url, suppliedToken) {
     headers.set("Authorization", "Bearer " + token.access);
   }
   const request = new Request(getAPIEndpoint() + url, {
-    method: "GET",
+    method: Constants.methods.GET,
     headers: headers
   });
 
@@ -88,7 +88,7 @@ function getRequest(url, suppliedToken) {
 }
 
 function getGroupRoles() {
-  const request = getRequest("/grouproles/");
+  const request = getRequest(`/${Constants.models.ROLES}/`);
   return fetch(request)
     .then(response => {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
@@ -104,14 +104,14 @@ function getGroupRoles() {
         var groupRole = result.results[i];
         groupRoles.push(groupRole);
       }
-      localStorage.setItem("groupRoles", JSON.stringify(groupRoles));
+      localStorage.setItem(Constants.models.ROLES, JSON.stringify(groupRoles));
       return Promise.resolve(groupRoles);
     });
 }
 
 function getUser(groupRoles) {
   const username = localStorage.getItem(Constants.model_fields.USERNAME);
-  const request = getRequest("/users/?username=" + username);
+  const request = getRequest(`/${Constants.models.USERS}/?${Constants.model_fields.USERNAME}=` + username);
   return fetch(request)
     .then(response => {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {

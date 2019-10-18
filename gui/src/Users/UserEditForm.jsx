@@ -56,7 +56,7 @@ class UserEditForm extends Component {
             this.setState({isFormDirty: false}, () => {
             return fetch(request).then(response => {
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
-                    this.props.history.push("/users");
+                    this.props.history.push(`/${Constants.models.USERS}`);
                     return response.json();
                 }
                 throw new Error(response.statusText);
@@ -75,13 +75,21 @@ class UserEditForm extends Component {
 
     handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
-        this.setState({isFormDirty: true})
+
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
+
+        console.log("value of e in handlechange is: ", e)
     };
 
     //strangely, the selects and date need a different change handler.
-    handleSelectChange = (key_in_dict, value, prevValue, target) => {
+    handleSelectChange = (e, value, prevValue, target) => {
         this.setState({ [target]: value })
-        this.setState({isFormDirty: true})
+
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
     };
 
     render() {
@@ -113,7 +121,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.last_name}
                 />
                 <TextInput
-                    type="email"
+                    type={Constants.model_fields.EMAIL}
                     label={"en.models.users.email"}
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}

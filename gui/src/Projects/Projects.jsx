@@ -9,11 +9,9 @@ import {
   List,
   ReferenceField,
   ReferenceInput,
-  RefreshButton,
   required,
   SelectInput,
   Show,
-  ShowButton,
   ShowController,
   SimpleForm,
   Tab,
@@ -25,8 +23,6 @@ import {
 } from 'react-admin';
 
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import Divider from '@material-ui/core/Divider';
 import { CardContentInner } from "ra-ui-materialui";
 import * as Constants from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
@@ -37,16 +33,9 @@ import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
-import Button from '@material-ui/core/Button';
-import SettingsIcon from '@material-ui/icons/Settings';
 import compose from "recompose/compose";
-import { FormDataConsumer } from 'ra-core';
-import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { Drawer } from '@material-ui/core';
-import { DatasetCreate } from '../Datasets/Datasets';
-import { Route } from "react-router"
 
 const styles = {
   actions: {
@@ -162,7 +151,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <ShowController translate={translate} {...props}>
               { controllerProps => (
                 <ShowMetadata
-                  type="project"
+                  type={Constants.model_fk_fields.PROJECT}
                   translate={translate}
                   record={controllerProps.record}
                   basePath={controllerProps.basePath}
@@ -198,11 +187,11 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           validate={validateName} />
       </div>
         <ReferenceInput
-          resource="projectavatars"
+          resource={Constants.models.PROJECTAVATARS}
           className="input-small"
-          label="Avatar"
-          source={"avatar"} reference="projectavatars">
-            <SelectInput source="avatar_image" optionText={<ImageField classes={{image: classes.image}} source="avatar_image" />}/>
+          label={Constants.model_fields.AVATAR} 
+          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
+            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
         </ReferenceInput>
       <div>
         <TextInput
@@ -232,8 +221,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
         </ReferenceInput>
         { record.id && (
           <React.Fragment>
-            <EditMetadata id={record.id} type="project"/>
-            <ConfigMetadata id={record.id} type="project"/>
+            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+            <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </React.Fragment>
           )}
       </div>

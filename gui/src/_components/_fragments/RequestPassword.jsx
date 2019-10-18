@@ -18,7 +18,7 @@ const RequestPassword = ({ classes, handleChange }) => (
             <TextField
                 id={Constants.password_change.PASSWORD_OLD}
                 name={Constants.password_change.PASSWORD_OLD}
-                label={"Password"}
+                label={Constants.login_details.PASSWORD}
                 onChange={handleChange}
                 type={Constants.fields.PASSWORD} />
         </div>
