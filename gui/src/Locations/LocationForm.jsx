@@ -164,6 +164,7 @@ class LocationForm extends Component {
           label={'en.models.locations.host_name'}
           source={Constants.model_fields.HOST_NAME}
           validate={validateHostname}
+          defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "osf.io" : ""}
         />
         </Grid>
         <Grid xs={12}>
@@ -201,7 +202,6 @@ class LocationForm extends Component {
         <LongTextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
-          defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "https://osf.io" : ""}
         />
         </Grid>
         <Grid xs={12}>
