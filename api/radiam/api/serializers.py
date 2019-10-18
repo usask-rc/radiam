@@ -318,6 +318,17 @@ class PasswordSerializer(serializers.Serializer):
         else:
             return data
 
+class UserAgentTokenSerializer(serializers.ModelSerializer):
+    """
+    User Agent Token serializer.
+    """
+    class Meta:
+        model = UserAgent
+        fields = ('id',
+                  'local_access_token',
+                  'local_refresh_token'
+                  )
+
 
 class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
