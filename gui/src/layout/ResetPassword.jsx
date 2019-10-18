@@ -155,8 +155,8 @@ class ResetPassword extends Component {
                   <div className={classes.input}>
                     <TextField
                       id={Constants.login_details.PASSWORD}
-                      label={"Password"}
-                      onChange={this.handleChange("password")}
+                      label={Constants.login_details.PASSWORD}
+                      onChange={this.handleChange(Constants.login_details.PASSWORD)}
                       value={password}
                       fullWidth
                       type={Constants.fields.PASSWORD}
@@ -166,7 +166,7 @@ class ResetPassword extends Component {
                     <TextField
                       id={Constants.login_details.PASSWORD_CONFIRM}
                       label={"Confirm Password"}
-                      onChange={this.handleChange("confirmPassword")}
+                      onChange={this.handleChange(Constants.login_details.PASSWORD_CONFIRM)}
                       value={confirmPassword}
                       fullWidth
                       type={Constants.fields.PASSWORD}

@@ -21,9 +21,9 @@ const FilePanelSummary = ({ classes, file, caller }) => (
           label={'en.models.agents.location'}
           source={Constants.model_fk_fields.LOCATION}
           reference={Constants.models.LOCATIONS}
-          linkType="show"
-          basePath="/projects"
-          resource="projects"
+          linkType={Constants.resource_operations.SHOW}
+          basePath={`/${Constants.models.PROJECTS}`}
+          resource={Constants.models.PROJECTS}
           record={file}
         >
           <LocationShow />

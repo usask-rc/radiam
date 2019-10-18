@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as Constants from '../_constants/index';
 import '../_components/components.css';
 import { Chip, Typography } from '@material-ui/core';
@@ -44,7 +44,7 @@ const RelatedUsers = (record) => {
   
         )
       })}
-          <CreateButton basePath={"/users"} label={`New User`}></CreateButton>
+          <CreateButton basePath={`/${Constants.models.USERS}`} label={`New User`}></CreateButton>
       </div>
     )
   }

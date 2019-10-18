@@ -318,6 +318,17 @@ class PasswordSerializer(serializers.Serializer):
         else:
             return data
 
+class UserAgentTokenSerializer(serializers.ModelSerializer):
+    """
+    User Agent Token serializer.
+    """
+    class Meta:
+        model = UserAgent
+        fields = ('id',
+                  'local_access_token',
+                  'local_refresh_token'
+                  )
+
 
 class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
@@ -354,6 +365,8 @@ class UserAgentSerializer(serializers.ModelSerializer):
                   'project_config_list',
                   'remote_api_username',
                   'remote_api_token',
+                  'local_access_token',
+                  'local_refresh_token',
                   'crawl_minutes',
                   'is_active'
                   )
@@ -389,6 +402,8 @@ class UserAgentSerializer(serializers.ModelSerializer):
 
         instance.remote_api_username = validated_data.get('remote_api_username', instance.remote_api_username)
         instance.remote_api_token = validated_data.get('remote_api_token', instance.remote_api_token)
+        instance.local_access_token = validated_data.get('local_access_token', instance.local_access_token)
+        instance.local_refresh_token = validated_data.get('local_refresh_token', instance.local_refresh_token)
         instance.crawl_minutes = validated_data.get('crawl_minutes', instance.crawl_minutes)
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()

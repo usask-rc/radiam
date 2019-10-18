@@ -9,7 +9,7 @@ import { required, email, minLength, maxLength } from 'ra-core';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt } from 'react-router';
 
-const validateUsername = [required('en.validate.user.username'), minLength(5), maxLength(20)];
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
 const validateGroup = required('en.validate.user.group');
 const validateRole = required('en.validate.user.role');
@@ -80,7 +80,7 @@ class UserFormWithAssoc extends Component {
                                 throw new Error(response.statusText);
                             })
                                 .then(data => {
-                                    this.props.history.push("/users");
+                                    this.props.history.push(`/${Constants.models.USERS}`);
                                 })
                                 .catch(err => {
                                     toastErrors(err)
@@ -89,11 +89,11 @@ class UserFormWithAssoc extends Component {
                         }
                         else if (group_role || group) {
                             toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
-                            this.props.history.push("/users");
+                            this.props.history.push(`/${Constants.models.USERS}`);
                         }
                         else {
                             toast.success("User: " + username + " was successfully created.")
-                            this.props.history.push("/users");
+                            this.props.history.push(`/${Constants.models.USERS}`);
                         }
 
                     }
@@ -122,14 +122,19 @@ class UserFormWithAssoc extends Component {
 
     handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
-        this.setState({isFormDirty: true})
+
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
     };
 
     //strangely, the selects and date need a different change handler.
-    handleSelectChange = (key_in_dict, value, prevValue, target) => {
+    handleSelectChange = (e, value, prevValue, target) => {
         this.setState({ [target]: value })
-        this.setState({isFormDirty: true})
 
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
     };
 
 
@@ -159,7 +164,7 @@ class UserFormWithAssoc extends Component {
                     onChange={this.handleChange}
                 />
                 <TextInput
-                    type="email"
+                    type={Constants.model_fields.EMAIL}
                     label={"en.models.users.email"}
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}

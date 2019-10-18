@@ -1,10 +1,9 @@
 import * as Constants from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, GET_MANY } from 'ra-core';
+import { GET_LIST, GET_ONE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
 //TODO: move '/api' to constants as the url for where the api is hosted.
@@ -14,7 +13,7 @@ export function getAPIEndpoint() {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
     
   }
-  return Constants.API_ENDPOINT;
+  return `/${Constants.API_ENDPOINT}`;
 }
 
 export function toastErrors(data) {
@@ -242,10 +241,10 @@ export function getUserGroups(record) {
   })
 }
 
-export function submitObjectWithGeo(formData, geo, props){
+export function submitObjectWithGeo(formData, geo, props, redirect=Constants.resource_operations.LIST ){
   console.log("formData heading into submitobjectwithgeo is: ", formData)
   if (formData.id){
-    updateObjectWithGeo(formData, geo, props)
+    updateObjectWithGeo(formData, geo, props, redirect)
   }
   else{
     createObjectWithGeo(formData, geo, props);
@@ -270,7 +269,7 @@ function updateObjectWithGeo(formData, geo, props){
   props.save(formData, Constants.resource_operations.LIST);
 }
 
-export function createObjectWithGeo(formData, geo, props){
+export function createObjectWithGeo(formData, geo, props, redirect){
   let headers = new Headers({ "Content-Type": "application/json" });
   const token = localStorage.getItem(Constants.WEBTOKEN);
   
@@ -327,7 +326,7 @@ export function createObjectWithGeo(formData, geo, props){
         })
         .then(data => {  
             console.log("data after update is: ", data)
-            props.history.push(`/${props.resource}/`)
+            props.history.push(`${redirect}/`)
         })
       }
       )

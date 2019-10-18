@@ -150,7 +150,7 @@ class ChangeDetails extends Component {
                                             label={englishMessages.en.models.users.email}
                                             value={this.state.email}
                                             onChange={this.handleChange(Constants.model_fields.EMAIL)}
-                                            type={"email"} />
+                                            type={Constants.model_fields.EMAIL} />
                                     </div>
                                     <div className={styles.input}>
 

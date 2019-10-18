@@ -1,6 +1,5 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  CardActions,
   Create,
   Datagrid,
   Edit,
@@ -10,11 +9,9 @@ import {
   ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
-  RefreshButton,
   required,
   SelectInput,
   Show,
-  ShowButton,
   ShowController,
   SimpleForm,
   SimpleShowLayout,
@@ -24,25 +21,24 @@ import {
   translate,
   withTranslate,
 } from 'react-admin';
-import { Typography } from "@material-ui/core";
+import compose from "recompose/compose";
+import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import * as Constants from '../_constants/index';
 import CustomPagination from '../_components/CustomPagination';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import { Prompt, Route } from "react-router"
+import PropTypes from 'prop-types';
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
-import SettingsIcon from '@material-ui/icons/Settings';
-import PropTypes from 'prop-types';
-import compose from "recompose/compose";
-import { Prompt } from "react-router"
+import { CardActions } from 'ra-ui-materialui/lib/layout';
+import { CreateButton } from 'ra-ui-materialui/lib/button';
+import { Drawer } from '@material-ui/core';
 
 const listStyles = {
   actions: {
@@ -85,41 +81,6 @@ const DatasetFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       source={Constants.model_fields.STUDY_SITE}
     />
   </Filter>
-));
-
-export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => (
-  <List
-    {...props}
-    classes={{
-      root: classes.root,
-      header: classes.header,
-      actions: classes.actions,
-    }}
-    exporter={false}
-    filters={<DatasetFilter />}
-    sort={{ field: Constants.model_fields.TITLE, order: 'DESC' }}
-    perPage={10}
-    pagination={<CustomPagination />}
-  >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
-      <TextField
-        label={'en.models.datasets.title'}
-        source={Constants.model_fields.TITLE}
-      />
-      <ReferenceField
-        linkType={false}
-        label={"en.models.datasets.project"}
-        source={Constants.model_fk_fields.PROJECT}
-        reference={Constants.models.PROJECTS}
-      >
-        <ProjectName label={"en.models.projects.name"}/>
-      </ReferenceField>
-      <TextField
-        label={'en.models.datasets.study_site'}
-        source={Constants.model_fields.STUDY_SITE}
-      />
-    </Datagrid>
-  </List>
 ));
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
@@ -258,6 +219,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.title"}
       source={Constants.model_fields.TITLE}
       validate={validateTitle}
+      
     />
     <TextInput
       className="input-large"
@@ -321,7 +283,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { props.mode == "edit" && props.id && (
+    { props.mode == Constants.resource_operations.EDIT && props.id && (
       <React.Fragment>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />
@@ -354,7 +316,7 @@ export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit title={<DatasetTitle />} actions={<MetadataEditActions />} {...props} >
-      <DatasetForm mode={"edit"} {...other} />
+      <DatasetForm mode={Constants.resource_operations.EDIT} {...other} />
     </Edit>
   );
 });

@@ -141,16 +141,16 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
                 return item.files && item.files.length > 0 &&
                   <Tab label={<React.Fragment><ReferenceField
                     record={item}
-                    basePath="projects"
+                    basePath={Constants.models.PROJECTS}
                     linkType={false}
-                    source={'avatar'}
-                    reference={'projectavatars'}
+                    source={Constants.model_fields.AVATAR}
+                    reference={Constants.models.PROJECTAVATARS}
                     className={classes.projectName}
                     allowEmpty
                   >
                     <ImageField
                       classes={{ image: classes.image }}
-                      source="avatar_image"
+                      source={Constants.model_fields.AVATAR_IMAGE}
                     />
                   </ReferenceField>{item.name}</React.Fragment>} value={i} key={item.id} className={classes.tabText}>
                   </Tab>
