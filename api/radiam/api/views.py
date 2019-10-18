@@ -885,7 +885,7 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
 
     def list(self, request, useragent_id, action):
         # Restricted to internal Docker network requests
-        if not request.META['REMOTE_ADDR'].startswith("172"):
+        if 'HTTP_X_FORWARDED_FOR' not in request.META or not request.META['HTTP_X_FORWARDED_FOR'].startswith("172"):
             data = {"error":"401","access_token":"","refresh_token":""}
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -899,7 +899,8 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
             "id": useragent_id,
             "user_id": useragent.user_id,
             "access_token": useragent.local_access_token,
-            "refresh_token": useragent.local_refresh_token
+            "refresh_token": useragent.local_refresh_token,
+            "host": request.META.get('HTTP_X_FORWARDED_FOR')
         }
 
         return Response(data)
