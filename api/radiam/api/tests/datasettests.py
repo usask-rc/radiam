@@ -40,8 +40,8 @@ class TestDatasetAPI(BaseSearchTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertLess(0, response.data['count'])
 
-    @mock.patch("radiam.api.models.Dataset._save_dataset_metadata_doc")
-    def test_dataset_create(self, mock_save_dataset_metadata_doc):
+    @mock.patch("radiam.api.models.Dataset._save_metadata_doc")
+    def test_dataset_create(self, mock_save_metadata_doc):
         """
         Test that a new dataset is created
         """
@@ -353,9 +353,9 @@ class TestDatasetAPI(BaseSearchTestCase):
             status_code = 200)
 
     @mock.patch("radiam.api.models.DatasetMetadataDoc.get")
-    def test_save_dataset_metadata_doc_update(self, mock_dataset_metadata_doc_get):
+    def test_save_metadata_doc_update(self, mock_dataset_metadata_doc_get):
         """
-        Test that _save_dataset_metadata_doc updates an existing
+        Test that _save_metadata_doc updates an existing
         DatasetMetadataDoc.
         """
         mock_dataset_metadata_doc = mock.MagicMock(spec=DatasetMetadataDoc)
@@ -364,7 +364,7 @@ class TestDatasetAPI(BaseSearchTestCase):
         id = '7492d321-10c7-4cba-9891-e5db63b20bce'
         dataset = Dataset.objects.get(id=id)
 
-        dataset._save_dataset_metadata_doc()
+        dataset._save_metadata_doc()
 
         mock_dataset_metadata_doc_get.assert_called_once()
         mock_dataset_metadata_doc.update.assert_called_once_with(
@@ -380,16 +380,16 @@ class TestDatasetAPI(BaseSearchTestCase):
 
     @mock.patch("radiam.api.models.DatasetMetadataDoc.save")
     @mock.patch("radiam.api.models.DatasetMetadataDoc.get")
-    def test_save_dataset_metadata_doc_create(self, mock_get, mock_save):
+    def test_save_metadata_doc_create(self, mock_get, mock_save):
         """
-        Test _save_dataset_metadata_doc creates a new DatasetMetadataDoc objects
+        Test _save_metadata_doc creates a new DatasetMetadataDoc objects
         """
 
         mock_get.side_effect = es_exceptions.NotFoundError
 
         id = '7492d321-10c7-4cba-9891-e5db63b20bce'
         dataset = Dataset.objects.get(id=id)
-        dataset._save_dataset_metadata_doc()
+        dataset._save_metadata_doc()
 
         mock_get.assert_called_once()
         mock_save.assert_called_once()

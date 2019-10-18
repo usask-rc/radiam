@@ -278,7 +278,7 @@ class TestGroupHierarchyPermissions(APITestCase):
             text="",
             status_code=200)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
     def test_parent_admin_user_can_view_child_projects(self, m):
         """
         Test parent user can view projects with child groups assigned
@@ -299,12 +299,16 @@ class TestGroupHierarchyPermissions(APITestCase):
         self.assertIn("child group 1 project 1", result_str)
         self.assertIn("grandchild group 1 project 1", result_str)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_parent_admin_user_can_create_child_projects(self, m):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    @mock.patch("radiam.api.views.ProjectViewSet.MetadataDoc")
+    def test_parent_admin_user_can_create_child_projects(self, m, doc):
         """
         Test that a parent user can create a new project assigning a
         child group.
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
+
         parent_user = User.objects.get(username='parentuser1')
 
         research_group = ResearchGroup.objects.get(name='Child Group 1')
@@ -333,7 +337,7 @@ class TestGroupHierarchyPermissions(APITestCase):
             text="",
             status_code=201)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
     def test_parent_admin_user_can_edit_child_projects(self, m):
         """
         Test that a parent user can edit a project that has a child group

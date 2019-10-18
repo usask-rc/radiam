@@ -229,6 +229,8 @@ class MetadataViewset():
     def update(self, request, pk):
         if pk is not None and self.request.data is not None:
             metadata = self.request.data.get("metadata")
+            if metadata is None:
+                return None
             metadata = self.sanitize_empty_values(metadata)
             parser_classes = (JSONParser,)
             try:
@@ -249,6 +251,9 @@ class MetadataViewset():
                 raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
 
             return None
+
+    def partial_update(self, request, pk):
+        return self.update(request, pk)
 
 class RadiamOrderingFilter(OrderingFilter):
     """
@@ -528,12 +533,19 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     def create(self, request, *args, **kwargs):
         return MetadataViewset.create(self, request, *args, **kwargs)
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         response = MetadataViewset.update(self, request, pk)
         if response is not None:
             return response
         else:
-            return super().update(request, pk)
+            return super().update(request, pk, **kwargs)
+
+    def partial_update(self, request, pk, **kwargs):
+        response = MetadataViewset.partial_update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().partial_update(request, pk, **kwargs)
 
 
 class GroupRoleViewSet(RadiamViewSet):
@@ -612,6 +624,13 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
             return response
         else:
             return super().update(request, pk)
+
+    def partial_update(self, request, pk):
+        response = MetadataViewset.partial_update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().partial_update(request, pk)
 
     def destroy(self, request, pk, *args, **kwargs):
         dataset = Dataset.objects.get(id=pk)
@@ -866,6 +885,13 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
             return response
         else:
             return super().update(request, pk)
+
+    def partial_update(self, request, pk):
+        response = MetadataViewset.partial_update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().partial_update(request, pk)
 
 class ProjectAvatarViewSet(RadiamViewSet):
     """
