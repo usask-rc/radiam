@@ -49,7 +49,7 @@ class LocationForm extends Component {
   }
 
   componentDidMount() {
-    this.setState({ geoText: JSON.stringify(this.state.geo, null, 2) });
+    this.setState({ geoText: JSON.stringify(this.state.geo.geojson.features, null, 2) });
   }
 
   geoDataCallback = geo => {
@@ -84,8 +84,6 @@ class LocationForm extends Component {
   }
 
   handleInput = event => {
-    console.log('event.t.v in handleinput is: ', event.target.value);
-
     this.setState({ geoText: event.target.value });
   };
 
@@ -93,23 +91,51 @@ class LocationForm extends Component {
     console.log('text to geo button pressed');
     let parseGeoText;
     try {
-      parseGeoText = JSON.parse(this.state.geoText);
 
-      if (parseGeoText && GJV.valid(parseGeoText.geojson)){
+      //TODO: this isnt parsing geotext, it's parsing features.
 
-        const newGeo = this.state.geo
-        newGeo.geojson = parseGeoText.geojson
+      /**
+       *{
+  "id": "97313af3-ac52-4b12-afdb-4a0307bb58e2",
+  "geojson": {
+    "type": "FeatureCollection",
+    "features": []
+  },
+  "object_id": "e950313e-faf0-47aa-ac35-5294857c1486",
+  "content_type": "location"
+} 
+       */
 
+
+       //organize features into a geoJSON object to see if it is valid geoJSON.
+      const geoObject = {
+        "geojson": {
+          "type": "FeatureCollection",
+          "features": JSON.parse(this.state.geoText)
+        },
+        "content_type": "location",
+      }
+
+      if (this.props.record && this.props.record.id){
+        geoObject.object_id = this.props.record.id
+      }
+      if (this.props.record && this.props.record.geo && this.props.record.geo.id){
+        geoObject.id = this.props.record.geo.id
+      }
+
+      parseGeoText = JSON.parse(JSON.stringify(geoObject));
+
+      if (parseGeoText && GJV.valid(geoObject.geojson)){
         //check for unsupported types - Multi____
 
         //TODO: the belong code doesn't belong on the text validator, it belongs on the map prior to a display attempt.
         //1. parse for validity (already done by this point)
-        //2. TODO: send to the map display for processing
+        //2.  send to the map display for processing
           //a. Update State
           //b. Modify Key to force a refresh
           //c. Map Values are now imported.  Scan them for these irregularities.
-        //3. TODO: display alert
-        //4. TODO: check to ensure data still exists in map when exported.
+        //3.  display alert
+        //4.  check to ensure data still exists in map when exported.
         /*
         parseGeoText.geojson.features.map(feature => {
           const type = feature.geometry.type
@@ -119,7 +145,8 @@ class LocationForm extends Component {
           }
         })*/
 
-        this.setState({ geo: newGeo }, this.setState({mapFormKey: this.state.mapFormKey + 1}));
+        //TODO: non-feature values should not be in the text form.
+        this.setState({ geo: geoObject }, this.setState({mapFormKey: this.state.mapFormKey + 1}));
       }
       else{
         console.log("Invalid geoJSON provided to form - If there's a plugin that identifies the mistake in-page, please insert it here.")
@@ -129,6 +156,7 @@ class LocationForm extends Component {
 
     } catch (e) {
       toastErrors("Invalid JSON given to Text Entry: ", e)
+      console.log("e in try catch geoObject failure is: ", e)
     }
     //check for difference between text and map
     //check for valid geoJSON

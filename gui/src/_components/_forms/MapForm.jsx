@@ -292,8 +292,8 @@ class MapForm extends Component {
                 })
 
 
-                if (notDisplayedFeatures.length>0){
-                    alert(`Some geoJSON features exist in geoJSON that cannot be modified via the map.  They are of type 'Multi'.  The Property Names (should they exist) or Types in question are: ${notDisplayedFeatures} and may be modified in the textArea beneath the map.`)
+                if (notDisplayedFeatures.length > 0){
+                    alert(`Some geoJSON features exist in geoJSON that cannot be modified via the map.  They are of type 'Multi'.  The Property Names (should they exist) / Types in question are: \n${notDisplayedFeatures} \nand may be modified in the textArea beneath the map.`)
                 }
                 this.setState({features: localFeatures}, () =>
                 console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
