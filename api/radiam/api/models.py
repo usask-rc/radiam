@@ -20,6 +20,7 @@ from .signals import (radiam_user_created, radiam_project_created,
 from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
 
 from django_rest_passwordreset.signals import reset_password_token_created
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
@@ -356,8 +357,8 @@ class UserAgent(models.Model):
     date_updated = models.DateTimeField(blank=True, null=False, default=now, help_text="The date this agent last checked in")
     remote_api_username = models.CharField(blank=True, null=True, max_length=120, help_text="The remote API username (if applicable)")
     remote_api_token = models.CharField(blank=True, null=True, max_length=200, help_text="The remote API token (if applicable)")
-    local_access_token = models.CharField(blank=True, null=True, max_length=200, help_text="JWT access token for local API")
-    local_refresh_token = models.CharField(blank=True, null=True, max_length=200, help_text="JWT refresh token for local API")
+    local_access_token = models.CharField(blank=True, null=True, max_length=2000, help_text="JWT access token for local API")
+    local_refresh_token = models.CharField(blank=True, null=True, max_length=2000, help_text="JWT refresh token for local API")
     crawl_minutes = models.IntegerField(blank=True, default=15, help_text="How many minutes between crawling (for remote API agents)")
     is_active = models.BooleanField(default=True, help_text="Whether this user agent is active")
 
@@ -369,6 +370,14 @@ class UserAgent(models.Model):
             return UserAgentProjectConfig.objects.filter(agent=self)
         except UserAgentProjectConfig.DoesNotExist:
             return None
+
+    def generate_tokens(self):
+        user = User.objects.get(id=self.user_id)
+        refresh = RefreshToken.for_user(user)
+        self.local_access_token = str(refresh.access_token)
+        self.local_refresh_token = str(refresh)
+        return None
+
 
 class UserAgentProjectConfig(models.Model):
     """
