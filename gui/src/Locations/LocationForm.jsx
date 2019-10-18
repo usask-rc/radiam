@@ -45,6 +45,7 @@ class LocationForm extends Component {
       geoText: '',
       isFormDirty: false,
       mapFormKey: 0,
+      jsonTextFormKey: 1000,
     };
   }
 
@@ -53,8 +54,9 @@ class LocationForm extends Component {
   }
 
   geoDataCallback = geo => {
+    console.log("gdc called", geo)
     if (geo && Object.keys(geo).length > 0) {
-      this.setState({ geo: geo });
+      this.setState({ geo: geo }, () => this.setState({geoText: JSON.stringify(geo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: this.state.jsonTextFormKey + 1})));
     } else {
       //this will likely have to be changed
       this.setState({ geo: {} });
@@ -235,7 +237,7 @@ class LocationForm extends Component {
         <Grid xs={12}>
         <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
         </Grid>
-        <Grid xs={12}>
+        <Grid xs={12} key={this.state.mapFormKey}>
         <MapForm
           content_type={Constants.model_fk_fields.LOCATION}
           recordGeo={this.state.geo}
@@ -243,7 +245,7 @@ class LocationForm extends Component {
           geoDataCallback={this.geoDataCallback}
         />
         </Grid>
-        <Grid xs={12}>
+        <Grid xs={12} key={this.state.jsonTextFormKey}>
         <ExpansionPanel fullWidth>
           <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
             <Typography>{`Geo Text Entry - Experimental`}</Typography>

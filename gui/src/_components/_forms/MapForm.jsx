@@ -90,6 +90,8 @@ class MapForm extends Component {
             return {}
         }
 
+        console.log("layer in _generateFeature is: ", layer)
+
         let newFeature = {
             id: layer._leaflet_id, //may have to remove before submission to API
             type: 'Feature',
@@ -221,6 +223,7 @@ class MapForm extends Component {
     }
 
     //get all edited values and push them up to the update function.
+    //this occurs when we hit 'Save' after editing
     _onEdited = e => {
 
         Object.keys(e.layers._layers).map(item => {
@@ -234,6 +237,11 @@ class MapForm extends Component {
             this.setState({popup:{active: true, for:newFeature.id}}, this.featuresCallback(newFeature))
         })
     };
+
+    //NOTE: This triggers when the Edit button is clicked, not the value to be edited.
+    _onEditStart = e => {
+        console.log("oneditstart e: ", e)
+    }
 
     //this is where we would put info display / editing for features.
     _onLayerClick = e => {
@@ -280,6 +288,7 @@ class MapForm extends Component {
                             else{
                                 //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
                                 notDisplayedFeatures = [...notDisplayedFeatures, layer.feature.properties.name ? layer.feature.properties.name : layer.feature.geometry.type]
+                                console.log("layer to not be editable is: ", layer)
                                 console.log("feature to not display is: ", layer.feature.properties.name)
                                 output = ref.leafletElement.addLayer(layer)
                                 layer.on({
@@ -341,6 +350,7 @@ class MapForm extends Component {
                     <EditControl
                     position="topleft"
                     onCreated={this._onCreated}
+                    onEditStart={this._onEditStart}
                     onEdited={this._onEdited}
                     onDeleted={this._onDeleted}
                     onDeleteStart={this._onDeleteStart}
