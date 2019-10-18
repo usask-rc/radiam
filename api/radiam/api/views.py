@@ -876,36 +876,14 @@ class ProjectAvatarViewSet(RadiamViewSet):
 
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
-class UserAgentGetTokenViewSet(viewsets.GenericViewSet):
-    """
-    Return existing JWT access and refresh token set for this user agent
-    """
-    serializer_class = UserAgentSerializer
 
-    def list(self, request, useragent_id):
-        # Restricted to internal Docker network requests
-        if not request.META['REMOTE_ADDR'].startswith("172"):
-            data = {"error":"401","access_token":"","refresh_token":""}
-            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
-
-        useragent = UserAgent.objects.get(id=useragent_id)
-
-        data = {
-            "id": useragent_id,
-            "user_id": useragent.user_id,
-            "access_token": useragent.local_access_token,
-            "refresh_token": useragent.local_refresh_token
-        }
-
-        return Response(data)
-
-class UserAgentNewTokenViewSet(viewsets.GenericViewSet):
+class UserAgentTokenViewSet(viewsets.GenericViewSet):
     """
     Generate and return a new JWT access and refresh token set for this user agent
     """
     serializer_class = UserAgentSerializer
 
-    def list(self, request, useragent_id):
+    def list(self, request, useragent_id, action):
         # Restricted to internal Docker network requests
         if not request.META['REMOTE_ADDR'].startswith("172"):
             data = {"error":"401","access_token":"","refresh_token":""}
@@ -913,8 +891,9 @@ class UserAgentNewTokenViewSet(viewsets.GenericViewSet):
 
         useragent = UserAgent.objects.get(id=useragent_id)
 
-        useragent.generate_tokens()
-        useragent.save()
+        if action and action == "new":
+            useragent.generate_tokens()
+            useragent.save()
 
         data = {
             "id": useragent_id,

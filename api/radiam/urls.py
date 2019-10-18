@@ -54,11 +54,8 @@ router.register(r'sensitivitylevel', views.SensitivityLevelViewSet)
 router.register(r'useragents', views.UserAgentViewSet)
 router.register(r'users', views.UserViewSet)
 
-router.register(r'useragents/(?P<useragent_id>[-\w]+)/gettokens',
-                views.UserAgentGetTokenViewSet,
-                basename='useragenttokens')
-router.register(r'useragents/(?P<useragent_id>[-\w]+)/newtokens',
-                views.UserAgentNewTokenViewSet,
+router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
+                views.UserAgentTokenViewSet,
                 basename='useragenttokens')
 
 router.register(r'projects/(?P<project_id>[-\w]+)/docs',
