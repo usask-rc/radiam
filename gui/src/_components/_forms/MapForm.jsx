@@ -289,6 +289,8 @@ class MapForm extends Component {
                             }
                             else{
                                 //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
+                                //multi___ are unsupported by Leaflet.js itself, but maybe we can patch it on top?
+                                //when a multipoint is created, 
                                 notDisplayedFeatures = [...notDisplayedFeatures, layer.feature.properties.name ? layer.feature.properties.name : layer.feature.geometry.type]
                                 console.log("layer to not be editable is: ", layer)
                                 console.log("feature to not display is: ", layer.feature.properties.name)
@@ -302,6 +304,8 @@ class MapForm extends Component {
                     })
                 //initialize our features
                 Object.keys(output._layers).map(key => {
+                    console.log("layer being logged to localFeature is: ", output._layers[key] )
+                    //the solution for multi_ values is likely here.
                     output._layers[key].feature.id = key
                     localFeatures[key] = output._layers[key].feature
                 })
