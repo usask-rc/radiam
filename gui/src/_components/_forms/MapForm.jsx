@@ -310,6 +310,9 @@ class MapForm extends Component {
 
     _setMapRef = (ref) => {
         this.setState({mapRef: ref})
+        console.log("mapref is: ", ref)
+        console.log("ref leafletelement is: ", ref.leafletElement)
+        
     }
 
     render() { 
@@ -344,6 +347,7 @@ class MapForm extends Component {
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
+                        userAgent={navigator.userAgent}
                         url={Constants.OSMTILEURL}
                     />
 
