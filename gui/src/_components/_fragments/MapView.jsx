@@ -31,12 +31,15 @@ const MapView = ({ classes, record }) => {
     const [location, setLocation] = useState([])
     const [mapLoading, setMapLoading] = useState(true)
     const [curFeature, setCurFeature] = useState({})
+    const [mapRef, setMapRef] = useState(null)
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
         var layer = e.target;
 
-        setLocation(getFirstCoordinate(layer))
+        setLocation([e.latlng.lat, e.latlng.lng])
+
+        //setLocation(getFirstCoordinate(layer))
         setCurFeature(layer.feature)
         setPopup({active: true, for: layer._leaflet_id})
     }
@@ -47,14 +50,20 @@ const MapView = ({ classes, record }) => {
             switch (layerGeo.type){
                 case "Point":
                     return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
+                case "MultiPoint":
                 case "LineString":
                         return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
+                case "MultiLineString":
                 case "Polygon":
                         return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
+                case "MultiPolygon":
+                        return [layerGeo.coordinates[0][0][0][1], layerGeo.coordinates[0][0][0][0]]
                 default:
-                    console.error("invalid feature type sent to getFirstCoordinate, setting to [0, 0]")
+                    console.error("Invalid feature type sent to _getFirstCoordinate.  Layer: ", layer)
                     return [0, 0]
             }
+
+            
         }
     }
 
@@ -154,48 +163,54 @@ const MapView = ({ classes, record }) => {
     return(
         <React.Fragment>
             {location && location.length > 0 && (
-            <Map
-            center={location}
-            className={classes.mapDisplay}
-            zoom={10}
-            minZoom={4}
-            maxZoom={16}
-            noWrap={true}
-            >
-                <TileLayer
-                    attribution={
-                    'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
-                    }
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
-                />
-
-                <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
-
-                {popup && popup.active &&
-                <Popup className={classes.mapPopup}
-                position = {location}
-                onClose={_onPopupClose}
+            <React.Fragment>
+                <Typography variant={"h5"} component={"h5"}>
+                    {`GeoJSON Map Data`}
+                </Typography>
+                <Map
+                ref={(ref) => {setMapRef(ref)}}
+                center={location}
+                className={classes.mapDisplay}
+                zoom={mapRef && mapRef.leafletElement.getZoom() || 7}
+                minZoom={4}
+                maxZoom={16}
+                noWrap={true}
                 >
-                {curFeature.properties && 
-                <React.Fragment>
-                    <Typography variant="h5" className={classes.mapPopupTitle}>
-                        {`Feature Data:`}
-                    </Typography>
-                    <Divider/>
-                    {Object.keys(curFeature.properties).map(key => {
-                        return(
-                        <Typography className={classes.mapPopupDetails}>
-                            {`${key} : ${curFeature.properties[key]}`}
+                    <TileLayer
+                        attribution={
+                        'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+                        }
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                    />
+
+                    <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
+
+                    {popup && popup.active &&
+                    <Popup className={classes.mapPopup}
+                    position = {location}
+                    onClose={_onPopupClose}
+                    >
+                    {curFeature.properties && 
+                    <React.Fragment>
+                        <Typography variant="h5" className={classes.mapPopupTitle}>
+                            {`Feature Data:`}
                         </Typography>
-                        );
-                    })}
-                    </React.Fragment>
-                }
-                </Popup>
-                }
+                        <Divider/>
+                        {Object.keys(curFeature.properties).map(key => {
+                            return(
+                            <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
+                                {`${key} : ${curFeature.properties[key]}`}
+                            </Typography>
+                            );
+                        })}
+                        </React.Fragment>
+                    }
+                    </Popup>
+                    }
 
 
-            </Map>
+                </Map>
+                </React.Fragment>
             )}
         </React.Fragment>
     )

@@ -4,7 +4,7 @@ import { EditControl } from "react-leaflet-draw"
 import L from "leaflet";
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
-import { withStyles } from '@material-ui/core';
+import { withStyles, Typography } from '@material-ui/core';
 import equal from "fast-deep-equal"
 
 const styles = {
@@ -22,7 +22,7 @@ class MapForm extends Component {
     constructor(props){
         super(props);
         console.log("imported props from parent in MapForm is: ", this.props)
-        this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
+        this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapRef: null, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
         this.updateGeo = this.updateGeo.bind(this)
         this._updateFeatures = this._updateFeatures.bind(this)
         this.featuresCallback = this.featuresCallback.bind(this)
@@ -234,7 +234,6 @@ class MapForm extends Component {
             let newFeature = this._generateFeature(layer)
 
             //TODO: at some point, this callback will need to happen for each edited object to update their descriptions
-            this.setState({location: this._getFirstCoordinate(layer)})
             this.setState({prevProperties: this.state.features[item].properties ? this.state.features[item].properties : {}})
             this.setState({popup:{active: true, for:newFeature.id}}, this.featuresCallback(newFeature))
         })
@@ -251,7 +250,7 @@ class MapForm extends Component {
         let prevProperties = this.state.features[layer._leaflet_id].properties ? this.state.features[layer._leaflet_id].properties : {}
 
         if (!this.state.blockPopup){
-            this.setState({location: this._getFirstCoordinate(layer)})
+            this.setState({location: ([e.latlng.lat, e.latlng.lng])})
             this.setState({prevProperties: prevProperties})
             this.setState({popup: {active: true, for: layer._leaflet_id}})
         }
@@ -312,7 +311,7 @@ class MapForm extends Component {
 
 
                 if (notDisplayedFeatures.length > 0){
-                    alert("Warning - There is at least one Multi____ feature in your geoJSON dataset.  Editing or Removing these values using the Map View is still experimental and likely will not work.")
+                    alert("Warning - There is at least one Multi feature in your geoJSON dataset.  Editing or Removing these values using the Map View is still experimental.  To remove these values, please use the Textfield Below the Map.  ")
                 }
                 this.setState({features: localFeatures}, () =>
                 console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
@@ -327,6 +326,11 @@ class MapForm extends Component {
         this.setState({popup: {active: false, for: ""}})
     }
 
+    _setMapRef = (ref) => {
+        this.setState({mapRef: ref})
+
+    }
+
     render() { 
         navigator.geolocation.getCurrentPosition(this.success, this.error, {
             enableHighAccuracy: true,
@@ -337,47 +341,58 @@ class MapForm extends Component {
         return(
             <React.Fragment>
             {this.state.location && this.state.location.length > 0 && (
-            <Map
-            center={this.state.location}
-            className={this.props.classes.mapDisplay}
-            zoom={10}
-            minZoom={4}
-            maxZoom={16}
-            noWrap={true}
-            >
-                <TileLayer
-                    attribution={
-                    'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+            <React.Fragment>
+                <Typography variant={"h5"} component={"h5"}>
+                    {`GeoJSON Map Input`}
+                </Typography>
+                <Map
+                ref = {(ref) => {
+                        if (!this.state.mapRef){
+                            this._setMapRef(ref)
+                        }
                     }
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
-                />
-
-                <FeatureGroup ref = {(reactFGref) =>{this._onFeatureGroupReady(reactFGref);}} >
-                    <EditControl
-                    position="topleft"
-                    onCreated={this._onCreated}
-                    onEditStart={this._onEditStart}
-                    onEdited={this._onEdited}
-                    onDeleted={this._onDeleted}
-                    onDeleteStart={this._onDeleteStart}
-                    onDeleteStop={this._onDeleteStop}
-                    draw={{
-                        rectangle: false,
-                        circle: false,
-                        circlemarker: false,
-                    }}
-                    />
-                </FeatureGroup>
-
-                {this.state.popup.active && 
-                <Popup className={this.props.classes.mapPopup}
-                    position={this.state.location}
-                    onClose={this._onPopupClose}
-                    >
-                    <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
-                </Popup>
                 }
-            </Map>
+                center={this.state.location}
+                className={this.props.classes.mapDisplay}
+                zoom={this.state.mapRef && this.state.mapRef.leafletElement.getZoom() || 7}
+                minZoom={4}
+                maxZoom={16}
+                noWrap={true}
+                >
+                    <TileLayer
+                        attribution={
+                        'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+                        }
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                    />
+
+                    <FeatureGroup ref = {(reactFGref) =>{this._onFeatureGroupReady(reactFGref);}} >
+                        <EditControl
+                        position="topleft"
+                        onCreated={this._onCreated}
+                        onEditStart={this._onEditStart}
+                        onEdited={this._onEdited}
+                        onDeleted={this._onDeleted}
+                        onDeleteStart={this._onDeleteStart}
+                        onDeleteStop={this._onDeleteStop}
+                        draw={{
+                            rectangle: false,
+                            circle: false,
+                            circlemarker: false,
+                        }}
+                        />
+                    </FeatureGroup>
+
+                    {this.state.popup.active && 
+                    <Popup className={this.props.classes.mapPopup}
+                        position={this.state.location}
+                        onClose={this._onPopupClose}
+                        >
+                        <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
+                    </Popup>
+                    }
+                </Map>
+            </React.Fragment>
             )}
             </React.Fragment>
         )
