@@ -192,7 +192,7 @@ class TestUserAPI(APITestCase):
         # Should return '400'
         self.assertContains(
             response=response,
-            text="A user with that username already exists.",
+            text="user with this username already exists.",
             status_code=400)
 
     def test_create_user_inactive(self):

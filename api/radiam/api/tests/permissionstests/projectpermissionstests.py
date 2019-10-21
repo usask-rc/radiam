@@ -56,12 +56,16 @@ class TestSuperuserProjectPermissions(APITestCase):
             response=response,
             text="",
             status_code=200)
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_superuser_write_project_list(self, m):
+
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    @mock.patch("radiam.api.views.ProjectViewSet.MetadataDoc")
+    def test_superuser_write_project_list(self, projectMock, doc):
         """
         Test Superuser can write a Project list endpoint
         (ie: Create projects)
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
 
         research_group = ResearchGroup.objects.get(id='718aaa07-0891-4931-8c73-1304f4a21d0d')
 
@@ -88,12 +92,16 @@ class TestSuperuserProjectPermissions(APITestCase):
             text="",
             status_code=201)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_superuser_write_project_detail(self, m):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    @mock.patch("radiam.api.views.ProjectViewSet.MetadataDoc")
+    def test_superuser_write_project_detail(self, pm, doc):
         """
         Test Superuser can write a Project detail endpoint
         (ie: Update an existing project)
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
+
         detail_project = Project.objects.get(name='project 1')
 
         body = {
@@ -161,12 +169,15 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_adminuser_write_project_list(self, m):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    @mock.patch("radiam.api.views.ProjectViewSet.MetadataDoc")
+    def test_adminuser_write_project_list(self, m, doc):
         """
         Test Admin user can write a Project list endpoint
         (ie: Create projects)
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
 
         research_group = ResearchGroup.objects.get(id='718aaa07-0891-4931-8c73-1304f4a21d0d')
 
@@ -193,7 +204,7 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=201)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
     def test_adminuser_write_project_detail(self, m):
         """
         Test Admin user can write a Project detail endpoint
@@ -221,7 +232,7 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
     def test_adminuser_change_project_group(self, m):
         """
         Test Admin user can change the group associated with a project
@@ -249,7 +260,7 @@ class TestAdminuserProjectPermissions(APITestCase):
             text="",
             status_code=200)
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
     def test_adminuser_change_project_group_denied(self, m):
         """
         Test Admin user cannot replace the group for a project with a

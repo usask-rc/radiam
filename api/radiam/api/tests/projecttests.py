@@ -41,12 +41,15 @@ class TestProjectAPI(BaseSearchTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertLess(0, response.data['count'])
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_create(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    @mock.patch("radiam.api.views.ProjectViewSet.MetadataDoc")
+    def test_project_create(self, mock_save_metadata_doc, doc):
         """
         Test that a new project is created with corresponding ES index,
         and ProjectMetadataDoc
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
 
         research_group = ResearchGroup.objects.get(id='23e69896-c60a-4e6c-a444-ba906ada91fb')
 
@@ -77,7 +80,6 @@ class TestProjectAPI(BaseSearchTestCase):
 
         # Does a corresponding Elasticsearch index exist?
         self.assertTrue(self.indexservice.index_exists(response.data['id']))
-        mock_save_project_metadata_doc.assert_called_once()
 
     def test_project_exists(self):
         """
@@ -115,8 +117,8 @@ class TestProjectAPI(BaseSearchTestCase):
             text='Not found',
             status_code=404)
 
-    @mock.patch("radiam.api.models.Project._delete_project_metadata_doc")
-    def test_project_delete(self, mock_delete_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._delete_metadata_doc")
+    def test_project_delete(self, mock_delete_metadata_doc):
         """
         Test that deleting a project removes the model as well as the ES index
         """
@@ -144,10 +146,10 @@ class TestProjectAPI(BaseSearchTestCase):
             text='',
             status_code=204)
         self.assertFalse(self.indexservice.index_exists(testproject_id))
-        mock_delete_project_metadata_doc.assert_called_once()
+        mock_delete_metadata_doc.assert_called_once()
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_update_name(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    def test_project_update_name(self, mock_save_metadata_doc):
         """
         Test updating a project name
         """
@@ -174,10 +176,10 @@ class TestProjectAPI(BaseSearchTestCase):
             text = updated_name,
             status_code = 200)
         self.assertEquals(response.data['name'], updated_name)
-        mock_save_project_metadata_doc.assert_called_once()
+        mock_save_metadata_doc.assert_called_once()
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_update_group(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    def test_project_update_group(self, mock_save_metadata_doc):
         """
         Test updating a project group
         """
@@ -204,10 +206,10 @@ class TestProjectAPI(BaseSearchTestCase):
             text = group.id,
             status_code = 200)
         self.assertEquals(group.id, response.data['group'])
-        mock_save_project_metadata_doc.assert_called_once()
+        mock_save_metadata_doc.assert_called_once()
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_update_number(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    def test_project_update_number(self, mock_save_metadata_doc):
         """
         Test updating a project number
         """
@@ -234,10 +236,10 @@ class TestProjectAPI(BaseSearchTestCase):
             text = updated_number,
             status_code = 200)
         self.assertEquals(response.data['number'], updated_number)
-        mock_save_project_metadata_doc.assert_called_once()
+        mock_save_metadata_doc.assert_called_once()
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_update_keywords(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    def test_project_update_keywords(self, mock_save_metadata_doc):
         """
         Test updating a project keywords
         """
@@ -264,10 +266,10 @@ class TestProjectAPI(BaseSearchTestCase):
             text = updated_keywords,
             status_code = 200)
         self.assertEquals(response.data['keywords'], updated_keywords)
-        mock_save_project_metadata_doc.assert_called_once()
+        mock_save_metadata_doc.assert_called_once()
 
-    @mock.patch("radiam.api.models.Project._save_project_metadata_doc")
-    def test_project_update_primary_contact_user(self, mock_save_project_metadata_doc):
+    @mock.patch("radiam.api.models.Project._save_metadata_doc")
+    def test_project_update_primary_contact_user(self, mock_save_metadata_doc):
         """
         Test updating a project primary contact user
         """
@@ -294,7 +296,7 @@ class TestProjectAPI(BaseSearchTestCase):
             text = updated_primary_contact_user.id,
             status_code = 200)
         # self.assertEquals(response.data['primary_contact_user'], str(updated_primary_contact_user))
-        mock_save_project_metadata_doc.assert_called_once()
+        mock_save_metadata_doc.assert_called_once()
 
     def test_project_doc_list(self):
         """
@@ -353,9 +355,9 @@ class TestProjectAPI(BaseSearchTestCase):
             status_code=200)
 
     @mock.patch("radiam.api.models.ProjectMetadataDoc.get")
-    def test_save_project_metadata_doc_update(self, mock_project_metadata_doc_get):
+    def test_save_metadata_doc_update(self, mock_project_metadata_doc_get):
         """
-        Test that _save_project_metadata_doc updates an existing
+        Test that _save_metadata_doc updates an existing
         ProjectMetadataDoc.
         """
         mock_project_metadata_doc = mock.MagicMock(spec=ProjectMetadataDoc)
@@ -364,7 +366,7 @@ class TestProjectAPI(BaseSearchTestCase):
         id = '094ee941-3c2b-4e73-953b-85cf1585dab5'
         project = Project.objects.get(id=id)
 
-        project._save_project_metadata_doc()
+        project._save_metadata_doc()
 
         mock_project_metadata_doc_get.assert_called_once()
         mock_project_metadata_doc.update.assert_called_once_with(
@@ -377,15 +379,15 @@ class TestProjectAPI(BaseSearchTestCase):
 
     @mock.patch("radiam.api.models.ProjectMetadataDoc.save")
     @mock.patch("radiam.api.models.ProjectMetadataDoc.get")
-    def test_save_project_metadata_doc_create(self, mock_get, mock_save):
+    def test_save_metadata_doc_create(self, mock_get, mock_save):
         """
-        Test _save_project_metadata_doc creates a new ProjectMetadataDoc objects
+        Test _save_metadata_doc creates a new ProjectMetadataDoc objects
         """
         mock_get.side_effect = es_exceptions.NotFoundError
 
         id = '094ee941-3c2b-4e73-953b-85cf1585dab5'
         project = Project.objects.get(id=id)
-        project._save_project_metadata_doc()
+        project._save_metadata_doc()
 
         mock_get.assert_called_once()
         mock_save.assert_called_once()
