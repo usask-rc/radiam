@@ -12,14 +12,14 @@ WORKDIR /code
 RUN pip install --upgrade pip
 
 # Copy requirements.txt file and install
-COPY ./radiam/requirements.txt /code/radiam/requirements.txt
+COPY ./api/radiam/requirements.txt /code/radiam/requirements.txt
 RUN pip install -r /code/radiam/requirements.txt
 
 # Copy version file into container.
 
-COPY ./VERSION /etc/VERSION
+COPY VERSION /etc/VERSION
 # Copy project files
-COPY . /code/
+COPY ./api/ /code/
 
 # Install waitoforit script for blocking until postgres
 RUN git clone https://github.com/usask-rc/wait-for-it.git /wait-for-it
