@@ -9,6 +9,7 @@ module.exports = Object.freeze({
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
   LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
   ROLE_USER: "user",
+  OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   WEBTOKEN: "token",
   fields: {
     PASSWORD: "password",
