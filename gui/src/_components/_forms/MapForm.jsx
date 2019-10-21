@@ -6,6 +6,7 @@ import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
 import { withStyles, Typography } from '@material-ui/core';
 import equal from "fast-deep-equal"
+import { getFirstCoordinate } from '../../_tools/funcs';
 
 const styles = {
     mapDisplay: {
@@ -104,27 +105,6 @@ class MapForm extends Component {
         return newFeature
     }
 
-    _getFirstCoordinate = layer => {
-        if (layer.feature){
-            const layerGeo = layer.feature.geometry
-            switch (layerGeo.type){
-                case "Point":
-                    return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
-                case "MultiPoint":
-                case "LineString":
-                        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
-                case "MultiLineString":
-                case "Polygon":
-                        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
-                case "MultiPolygon":
-                        return [layerGeo.coordinates[0][0][0][1], layerGeo.coordinates[0][0][0][0]]
-                default:
-                    console.error("Invalid feature type sent to _getFirstCoordinate.  Layer: ", layer)
-                    return [0, 0]
-            }
-        }
-    }
-
     //latitude should never require normalizing, but a bug exists in Leaflet that causes the map to repeat itself longitudinally.
     _normLng(lng){
         return lng % 180
@@ -205,7 +185,7 @@ class MapForm extends Component {
             click: this._onLayerClick.bind(this)
         })
         layer.feature = this._generateFeature(layer)
-        this.setState({location: this._getFirstCoordinate(layer)})
+        this.setState({location: getFirstCoordinate(layer)}) //TODO: there has to be a way to remove this one as well.
         this.setState({prevProperties: {}})
         this.setState({popup:{active: true, for:layer.feature.id}}, this.featuresCallback(layer.feature))
     };
@@ -318,7 +298,6 @@ class MapForm extends Component {
                 )                
             }
         this.setState({mapLoading: false})
-        
     }
 
     _onPopupClose = () => {
@@ -328,7 +307,6 @@ class MapForm extends Component {
 
     _setMapRef = (ref) => {
         this.setState({mapRef: ref})
-
     }
 
     render() { 

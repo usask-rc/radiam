@@ -38,33 +38,8 @@ const MapView = ({ classes, record }) => {
         var layer = e.target;
 
         setLocation([e.latlng.lat, e.latlng.lng])
-
-        //setLocation(getFirstCoordinate(layer))
         setCurFeature(layer.feature)
         setPopup({active: true, for: layer._leaflet_id})
-    }
-
-    function getFirstCoordinate(layer){
-        if (layer.feature){
-            const layerGeo = layer.feature.geometry
-            switch (layerGeo.type){
-                case "Point":
-                    return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
-                case "MultiPoint":
-                case "LineString":
-                        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
-                case "MultiLineString":
-                case "Polygon":
-                        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
-                case "MultiPolygon":
-                        return [layerGeo.coordinates[0][0][0][1], layerGeo.coordinates[0][0][0][0]]
-                default:
-                    console.error("Invalid feature type sent to _getFirstCoordinate.  Layer: ", layer)
-                    return [0, 0]
-            }
-
-            
-        }
     }
 
     function _onPopupClose() {

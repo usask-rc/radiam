@@ -37,17 +37,28 @@ export function toastErrors(data) {
     toast.error(data);
   }
 }
-export function getRelatedDatasets(setDatasets, record){
-  return new Promise((resolve, reject) => {
 
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.DATASETS, 
-      {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
-    .then(assocDatasets => {
-      resolve(setDatasets(assocDatasets))
-    }).catch(err => reject(err))
-  })
+export function getFirstCoordinate(layer) {
+  if (layer.feature){
+      const layerGeo = layer.feature.geometry
+      switch (layerGeo.type){
+          case "Point":
+              return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
+          case "MultiPoint":
+          case "LineString":
+                  return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
+          case "MultiLineString":
+          case "Polygon":
+                  return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
+          case "MultiPolygon":
+                  return [layerGeo.coordinates[0][0][0][1], layerGeo.coordinates[0][0][0][0]]
+          default:
+              console.error("Invalid feature type sent to _getFirstCoordinate.  Layer: ", layer)
+              return [0, 0]
+      }
+  }
 }
+
 
 export function getFolderFiles(setFiles, folderPath, projectID){
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
@@ -105,57 +116,6 @@ export function getFolderFiles(setFiles, folderPath, projectID){
   });
 }
 
-export function getRootPaths(setListOfRootPaths, setStatus, projectID){
-  const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
-    sort: { field: 'last_modified', order: 'ASC' },
-  };
-
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-
-  return new Promise((resolve, reject) => {
-
-    dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
-      params
-    )
-      .then(response => {
-
-        let rootList = {}
-
-        response.data.map(file => {
-          //new location that we haven't seen yet.  Add it to the dictionary.
-          if (typeof file.location !== "undefined") {
-            if (!rootList || !rootList[file.location]) {
-              rootList[file.location] = file.path_parent;
-            }
-            //we've seen this location before.  Compare for the shorter string.
-            else {
-              //take the smaller value of the two.  They must share a parent path as they are in the same location.
-              if (rootList[file.location].length > file.path_parent) {
-                rootList[file.location] = file.path_parent
-              }
-            }
-          }
-          return file;
-        })
-
-        let rootPaths = []
-
-        //create dummy root folder items.
-        for (var key in rootList) {
-          rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
-        }
-        resolve(setListOfRootPaths(rootPaths))
-
-      })
-      .catch(error => {
-        reject(setStatus({ loading: false, error: error }));
-      });
-  });
-}
-
 export function getGroupUsers(setGroupMembers, record) {
   return new Promise((resolve, reject) => {
     let groupUsers = []
@@ -196,6 +156,68 @@ export function getGroupUsers(setGroupMembers, record) {
       return groupRoles
     })
   })
+}
+
+
+
+export function getRelatedDatasets(setDatasets, record){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.DATASETS, 
+      {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
+    .then(assocDatasets => {
+      resolve(setDatasets(assocDatasets))
+    }).catch(err => reject(err))
+  })
+}
+
+export function getRootPaths(setListOfRootPaths, setStatus, projectID){
+  const params = {
+    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    sort: { field: 'last_modified', order: 'ASC' },
+  };
+
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+  return new Promise((resolve, reject) => {
+    dataProvider(
+      GET_LIST,
+      Constants.models.PROJECTS + '/' + projectID + '/search',
+      params
+    )
+      .then(response => {
+
+        let rootList = {}
+
+        response.data.map(file => {
+          //new location that we haven't seen yet.  Add it to the dictionary.
+          if (typeof file.location !== "undefined") {
+            if (!rootList || !rootList[file.location]) {
+              rootList[file.location] = file.path_parent;
+            }
+            //we've seen this location before.  Compare for the shorter string.
+            else {
+              //take the smaller value of the two.  They must share a parent path as they are in the same location.
+              if (rootList[file.location].length > file.path_parent) {
+                rootList[file.location] = file.path_parent
+              }
+            }
+          }
+          return file;
+        })
+
+        let rootPaths = []
+
+        //create dummy root folder items.
+        for (var key in rootList) {
+          rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
+        }
+        resolve(setListOfRootPaths(rootPaths))
+
+      })
+      .catch(error => {
+        reject(setStatus({ loading: false, error: error }));
+      });
+  });
 }
 
 export function getUserGroups(record) {
