@@ -7,6 +7,7 @@ import { compose } from 'recompose';
 import { withStyles, Typography } from '@material-ui/core';
 import equal from "fast-deep-equal"
 import { getFirstCoordinate } from '../../_tools/funcs';
+import * as Constants from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -229,6 +230,8 @@ class MapForm extends Component {
         var layer = e.target;
         let prevProperties = this.state.features[layer._leaflet_id].properties ? this.state.features[layer._leaflet_id].properties : {}
 
+        console.log("layer clicked with value e: ", e, "and state: ", this.state)
+
         if (!this.state.blockPopup){
             this.setState({location: ([e.latlng.lat, e.latlng.lng])})
             this.setState({prevProperties: prevProperties})
@@ -334,14 +337,14 @@ class MapForm extends Component {
                 className={this.props.classes.mapDisplay}
                 zoom={this.state.mapRef && this.state.mapRef.leafletElement.getZoom() || 7}
                 minZoom={4}
-                maxZoom={16}
+                maxZoom={13}
                 noWrap={true}
                 >
                     <TileLayer
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
-                        url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                        url={Constants.OSMTILEURL}
                     />
 
                     <FeatureGroup ref = {(reactFGref) =>{this._onFeatureGroupReady(reactFGref);}} >

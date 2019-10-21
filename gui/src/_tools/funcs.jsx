@@ -59,7 +59,6 @@ export function getFirstCoordinate(layer) {
   }
 }
 
-
 export function getFolderFiles(setFiles, folderPath, projectID){
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
@@ -157,8 +156,6 @@ export function getGroupUsers(setGroupMembers, record) {
     })
   })
 }
-
-
 
 export function getRelatedDatasets(setDatasets, record){
   return new Promise((resolve, reject) => {
