@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
-import { getAPIEndpoint, radiamRestProvider, httpClient } from '../_tools';
+import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { email, maxLength, minLength, required, GET_LIST, GET_ONE } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
-import { Prompt } from 'react-router';
+import { Prompt, Redirect } from 'react-router';
 import UserGroupsDisplay from './UserGroupsDisplay';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
@@ -22,7 +22,7 @@ const styles = theme => ({
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
-        this.state = { ...props.record, groupMembers: [], isFormDirty: false }
+        this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false }
     }
 
     async componentDidMount() {
@@ -42,6 +42,7 @@ class UserEditForm extends Component {
             toastErrors(
                 Constants.warnings.NO_AUTH_TOKEN
             );
+            this.setState({redirect: true})
         }
 
         const request = new Request(
@@ -149,6 +150,7 @@ class UserEditForm extends Component {
                 />
             </Toolbar>
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            {this.state.redirect && <Redirect to="/login"/>}
         </React.Fragment>
         );
     }

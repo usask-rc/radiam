@@ -356,6 +356,14 @@ export function createObjectWithGeo(formData, geo, props, redirect){
       toastErrors(
           Constants.warnings.NO_AUTH_TOKEN
       );
+
+      if (props && props.history)
+      {
+        props.history.push(`/login`)
+      }
+      else{
+        console.error("no props sent to createobjectwithgeo - how did this happen?  formData: ", formData)
+      }
   }
 }
 
