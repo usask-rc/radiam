@@ -146,7 +146,7 @@ module.exports = Object.freeze({
   warnings: {
     TOO_MANY_ROLES: "This user is already assigned a role in this group. Only one role is allowed per group.",
     UNSAVED_CHANGES: "This form contains unsaved changes.  Leave without saving?",
-    NO_AUTH_TOKEN: "No authentication token detected.  Please return to the login page, then return here and try again.",
+    NO_AUTH_TOKEN: "No authentication token detected.  Returning to the login page.  Please login and try again.",
     NO_CONNECTION: "Could not connect to the API.  Please refresh the page and try again.",
   }
 });
