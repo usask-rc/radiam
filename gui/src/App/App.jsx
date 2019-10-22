@@ -157,7 +157,7 @@ const App = props => {
                 : null
             }
             create={
-              permissions.is_amdin || permissions.is_group_admin 
+              permissions.is_admin || permissions.is_group_admin 
               ? GroupCreate 
               : null
             }

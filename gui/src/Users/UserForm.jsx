@@ -115,7 +115,7 @@ class UserFormWithAssoc extends Component {
 
         }
         else {
-            toastErrors("Please enter your Username and Email Address.");
+            toastErrors("Please enter the new User's Username and Email Address.");            
         }
     })
     };
