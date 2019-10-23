@@ -122,6 +122,14 @@ services:
       - radiamapi
       - radiamgui
 
+  osfconnector:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile.radiam-osf
+    command: ["/wait-for-it/wait-for-it.sh", "nginx:80", "-s", "--timeout=60", "--", "python", "osf_connector.py"]
+    depends_on:
+      - nginx
+
 volumes:
       elasticsearch_data_vol:
       postgres_data_vol:
