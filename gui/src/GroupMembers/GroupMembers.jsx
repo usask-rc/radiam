@@ -95,7 +95,7 @@ export const GroupMemberList = withStyles(listStyles)(
             source={Constants.model_fk_fields.USER}
             reference={Constants.models.USERS}
           >
-            <UserShow />
+            <UserShow {...props} />
           </ReferenceField>
           <ReferenceField
             linkType={false}
