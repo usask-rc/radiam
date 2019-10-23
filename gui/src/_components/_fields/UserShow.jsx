@@ -12,11 +12,11 @@ const styles = {
   },
   imageContainer: {
     float: "left",
-    "margin": "6px 6px 6px 0px"
+    "margin": "9px"
   },
   nameContainer: {
     float: "left",
-    padding: "17px 0"
+    padding: "17px 17px"
   }
 };
 
