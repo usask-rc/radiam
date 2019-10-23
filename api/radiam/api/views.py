@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, permission_classes
 
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
@@ -911,16 +912,17 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
     Generate and return a new JWT access and refresh token set for this user agent
     """
     serializer_class = UserAgentSerializer
+    permission_classes = [AllowAny]
 
     def list(self, request, useragent_id, action):
         # Restricted to internal Docker network requests
-        if 'HTTP_X_FORWARDED_FOR' not in request.META or not request.META['HTTP_X_FORWARDED_FOR'].startswith("172"):
-            data = {"error":"401","access_token":"","refresh_token":""}
+        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
+            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         useragent = UserAgent.objects.get(id=useragent_id)
 
-        if action and action == "new":
+        if (action and action == "new") or (useragent.local_refresh_token is None):
             useragent.generate_tokens()
             useragent.save()
 
