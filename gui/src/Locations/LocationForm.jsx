@@ -18,6 +18,7 @@ import { withStyles } from '@material-ui/styles';
 import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
 import { FormDataConsumer } from 'ra-core';
+import get from 'lodash/get';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -50,7 +51,7 @@ class LocationForm extends Component {
   }
 
   componentDidMount() {
-    this.setState({ geoText: JSON.stringify(this.state.geo.geojson.features, null, 2) });
+    this.setState({ geoText: JSON.stringify(get(this, "state.geo.geojson.features", {}), null, 2) });
   }
 
   geoDataCallback = geo => {
