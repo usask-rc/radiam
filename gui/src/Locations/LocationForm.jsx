@@ -50,7 +50,7 @@ class LocationForm extends Component {
   }
 
   componentDidMount() {
-    this.setState({ geoText: JSON.stringify(this.state.geo.geojson.features, null, 2) });
+    this.setState({ geoText: this.state.geo && this.state.geo.geojson ? JSON.stringify(this.state.geo.geojson.features, null, 2) : '[]' });
   }
 
   geoDataCallback = geo => {
