@@ -64,3 +64,16 @@ class RadiamService:
 
     def get_search(self):
         return self.search_service.search
+
+    def no_docs(self, index_name):
+        """
+        Do a quick search for only metadata to determine how many docs this index has
+        """
+        from elasticsearch_dsl import Search
+        s = Search(index=index_name)
+        s = s.source(False)
+        s.execute()
+        if s.count() > 0:
+            return False
+        else:
+            return True

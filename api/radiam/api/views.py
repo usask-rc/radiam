@@ -969,12 +969,23 @@ class SearchViewSet(viewsets.GenericViewSet):
             else:
                 radiam_service.add_generic_search(value)
 
+        # Check to see if there are no docs, we can't sort if there are no docs
+        # as it causes a 500 error that we don't actually mind.
+        if sort:
+            if radiam_service.no_docs(project_id):
+                empty = {}
+                empty["count"] = 0
+                empty["next"] = None
+                empty["previous"] = None
+                empty["results"] = []
+                return Response(empty)
+
         self.queryset = radiam_service.get_search()
 
-        if not sort:
-            self.queryset = self.queryset.sort()
-        else:
+        if sort:
             self.queryset = self.queryset.sort(sort)
+        else:
+            self.queryset = self.queryset.sort()
 
         page = self.paginate_queryset(self.queryset)
         serializer = self.get_serializer(page, many=True)
