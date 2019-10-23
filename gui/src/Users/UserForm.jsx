@@ -175,12 +175,6 @@ class UserFormWithAssoc extends Component {
                     source={Constants.model_fields.NOTES}
                     onChange={this.handleChange}
                 />
-                <BooleanInput
-                    label={"en.models.generic.active"}
-                    source={Constants.model_fields.ACTIVE}
-                    defaultValue={true}
-                    onChange={this.handleSelectChange}
-                />
                 <ReferenceInput
                     label={"en.models.groupmembers.group"}
                     source={Constants.model_fk_fields.GROUP}
