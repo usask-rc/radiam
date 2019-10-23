@@ -25,7 +25,6 @@ class UserFormWithAssoc extends Component {
         this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
-
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
         if (token) {

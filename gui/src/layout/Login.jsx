@@ -121,7 +121,8 @@ class Login extends Component {
     this.toggleForgotPassword();
   };
 
-  toggleForgotPassword = () => {
+  toggleForgotPassword = (e) => {
+    e.preventDefault()
     this.setState({forgotpassword: !this.state.forgotpassword });
   };
 
@@ -181,8 +182,8 @@ class Login extends Component {
               </form>
               <div className={classes.forgotContainer}>
                 <Link
+                  href="#"
                   onClick={this.toggleForgotPassword}
-                  fullWidth
                 >
                   {translate("en.auth.forgot")}
                 </Link>
