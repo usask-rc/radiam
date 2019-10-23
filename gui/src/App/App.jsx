@@ -16,6 +16,7 @@ import {
   Visibility,
   VisibilityOff,
   VpnKey,
+  Home,
 } from '@material-ui/icons';
 import authProvider from '../_tools/authProvider';
 import radiamRestProvider from '../_tools/radiamRestProvider';
@@ -88,8 +89,7 @@ import {
   UserAgentEdit,
   UserAgentCreate,
 } from '../UserAgents/UserAgents';
-import DashboardComponent from '../Dashboard/Dashboard';
-import { Layout } from '../layout';
+import {Layout} from "../layout/index"
 import { httpClient } from '../_tools/httpClient';
 import englishMessages from '../_constants/i18n/en';
 import * as Constants from '../_constants/index';
@@ -100,6 +100,8 @@ import { ToastContainer } from 'react-toastify';
 import datasets from "../Datasets"
 import locations from "../Locations"
 import projectavatars from "../ProjectAvatars"
+import Dashboard from '../Dashboard/Dashboard';
+import RadiamMenu from '../Dashboard/RadiamMenu';
 
 const i18nProvider = locale => {
   return englishMessages;
@@ -117,7 +119,8 @@ const App = props => {
       <Admin
         loginPage={Login}
         customRoutes={customRoutes}
-        dashboard={DashboardComponent}
+        dashboard={Dashboard}
+        menu={RadiamMenu}
         styles={styles}
         authProvider={authProvider}
         dataProvider={radiamRestProvider(getAPIEndpoint(), httpClient)}

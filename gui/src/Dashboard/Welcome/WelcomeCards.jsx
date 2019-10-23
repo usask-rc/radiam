@@ -10,8 +10,10 @@ const WelcomeCards = () => (
         container
         spacing={3}
     >
+    <Grid container xs={12}>
         <Welcome item xs={6} />
         <AgentInstall item xs={6} />
+        </Grid>
     </Grid>
 )
 

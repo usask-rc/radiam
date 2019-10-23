@@ -12,6 +12,7 @@ import RecentFiles from './RecentFiles/RecentFiles';
 class Dashboard extends Component {
   constructor(props) {
     super(props);
+    console.log("props of dashboard are: ", props)
     this.state = { loading: true, hasFiles: false };
   }
 

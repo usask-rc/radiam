@@ -212,6 +212,7 @@ export function getRootPaths(setListOfRootPaths, setStatus, projectID){
 
       })
       .catch(error => {
+        console.log("error in getrootpaths is: ", error)
         reject(setStatus({ loading: false, error: error }));
       });
   });
