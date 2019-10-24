@@ -406,6 +406,10 @@ class UserAgentSerializer(serializers.ModelSerializer):
         instance.local_refresh_token = validated_data.get('local_refresh_token', instance.local_refresh_token)
         instance.crawl_minutes = validated_data.get('crawl_minutes', instance.crawl_minutes)
         instance.is_active = validated_data.get('is_active', instance.is_active)
+        if instance.user != validated_data.get('user', instance.user):
+            instance.local_access_token = None
+            instance.local_refresh_token = None
+        instance.user = validated_data.get('user', instance.user)
         instance.save()
 
         return instance
