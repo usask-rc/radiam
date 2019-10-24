@@ -220,16 +220,13 @@ class Login extends Component {
                       {translate("en.auth.send_email")}
                     </Button>
                   </CardActions>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    disabled={isLoading}
-                    className={classes.button}
-                    onClick={this.toggleForgotPassword}
-                    fullWidth
-                  >
-                    {translate("en.auth.return_to_login")}
-                  </Button>
+                  <div className={classes.forgotContainer}>
+                    <Link
+                    href="#"
+                    onClick={this.toggleForgotPassword}>
+                      {translate("en.auth.return_to_login")}
+                    </Link>
+                  </div>
                 </form>
               </React.Fragment>
             )}

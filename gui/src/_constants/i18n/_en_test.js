@@ -257,7 +257,7 @@ export default {
     auth: {
       username: 'Username',
       password: 'Password',
-      forgot: 'Reset Password?',
+      forgot: 'Reset Password',
       sign_in: 'Sign In',
       email: 'Email',
       send_email: 'Send Confirmation',
