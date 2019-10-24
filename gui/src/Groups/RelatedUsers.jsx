@@ -39,7 +39,7 @@ const RelatedUsers = (record) => {
             groupRoleValue=groupRoleTextArr[groupRoleTextArr.length - 2]
         }
 
-        return( //TODO: display number of files in each user in the chip
+        return(
           <Chip className={styles.chipDisplay} variant="outlined" key={groupMember.id}
           avatar={
             <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
@@ -60,9 +60,3 @@ const RelatedUsers = (record) => {
   }
 
 export default RelatedUsers
-
-/**
- * <div className={classes.imageContainer}>
-        <UserAvatar size="36" name={`${first} ${last}`} />
-      </div>
- */

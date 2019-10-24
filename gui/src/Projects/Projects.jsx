@@ -31,7 +31,7 @@ import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from 
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
-import { userSelect, UserShow } from "../_components/_fields/UserShow";
+import { userSelect, UserShow, userSelectField } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';

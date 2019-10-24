@@ -5,6 +5,7 @@ import { FieldProps, InjectedFieldProps, fieldPropTypes } from "react-admin";
 import * as Constants from "../../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import UserAvatar from "react-user-avatar"
+import { Grid } from "@material-ui/core";
 
 const styles = {
   image: {
@@ -16,11 +17,28 @@ const styles = {
   },
   nameContainer: {
     float: "left",
-    padding: "17px 17px"
+    padding: "17px 17px",
+  },
+  selectContainer: {
+    flex: 1,
+    flexDirection: "row"
   }
 };
 
+/*worked on getting this as a replacement for the drop-down select for Users, but I can't get the Styles to work properly.
+<Grid container>
+  <div>
+    <UserAvatar size="24" name={`${choice.first_name} ${choice.last_name}`} />
+  </div>
+
+  <div styles={{backgroundColor: "red"}}>
+  {`${choice.first_name} ${choice.last_name} ${choice.username}`}
+  </div>
+  </Grid>
+  */
+
 export const userSelect = choice => choice.first_name || choice.last_name ?
+
   `${choice.first_name} ${choice.last_name} (${choice.username})` : `${choice.username}`;
 
 export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = withStyles(styles)  (({
@@ -73,6 +91,7 @@ UserShow.defaultProps = {
   addLabel: true,
   sortBy: Constants.model_fields.USERNAME,
 };
+
 
 const EnhancedUserShow = withStyles(styles)(UserShow);
 
