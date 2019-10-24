@@ -120,6 +120,10 @@ def get_radiam_token_for_osf(agent_id):
     r = requests.get(token_endpoint, headers=head)
     if r.status_code == 200:
         tokens = json.loads(r.content)
+        tokens["access"] = tokens["access_token"]
+        tokens["refresh"] = tokens["refresh_token"]
+        tokens.pop("access_token")
+        tokens.pop("refresh_token")
         return tokens
     else:
         return None
