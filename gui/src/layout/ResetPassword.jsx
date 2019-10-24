@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
-import { Card, CardActions, Button, Typography } from "@material-ui/core";
+import { Card, CardActions, Button, Typography, Avatar } from "@material-ui/core";
 import { Link } from "ra-ui-materialui";
 import { withRouter } from "react-router";
+import LockIcon from "@material-ui/icons/Lock";
 
 import { getAPIEndpoint } from "../_tools";
 import { toast, ToastContainer } from "react-toastify";
@@ -11,8 +12,41 @@ import { withStyles } from "@material-ui/core/styles";
 
 import * as Constants from "../_constants/index";
 import { toastErrors } from "../_tools/funcs";
+import { required } from "ra-core";
 
 const styles = theme => ({
+  actions: {
+    padding: "0 1em 1em 1em"
+  },
+  avatar: {
+    margin: "1em",
+    display: "flex",
+    justifyContent: "center"
+  },
+  button: {
+    marginTop: "6em",
+    padding: "1em",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column"
+  },
+  card: {
+    width: 300,
+    marginTop: "6em"
+  },
+  form: {
+    padding: "0 1em 1em 1em"
+  },
+  icon: {
+    backgroundColor: "black"
+  },
+  input: {
+    marginTop: "1em"
+  },
+  loading: {
+    margin: "1em",
+    fontSize: "24px"
+  },
   main: {
     display: "flex",
     flexDirection: "column",
@@ -22,34 +56,19 @@ const styles = theme => ({
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover"
   },
-  loading: {
-    margin: "1em",
-    fontSize: "24px"
-  },
-  card: {
-    minWidth: 300,
-    marginTop: "6em"
-  },
-  form: {
-    padding: "0 1em 1em 1em"
-  },
-  input: {
-    marginTop: "1em"
-  },
-  actions: {
-    padding: "0 1em 1em 1em"
-  },
   title: {
     padding: "16px 16px"
   },
-  button: {
-    marginTop: "6em",
-    padding: "1em",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    flexDirection: "column"
-  }
 });
+
+const validatePassword = [required()];
+const validateConfirmPassword = values => {
+  const errors = {}
+
+  console.log("validateconfirmpassword values are: ", values)
+
+  return errors
+}
 
 //TODO: this page needs to be integrated into the translation schema.
 class ResetPassword extends Component {
@@ -149,9 +168,11 @@ class ResetPassword extends Component {
             <React.Fragment>
               <form onSubmit={this.updatePassword}>
                 <div className={classes.form}>
-                <Typography component={"h4"} variant={"h4"}
-                    className={classes.title}
-                  >{`Please enter and confirm a new password.`}</Typography>
+                  <div className={classes.avatar}>
+                    <Avatar className={classes.icon}>
+                      <LockIcon />
+                    </Avatar>
+                  </div>
                   <div className={classes.input}>
                     <TextField
                       id={Constants.login_details.PASSWORD}
@@ -160,6 +181,7 @@ class ResetPassword extends Component {
                       value={password}
                       fullWidth
                       type={Constants.fields.PASSWORD}
+                      validate={validatePassword}
                     />
                   </div>
                   <div className={classes.input}>
@@ -170,6 +192,7 @@ class ResetPassword extends Component {
                       value={confirmPassword}
                       fullWidth
                       type={Constants.fields.PASSWORD}
+                      validate={validateConfirmPassword}
                     />
                   </div>
                 </div>
