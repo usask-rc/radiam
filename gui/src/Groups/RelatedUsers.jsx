@@ -4,7 +4,8 @@ import '../_components/components.css';
 import { Chip, Typography } from '@material-ui/core';
 import { CreateButton } from 'ra-ui-materialui/lib/button';
 import {  getGroupUsers } from '../_tools/funcs';
-import UserAvatar from "react-user-avatar"
+import UserAvatar from "react-user-avatar";
+import { Link } from  "react-router-dom";
 
 const RelatedUsers = (record) => {
     const styles = theme => ({
@@ -49,7 +50,11 @@ const RelatedUsers = (record) => {
   
         )
       })}
-          <CreateButton basePath={`/${Constants.models.USERS}`} label={`New User`}></CreateButton>
+      <Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
+          <Chip label={`+ New User`} className={styles.chipDisplay} variant="outlined" key={"newUserChip"} clickable>
+            
+          </Chip>
+          </Link> 
       </div>
     )
   }

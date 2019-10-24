@@ -18,7 +18,8 @@ const validateRole = required('en.validate.user.role');
 class UserFormWithAssoc extends Component {
     constructor(props) {
         super(props);
-        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.group || "", group_role: "", date_expires: null, redirect: false }
+        console.log("userformwithassoc prop: ", props)
+        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location.group || "", group_role: "", date_expires: null, redirect: false }
     }
 
     handleSubmit = event => {
@@ -179,6 +180,7 @@ class UserFormWithAssoc extends Component {
                     source={Constants.model_fk_fields.GROUP}
                     reference={Constants.models.GROUPS}
                     onChange={this.handleSelectChange}
+                    defaultValue={this.state.group}
                 >
                     <SelectInput
                         validate={this.state.group_role ? validateGroup : true}
