@@ -25,7 +25,11 @@ def list_(osf_token, project_name, agent_id, location_id):
     meta_data = []
     for store in project.storages:
         for file_ in store.files:
-            data = (file_._json(file_._get(file_._endpoint), 200))['data']
+            data = (file_._json(file_._get(file_._endpoint), 200))
+            if data is not None:
+                data = data['data']
+            else:
+                continue
             path = file_.path
             if path.startswith('/'):
                 path = path[1:]
@@ -116,6 +120,10 @@ def get_radiam_token_for_osf(agent_id):
     r = requests.get(token_endpoint, headers=head)
     if r.status_code == 200:
         tokens = json.loads(r.content)
+        tokens["access"] = tokens["access_token"]
+        tokens["refresh"] = tokens["refresh_token"]
+        tokens.pop("access_token")
+        tokens.pop("refresh_token")
         return tokens
     else:
         return None

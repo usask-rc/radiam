@@ -204,4 +204,7 @@ class _WaterButlerFolder(OSFCore, ContainerMixin):
     def full_folder(self):
         base_url = "https://api.osf.io/v2/files"
         folder = self._json(self._get(base_url % self.osf_path), 200)
-        return Folder(folder, self.session)
+        if folder is not None:
+            return Folder(folder, self.session)
+        else:
+            return None
