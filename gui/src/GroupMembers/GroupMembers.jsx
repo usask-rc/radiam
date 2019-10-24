@@ -89,11 +89,13 @@ export const GroupMemberList = withStyles(listStyles)(
 
       >
         <Datagrid rowClick={Constants.resource_operations.SHOW}>
+
           <ReferenceField
             linkType={false}
             label={"en.models.groupmembers.user"}
             source={Constants.model_fk_fields.USER}
             reference={Constants.models.USERS}
+            allowEmpty //TODO: this `not loading user` issue will be fixed when ADM-1712 is resolved
           >
             <UserShow />
           </ReferenceField>
@@ -101,9 +103,8 @@ export const GroupMemberList = withStyles(listStyles)(
             linkType={false}
             label={"en.models.groupmembers.group"}
             source={Constants.model_fk_fields.GROUP}
-            reference={Constants.models.GROUPS}
-          >
-            <TextField source={Constants.model_fields.NAME} />
+            reference={Constants.models.GROUPS}>
+            <TextField source={Constants.model_fields.NAME}  />
           </ReferenceField>
           <ReferenceField
             linkType={false}

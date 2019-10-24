@@ -4,6 +4,7 @@ import '../_components/components.css';
 import { Chip, Typography } from '@material-ui/core';
 import { CreateButton } from 'ra-ui-materialui/lib/button';
 import {  getGroupUsers } from '../_tools/funcs';
+import UserAvatar from "react-user-avatar"
 
 const RelatedUsers = (record) => {
     const styles = theme => ({
@@ -34,13 +35,17 @@ const RelatedUsers = (record) => {
         let groupRoleValue=""
 
         if (groupRoleTextArr.length === 4) {
-            groupRoleValue=groupRoleTextArr[groupRoleTextArr.length - 2] + ": "
+            groupRoleValue=groupRoleTextArr[groupRoleTextArr.length - 2]
         }
 
         return( //TODO: display number of files in each user in the chip
           <Chip className={styles.chipDisplay} variant="outlined" key={groupMember.id}
-          label={`${groupRoleValue}: ${groupMember.user.username}`}
-          href={`/#/${Constants.models.USERS}/${groupMember.user.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
+          avatar={
+            <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+          }
+          label={`${groupRoleValue}`}
+          href={`/#/${Constants.models.USERS}/${groupMember.user.id}/${Constants.resource_operations.SHOW}`} component="a" clickable>
+          </Chip>
   
         )
       })}
@@ -50,3 +55,9 @@ const RelatedUsers = (record) => {
   }
 
 export default RelatedUsers
+
+/**
+ * <div className={classes.imageContainer}>
+        <UserAvatar size="36" name={`${first} ${last}`} />
+      </div>
+ */

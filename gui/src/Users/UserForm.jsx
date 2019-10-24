@@ -18,7 +18,7 @@ const validateRole = required('en.validate.user.role');
 class UserFormWithAssoc extends Component {
     constructor(props) {
         super(props);
-        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: "", group_role: "", date_expires: null, redirect: false }
+        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.group || "", group_role: "", date_expires: null, redirect: false }
     }
 
     handleSubmit = event => {

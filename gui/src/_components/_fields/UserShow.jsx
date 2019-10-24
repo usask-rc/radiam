@@ -36,7 +36,7 @@ export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = w
   const last = get(record, Constants.model_fields.LAST_NAME);
   const username = get(record, Constants.model_fields.USERNAME);
 
-  if (first || last) {
+  if (first && last) {
     return (
       <span>
       <div className={classes.imageContainer}>
