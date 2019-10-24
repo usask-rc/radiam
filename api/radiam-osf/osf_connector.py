@@ -25,7 +25,11 @@ def list_(osf_token, project_name, agent_id, location_id):
     meta_data = []
     for store in project.storages:
         for file_ in store.files:
-            data = (file_._json(file_._get(file_._endpoint), 200))['data']
+            data = (file_._json(file_._get(file_._endpoint), 200))
+            if data is not None:
+                data = data['data']
+            else:
+                continue
             path = file_.path
             if path.startswith('/'):
                 path = path[1:]
