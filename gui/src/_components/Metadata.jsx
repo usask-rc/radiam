@@ -40,7 +40,6 @@ import Input from '@material-ui/core/Input';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Switch from '@material-ui/core/Switch';
 import { withStyles } from "@material-ui/core/styles";
-import { makeStyles, createStyles } from '@material-ui/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import compose from "recompose/compose";
 import PropTypes from 'prop-types';

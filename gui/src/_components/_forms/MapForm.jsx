@@ -16,8 +16,12 @@ const styles = {
     },
     mapPopup: {
         width: '260px',
+    },
+    mapTitle: {
+        marginTop: "2em",
+        marginBottom: "2em",
     }
-  };
+};
 //NOTE: adding returns in the arrow functions somehow breaks the map.  the warnings will persist for now.
 //TODO: some duplicate processing occurs here and needs to be refactored.
 class MapForm extends Component {
@@ -326,8 +330,8 @@ class MapForm extends Component {
             <React.Fragment>
             {this.state.location && this.state.location.length > 0 && (
             <React.Fragment>
-                <Typography variant={"h5"} component={"h5"}>
-                    {`GeoJSON Map Input`}
+                <Typography className={this.props.classes.mapTitle} component={"p"}>
+                    {`Geolocation Map Input`}
                 </Typography>
                 <Map
                 ref = {(ref) => {

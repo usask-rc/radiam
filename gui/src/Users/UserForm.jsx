@@ -207,6 +207,7 @@ class UserFormWithAssoc extends Component {
                         month: "long",
                         day: "numeric"
                     }}
+                    defaultValue={""}
                     source={Constants.model_fields.DATE_EXPIRES}
                     onChange={this.handleSelectChange}
                 />

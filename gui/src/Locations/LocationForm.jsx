@@ -1,3 +1,4 @@
+//LocationForm.jsx
 import React, { Component } from 'react';
 import {
   LongTextInput,
@@ -244,23 +245,7 @@ class LocationForm extends Component {
           geoDataCallback={this.geoDataCallback}
         />
         </Grid>
-        <Grid xs={12} key={this.state.jsonTextFormKey}>
-        <ExpansionPanel fullWidth>
-          <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
-            <Typography>{`Geo Text Entry - Experimental`}</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails className={styles.geoTextArea}>
-          <Grid container>
-          <Grid item xs={12}>
-            <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
-            </Grid>
-            <Grid item xs={12}>
-            <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
-            </Grid>
-            </Grid>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-        </Grid>
+        
         </Grid>
         )
       }
@@ -275,3 +260,25 @@ class LocationForm extends Component {
 
 const enhance = compose(withStyles(styles));
 export default enhance(LocationForm);
+
+
+/**
+ *  This is the geojson text form - it can be thrown into the form, but currently we're still figuring out the best way to implement this.
+        <Grid xs={12} key={this.state.jsonTextFormKey}>
+          <ExpansionPanel fullWidth>
+            <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
+              <Typography>{`Geo Text Entry - Experimental`}</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails className={styles.geoTextArea}>
+            <Grid container>
+            <Grid item xs={12}>
+              <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
+              </Grid>
+              <Grid item xs={12}>
+              <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
+              </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+        </Grid>
+ */
