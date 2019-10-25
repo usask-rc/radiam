@@ -5,6 +5,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import compose from 'recompose/compose';
 import { translate } from 'react-admin';
 import { withStyles } from '@material-ui/core/styles';
+import * as Constants from "../../_constants/index"
 const styles = {
   headlineTop: {
     backgroundColor: '#688db2',
@@ -26,7 +27,7 @@ const styles = {
   },
   container: {
     width: '40em',
-    margin: '1em',
+    margin: "1em 1em 1em 2em",
     textAlign: 'flex-start',
     minHeight: "12em",
   },
@@ -43,7 +44,7 @@ const Welcome = ({ classes, translate }) => (
       </Typography>
       <Typography variant={"body2"} component="p">
         {`View the User Manual `} 
-        <a href="/staticfiles/Radiam_user_manual.pdf">{`Here`}</a>
+        <a href={Constants.USERMANUALPATH}>{Constants.USERMANUALFILENAME}</a>
       </Typography> 
     </CardContent>
   </Card>

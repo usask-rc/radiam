@@ -94,7 +94,7 @@ const Help = ({ classes, translate }) => (
                     {translate('en.help.usermanual.title')}
                 </Typography>
                 <Typography  className={classes.link} variant="a" component="a" href={`..${Constants.USERMANUALPATH}`}>
-                    {Constants.USERMANUALPATH}}
+                    {Constants.USERMANUALFILENAME}
                 </Typography>
             </div>
 

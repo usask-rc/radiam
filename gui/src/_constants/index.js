@@ -15,6 +15,7 @@ module.exports = Object.freeze({
   WEBTOKEN: "token",
   SUPPORTEMAIL: "support@radiam.ca",
   USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
+  USERMANUALFILENAME: "Radiam_user_manual.pdf",
   fields: {
     PASSWORD: "password",
     SUBMIT: "submit"
