@@ -257,7 +257,7 @@ export default {
     auth: {
       username: 'Username',
       password: 'Password',
-      forgot: 'Forgot Password?',
+      forgot: 'Reset Password',
       sign_in: 'Sign In',
       email: 'Email',
       send_email: 'Send Confirmation',
@@ -324,9 +324,9 @@ export default {
       users: 'Users',
       welcome: {
         title: 'Radiam',
-        subtitle: 'Welcome to Radiam',
+        subtitle: 'Getting Started',
         content:
-          'Browse your Project data in the left sidebar, or see the most recently updated files below.',
+          'Browse existing Project data in the Projects sidebar, or see the most recently updated files below.',
       },
     },
     models: {

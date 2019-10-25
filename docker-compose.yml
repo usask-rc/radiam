@@ -46,8 +46,10 @@ services:
 
   # Radiam API
   radiamapi:
+    container_name: radiamapi
     build:
-      context: ./api
+      context: .
+      dockerfile: Dockerfile.api
     command: ["/wait-for-it/wait-for-it.sh", "db:5432", "-s", "--timeout=60", "--", "gunicorn", "--bind", ":8000", "--reload", "radiam.wsgi:application"]
     environment:
       - SESSIONAUTH=1
@@ -67,8 +69,9 @@ services:
 
   # Run database migrations for Django on startup.
   migration:
-    build: 
-      context: ./api
+    build:
+      context: . 
+      dockerfile: Dockerfile.api
     command: ["/wait-for-it/wait-for-it.sh", "db:5432", "-s", "--timeout=60", "--", "python", "/code/manage.py", "migrate", "--noinput"]
     volumes:
       - ./api:/code
@@ -79,7 +82,8 @@ services:
   # Run Radiam Initialization after the application is built
   init:
     build: 
-      context: ./api
+      context: .
+      dockerfile: Dockerfile.api
     command: ["/wait-for-it/wait-for-it.sh", "elasticsearch:9200", "-s", "--timeout=60", "--", "python", "/code/manage.py", "radiam"]
     volumes:
       - ./api:/code
@@ -90,7 +94,8 @@ services:
   radiamgui:
     container_name: radiamgui
     build:
-      context: ./gui
+      context: .
+      dockerfile: Dockerfile.gui
     healthcheck:
       test: "curl -X OPTIONS http://localhost:3000 -H 'Origin: http://localhost:3000' -H 'Access-Control-Request-Headers: Origin, Accept, Content-Type' -H 'Access-Control-Request-Method: GET' || exit 1"
       interval: 30s
@@ -116,6 +121,14 @@ services:
     depends_on:
       - radiamapi
       - radiamgui
+
+  osfconnector:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile.radiam-osf
+    command: ["/wait-for-it/wait-for-it.sh", "nginx:80", "-s", "--timeout=60", "--", "python", "osf_connector.py"]
+    depends_on:
+      - nginx
 
 volumes:
       elasticsearch_data_vol:

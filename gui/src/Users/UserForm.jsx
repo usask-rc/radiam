@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { translateDates, toastErrors } from '../_tools/funcs';
 import { required, email, minLength, maxLength } from 'ra-core';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { Prompt } from 'react-router';
+import { Prompt, Redirect } from 'react-router';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
@@ -18,24 +18,24 @@ const validateRole = required('en.validate.user.role');
 class UserFormWithAssoc extends Component {
     constructor(props) {
         super(props);
-        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: "", group_role: "", date_expires: null }
+        console.log("userformwithassoc prop: ", props)
+        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location.group || "", group_role: "", date_expires: null, redirect: false }
     }
 
     handleSubmit = event => {
         this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
-
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
         if (token) {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);
         } else {
-            //TODO: logout the user.
             toastErrors(
                 Constants.warnings.NO_AUTH_TOKEN
             );
+            this.setState({redirect: true})
         }
 
         let { username, email, group, group_role, date_expires } = this.state;
@@ -115,7 +115,7 @@ class UserFormWithAssoc extends Component {
 
         }
         else {
-            toastErrors("Please enter your Username and Email Address.");
+            toastErrors("Please enter the new User's Username and Email Address.");            
         }
     })
     };
@@ -145,8 +145,8 @@ class UserFormWithAssoc extends Component {
                 resource={Constants.models.USERS}
                 toolbar={null}
                 asyncValidate={asyncValidate}
-                asyncBlurFields={[Constants.model_fields.USERNAME]}
-                 >
+                asyncBlurFields={[Constants.model_fields.USERNAME]}>
+
                 <TextInput
                     label={"en.models.users.username"}
                     source={Constants.model_fields.USERNAME}
@@ -175,17 +175,12 @@ class UserFormWithAssoc extends Component {
                     source={Constants.model_fields.NOTES}
                     onChange={this.handleChange}
                 />
-                <BooleanInput
-                    label={"en.models.generic.active"}
-                    source={Constants.model_fields.ACTIVE}
-                    defaultValue={true}
-                    onChange={this.handleSelectChange}
-                />
                 <ReferenceInput
                     label={"en.models.groupmembers.group"}
                     source={Constants.model_fk_fields.GROUP}
                     reference={Constants.models.GROUPS}
                     onChange={this.handleSelectChange}
+                    defaultValue={this.state.group}
                 >
                     <SelectInput
                         validate={this.state.group_role ? validateGroup : true}
@@ -222,6 +217,7 @@ class UserFormWithAssoc extends Component {
                 />
             </Toolbar>
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            {this.state.redirect && <Redirect to="/login"/>}
         </React.Fragment>
         );
     }

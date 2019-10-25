@@ -3,6 +3,7 @@ import { Button, CardActions, TextField, Typography } from "@material-ui/core";
 import * as Constants from "../../_constants/index";
 import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
+import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
@@ -64,7 +65,7 @@ class ChangeDetails extends Component {
         dataProvider(UPDATE, Constants.models.USERS, params).then(response => {
             toast.success("Account information successfully updated.")
         }).catch(err => {
-            toastErrors("Error in updating your information: ", err)
+            console.log("error in user details update is: ", err)
         })
         event.preventDefault();
     };
@@ -84,11 +85,12 @@ class ChangeDetails extends Component {
                 this.setState(response.data)
             }
             else {
-                //TODO: user in storage does not match.  Log the user out.  Figure out how to do that.
+                this.setState({redirect: true})
                 toastErrors(Constants.warnings.NO_AUTH_TOKEN)
             }
         }).catch(err => {
-            toastErrors("Could not connect to server.  Please refresh the page and then try again.")
+            this.setState({redirect: true})
+            toastErrors("Could not connect to server.  Please login and try again.")
         }
         );
     }
@@ -97,7 +99,7 @@ class ChangeDetails extends Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
+        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null }
     }
 
     componentDidMount() {
@@ -183,6 +185,7 @@ class ChangeDetails extends Component {
                             </div>
                         </div>
                         <ToastContainer />
+                        {this.state.redirect && <Redirect to="/login"/>}
                     </React.Fragment>
                 }
             />

@@ -1,3 +1,4 @@
+//Login.jsx
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { propTypes, reduxForm, Field } from "redux-form";
@@ -121,7 +122,8 @@ class Login extends Component {
     this.toggleForgotPassword();
   };
 
-  toggleForgotPassword = () => {
+  toggleForgotPassword = (e) => {
+    e.preventDefault()
     this.setState({forgotpassword: !this.state.forgotpassword });
   };
 
@@ -181,8 +183,8 @@ class Login extends Component {
               </form>
               <div className={classes.forgotContainer}>
                 <Link
+                  href="#"
                   onClick={this.toggleForgotPassword}
-                  fullWidth
                 >
                   {translate("en.auth.forgot")}
                 </Link>
@@ -218,16 +220,13 @@ class Login extends Component {
                       {translate("en.auth.send_email")}
                     </Button>
                   </CardActions>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    disabled={isLoading}
-                    className={classes.button}
-                    onClick={this.toggleForgotPassword}
-                    fullWidth
-                  >
-                    {translate("en.auth.return_to_login")}
-                  </Button>
+                  <div className={classes.forgotContainer}>
+                    <Link
+                    href="#"
+                    onClick={this.toggleForgotPassword}>
+                      {translate("en.auth.return_to_login")}
+                    </Link>
+                  </div>
                 </form>
               </React.Fragment>
             )}
