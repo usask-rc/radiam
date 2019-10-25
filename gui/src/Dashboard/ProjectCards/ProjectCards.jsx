@@ -11,7 +11,8 @@ const ProjectCards = ({ loading, projects }) => <Grid
     {!loading &&
         projects &&
         projects.map(project => {
-            if (project.files) {
+            
+            if (project.nbFiles > 0) {
                 return (
                     <ProjectCardDisplay key={project.id} project={project} />
                 );
