@@ -1,3 +1,4 @@
+//MapForm.jsx
 import React, { Component } from 'react'
 import { Map, TileLayer, FeatureGroup, Popup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
@@ -76,6 +77,7 @@ class MapForm extends Component {
         else if (layer._latlngs && typeof layer._latlngs[0] === 'object' && layer._latlngs[0].lat){
             layer._latlngs.map(coord => {
                 coords = [...coords, [this._normLng(coord.lng), coord.lat]]
+                return coord
             })
         }
         //if we have an object on the third layer down, it's a polygon.
@@ -85,6 +87,7 @@ class MapForm extends Component {
 
             layer._latlngs[0].map(coord => {
                 coords = [[...coords[0], [this._normLng(coord.lng), coord.lat]]]
+                return coord
             })
 
             //if the last point is unequal to the first, we need to correct this to create valid geojson
@@ -166,6 +169,7 @@ class MapForm extends Component {
         let featuresList = []
         Object.keys(this.state.features).map(key => {
             featuresList.push(this.state.features[key])
+            return key
         })
         let localGeo = {}
         if (featuresList.length > 0){
@@ -342,7 +346,7 @@ class MapForm extends Component {
                 }
                 center={this.state.location}
                 className={this.props.classes.mapDisplay}
-                zoom={this.state.mapRef && this.state.mapRef.leafletElement.getZoom() || 7}
+                zoom={this.state.mapRef && this.state.mapRef.leafletElement ? this.state.mapRef.leafletElement.getZoom() : 7}
                 minZoom={4}
                 maxZoom={13}
                 noWrap={true}

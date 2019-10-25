@@ -1,3 +1,4 @@
+//MapView.jsx
 import React, { useState } from 'react'
 import compose from 'recompose/compose';
 import { FeatureGroup, Map, Popup, TileLayer } from 'react-leaflet';
@@ -83,6 +84,7 @@ const MapView = ({ classes, record }) => {
                     let feature = output._layers[key].feature
                     feature.id = key
                     localFeatures[key] = feature
+                    return key
                 })
             }
         setMapLoading(false)
@@ -147,7 +149,7 @@ const MapView = ({ classes, record }) => {
                 ref={(ref) => {setMapRef(ref)}}
                 center={location}
                 className={classes.mapDisplay}
-                zoom={mapRef && mapRef.leafletElement.getZoom() || 7}
+                zoom={mapRef && mapRef.leafletElement ? mapRef.leafletElement.getZoom() : 7}
                 minZoom={4}
                 maxZoom={13}
                 noWrap={true}
@@ -184,8 +186,6 @@ const MapView = ({ classes, record }) => {
                     }
                     </Popup>
                     }
-
-
                 </Map>
                 </React.Fragment>
             )}
