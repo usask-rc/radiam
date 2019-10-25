@@ -1,12 +1,14 @@
-import React, { Component } from 'react'
+//Help.jsx
+import React from 'react'
 import { translate } from 'ra-core';
 import { withStyles } from '@material-ui/styles';
 import { connect } from "react-redux";
-import { changeLocale, Title } from "react-admin";
+import { changeLocale } from "react-admin";
 import compose from "recompose/compose";
 import { changeTheme } from "./actions";
-import { Typography, Card, CardContent, Divider } from '@material-ui/core';
+import { Typography, Card, CardContent } from '@material-ui/core';
 import { HelpOutline } from '@material-ui/icons';
+import * as Constants from "../_constants/index"
 
 
 
@@ -59,54 +61,54 @@ const Help = ({ classes, translate }) => (
 
             <Typography className={classes.headlineTop} variant="h5" component="h5">
                 <HelpOutline className={classes.titleIcon} />
-                {`Radiam Help`}
+                {translate('en.help.title')}
             </Typography>
             <Typography className={classes.subheader} variant="p" component="p">
-                Agent Installation
+                {translate('en.help.agentinstallation')}
             </Typography>
             
             <div className={classes.inlineText}>
                 <Typography className={classes.content} variant="p" component="p">
-                    {`The downloads for the Radiam agent are here: `}
+                    {translate('en.help.download.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href="https://github.com/usask-rc/radiam-agent-releases" >
-                {`https://github.com/usask-rc/radiam-agent-releases`}
+                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTURL} >
+                    {Constants.RADIAMAGENTURL}
                 </Typography>
             </div>
 
             <Typography className={classes.subheader} variant="p" component="p">
-                Email Support
+                {translate('en.help.email.title')}
             </Typography>
             
             <div className={classes.inlineText}>
                 <Typography className={classes.content} variant="p" component="p">
-                    {`For assistance using this specific installation of Radiam, please email: `}
+                    {translate('en.help.email.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href="mailto:support@radiam.ca">
-                    {`support@radiam.ca`}
+                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${Constants.SUPPORTEMAIL}`}>
+                    {Constants.SUPPORTEMAIL}
                 </Typography>
             </div>
             
             <div className={classes.inlineText}>
                 <Typography className={classes.subheader} variant="p" component="p">
-                    {`User Manual: `}
+                    {translate('en.help.usermanual.title')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href="../staticfiles/Radiam_user_manual.pdf">
-                    {`Radiam_User_Manual.pdf`}
+                <Typography  className={classes.link} variant="a" component="a" href={`..${Constants.USERMANUALPATH}`}>
+                    {Constants.USERMANUALPATH}}
                 </Typography>
             </div>
 
             <Typography className={classes.subheader} variant="p" component="p">
-                {`Developer Resources`}
+                {translate('en.help.developers.title')}
             </Typography>
 
             <div className={classes.inlineText}>
                 <Typography className={classes.content} variant="p" component="p">
-                    {`Developers can consult the Readme file located in the source repository: `}
+                    {translate('en.help.developers.text')}
                 </Typography>
 
-                <Typography  className={classes.link} variant="a" component="a" href="https://gitlab.com/usask-rc/radiam">
-                    {`https://gitlab.com/usask-rc/radiam`}
+                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTREADMEURL}>
+                    {Constants.RADIAMAGENTREADMEURL}
                 </Typography>
             </div>
 

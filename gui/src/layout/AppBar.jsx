@@ -1,3 +1,4 @@
+//Appbar.jsx
 import React, { useState } from "react";
 import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";

@@ -10,7 +10,11 @@ module.exports = Object.freeze({
   LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
   ROLE_USER: "user",
   OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",
+  RADIAMAGENTREADMEURL: "https://gitlab.com/usask-rc/radiam",
   WEBTOKEN: "token",
+  SUPPORTEMAIL: "support@radiam.ca",
+  USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
   fields: {
     PASSWORD: "password",
     SUBMIT: "submit"
