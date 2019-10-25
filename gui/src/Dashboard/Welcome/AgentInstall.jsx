@@ -20,6 +20,8 @@ const styles = {
   titleIcon: {
     marginRight: '8px',
     marginBottom: '-5px',
+    height: "30px",
+    width: "30px",
   },
   container: {
     width: '40em',

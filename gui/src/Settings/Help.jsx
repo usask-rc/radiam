@@ -16,6 +16,12 @@ const styles = {
     link: {
         marginLeft: "0.5em",
     },
+    titleIcon: {
+        marginRight: '8px',
+        marginBottom: '-5px',
+        height: "30px",
+        width: "30px",
+      },
     inlineText: {
         display: "flex",
         flexDirection: "row",
@@ -33,6 +39,7 @@ const styles = {
 
       },
       headlineTop: {
+          display: "flex",
         backgroundColor: '#688db2',
         color: 'white',
         marginLeft: '-24px',
@@ -53,7 +60,7 @@ const Help = ({ classes, translate }) => (
 
             <Typography className={classes.headlineTop} variant="h5" component="h5">
                 <HelpOutline className={classes.titleIcon} />
-                Radiam Help
+                {`Radiam Help`}
             </Typography>
             <Typography className={classes.subheader} variant="p" component="p">
                 Agent Installation

@@ -21,6 +21,8 @@ const styles = {
   titleIcon: {
     marginRight: '8px',
     marginBottom: '-5px',
+    height: "28px",
+    width: "28px",
   },
   container: {
     width: '40em',

@@ -62,6 +62,8 @@ const styles = theme => ({
   titleIcon: {
     marginRight: '8px',
     marginBottom: '-5px',
+    height: "30px",
+    width: "30px",
   },
   value: {
     padding: '0 16px',
@@ -102,18 +104,13 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
     <Card className={classes.container}>
 
       <React.Fragment>
-        <div className={classes.headlineTop}>
-          <div
-            className={classes.recentFiles}
+          <Typography
+            className={classes.headlineTop}
+            variant="h5"
+            component="h5"
           >
-            <Typography
-              className={classes.recentFilesText}
-              variant="h5"
-              component="h5"
-            >
-              <ScheduleIcon className={classes.titleIcon} />
-              {translate('en.dashboard.recentfiles')}
-            </Typography>
+            <ScheduleIcon className={classes.titleIcon} />
+            {translate('en.dashboard.recentfiles')}
             <TextField
               id="dateLimit"
               label="Days Since Crawl"
@@ -123,9 +120,8 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
               onChange={handleDateLimit('date')}
             >
             </TextField>
-          </div>
-        </div>
-
+          </Typography>
+          
         {projects.length > 0 ? (
           <div>
             <Tabs
