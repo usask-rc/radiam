@@ -38,6 +38,10 @@ const Welcome = ({ classes, translate }) => (
       <Typography variant="body2" component="p">
         {translate('en.dashboard.welcome.content')}
       </Typography>
+      <Typography variant={"body2"} component="p">
+        {`View the User Manual `} 
+        <a href="/staticfiles/Radiam_user_manual.pdf">{`Here`}</a>
+      </Typography> 
     </CardContent>
   </Card>
 );

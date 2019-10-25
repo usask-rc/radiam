@@ -5,7 +5,9 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
-import { Typography } from "@material-ui/core";
+import { Typography, Link } from "@material-ui/core";
+import { Redirect } from "react-router"
+import { Help } from "@material-ui/icons";
 
 const styles = {
   appBarText: {
@@ -38,6 +40,11 @@ const CustomUserMenu = translate(({ translate, ...props }) => (
       to="/settings"
       primaryText={translate("en.settings.label")}
       leftIcon={<SettingsIcon />}
+    />
+    <MenuItemLink
+    to="/help"
+    primaryText={translate("en.help.label")}
+    leftIcon={<Help/>}
     />
   </UserMenu>
 ));
