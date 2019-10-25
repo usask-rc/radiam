@@ -16,7 +16,6 @@ import {
   Visibility,
   VisibilityOff,
   VpnKey,
-  Home,
 } from '@material-ui/icons';
 import authProvider from '../_tools/authProvider';
 import radiamRestProvider from '../_tools/radiamRestProvider';

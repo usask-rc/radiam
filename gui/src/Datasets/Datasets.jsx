@@ -250,7 +250,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { props.mode == Constants.resource_operations.EDIT && props.id && (
+    { props.mode === Constants.resource_operations.EDIT && props.id && (
       <React.Fragment>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />

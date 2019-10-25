@@ -16,8 +16,7 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
 
 const validateHostname = required('en.validate.locations.host_name');

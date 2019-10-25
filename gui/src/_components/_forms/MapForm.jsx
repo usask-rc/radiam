@@ -203,6 +203,7 @@ class MapForm extends Component {
         console.log("ondeleted event e:" ,e)
         Object.keys(e.layers._layers).map(key => {
             this.featuresCallback(key)
+            return key
         })
     };
     //block / unblock popup display
@@ -225,6 +226,7 @@ class MapForm extends Component {
             //TODO: at some point, this callback will need to happen for each edited object to update their descriptions
             this.setState({prevProperties: this.state.features[item].properties ? this.state.features[item].properties : {}})
             this.setState({popup:{active: true, for:newFeature.id}}, this.featuresCallback(newFeature))
+            return item
         })
     };
 
@@ -267,7 +269,7 @@ class MapForm extends Component {
                     leafletGeoJSON.eachLayer(layer => 
                         {
                             const layerType = layer.feature.geometry.type
-                console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
+                            console.log("value of notdisplayedfeatures is: ", notDisplayedFeatures)
 
                             if (layerType === "LineString" || layerType === "Polygon" || layerType === "Point")
                             {
@@ -291,6 +293,7 @@ class MapForm extends Component {
                             }
                         }
                         );
+                        return feature
                     })
                 //initialize our features
                 Object.keys(output._layers).map(key => {
@@ -298,6 +301,7 @@ class MapForm extends Component {
                     //the solution for multi_ values is likely here.
                     output._layers[key].feature.id = key
                     localFeatures[key] = output._layers[key].feature
+                    return key
                 })
 
 

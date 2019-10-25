@@ -1,3 +1,4 @@
+//Metadata.jsx
 import { Typography } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
@@ -22,14 +23,12 @@ import {
   RefreshButton,
   required,
   ShowButton,
-  SingleFieldList,
   TextField,
   TextInput,
   Toolbar,
   translate,
   UPDATE,
   UrlField,
-  withTranslate
 } from "react-admin";
 import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import Button from '@material-ui/core/Button';
@@ -125,7 +124,6 @@ const showStyles = {
     fontSize: "1rem",
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif;',
     lineHeight: "1",
-    marginRight: "1em",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -242,11 +240,11 @@ class MetadataComponent extends Component {
     var schemas = {};
     var hasSelected = false;
     if (entity.schemas) {
-      entity.schemas.map((schema, index) => {
+      entity.schemas.map((schema) => {
         schemas[schema.id] = schema;
         schemas[schema.id].selected = false;
         schemas[schema.id].was_selected = false;
-        entity.selected_schemas.map((selected, index) => {
+        entity.selected_schemas.map((selected) => {
           if(selected.schema === schema.id) {
             schemas[schema.id].selected = true;
             if (!fromParent) {
@@ -254,8 +252,9 @@ class MetadataComponent extends Component {
             }
             hasSelected = true;
           }
+          return selected
         });
-
+        return schema
       });
     }
 
@@ -266,35 +265,39 @@ class MetadataComponent extends Component {
 
     var uiTypes = {};
     if (entity.metadata_ui_types) {
-      entity.metadata_ui_types.map((type, index) => {
+      entity.metadata_ui_types.map((type) => {
         uiTypes[type.id] = type;
+        return type
       });
     }
     var valueTypes = {};
     if (entity.metadata_value_types) {
-      entity.metadata_value_types.map((value, index) => {
+      entity.metadata_value_types.map((value) => {
         valueTypes[value.id] = value;
+        return value
       });
     }
     var choiceLists = {};
     if (entity.choice_lists) {
-      entity.choice_lists.map((choiceList, index) => {
+      entity.choice_lists.map((choiceList) => {
         choiceList.choices = [];
         choiceLists[choiceList.id] = choiceList;
+        return choiceList
       });
     }
     var choiceListValues = {};
     if (entity.choice_list_values) {
-      entity.choice_list_values.map((choiceListValue, index) => {
+      entity.choice_list_values.map((choiceListValue) => {
         choiceListValues[choiceListValue.id] = choiceListValue;
         choiceLists[choiceListValue.list].choices.push(choiceListValue);
+        return choiceListValue
       });
     }
 
     var fields = {};
     var rootFields = [];
     if (entity.fields) {
-      entity.fields.map((field, index) => {
+      entity.fields.map((field) => {
         fields[field.id] = field;
         fields[field.id].selected = false;
         fields[field.id].changed = false;
@@ -314,7 +317,7 @@ class MetadataComponent extends Component {
         if (!field.parent) {
           rootFields.push(field);
         }
-        entity.selected_fields.map((selected, index) => {
+        entity.selected_fields.map((selected) => {
           if(selected.field === field.id) {
             fields[field.id].selected = true;
             if (!fromParent) {
@@ -326,23 +329,26 @@ class MetadataComponent extends Component {
             fields[field.id].order = selected.order;
             hasSelected = true;
           }
+          return selected
         });
-
+        return field;
       });
     }
 
     // Add the children for each field
-    Object.values(fields).map((field, index) => {
+    Object.values(fields).map((field) => {
       if (field.parent) {
         fields[field.parent].children.push(field);
       }
+      return field
     });
 
     // Sort the children for each field
-    Object.values(fields).map((field, index) => {
+    Object.values(fields).map((field) => {
       if (field.children.length > 0) {
         field.children.sort(this.orderField);
       }
+      return field
     });
 
 
@@ -404,7 +410,6 @@ class MetadataComponent extends Component {
   };
 
   renderChildren = (classes, translate, parentField, depth, parentPath) => {
-    const { fields } = this.state;
     var that = this;
     return parentField.children.map((field) => {
       return that.renderField(classes, translate, field, depth, parentPath);
@@ -509,7 +514,7 @@ class MetadataComponent extends Component {
 
   createEntity = (fromParent) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    const { classes, id, type } = this.props;
+    const { id, type } = this.props;
 
     if (type && id) {
       let params = {
@@ -529,6 +534,7 @@ class MetadataComponent extends Component {
           params
         ).then(response => {
           this.getEntitySchemasFields(id, type, fromParent);
+          return response
         }).catch(error => {
           console.error(error);
           if (error.status === 400 &&
@@ -570,13 +576,14 @@ class BaseConfigMetadata extends MetadataComponent {
   schemasHasChanged = () => {
     const { schemas } = this.state;
     var hasChanged = false;
-    Object.keys(schemas).map((schemaKey, index) => {
+    Object.keys(schemas).map((schemaKey) => {
       let schema = schemas[schemaKey];
       if (schema.selected && !schema.was_selected) {
         hasChanged = true;
       } else if (!schema.selected && schema.was_selected) {
         hasChanged = true;
       }
+      return schemaKey
     });
     return hasChanged;
   };
@@ -584,7 +591,7 @@ class BaseConfigMetadata extends MetadataComponent {
   fieldsHasChanged = () => {
     const { fields } = this.state;
     var hasChanged = false;
-    Object.keys(fields).map((fieldKey, index) => {
+    Object.keys(fields).map((fieldKey) => {
       let field = fields[fieldKey];
       if (field.changed) {
         hasChanged = true;
@@ -593,6 +600,7 @@ class BaseConfigMetadata extends MetadataComponent {
       } else if (!field.selected && field.was_selected) {
         hasChanged = true;
       }
+      return fieldKey
     });
     return hasChanged;
   };
@@ -600,7 +608,7 @@ class BaseConfigMetadata extends MetadataComponent {
   metadataHasChanged = () => {
     var schemaChanged = this.schemasHasChanged();
     var fieldsChanged = this.fieldsHasChanged();
-    return this.schemasHasChanged() || this.fieldsHasChanged();
+    return schemaChanged || fieldsChanged;
   };
 
   saveSchemas = () => {
@@ -617,16 +625,18 @@ class BaseConfigMetadata extends MetadataComponent {
         } else if (!schema.selected && schema.was_selected) {
           deletedSchemas.push(schema);
         }
+        return (schemaKey, index)
       });
     } else {
       if (this.metadataHasChanged()) {
-        Object.keys(schemas).map((schemaKey, index) => {
+        Object.keys(schemas).map((schemaKey) => {
           let schema = schemas[schemaKey];
           if (schema.selected) {
             selectedSchemas.push(schema);
           } else if (!schema.selected) {
             deletedSchemas.push(schema);
           }
+          return schemaKey
         });
       }
       else {
@@ -635,7 +645,7 @@ class BaseConfigMetadata extends MetadataComponent {
       }
     }
 
-    var promises = selectedSchemas.map((schema, index) => {
+    var promises = selectedSchemas.map((schema) => {
       let params = { data: { schema: schema.id, entity: entity.id } };
       const fetchData = async () => {
         await dataProvider(
@@ -653,10 +663,7 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   saveFields = () => {
-    const { entity, fromParent, fields } = this.state;
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    var selectedFields = [];
-    var deletedFields = [];
+    const { entity, fields } = this.state;
 
     var createdFields = Object.values(fields).filter(field => field.selected && !field.was_selected);
     var updatedFields = Object.values(fields).filter(field => field.selected && field.was_selected);
@@ -691,7 +698,7 @@ class BaseConfigMetadata extends MetadataComponent {
         "selectedfields",
         params
       ).then(response => {
-        if (response && response.data && response.data.length == 0) {
+        if (response && response.data && response.data.length === 0) {
           // Can't do the update so we will create it instead.
           return this.createField(field, entity);
         } else if (response && response.data && response.data.length > 0) {
@@ -714,6 +721,7 @@ class BaseConfigMetadata extends MetadataComponent {
                 params
               ).then(response => {
                 field.was_selected = true;
+                return response
               });
             };
             return updateFieldWithPut();
@@ -726,7 +734,7 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   createFields = (fields, entity) => {
-    return fields.map((field, index) => {
+    return fields.map((field) => {
       return this.createField(field, entity);
     });
   };
@@ -748,8 +756,9 @@ class BaseConfigMetadata extends MetadataComponent {
         CREATE,
         "selectedfields",
         params
-      ).then(response => {
+      ).then((response) => {
         field.was_selected = true;
+        return response
       })
     };
     return fetchData();
@@ -773,9 +782,9 @@ class BaseConfigMetadata extends MetadataComponent {
           "selectedschemas",
           params
         ).then(response => {
-          if (response && response.data && response.data.length == 0) {
+          if (response && response.data && response.data.length === 0) {
             // It must have already been deleted
-          } else if (response && response.data && response.data.length == 1) {
+          } else if (response && response.data && response.data.length === 1) {
             let params = { id: response.data[0].id};
             const deleteSchema = async () => await dataProvider(
               DELETE,
@@ -810,7 +819,7 @@ class BaseConfigMetadata extends MetadataComponent {
           "selectedfields",
           params
         ).then(response => {
-          if (response && response.data && response.data.length == 0) {
+          if (response && response.data && response.data.length === 0) {
             // It must have already been deleted
           } else if (response && response.data) {
             response.data.map((key, index) => {
@@ -823,6 +832,7 @@ class BaseConfigMetadata extends MetadataComponent {
                 field.was_selected = false;
               });
               deleteField();
+              return (key, index)
             });
           }
         }).catch(error => {
@@ -858,7 +868,6 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   onUpdate = () => {
-    const {close} = this.props;
     var promises = this.saveSchemas();
     promises = promises.concat(this.saveFields());
     this.setState({ config: false});
@@ -894,6 +903,7 @@ class BaseConfigMetadata extends MetadataComponent {
       var rootFieldsArray = [];
       Object.values(rootFields).map((rootField, index) => {
         rootFieldsArray.push(rootField);
+        return (rootField, index)
       });
       var currentIndex = rootFieldsArray.indexOf(field);
       rootFieldsArray = this.shiftField(rootFieldsArray, currentIndex, up);
@@ -1024,7 +1034,7 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   renderField = (classes, translate, field, depth) => {
-    if (field.metadata_ui_type.key == "container") {
+    if (field.metadata_ui_type.key === "container") {
       return this.renderContainer(classes, translate, field, depth);
     } else {
       return <div key={"input-" + field.id} className={classes.container}>
@@ -1102,8 +1112,8 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   renderBody() {
-    const { entity, error, fields, isLoaded, rootFields, schemas} = this.state;
-    const { classes, close, id, type, translate, ...others } = this.props;
+    const { entity, error, isLoaded, rootFields } = this.state;
+    const { classes, id, translate } = this.props;
     if (error) {
       return <div>There was an error loading additional metadata: {error.message} </div>
     } else if (!id || !isLoaded){
@@ -1113,7 +1123,7 @@ class BaseConfigMetadata extends MetadataComponent {
         <Typography variant="h4">{translate("en.metadata.config.title")}</Typography>
         <Typography variant="h5">{translate("en.metadata.schemas")}</Typography>
         <div>
-          {entity.schemas.map((schema, index) => {
+          {entity.schemas.map((schema) => {
             return <div key={schema.id} >
               <Switch checked={this.state.schemas[schema.id].selected} color="primary" component="span" onChange={this.handleSchemaChange(schema.id)} value={schema.id} />
               <Typography variant="body1" component="span">{translate(schema.label + ".label")}</Typography>
@@ -1135,7 +1145,6 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   render() {
-    const { entity, error, fields, isLoaded, rootFields, schemas} = this.state;
     const { classes, close, id, type, translate, ...others } = this.props;
 
     return <Drawer anchor="bottom" open={this.state.config} onClose={() => drawerState.close()} {...others}>
@@ -1397,7 +1406,7 @@ class BaseEditMetadata extends MetadataComponent {
 
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
-    const { classes, close, id, type, translate, ...others } = this.props;
+    const { classes, id, translate } = this.props;
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
@@ -1803,10 +1812,9 @@ class BaseShowMetadata extends MetadataComponent {
     }
     var hasValue = false;
     fields.map((field) => {
-      var source = this.getSource(field, parentPath);
       if (!field.selected) {
         // This field isn't selected so it and its children don't count for a value to show
-        return;
+        return field;
       }
       if (Array.isArray(get(record, parentPath + "." + field.id, null)) &&
           get(record, parentPath + "." + field.id, null).length > 0) {
@@ -1821,6 +1829,7 @@ class BaseShowMetadata extends MetadataComponent {
               hasValue = true;
             }
           }
+          return(subfield, index)
         });
       }
       else if (get(record, this.getSource(field, parentPath), null)) {
@@ -1832,13 +1841,15 @@ class BaseShowMetadata extends MetadataComponent {
           hasValue = true;
         }
       }
+      return field
     });
+    
     return hasValue;
   };
 
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
-    const { classes, close, record, id, type, translate, ...others } = this.props;
+    const { classes, record, id, translate } = this.props;
 
     if (error) {
       return <div className={classes.section}>
