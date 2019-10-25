@@ -6,7 +6,7 @@ import { Responsive } from 'react-admin';
 import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
 import moment from 'moment';
-import WelcomeGrid from './Welcome/WelcomeCards';
+import WelcomeCards from './Welcome/WelcomeCards';
 import RecentFiles from './RecentFiles/RecentFiles';
 
 class Dashboard extends Component {
@@ -127,7 +127,7 @@ class Dashboard extends Component {
       <Responsive
         medium={
           <React.Fragment>
-            <WelcomeGrid />
+            <WelcomeCards />
             {!this.state.loading &&
               <React.Fragment>
                 <ProjectCards {...this.state} />

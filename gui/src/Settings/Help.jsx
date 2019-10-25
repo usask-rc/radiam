@@ -19,8 +19,8 @@ const styles = {
     titleIcon: {
         marginRight: '8px',
         marginBottom: '-5px',
-        height: "30px",
-        width: "30px",
+        height: "28px",
+        width: "28px",
       },
     inlineText: {
         display: "flex",
@@ -28,7 +28,6 @@ const styles = {
         marginBottom: "1em",
     },
     container: {
-        margin: '1em',
         textAlign: 'left',
         minWidth: "20em",
       },

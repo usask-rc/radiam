@@ -62,8 +62,8 @@ const styles = theme => ({
   titleIcon: {
     marginRight: '8px',
     marginBottom: '-5px',
-    height: "30px",
-    width: "30px",
+    height: "28px",
+    width: "28px",
   },
   value: {
     padding: '0 16px',
