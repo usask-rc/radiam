@@ -59,6 +59,9 @@ class RadiamService:
     def add_match(self, key, value):
         return self.search_service.add_match(key, value)
 
+    def add_filter(self, key, value):
+        return self.search_service.add_filter(key, value)
+
     def add_generic_search(self, value):
         return self.search_service.add_generic_search(value)
 

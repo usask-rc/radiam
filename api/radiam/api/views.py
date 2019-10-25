@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, Q
 from elasticsearch import exceptions as es_exceptions
 
 from rest_framework.parsers import JSONParser
@@ -990,12 +990,69 @@ class ProjectSearchViewSet(viewsets.ViewSet):
             raise BadRequestException("No request data found")
 
         if type(data).__name__ not in 'list':
-            doc = ESDataset(**data)
+            check_existing = RadiamService(project_id)
+            #check_existing.add_filter('path.linux', data['path'])
+            # check_existing.add_filter('location', data['location'])
+            # check_existing.add_filter('agent', data['agent'])
+            # Working
+            #search = check_existing.get_search().query('term', path__keyword='/mnt/crawl/32.txt')
 
-            result = radiam_service.create_single_doc(project_id, doc)
+            # search = check_existing.get_search().query('term', path__keyword=data['path'])
+            # search = check_existing.get_search().query('term', path__linux=data['path']).query('term', name__keyword=data['name'])
+            #search = check_existing.get_search() \
+            #    .query('term', path__keyword=data['path']) \
+            #    .query('term', name__keyword=data['name']) \
+            #    .query('term', location__keyword=data['location']) \
+            #    .query('term', agent__keyword=data['agent'])
 
-            return Response(result)
+            search = Search(index=project_id) \
+               .query('term', path__keyword=data['path'])
+            search = search.extra(explain=True)
+            search = search.source(None)
 
+            #search = Search(index=project_id) \
+            #    .query('term', path__keyword=data['path'])
+
+            search = search.extra(explain=True)
+
+            #q = Q('bool',
+                #must=[Q('match', path__keyword='/mnt/crawl/32.txt')]
+            #)
+            # print(search.build_search())
+            print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
+            response = search.execute()
+            print(response.to_dict())
+            # need to add a filter here instead of a query and hopefully it will give the right results
+            print(project_id + ':' + str(data['path']) + ':' + str(data['location']) + ':' + str(data['agent']))
+            # response = search.execute()
+            # print("Response:" + str(response.to_dict()))
+            for hit in response:
+                print(hit.meta.id)
+                print(hit.meta.index)
+            print(response.hits.total)
+            #for hit in response:
+                #print("Found: " + str(hit))
+            if response.hits.total == 0:
+                doc = ESDataset(**data)
+                result = radiam_service.create_single_doc(project_id, doc)
+                return Response(result)
+            elif response.hits.total == 1:
+                id = str(response.hits[0].meta.id)
+                print("Updating '" + id  + "'")
+                return self.update(request, project_id, id)
+            else:
+                print("Need to delete the older hits")
+                newest = response.hits[0]
+                for hit in response.hits:
+                    # print(str(hit.indexed_date))
+                    if hit is not newest and hit.indexed_date > newest.indexed_date:
+                        newest = hit
+                for hit in response.hits:
+                    if hit is not newest:
+                        print("Destroying " + str(hit.path) + " " + str(hit.meta.id))
+                        #self.perform_destroy(project_id, hit.meta.id)
+
+                return self.update(request, project_id, newest.meta.id)
         else:
             results = radiam_service.create_many_docs(project_id, data)
 
@@ -1010,11 +1067,7 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         # else:
         #     return Response("Creation failed")
 
-    def update(self, request, project_id, pk):
-        """
-        Update a document in an index
-        """
-        parser_classes = (JSONParser,)
+    def perform_update(self, request, project_id, pk):
 
         radiam_service = RadiamService(project_id)
 
@@ -1023,6 +1076,13 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         result = radiam_service.update_doc(project_id, pk, updated_doc)
 
         return Response(result)
+
+    def update(self, request, project_id, pk):
+        """
+        Update a document in an index
+        """
+        parser_classes = (JSONParser,)
+        self.perform_update(request, project_id, pk)
 
     def partial_update(self, request, project_id, pk):
         """
@@ -1041,18 +1101,18 @@ class ProjectSearchViewSet(viewsets.ViewSet):
 
         return Response(result)
 
+    def perform_destroy(self, project_id, pk):
+        # ES Python clients don't actually return anything on delete,
+        # API calls right to ES would... is this a problem?
+        radiam_service = RadiamService(project_id)
+        result = radiam_service.delete_doc(project_id, pk)
+        return Response(result)
+
     def destroy(self, request, project_id, pk):
         """
         Delete a Document from a given index
         """
-        # ES Python clients don't actually return anything on delete,
-        # API calls right to ES would... is this a problem?
-
-        radiam_service = RadiamService(project_id)
-
-        result = radiam_service.delete_doc(project_id, pk)
-
-        return Response(result)
+        return self.perform_destroy(project_id, pk)
 
 class MetadataUITypeViewSet(RadiamViewSet):
     queryset = MetadataUIType.objects.all().order_by('key')

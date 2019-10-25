@@ -10,10 +10,11 @@ class _SearchService:
 
     def __init__(self, index_name):
         self.search = Search(index=index_name)
+        self.search.extra(explain=True)
 
-    # def add_filter(self):
-    #     self.search.filter('term', name__keyword="can't phylogenetic enormous.txt")
-    #     return self
+    def add_filter(self, key, value):
+        self.search.filter('term', **{ key : value })
+        return self
 
     def add_match(self, key, value):
         """
