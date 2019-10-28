@@ -119,7 +119,6 @@ class Login extends Component {
       .catch(err =>
         toast.success("Please check your email for a password reset link.")
       );
-    this.toggleForgotPassword();
   };
 
   toggleForgotPassword = (e) => {
