@@ -109,14 +109,17 @@ const MapView = ({ classes, record }) => {
                 if (firstFeature.geometry.type === 'Point'){
                     latLng = [firstFeature.geometry.coordinates[1], firstFeature.geometry.coordinates[0]]
                 }
-                else if (firstFeature.geometry.type === 'LineString'){
+                else if (firstFeature.geometry.type === 'LineString' || firstFeature.geometry.type === 'MultiPoint'){
                     latLng = [firstFeature.geometry.coordinates[0][1], firstFeature.geometry.coordinates[0][0]]
                 }
-                else if (firstFeature.geometry.type === 'Polygon'){
+                else if (firstFeature.geometry.type === 'Polygon' || firstFeature.geometry.type === 'MultiLineString'){
                     latLng = [firstFeature.geometry.coordinates[0][0][1], firstFeature.geometry.coordinates[0][0][0]]
                 }
+                else if (firstFeature.geometry.type === 'MultiPolygon'){
+                    latLng = [firstFeature.geometry.coordinates[0][0][0][1], firstFeature.geometry.coordinates[0][0][0][0]]
+                }
                 else{
-                    console.error("Unknown feature type loaded, defaulting map to user location")
+                    console.error("Unknown feature type loaded, defaulting map to user location.  Feature: ", firstFeature)
                 }
             }
 
