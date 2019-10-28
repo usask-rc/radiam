@@ -166,11 +166,18 @@ class MapForm extends Component {
         //there are values in Geo that we don't care for in the API.
 
         let featuresList = []
-        let notDisplayedFeaturesList = this.state.notDisplayedFeatures
         Object.keys(this.state.features).map(key => {
             featuresList.push(this.state.features[key])
             return key
         })
+
+        console.log("in updategeo, notdisplayedfeatures is: ", this.state.notDisplayedFeatures)
+        Object.keys(this.state.notDisplayedFeatures).map(key => {
+            featuresList.push(this.state.notDisplayedFeatures[key])
+            return key
+        })
+
+        console.log('full featureslist before push is:', featuresList)
         let localGeo = {}
         if (featuresList.length > 0){
             localGeo = {
@@ -178,7 +185,7 @@ class MapForm extends Component {
                 content_type: this.props.content_type,
                     geojson: {
                         type: "FeatureCollection",
-                        features: [featuresList, ...notDisplayedFeaturesList]
+                        features: featuresList
                     }
             }
         }
@@ -230,11 +237,6 @@ class MapForm extends Component {
         })
     };
 
-    //NOTE: This triggers when the Edit button is clicked, not the value to be edited.
-    _onEditStart = e => {
-        console.log("oneditstart e: ", e)
-    }
-
     //this is where we would put info display / editing for features.
     _onLayerClick = e => {
         var layer = e.target;
@@ -282,7 +284,8 @@ class MapForm extends Component {
                                 //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
                                 //multi___ are unsupported by Leaflet.js itself, but maybe we can patch it on top?
                                 //when a multipoint is created, 
-                                notDisplayedFeatures = [...notDisplayedFeatures, layer.feature.properties.name ? layer.feature.properties.name : layer.feature.geometry.type]
+                                notDisplayedFeatures = [...notDisplayedFeatures, layer.feature]
+
                                 //console.log("layer to not be editable is: ", layer)
                                 //console.log("feature to not display is: ", layer.feature.properties.name)
                                 //output = ref.leafletElement.addLayer(layer)
@@ -306,6 +309,8 @@ class MapForm extends Component {
 
                 if (notDisplayedFeatures.length > 0){
                     alert("There is at least one Multi feature in your geoJSON dataset This information will not be Editable or Viewable on this Edit page, but may be viewed on this item's Show page.")
+                    console.log("notdisplayedfeatures prompt is: ", notDisplayedFeatures)
+                    console.log("localfeatures prompt is: ", localFeatures)
                 }
                 this.setState({features: localFeatures}, () =>
                 this.setState({notDisplayedFeatures: notDisplayedFeatures})
@@ -366,7 +371,6 @@ class MapForm extends Component {
                         <EditControl
                         position="topleft"
                         onCreated={this._onCreated}
-                        onEditStart={this._onEditStart}
                         onEdited={this._onEdited}
                         onDeleted={this._onDeleted}
                         onDeleteStart={this._onDeleteStart}
