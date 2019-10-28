@@ -1,3 +1,4 @@
+//UserForm.jsx
 import React, { Component } from 'react';
 import { SimpleForm, TextInput, SelectInput, ReferenceInput, DateInput, SaveButton, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
@@ -183,7 +184,7 @@ class UserFormWithAssoc extends Component {
                     defaultValue={this.state.group}
                 >
                     <SelectInput
-                        validate={this.state.group_role ? validateGroup : true}
+                        validate={this.state.group_role ? validateGroup : null}
                         optionText={Constants.model_fields.NAME}
                     />
                 </ReferenceInput>
@@ -195,7 +196,7 @@ class UserFormWithAssoc extends Component {
                     onChange={this.handleSelectChange}
                 >
                     <TranslationSelect
-                        validate={this.state.group ? validateRole : true}
+                        validate={this.state.group ? validateRole : null}
                         optionText={Constants.model_fields.LABEL}
                     />
                 </ReferenceInput>

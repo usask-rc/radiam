@@ -28,7 +28,7 @@ const RelatedUsers = (record) => {
 
     return(
       <div className={styles.relatedDSContainer}>
-      {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="p">{`Group Users: `}</Typography> }
+      {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
       {groupMembers && groupMembers.map(groupMember => {
 
 

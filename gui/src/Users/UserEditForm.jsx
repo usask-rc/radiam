@@ -12,14 +12,6 @@ import UserGroupsDisplay from './UserGroupsDisplay';
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
 
-//we want a horizontal display to match our other chip displays elsewhere in the application.
-const styles = theme => ({
-    chipDisplay: {
-        display: 'flex',
-        justifyContent: 'left',
-        flexWrap: 'wrap',
-    },
-});
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
@@ -39,7 +31,6 @@ class UserEditForm extends Component {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);
         } else {
-            //TODO: logout the user.
             toastErrors(
                 Constants.warnings.NO_AUTH_TOKEN
             );
@@ -142,7 +133,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
-                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay classes={styles} groupMembers={groupMembers}/>}
+                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
 
             </SimpleForm>
             <Toolbar>

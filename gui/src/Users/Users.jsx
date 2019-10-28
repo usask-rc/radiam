@@ -1,3 +1,4 @@
+//Users.jsx
 import React from "react";
 import {
   BooleanField,
@@ -82,6 +83,8 @@ const userListRowClick = (id, basePath, record) => record.is_active ? `${basePat
 export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
   console.log("props in userList are: ", props)
 
+  const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
+
   return (
     <List
       {...props}
@@ -96,7 +99,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       perPage={10}
       pagination={<CustomPagination />}
     >
-      <Datagrid rowClick={userListRowClick} {...props}>
+      <Datagrid rowClick={userListRowClick} {...other}>
         <TextField
           label={"en.models.users.username"}
           source={Constants.model_fields.USERNAME}

@@ -108,7 +108,7 @@ class Login extends Component {
 
 
   //TODO: the below Toasts need to be put in the Constants or the Translation file.
-  forgotPassword = () => {
+  forgotPassword = (e) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: this.state.email
@@ -119,7 +119,6 @@ class Login extends Component {
       .catch(err =>
         toast.success("Please check your email for a password reset link.")
       );
-    this.toggleForgotPassword();
   };
 
   toggleForgotPassword = (e) => {
