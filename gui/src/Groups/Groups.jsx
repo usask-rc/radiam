@@ -259,10 +259,6 @@ class BaseGroupEdit extends Component {
   }
 
   render() {
-    const closeDrawer = () => event => {
-      this.setState({ config:  false});
-    };
-
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 
