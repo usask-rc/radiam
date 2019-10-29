@@ -1,3 +1,4 @@
+//BrowseTab.jsx
 import React, { useState, useEffect } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
@@ -21,7 +22,7 @@ function BrowseTab({ projectID, classes }) {
   useEffect(() => {
     getRootPaths(setListOfRootPaths, setStatus, projectID)
     setStatus({loading: false});
-  }, []);
+  }, [projectID]);
 
   return (
     <div className={classes.main}>

@@ -59,10 +59,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                         resource={Constants.models.PROJECTS}
                         record={item}
                       >
-                      <React.Fragment>
-                      {console.log("item props going into agentshow are: ", item)}
                         <AgentShow />
-                        </React.Fragment>
                       </ReferenceField>
                     ) : key === Constants.model_fields.FILESIZE ? (
                       formatBytes(item[key], 2)

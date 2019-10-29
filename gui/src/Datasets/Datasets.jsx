@@ -1,10 +1,8 @@
+//Datasets.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Create,
-  Datagrid,
   Edit,
-  Filter,
-  List,
   ReferenceArrayField,
   ReferenceArrayInput,
   ReferenceField,
@@ -24,11 +22,10 @@ import {
 import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import * as Constants from '../_constants/index';
-import CustomPagination from '../_components/CustomPagination';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { Prompt, Route } from "react-router"
+import { Prompt } from "react-router"
 import PropTypes from 'prop-types';
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
@@ -36,9 +33,6 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import { CardActions } from 'ra-ui-materialui/lib/layout';
-import { CreateButton } from 'ra-ui-materialui/lib/button';
-import { Drawer } from '@material-ui/core';
 
 const listStyles = {
   actions: {
@@ -55,33 +49,6 @@ const listStyles = {
     whiteSpace: "pre-wrap",
   },
 };
-
-const filterStyles = {
-  form: {
-    backgroundColor: 'inherit',
-  },
-};
-
-//This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
-const DatasetFilter = withStyles(filterStyles)(({ classes, ...props }) => (
-  <Filter classes={classes} {...props}>
-    <ReferenceInput
-      label={'en.models.datasets.project'}
-      source={Constants.model_fk_fields.PROJECT}
-      reference={Constants.models.PROJECTS}
-    >
-      <SelectInput optionText={Constants.model_fields.NAME} />
-    </ReferenceInput>
-    <TextInput
-      label={'en.models.datasets.title'}
-      source={Constants.model_fields.TITLE}
-    />
-    <TextInput
-      label={'en.models.datasets.study_site'}
-      source={Constants.model_fields.STUDY_SITE}
-    />
-  </Filter>
-));
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show title={<DatasetTitle />} {...props}>
@@ -146,7 +113,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           </SingleFieldList>
         </ReferenceArrayField>
 
-        /** Needs a ShowController to get the record into the ShowMetadata **/
+        {/** Needs a ShowController to get the record into the ShowMetadata **/}
         <ShowController translate={translate} {...props}>
           { controllerProps => (
             <ShowMetadata
@@ -160,12 +127,12 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
             />
           )}
         </ShowController>
-
-
         <MapView/>
     </SimpleShowLayout>
   </Show>
 ));
+        
+
 
 const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
 const validateDataCollectionMethod = required('en.validate.dataset.data_collection_method');
@@ -283,7 +250,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { props.mode == Constants.resource_operations.EDIT && props.id && (
+    { props.mode === Constants.resource_operations.EDIT && props.id && (
       <React.Fragment>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />

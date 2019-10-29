@@ -16,8 +16,7 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { TextField, Button, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography, Grid } from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
 
 const validateHostname = required('en.validate.locations.host_name');
@@ -183,70 +182,72 @@ class LocationForm extends Component {
       {
         return(
           <Grid container>
-          <Grid xs={12}>
-        <TextInput
-          label={'en.models.locations.display_name'}
-          source={Constants.model_fields.DISPLAY_NAME}
-        />
-        </Grid>
-        <Grid xs={12}>
-        <TextInput
-          label={'en.models.locations.host_name'}
-          source={Constants.model_fields.HOST_NAME}
-          validate={validateHostname}
-          defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "osf.io" : ""}
-        />
-        </Grid>
-        <Grid xs={12}>
-        <ReferenceInput
-          label={'en.models.locations.type'}
-          source={Constants.model_fk_fields.LOCATION_TYPE}
-          reference={Constants.models.LOCATIONTYPES}
-          validate={validateLocationType}
-          defaultValue={Constants.LOCATIONTYPE_OSF}
-        >
-          <TranslationSelect optionText={Constants.model_fields.LABEL} />
-        </ReferenceInput>
-        </Grid>
-        <React.Fragment>
-          <Grid xs={12}>
-            <TextInput
-              label={'en.models.locations.globus_endpoint'}
-              source="globus_endpoint"
-              validate={validateGlobusEndpoint}
-            />
+            <Grid item xs={12}>
+              <TextInput
+                label={'en.models.locations.display_name'}
+                source={Constants.model_fields.DISPLAY_NAME}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextInput
+                label={'en.models.locations.host_name'}
+                source={Constants.model_fields.HOST_NAME}
+                validate={validateHostname}
+                defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "osf.io" : ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <ReferenceInput
+                label={'en.models.locations.type'}
+                resource={Constants.models.LOCATIONTYPES}
+                source={Constants.model_fk_fields.LOCATION_TYPE}
+                reference={Constants.models.LOCATIONTYPES}
+                validate={validateLocationType}
+                defaultValue={Constants.LOCATIONTYPE_OSF}
+              >
+                <TranslationSelect optionText={Constants.model_fields.LABEL} />
+              </ReferenceInput>
+            </Grid>
+            <React.Fragment>
+              <Grid item xs={12}>
+                <TextInput
+                  label={'en.models.locations.globus_endpoint'}
+                  source="globus_endpoint"
+                  validate={validateGlobusEndpoint}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <LongTextInput
+                  label={'en.models.locations.globus_path'}
+                  source="globus_path"
+                />
+              </Grid>
+            </React.Fragment>
+            {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
+              <Grid item xs={12}>
+                <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
+              </Grid>
+            }
+            <Grid item xs={12}>
+              <LongTextInput
+                label={'en.models.locations.portal_url'}
+                source="portal_url"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
+            </Grid>
+
+            <Grid item xs={12} key={this.state.mapFormKey}>
+              <MapForm
+                content_type={Constants.model_fk_fields.LOCATION}
+                recordGeo={this.state.geo}
+                id={this.props.id}
+                geoDataCallback={this.geoDataCallback}
+              />
+            </Grid>
+          
           </Grid>
-          <Grid xs={12}>
-            <LongTextInput
-              label={'en.models.locations.globus_path'}
-              source="globus_path"
-            />
-          </Grid>
-        </React.Fragment>
-        {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
-        <Grid xs={12}>
-          <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
-        </Grid>
-        }
-        <Grid xs={12}>
-        <LongTextInput
-          label={'en.models.locations.portal_url'}
-          source="portal_url"
-        />
-        </Grid>
-        <Grid xs={12}>
-        <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
-        </Grid>
-        <Grid xs={12} key={this.state.mapFormKey}>
-        <MapForm
-          content_type={Constants.model_fk_fields.LOCATION}
-          recordGeo={this.state.geo}
-          id={this.props.id}
-          geoDataCallback={this.geoDataCallback}
-        />
-        </Grid>
-        
-        </Grid>
         )
       }
       }

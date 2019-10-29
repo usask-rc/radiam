@@ -23,11 +23,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     const options = {};
     switch (type) {
 
-      //probably deprecated
-      case 'GET_USER_ICON': {
-        options.method=Constants.methods.GET
-        break;
-      }
       case GET_LIST: {
         //TODO: this needs refactoring badly.
         //types of request:
@@ -241,8 +236,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     const { headers, json } = response;
 
     switch (type) {
-      case 'GET_USER_ICON':
-        console.log("usericon response is: ", response)
       case 'PASSWORD_RESET_EMAIL':
       case 'PASSWORD_RESET_CONFIRM':
       case 'PASSWORD_CHANGE':

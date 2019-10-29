@@ -1,15 +1,14 @@
+//ResetPassword.jsx
 import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
-import { Card, CardActions, Button, Typography, Avatar } from "@material-ui/core";
+import { Card, CardActions, Button, Avatar } from "@material-ui/core";
 import { Link } from "ra-ui-materialui";
 import { withRouter } from "react-router";
 import LockIcon from "@material-ui/icons/Lock";
-
 import { getAPIEndpoint } from "../_tools";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { withStyles } from "@material-ui/core/styles";
-
 import * as Constants from "../_constants/index";
 import { toastErrors } from "../_tools/funcs";
 import { required } from "ra-core";

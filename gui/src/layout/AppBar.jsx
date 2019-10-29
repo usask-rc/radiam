@@ -1,13 +1,12 @@
 //Appbar.jsx
-import React, { useState } from "react";
+import React from "react";
 import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
-import { Typography, Link } from "@material-ui/core";
-import { Redirect } from "react-router"
+import { Typography } from "@material-ui/core";
 import { Help } from "@material-ui/icons";
 
 const styles = {

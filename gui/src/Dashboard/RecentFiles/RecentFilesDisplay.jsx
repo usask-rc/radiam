@@ -89,7 +89,7 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
   function handleChange(event, newValue) {
     setValue(newValue);
   }
-  const handleDateLimit = name => event => {
+  const handleDateLimit = event => {
 
     if (!isNaN(event.target.value)) {
       let daysSince = Number(parseInt(event.target.value))
@@ -117,7 +117,7 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
               type="number"
               className={classes.dateLimitSelection}
               value={dateLimit}
-              onChange={handleDateLimit('date')}
+              onChange={handleDateLimit}
             >
             </TextField>
           </Typography>

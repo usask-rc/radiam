@@ -256,8 +256,6 @@ export const UserAgentCreate = props => {
   )
 };
 
-const WithProps = ({children, ...props}) => children(props)
-
 //TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props

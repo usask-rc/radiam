@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+//DatasetList.jsx
+import React from 'react';
 import {
   Datagrid,
   Filter,
@@ -8,16 +9,11 @@ import {
   SelectInput,
   TextField,
   TextInput,
-  translate,
 } from 'react-admin';
-import compose from "recompose/compose";
 import * as Constants from '../_constants/index';
 import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
-import {  Route } from "react-router"
 import { withStyles } from '@material-ui/core/styles';
-import { CardActions } from 'ra-ui-materialui/lib/layout';
-import { CreateButton } from 'ra-ui-materialui/lib/button';
 
 const listStyles = {
     actions: {

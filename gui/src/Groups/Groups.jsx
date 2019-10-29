@@ -1,8 +1,8 @@
+//Groups.jsx
 import React, { Component, useEffect, useState } from "react";
 import {
   BooleanField,
   BooleanInput,
-  CardActions,
   Create,
   Datagrid,
   DateInput,
@@ -29,11 +29,9 @@ import CustomPagination from "../_components/CustomPagination";
 import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import { Prompt, Route } from 'react-router';
+import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
-import { CreateButton } from "ra-ui-materialui/lib/button";
-import { Drawer } from "@material-ui/core";
 
 
 const styles = {
@@ -76,12 +74,6 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     </ReferenceInput>
   </Filter>
 ));
-
-const GroupListActions = ({ basePath }) => (
-  <CardActions>
-    <CreateButton basePath={basePath} />
-  </CardActions>
-)
 
 export const GroupList = withStyles(styles)(({ classes, ...props }) => (
   <React.Fragment>
@@ -155,7 +147,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         />
       </ReferenceField>
 
-      /** Needs a ShowController to get the record into the ShowMetadata **/
+      {/** Needs a ShowController to get the record into the ShowMetadata **/}
       <ShowController translate={translate} {...props}>
         { controllerProps => (
           <ShowMetadata
@@ -267,10 +259,6 @@ class BaseGroupEdit extends Component {
   }
 
   render() {
-    const closeDrawer = () => event => {
-      this.setState({ config:  false});
-    };
-
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 

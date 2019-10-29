@@ -1,3 +1,4 @@
+//en.js
 import englishMessages from 'ra-language-english';
 
 export default {
@@ -496,7 +497,6 @@ export default {
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
-        osf: 'OSF',
       },
     },
     distribution: {

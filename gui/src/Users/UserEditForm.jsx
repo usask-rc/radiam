@@ -1,9 +1,10 @@
+//UserEditForm.jsx
 import React, { Component } from 'react';
 import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { email, maxLength, minLength, required, GET_LIST, GET_ONE } from 'ra-core';
+import { email, maxLength, minLength, required } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt, Redirect } from 'react-router';
 import UserGroupsDisplay from './UserGroupsDisplay';

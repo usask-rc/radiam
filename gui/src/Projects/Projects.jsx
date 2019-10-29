@@ -1,6 +1,6 @@
+//Projects.jsx
 import React, {Component} from "react";
 import {
-  CardActions,
   Create,
   Datagrid,
   Edit,
@@ -31,7 +31,7 @@ import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from 
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
-import { userSelect, UserShow, userSelectField } from "../_components/_fields/UserShow";
+import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
@@ -122,7 +122,6 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-    const { record } = props;
     return (
       <Show {...props}>
         <TabbedShowLayout>
@@ -147,7 +146,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             >
               <TextField source={Constants.model_fields.NAME} />
             </ReferenceField>
-            /** Needs a ShowController to get the record into the ShowMetadata **/
+            {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
                 <ShowMetadata
@@ -265,14 +264,6 @@ const enhance = compose(
   translate,
   withStyles(styles),
 );
-
-const TagCreateActions = ({record}) =>
-{
-return(
-  <CardActions>
-    <RelatedDatasets record={record} />
-  </CardActions>
-)};
 
 export const ProjectEdit = enhance(BaseProjectEdit);
 

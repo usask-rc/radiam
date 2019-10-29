@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BooleanInput, SimpleForm, TextInput, SelectInput, ReferenceInput, DateInput, SaveButton, Toolbar } from "react-admin";
+import { SimpleForm, TextInput, SelectInput, ReferenceInput, DateInput, SaveButton, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
 import { getAPIEndpoint } from '../_tools';
 import TranslationSelect from '../_components/_fields/TranslationSelect';

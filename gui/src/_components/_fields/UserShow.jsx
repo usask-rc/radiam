@@ -1,3 +1,4 @@
+//UserShow.jsx
 import React, { SFC } from "react";
 import get from 'lodash/get';
 import Typography from '@material-ui/core/Typography';
@@ -5,7 +6,6 @@ import { FieldProps, InjectedFieldProps, fieldPropTypes } from "react-admin";
 import * as Constants from "../../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import UserAvatar from "react-user-avatar"
-import { Grid } from "@material-ui/core";
 
 const styles = {
   image: {
