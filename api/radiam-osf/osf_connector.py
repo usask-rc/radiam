@@ -11,7 +11,7 @@ from radiam_api import RadiamAPI
 from configobj import ConfigObj
 import json
 import requests
-
+import multiprocessing
 
 def _setup_osf(osf_token):
     return api.OSF(token=osf_token)
@@ -135,6 +135,7 @@ def main():
 
     host = 'http://nginx'
     logger = log_setup('info')
+    processes = []
 
     try:
         # db_config = ConfigObj(r"../config/db/db_env")
@@ -159,10 +160,14 @@ def main():
                     agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
                     API = RadiamAPI(**agent_config)
 
-                    update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id)
+                    p = multiprocessing.Process(target=update_info, args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
+                    # update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id)
+                    processes.append(p)
+                    p.start()
                 except Exception as e:
                     print('Error with OSF Project %s' %e)
-
+            for process in processes:
+                process.join()
             time.sleep(3600)
 
     except psycopg2.Error as e:
