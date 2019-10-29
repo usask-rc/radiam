@@ -24,7 +24,11 @@ Postgres for Django backend.
 3. Follow instructions on setting up host production environment for Elasticsearch:
 https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
-On linux, it is useful to add your user to the docker group.
+On linux, it is useful to add your user to the docker group. For example to add the ubuntu user to the docker group on Ubuntu:
+
+```
+sudo usermod -a -G docker ubuntu.
+```
 
 
 **Develop:**
