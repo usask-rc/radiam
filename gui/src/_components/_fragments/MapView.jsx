@@ -42,7 +42,7 @@ const MapView = ({ classes, record }) => {
             }
 
         }
-    }, [mapRef])
+    }, [])
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {

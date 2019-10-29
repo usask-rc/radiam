@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import * as Constants from '../_constants/index';
 import '../_components/components.css';
 import { Chip, Typography } from '@material-ui/core';
-import { CreateButton } from 'ra-ui-materialui/lib/button';
 import { getRelatedDatasets } from '../_tools/funcs';
+import { Link } from  "react-router-dom";
+
 
 const RelatedDatasets = ({ record }) => {
     const styles = theme => ({
@@ -35,10 +36,11 @@ const RelatedDatasets = ({ record }) => {
           <Chip className={styles.chipDisplay} variant="outlined" key={dataset.id}
           label={`${dataset.title}`}
           href={`/#/${Constants.models.DATASETS}/${dataset.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
-  
         )
       })}
-          <CreateButton basePath={`/${Constants.models.DATASETS}`} label={`New Dataset`}></CreateButton>
+        <Link to={{pathname:`/${Constants.models.DATASETS}/Create`, project: record.id}}>
+          <Chip label={`+ New Dataset`} className={styles.chipDisplay} variant="outlined" key={"newDatasetChip"} clickable/>
+        </Link>
       </div>
     )
   }

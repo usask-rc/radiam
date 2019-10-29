@@ -50,11 +50,9 @@ const RelatedUsers = (record) => {
   
         )
       })}
-      <Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
-          <Chip label={`+ New User`} className={styles.chipDisplay} variant="outlined" key={"newUserChip"} clickable>
-            
-          </Chip>
-          </Link> 
+        <Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
+          <Chip label={`+ New User`} className={styles.chipDisplay} variant="outlined" key={"newUserChip"} clickable/>
+        </Link> 
       </div>
     )
   }

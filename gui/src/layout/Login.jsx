@@ -34,6 +34,9 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "center"
   },
+  button: {
+    textTransform: "none",
+  },
   card: {
     minWidth: 300,
     marginTop: "6em"
