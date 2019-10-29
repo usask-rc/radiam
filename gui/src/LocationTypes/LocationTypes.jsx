@@ -8,6 +8,7 @@ import { Prompt } from 'react-router';
 
 export const LocationTypeList = props => (
   <List {...props} exporter={false}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>

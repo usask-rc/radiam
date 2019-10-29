@@ -82,7 +82,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
-
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <ReferenceField

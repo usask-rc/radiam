@@ -26,6 +26,7 @@ const styles = theme => ({
 export const ProjectAvatarsList = withStyles(styles)(({ classes, ...props }) => (
   <List {...props} exporter={false}
     sort={{ field: Constants.model_fields.AVATAR_IMAGE, order: "DESC" }}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>

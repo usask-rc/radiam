@@ -15,7 +15,9 @@ import TranslationField from '../_components/_fields/TranslationField';
 import CustomPagination from '../_components/CustomPagination';
 
 export const DataCollectionMethodList = props => (
-  <List {...props} exporter={false} pagination={<CustomPagination />}>
+  <List {...props} exporter={false} 
+        pagination={<CustomPagination />}
+        bulkActionButtons={false}>
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TranslationField
         label={'en.models.data_collection_method.label'}

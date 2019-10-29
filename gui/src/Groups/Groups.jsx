@@ -32,6 +32,7 @@ import PropTypes from 'prop-types';
 import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
+import { Typography } from "@material-ui/core";
 
 
 const styles = {
@@ -75,8 +76,9 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-export const GroupList = withStyles(styles)(({ classes, ...props }) => (
-  <React.Fragment>
+export const GroupList = withStyles(styles)(({ classes, ...props }) => {
+
+  return(
   <List
     {...props}
     classes={{
@@ -89,7 +91,8 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
-  >
+    bulkActionButtons={false}>
+    
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TextField
         label={"en.models.groups.name"}
@@ -113,8 +116,9 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
       </ReferenceField>
     </Datagrid>
   </List>
-  </React.Fragment>
-));
+)
+
+});
 
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
     return(

@@ -91,6 +91,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     filters={<ProjectFilter />}
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>

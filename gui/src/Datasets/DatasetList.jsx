@@ -73,7 +73,7 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         sort={{ field: Constants.model_fields.TITLE, order: 'DESC' }}
         perPage={10}
         pagination={<CustomPagination />}
-        
+        bulkActionButtons={false}
       >
         <Datagrid rowClick={Constants.resource_operations.SHOW}>
           <TextField

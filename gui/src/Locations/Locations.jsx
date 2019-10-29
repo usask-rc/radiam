@@ -90,6 +90,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
     filters={<LocationFilter />}
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW} {...other}>
