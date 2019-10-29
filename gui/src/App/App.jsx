@@ -240,7 +240,6 @@ const App = props => {
           <Resource
             name={Constants.models.PROJECTAVATARS}
             icon={FlipToFront}
-            bulkActionButtons={false}
             options={{ label: 'en.sidebar.projectavatars' }}
             {...projectavatars}
           />,

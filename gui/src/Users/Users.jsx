@@ -1,9 +1,10 @@
 //Users.jsx
-import React from "react";
+import React, { Component } from "react";
 import {
   BooleanField,
   BooleanInput,
   Create,
+  crudUpdateMany,
   Datagrid,
   DateInput,
   Edit,
@@ -23,6 +24,8 @@ import UserFormWithAssoc from "./UserForm";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
+import { Button } from "ra-ui-materialui/lib/button";
+import ToggleActiveButton from "./ToggleActiveButton";
 
 
 const listStyles = {
@@ -80,6 +83,13 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
 
 const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
+const PostBulkActionButtons = props => (
+  <React.Fragment>
+    <ToggleActiveButton label="Toggle Active" {...props} />
+  </React.Fragment>
+)
+
+
 export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
   console.log("props in userList are: ", props)
 
@@ -98,6 +108,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
       perPage={10}
       pagination={<CustomPagination />}
+      //bulkActionButtons={<PostBulkActionButtons {...other}/>} - This can be activated as soon as Username is no longer a required field on PUT.
       bulkActionButtons={false}
     >
       <Datagrid rowClick={userListRowClick} {...other}>
