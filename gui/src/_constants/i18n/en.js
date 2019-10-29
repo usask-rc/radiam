@@ -396,6 +396,7 @@ export default {
       },
       groups: {
         name: 'Group Name',
+        active: 'Active',
         description: 'Description',
         parent_group: 'Parent Group',
       },

@@ -59,7 +59,7 @@ export function getFirstCoordinate(layer) {
   }
 }
 
-export function getFolderFiles(setFiles, folderPath, projectID){
+export function getFolderFiles(folderPath, projectID){
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
@@ -105,17 +105,15 @@ export function getFolderFiles(setFiles, folderPath, projectID){
             return 1;
           }
         });
-        resolve(setFiles(fileList));
+        resolve(fileList);
       })
-      .catch(error => {
-        //setStatus(status => (status = { loading: false, error: error }));
-        console.log('error in fetch from API: ', error);
-        reject(error)
+      .catch(err => {
+        reject(err)
       });
   });
 }
 
-export function getGroupUsers(setGroupMembers, record) {
+export function getGroupUsers(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = []
 
@@ -141,7 +139,7 @@ export function getGroupUsers(setGroupMembers, record) {
                         groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
                         groupUsers = [...groupUsers, groupMember]
                         if (groupUsers.length === groupMembers.length){
-                          setGroupMembers(groupMembers)
+                          resolve(groupMembers)
                         }
 
                     }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
@@ -157,18 +155,18 @@ export function getGroupUsers(setGroupMembers, record) {
   })
 }
 
-export function getRelatedDatasets(setDatasets, record){
+export function getRelatedDatasets(record){
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.DATASETS, 
       {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
     .then(assocDatasets => {
-      resolve(setDatasets(assocDatasets))
+      resolve(assocDatasets)
     }).catch(err => reject(err))
   })
 }
 
-export function getRootPaths(setListOfRootPaths, setStatus, projectID){
+export function getRootPaths(projectID){
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
     sort: { field: 'last_modified', order: 'ASC' },
@@ -208,12 +206,12 @@ export function getRootPaths(setListOfRootPaths, setStatus, projectID){
         for (var key in rootList) {
           rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
         }
-        resolve(setListOfRootPaths(rootPaths))
+        console.log("rootpaths being resolved: ", rootPaths)
+        resolve(rootPaths)
 
       })
       .catch(error => {
-        console.log("error in getrootpaths is: ", error)
-        reject(setStatus({ loading: false, error: error }));
+        reject(error);
       });
   });
 }

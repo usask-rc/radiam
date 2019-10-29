@@ -21,10 +21,23 @@ const RelatedDatasets = ({ record }) => {
     });
   
     const [datasets, setDatasets] = useState([])
-  
+    let _isMounted = false
     useEffect(() => {
+      _isMounted = true
       if (record){
-        getRelatedDatasets(setDatasets, record)
+        getRelatedDatasets(record)
+        .then(data => {
+          if (_isMounted){
+          setDatasets(data)
+          }
+          return data
+        })
+        .catch(err => console.error(err))
+      }
+
+      //if we unmount, lock out the component from being able to use the state
+      return function cleanup() {
+        _isMounted = false;
       }
     }, [record])
   

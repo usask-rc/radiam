@@ -73,6 +73,10 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
     </ReferenceInput>
+    <BooleanInput
+      label={"en.models.groups.active"}
+      defaultValue={true}
+      source={Constants.model_fields.ACTIVE} />
   </Filter>
 ));
 
@@ -92,7 +96,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     perPage={10}
     pagination={<CustomPagination />}
     bulkActionButtons={false}>
-    
+
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TextField
         label={"en.models.groups.name"}
@@ -124,7 +128,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     return(
   <Show title={<GroupTitle />} {...props}>
     <SimpleShowLayout>
-    <RelatedUsers {...props} />
+      <RelatedUsers {...props} />
 
       <TextField
         label={"en.models.groups.name"}

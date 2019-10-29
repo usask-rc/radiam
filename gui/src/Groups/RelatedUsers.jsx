@@ -8,6 +8,7 @@ import UserAvatar from "react-user-avatar";
 import { Link } from  "react-router-dom";
 
 const RelatedUsers = (record) => {
+    let _isMounted = false;
     const styles = theme => ({
         chipDisplay: {
             display: 'flex',
@@ -23,15 +24,25 @@ const RelatedUsers = (record) => {
     const [groupMembers, setGroupMembers] = useState([])
   
     useEffect(() => {
-      getGroupUsers(setGroupMembers, record)
+      _isMounted = true;
+      
+      getGroupUsers(record).then((data) =>{
+        if (_isMounted){
+            setGroupMembers(data)
+        }
+        return data
+      }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
+
+      //if we unmount, lock out the component from being able to use the state
+      return function cleanup() {
+        _isMounted = false;
+      }
     }, [])
 
     return(
       <div className={styles.relatedDSContainer}>
       {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
       {groupMembers && groupMembers.map(groupMember => {
-
-
         let groupRoleTextArr = groupMember.group_role.label.split(".")
         let groupRoleValue=""
 

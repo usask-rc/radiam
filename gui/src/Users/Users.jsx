@@ -24,7 +24,6 @@ import UserFormWithAssoc from "./UserForm";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
-import { Button } from "ra-ui-materialui/lib/button";
 import ToggleActiveButton from "./ToggleActiveButton";
 
 
