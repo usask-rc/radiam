@@ -247,7 +247,7 @@ def use_email():
     return use_email
 
 @receiver(radiam_user_created)
-def send_user_welcome_email(sender, user, *args, **kwargs):
+def send_user_welcome_email(sender, user, reset_password_token, *args, **kwargs):
     """
     When a new user is created, send them a welcome email with instructions
     directing them to the password-reset function.
@@ -259,7 +259,9 @@ def send_user_welcome_email(sender, user, *args, **kwargs):
         'user':user,
         'host': request.get_host(),
         'scheme': request.scheme,
-        'login_url': settings.CLIENT_APP_URLS.get('LOGIN_URL')
+        'reset_password_url': "{}{}".format(
+            settings.CLIENT_APP_URLS.get('PASSWORD_RESET_BASE_URL'),
+                                             reset_password_token.key),
     }
 
     user_welcome_subj = "Welcome to Radiam"
