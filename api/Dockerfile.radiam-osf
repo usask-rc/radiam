@@ -15,15 +15,15 @@ RUN pip install --upgrade pip
 ## This is a Docker optimization that will pull these steps into their own 'layer'.
 ## If this step is below the code copying step, then every time something changes in the
 ## codebase, Docker will try to reinstall all the requirements, even if they didn't change.
-COPY ./api/radiam-osf/requirements.txt /code/requirements.txt
+COPY radiam-osf/requirements.txt /code/requirements.txt
 RUN pip install -r /code/requirements.txt
 
 # copy code in
 ## For some reason using the wildcard character 'radiam-osf/*' didnt copy the osf-api directory
-COPY api/radiam-osf/ /code/
+COPY radiam-osf/ /code/
 
 # Copy dev postgres credentials over
-COPY api/config /code/config
+COPY config /code/config
 
 # Install waitforit script for blocking until postgres is up
 RUN git clone https://github.com/usask-rc/wait-for-it.git /wait-for-it
