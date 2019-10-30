@@ -26,7 +26,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 
@@ -169,6 +169,8 @@ class PageThree extends Component {
   };
 
   handleSubmit = (data, redirect) => {
+
+    console.log("data in handlesubmit is: ", data)
     this.setState({isFormDirty: false}, () => {
       submitObjectWithGeo(data, this.state.geo, this.props, redirect)
     }
@@ -199,12 +201,12 @@ class PageThree extends Component {
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, userList: new Set() }
+    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {} }
   }
 
   handleChange = (event, index, id, value) => {
     console.log("handlechange in pagetwo trigger")
-    this.setState({ group: index, groupList: [], isFormDirty: true, userList: new Set() })
+    this.setState({ group: index, groupList: [], isFormDirty: true, groupContactCandidates: {} })
     this.getAllParentGroups(index)
   };
 
@@ -215,6 +217,7 @@ class PageTwo extends Component {
     //Accessing in Edit Mode
     if (group) {
       this.setState({ group: group, primary_contact_user: primary_contact_user })
+      this.setState({groupList: []})
       this.getAllParentGroups(group)
       //TODO: ADM-1153 Despite receiving the Primary Contact User information, the value does not get filled into the drop-down by default.
     }
@@ -223,7 +226,33 @@ class PageTwo extends Component {
     }
   }
 
+
+  //TODO: handle potential setstate on unmounted component
   getAllParentGroups = group_id => {
+
+    if (group_id !== null){
+      getGroupData(group_id).then(
+        data => {
+          let groupList = this.state.groupList
+
+          groupList.push(data)
+          this.setState(groupList)
+            
+          this.getAllParentGroups(data.parent_group)
+
+          return data
+        }
+      ).catch(err => {
+        console.error("error returned in getallparentgroups: ", err)})
+    }
+    else{
+      //now get a list of users in each group
+
+      this.state.groupList.map(group => {
+        this.getUserList(group.id)
+      })
+    }
+    /*
     //get this group and any parent group
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
@@ -241,6 +270,7 @@ class PageTwo extends Component {
     }).catch(err => {
       console.error("Error in getAllParentGroups: ", err)
     })
+    */
   };
 
   //TODO: this can result in duplicate users, but the functionality itself is just fine.  This eventually should be fixed but is just an aesthetic issue.
@@ -254,7 +284,12 @@ class PageTwo extends Component {
         dataProvider(GET_ONE, Constants.models.USERS, {
           id: groupMember.user, is_active: groupMember.is_active
         }).then(response => {
-          this.setState({ userList: new Set([...this.state.userList, response.data]) })
+          let groupContactCandidates = this.state.groupContactCandidates
+
+          groupContactCandidates[response.data.id] = response.data
+          this.setState({groupContactCandidates: groupContactCandidates})
+          
+          //this.setState({ userList: new Set([...this.state.userList, response.data]) })
 
         })
         return groupMember
@@ -267,7 +302,15 @@ class PageTwo extends Component {
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
-    const { userList } = this.state
+    const { groupContactCandidates } = this.state
+
+    let groupContactList = []
+
+    Object.keys(groupContactCandidates).map(key => {
+      groupContactList.push(groupContactCandidates[key])
+    })
+
+    console.log("this state groupContactList is: ", groupContactList)
 
     return (
       <React.Fragment>
@@ -287,14 +330,14 @@ class PageTwo extends Component {
         </ReferenceInput>
       </div>
       <div>
-        {(primary_contact_user || (userList && userList.size) > 0) &&
+        {(primary_contact_user || (groupContactList && groupContactList.length) > 0) &&
           <UserInput
             required
             label={"en.models.projects.primary_contact_user"}
             placeholder={`Primary Contact`}
             validate={validatePrimaryContactUser}
             className="input-small"
-            users={userList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+            users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
             defaultValue={primary_contact_user} />
         }
       </div>

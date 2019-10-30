@@ -43,8 +43,6 @@ class MapForm extends Component {
 
     //here is where we handle different data management cases for features
     featuresCallback = (layer) => {
-        console.log("features sent to featurescallback is: ", layer)
-        console.log("list of features is: ", this.state.features)
         if (typeof layer === 'string'){
             const featureList = {...this.state.features};
             delete featureList[layer]

@@ -10,7 +10,7 @@ var cloneDeep = require('lodash.clonedeep');
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
-    return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
+    return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
     
   }
   return `/${Constants.API_ENDPOINT}`;
@@ -67,8 +67,8 @@ export function getFolderFiles(folderPath, projectID){
     pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
     sort: { field: 'last_modified', order: 'ASC' },
   };
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     
     dataProvider(
@@ -216,11 +216,66 @@ export function getRootPaths(projectID){
   });
 }
 
+export function getProjectFiles(params){
+
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+      dataProvider(
+        GET_LIST,
+        Constants.models.PROJECTS + '/' + params.id + '/search',
+        params
+      )
+      .then(response => {
+        resolve({ files: response.data, nbFiles: response.total })
+      })
+      .catch(err => {
+        reject({loading: false, error: err})
+      });
+    })
+};
+
+export function getGroupData(group_id){
+
+  return new Promise((resolve, reject) => {
+    
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
+    //get this group's details, then ascend if it has a parent.
+    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id }).then(response => {
+      resolve(response.data)
+
+    }).catch(err => {
+      reject(err)
+    })
+
+  })
+}
+
+export function getUserDetails(){
+
+  return new Promise((resolve, reject) => {
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
+      const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
+
+        if (response.data.id === localID) {
+          resolve(response.data)
+        }
+        else {
+          reject({redirect: true})
+          toastErrors(Constants.warnings.NO_AUTH_TOKEN)
+        }
+    }).catch(err => {
+      reject(err)
+      toastErrors("Could not connect to server.  Please login and try again.")
+    }
+    );
+  })
+}
+
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
-  
     let userGroupMembers = []
-
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
     .then(groupRoles => {
@@ -287,6 +342,7 @@ function updateObjectWithGeo(formData, geo, props){
   props.save(formData, Constants.resource_operations.LIST);
 }
 
+//TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, redirect){
   let headers = new Headers({ "Content-Type": "application/json" });
   const token = localStorage.getItem(Constants.WEBTOKEN);
@@ -311,7 +367,7 @@ export function createObjectWithGeo(formData, geo, props, redirect){
           throw new Error(response.statusText);
       })
       .then(data => {
-        console.log("data in createobjectiwhtgeo is: ", data)
+        console.log("data in createobjectwithgeo is: ", data)
         //some data exists - add in the object ID before submission
         if (geo && geo.content_type) {
             data.geo = geo

@@ -16,6 +16,7 @@ class Dashboard extends Component {
     this.state = { loading: true, hasFiles: false };
   }
 
+  //TODO: handle potential setstate on unmounted component
   getRecentUsers = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
@@ -33,6 +34,7 @@ class Dashboard extends Component {
       });
   };
 
+  //TODO: handle potential setstate on unmounted component
   getRecentGroups = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
@@ -54,6 +56,7 @@ class Dashboard extends Component {
 
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
+  //TODO: handle potential setstate on unmounted component
   getRecentProjects = (dateLimit = 21) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
