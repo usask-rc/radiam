@@ -26,7 +26,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getGroupUsers } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 
@@ -171,9 +171,9 @@ class PageThree extends Component {
   handleSubmit = (data, redirect) => {
 
     console.log("data in handlesubmit is: ", data)
-    this.setState({isFormDirty: false}, () => {
-      submitObjectWithGeo(data, this.state.geo, this.props, redirect)
-    }
+      this.setState({isFormDirty: false}, () => {
+        submitObjectWithGeo(data, this.state.geo, this.props, redirect)
+      }
     )
   };
 
@@ -201,7 +201,7 @@ class PageThree extends Component {
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {} }
+    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, isMounted: false }
   }
 
   handleChange = (event, index, id, value) => {
@@ -214,10 +214,10 @@ class PageTwo extends Component {
     //I don't know why this can't use dot notation, but apparently group appears in prop and can only be accessed in Dict notation.
     const { group, primary_contact_user } = this.props.record
 
+    this.setState({ groupList: [], isMounted: true })
     //Accessing in Edit Mode
     if (group) {
-      this.setState({ group: group, primary_contact_user: primary_contact_user })
-      this.setState({groupList: []})
+      this.setState({ group: group, primary_contact_user: primary_contact_user})
       this.getAllParentGroups(group)
       //TODO: ADM-1153 Despite receiving the Primary Contact User information, the value does not get filled into the drop-down by default.
     }
@@ -226,6 +226,9 @@ class PageTwo extends Component {
     }
   }
 
+  componentWillUnmount(){
+    this.setState({isMounted: false})
+  }
 
   //TODO: handle potential setstate on unmounted component
   getAllParentGroups = group_id => {
@@ -233,12 +236,14 @@ class PageTwo extends Component {
     if (group_id !== null){
       getGroupData(group_id).then(
         data => {
-          let groupList = this.state.groupList
 
+          let groupList = this.state.groupList
           groupList.push(data)
-          this.setState(groupList)
-            
-          this.getAllParentGroups(data.parent_group)
+
+          if (this.state.isMounted){
+            this.setState(groupList)
+            this.getAllParentGroups(data.parent_group)
+          }
 
           return data
         }
@@ -247,57 +252,32 @@ class PageTwo extends Component {
     }
     else{
       //now get a list of users in each group
+      this.getPrimaryContactCandidates()
+    }
+  };
+
+  getPrimaryContactCandidates = () => {
+    if (this.state.groupList){
 
       this.state.groupList.map(group => {
-        this.getUserList(group.id)
-      })
-    }
-    /*
-    //get this group and any parent group
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-
-    //get this group's details, then ascend if it has a parent.
-    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id }).then(response => {
-      const responseGroup = response.data
-      this.setState({ groupList: [...this.state.groupList, responseGroup] })
-
-      if (responseGroup.parent_group !== null) {
-        this.getAllParentGroups(responseGroup.parent_group);
-      }
-
-      this.getUserList(group_id)
-
-    }).catch(err => {
-      console.error("Error in getAllParentGroups: ", err)
-    })
-    */
-  };
-
-  //TODO: this can result in duplicate users, but the functionality itself is just fine.  This eventually should be fixed but is just an aesthetic issue.
-  getUserList = group => {
-
-    const params = { filter: { group: group }, pagination: { page: 1, perPage: 100 }, sort: { field: Constants.model_fields.ID, order: "DESC" } }
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-
-    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, params).then(response => {
-      response.data.map(groupMember => {
-        dataProvider(GET_ONE, Constants.models.USERS, {
-          id: groupMember.user, is_active: groupMember.is_active
-        }).then(response => {
+        getGroupUsers(group).then(data => {
           let groupContactCandidates = this.state.groupContactCandidates
+          data.map(item => {
+            groupContactCandidates[item.user.id] = item.user
+          })
 
-          groupContactCandidates[response.data.id] = response.data
-          this.setState({groupContactCandidates: groupContactCandidates})
+          if (this.state.isMounted){
+
+            this.setState({groupContactCandidates:groupContactCandidates})
+          }
           
-          //this.setState({ userList: new Set([...this.state.userList, response.data]) })
-
-        })
-        return groupMember
+        }).catch(err => console.error('error returned from getgroupusers is: ', err))
       })
-    }).catch(err => {
-      console.error("in useeffect hook in pagethree, error is: ", err)
-    })
-  };
+    }else{
+      console.error("no group selected from which to provide candidate contacts")
+    }
+  }
+  
 
   render() {
     const { handleBack, handleNext } = this.props
@@ -309,8 +289,6 @@ class PageTwo extends Component {
     Object.keys(groupContactCandidates).map(key => {
       groupContactList.push(groupContactCandidates[key])
     })
-
-    console.log("this state groupContactList is: ", groupContactList)
 
     return (
       <React.Fragment>
@@ -330,7 +308,6 @@ class PageTwo extends Component {
         </ReferenceInput>
       </div>
       <div>
-        {(primary_contact_user || (groupContactList && groupContactList.length) > 0) &&
           <UserInput
             required
             label={"en.models.projects.primary_contact_user"}
@@ -338,8 +315,7 @@ class PageTwo extends Component {
             validate={validatePrimaryContactUser}
             className="input-small"
             users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
-            defaultValue={primary_contact_user} />
-        }
+            defaultValue={primary_contact_user || ""} />
       </div>
     </SimpleForm>
     <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>

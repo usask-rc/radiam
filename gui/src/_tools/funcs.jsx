@@ -113,48 +113,6 @@ export function getFolderFiles(folderPath, projectID){
   });
 }
 
-export function getGroupUsers(record) {
-  return new Promise((resolve, reject) => {
-    let groupUsers = []
-
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
-    .then(groupRoles => {
-
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = record
-
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
-        }).then(response => {
-          return response.data})
-            .then(groupMembers => {
-                groupMembers.map(groupMember => {
-                    dataProvider(GET_ONE, Constants.models.USERS, {
-                        id: groupMember.user
-                    }).then(response => {
-                        return response.data
-                    }).then(user => {
-                        groupMember.user = user
-                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
-                        groupUsers = [...groupUsers, groupMember]
-                        if (groupUsers.length === groupMembers.length){
-                          resolve(groupMembers)
-                        }
-
-                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
-                    return groupMember
-                  })
-                  return groupMembers
-            })
-            .catch(err => {
-              reject("error in in get groupmembers: ", err)
-            })
-      return groupRoles
-    })
-  })
-}
-
 export function getRelatedDatasets(record){
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -273,6 +231,48 @@ export function getUserDetails(){
   })
 }
 
+export function getGroupUsers(record) {
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
+
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+    .then(groupRoles => {
+
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        const { id, is_active } = record
+
+        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+        }).then(response => {
+          return response.data})
+            .then(groupMembers => {
+                groupMembers.map(groupMember => {
+                    dataProvider(GET_ONE, Constants.models.USERS, {
+                        id: groupMember.user
+                    }).then(response => {
+                        return response.data
+                    }).then(user => {
+                        groupMember.user = user
+                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                        groupUsers = [...groupUsers, groupMember]
+                        if (groupUsers.length === groupMembers.length){
+                          resolve(groupMembers)
+                        }
+
+                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
+                    return groupMember
+                  })
+                  return groupMembers
+            })
+            .catch(err => {
+              reject("error in in get groupmembers: ", err)
+            })
+      return groupRoles
+    })
+  })
+}
+
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
     let userGroupMembers = []
@@ -341,6 +341,7 @@ function updateObjectWithGeo(formData, geo, props){
   }
   props.save(formData, Constants.resource_operations.LIST);
 }
+
 
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props){
