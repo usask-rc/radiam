@@ -109,7 +109,6 @@ services:
     image: nginx:${NGINX_VERSION}
     ports:
       - "8100:80"
-      - "6200:6200"
     volumes:
       - ./api/config/nginx/conf.d/local/:/etc/nginx/conf.d
       - ./api/uploads/:/django/uploads
