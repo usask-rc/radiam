@@ -124,8 +124,8 @@ services:
 
   osfconnector:
     build:
-      context: .
-      dockerfile: ./api/Dockerfile.radiam-osf
+      context: ./api
+      dockerfile: Dockerfile.radiam-osf
     command: ["/wait-for-it/wait-for-it.sh", "nginx:80", "-s", "--timeout=60", "--", "python", "osf_connector.py"]
     depends_on:
       - nginx
