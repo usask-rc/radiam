@@ -46,15 +46,10 @@ class _DocumentService:
         :param updated_doc: The updated document
         :return:
         """
-
         ESDataset.init(index=index_name)
         doc = ESDataset.get(index=index_name, id=pk)
-
-        # print(doc.modified_at)
-
-        result = doc.update(index=index_name, refresh=True, **updated_doc)
-
-        return result
+        doc.update(index=index_name, refresh=True, **updated_doc)
+        return doc
 
 
     def update_doc_partial(self, index_name, pk, doc_updates):

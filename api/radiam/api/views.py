@@ -1,4 +1,3 @@
-from elasticsearch_dsl import Search, Q
 from elasticsearch import exceptions as es_exceptions
 
 from rest_framework.parsers import JSONParser
@@ -10,7 +9,7 @@ from rest_framework.decorators import action, permission_classes
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
+from rest_framework.settings import api_settings, settings
 
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -200,7 +199,15 @@ class MetadataViewset():
         except ElasticSearchRequestError as error:
             raise ItemNotCreatedException(detail=error.info['error']['root_cause'][0]['reason'])
         except Exception as error:
-            raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+            if hasattr(error, 'info') and \
+                hasattr(error.info, 'error') and \
+                hasattr(error.info['error'], 'root_cause') and \
+                hasattr(error.info['error']['root_cause'].length > 0) and \
+                hasattr(error.info['error']['root_cause'][0], 'reason'):
+                raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+            else:
+                raise InternalErrorException(detail=error)
+
         else:
             #success
             headers = self.get_success_headers(serializer.data)
@@ -991,68 +998,39 @@ class ProjectSearchViewSet(viewsets.ViewSet):
 
         if type(data).__name__ not in 'list':
             check_existing = RadiamService(project_id)
-            #check_existing.add_filter('path.linux', data['path'])
-            # check_existing.add_filter('location', data['location'])
-            # check_existing.add_filter('agent', data['agent'])
-            # Working
-            #search = check_existing.get_search().query('term', path__keyword='/mnt/crawl/32.txt')
+            search = check_existing.get_search() \
+                .query('term', path__keyword=data['path']) \
+                .query('term', name__keyword=data['name']) \
+                .query('term', location__keyword=data['location']) \
+                .query('term', agent__keyword=data['agent']) \
+                .source(None)
 
-            # search = check_existing.get_search().query('term', path__keyword=data['path'])
-            # search = check_existing.get_search().query('term', path__linux=data['path']).query('term', name__keyword=data['name'])
-            #search = check_existing.get_search() \
-            #    .query('term', path__keyword=data['path']) \
-            #    .query('term', name__keyword=data['name']) \
-            #    .query('term', location__keyword=data['location']) \
-            #    .query('term', agent__keyword=data['agent'])
-
-            search = Search(index=project_id) \
-               .query('term', path__keyword=data['path'])
-            search = search.extra(explain=True)
-            search = search.source(None)
-
-            #search = Search(index=project_id) \
-            #    .query('term', path__keyword=data['path'])
-
-            search = search.extra(explain=True)
-
-            #q = Q('bool',
-                #must=[Q('match', path__keyword='/mnt/crawl/32.txt')]
-            #)
-            # print(search.build_search())
-            print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
+            if settings.TRACE:
+                print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
             response = search.execute()
-            print(response.to_dict())
-            # need to add a filter here instead of a query and hopefully it will give the right results
-            print(project_id + ':' + str(data['path']) + ':' + str(data['location']) + ':' + str(data['agent']))
-            # response = search.execute()
-            # print("Response:" + str(response.to_dict()))
-            for hit in response:
-                print(hit.meta.id)
-                print(hit.meta.index)
-            print(response.hits.total)
-            #for hit in response:
-                #print("Found: " + str(hit))
             if response.hits.total == 0:
+                if settings.DEBUG:
+                    print("New doc for " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id)
                 doc = ESDataset(**data)
                 result = radiam_service.create_single_doc(project_id, doc)
                 return Response(result)
             elif response.hits.total == 1:
+                if settings.DEBUG:
+                    print("Updating " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id)
                 id = str(response.hits[0].meta.id)
-                print("Updating '" + id  + "'")
                 return self.update(request, project_id, id)
             else:
-                print("Need to delete the older hits")
+                if settings.DEBUG:
+                    print("Updating " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + ", and need to delete the older entries. There were a total of " + str(response.hits.total) + " docs")
                 newest = response.hits[0]
                 for hit in response.hits:
-                    # print(str(hit.indexed_date))
                     if hit is not newest and hit.indexed_date > newest.indexed_date:
                         newest = hit
                 for hit in response.hits:
                     if hit is not newest:
-                        print("Destroying " + str(hit.path) + " " + str(hit.meta.id))
-                        #self.perform_destroy(project_id, hit.meta.id)
-
-                return self.update(request, project_id, newest.meta.id)
+                        self.perform_destroy(project_id, hit.meta.id)
+                result = self.update(request, project_id, newest.meta.id)
+                return result
         else:
             results = radiam_service.create_many_docs(project_id, data)
 
@@ -1068,13 +1046,12 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         #     return Response("Creation failed")
 
     def perform_update(self, request, project_id, pk):
-
+        serializer = ESDatasetSerializer()
         radiam_service = RadiamService(project_id)
-
         # Update the doc
         updated_doc = self.request.data
         result = radiam_service.update_doc(project_id, pk, updated_doc)
-
+        result = serializer.to_representation(result)
         return Response(result)
 
     def update(self, request, project_id, pk):
@@ -1082,7 +1059,7 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         Update a document in an index
         """
         parser_classes = (JSONParser,)
-        self.perform_update(request, project_id, pk)
+        return self.perform_update(request, project_id, pk)
 
     def partial_update(self, request, project_id, pk):
         """

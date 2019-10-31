@@ -32,6 +32,8 @@ SECRET_KEY = os.environ.get('PROD_SECRET_KEY', 'i_d58xix$0l%c0b^@lz%1#f@61^12yom
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', "True") == "True"
 
+TRACE = False
+
 # By default try to send emails, turn off in development environments.
 SEND_EMAIL = os.environ.get('SEND_EMAIL', "True") == "True"
 
