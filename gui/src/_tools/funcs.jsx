@@ -343,7 +343,7 @@ function updateObjectWithGeo(formData, geo, props){
 }
 
 //TODO: When creating Projects, there is a failure somewhere here.
-export function createObjectWithGeo(formData, geo, props, redirect){
+export function createObjectWithGeo(formData, geo, props){
   let headers = new Headers({ "Content-Type": "application/json" });
   const token = localStorage.getItem(Constants.WEBTOKEN);
   
@@ -400,7 +400,7 @@ export function createObjectWithGeo(formData, geo, props, redirect){
         })
         .then(data => {  
             console.log("data after update is: ", data)
-            props.history.push(`${redirect}/`)
+            props.history.push(`/${props.resource}`)
         })
       }
       )
