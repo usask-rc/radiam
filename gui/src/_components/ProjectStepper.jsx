@@ -26,7 +26,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getGroupUsers } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getGroupUsers, getUsersInGroup } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 
@@ -201,12 +201,11 @@ class PageThree extends Component {
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, isMounted: false }
+    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, groupContactList: [], isMounted: false }
   }
 
   handleChange = (event, index, id, value) => {
-    console.log("handlechange in pagetwo trigger")
-    this.setState({ group: index, groupList: [], isFormDirty: true, groupContactCandidates: {} })
+    this.setState({ group: index, groupList: [], isFormDirty: true, groupContactCandidates: {},  groupContactList: [] })
     this.getAllParentGroups(index)
   };
 
@@ -219,7 +218,6 @@ class PageTwo extends Component {
     if (group) {
       this.setState({ group: group, primary_contact_user: primary_contact_user})
       this.getAllParentGroups(group)
-      //TODO: ADM-1153 Despite receiving the Primary Contact User information, the value does not get filled into the drop-down by default.
     }
     else {
       //Accessing in Creation mode - is there anything extra needed here?
@@ -230,9 +228,7 @@ class PageTwo extends Component {
     this.setState({isMounted: false})
   }
 
-  //TODO: handle potential setstate on unmounted component
   getAllParentGroups = group_id => {
-
     if (group_id !== null){
       getGroupData(group_id).then(
         data => {
@@ -258,17 +254,27 @@ class PageTwo extends Component {
 
   getPrimaryContactCandidates = () => {
     if (this.state.groupList){
-
+      let iteratedGroups = []
       this.state.groupList.map(group => {
-        getGroupUsers(group).then(data => {
+        getUsersInGroup(group).then(data => {
           let groupContactCandidates = this.state.groupContactCandidates
+
           data.map(item => {
-            groupContactCandidates[item.user.id] = item.user
+            groupContactCandidates[item.id] = item
           })
 
           if (this.state.isMounted){
-
             this.setState({groupContactCandidates:groupContactCandidates})
+            iteratedGroups.push(group)
+          }
+
+          if (iteratedGroups.length === this.state.groupList.length){
+            let groupContactList = []
+            Object.keys(groupContactCandidates).map(key => {
+              groupContactList.push(groupContactCandidates[key])
+            })
+            console.log("groupContactList to be set is: ", groupContactList)
+            this.setState({groupContactList: groupContactList})
           }
           
         }).catch(err => console.error('error returned from getgroupusers is: ', err))
@@ -282,13 +288,9 @@ class PageTwo extends Component {
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
-    const { groupContactCandidates } = this.state
+    const { groupContactCandidates, groupContactList } = this.state
 
-    let groupContactList = []
-
-    Object.keys(groupContactCandidates).map(key => {
-      groupContactList.push(groupContactCandidates[key])
-    })
+    console.log("groupContactList is: ", groupContactList)
 
     return (
       <React.Fragment>
@@ -307,7 +309,7 @@ class PageTwo extends Component {
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
       </div>
-      <div>
+      {groupContactList.length > 0 && <div>
           <UserInput
             required
             label={"en.models.projects.primary_contact_user"}
@@ -317,6 +319,7 @@ class PageTwo extends Component {
             users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
             defaultValue={primary_contact_user || ""} />
       </div>
+      }
     </SimpleForm>
     <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
     </React.Fragment>

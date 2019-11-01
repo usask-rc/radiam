@@ -1,3 +1,4 @@
+//FolderView.jsx
 import React, { useState, useEffect } from 'react';
 import {
   AddLocation,
@@ -147,25 +148,6 @@ function FolderView({ projectID, item, classes, ...props }) {
       _isMounted = false;
     }
   }, [folderPath]);
-
-  /*
-  useEffect(() => {
-      _isMounted = true;
-      
-      getGroupUsers(record).then((data) =>{
-        if (_isMounted){
-            setGroupMembers(data)
-        }
-        return data
-      }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
-
-      //if we unmount, lock out the component from being able to use the state
-      return function cleanup() {
-        _isMounted = false;
-      }
-    }, [])
-    */
-  // className={classes.fileDisplay}
 
   if (files) {
     return (

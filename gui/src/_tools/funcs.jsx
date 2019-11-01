@@ -33,7 +33,6 @@ export function toastErrors(data) {
       return item;
     });
   } else {
-    console.log('Error in toastErrors - what type of object is this?');
     toast.error(data);
   }
 }
@@ -231,10 +230,47 @@ export function getUserDetails(){
   })
 }
 
+export function getUsersInGroup(record){
+  console.log("record called to getusersin group: ", record)
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const { id, is_active } = record
+
+    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+      filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+  }).then(response => {
+    console.log("getUsersInGroup queried with record: ", response)
+    if (response && response.total === 0){
+      resolve([])
+    }
+    return response.data
+  }).then(groupMembers => {
+
+      groupMembers.map(groupMember => {
+        dataProvider(GET_ONE, Constants.models.USERS, {
+          id: groupMember.user
+        }).then(response => {
+          return response.data
+        }).then(user => {
+          groupMember.user = user
+          groupUsers = [...groupUsers, user]
+
+          if (groupUsers.length === groupMembers.length){
+            console.log("data resolved is: ", groupUsers)
+            resolve(groupUsers)
+          }
+        }).catch(err => reject("error in attempt to get user: ", err))
+        return groupMember
+      })
+    return groupMembers
+  }).catch(err => reject("error in attempt to fetch groupMembers: ", err))
+})
+}
+
 export function getGroupUsers(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = []
-
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
     .then(groupRoles => {
@@ -245,6 +281,7 @@ export function getGroupUsers(record) {
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
             filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
         }).then(response => {
+
           return response.data})
             .then(groupMembers => {
                 groupMembers.map(groupMember => {
