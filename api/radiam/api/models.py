@@ -714,6 +714,10 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
 
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
+
+        entity = Entity.objects.get(project=self.id)
+        entity.delete()
+        
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
