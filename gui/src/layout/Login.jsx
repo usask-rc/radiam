@@ -257,12 +257,15 @@ const enhance = compose(
     validate: (values, props) => {
       const errors = {};
       const { translate } = props;
-      if (!values.username) {
-        errors.username = translate("ra.validation.required");
+      if (props.anyTouched){
+        if (!values.username) {
+          errors.username = translate("ra.validation.required");
+        }
+        if (!values.password) {
+          errors.password = translate("ra.validation.required");
+        }
       }
-      if (!values.password) {
-        errors.password = translate("ra.validation.required");
-      }
+
       return errors;
     }
   }),

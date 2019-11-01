@@ -60,8 +60,6 @@ const styles = theme => ({
     marginRight: '20em',
   },
   folderIcon: {
-    height: '1em',
-    width: '1em',
     marginRight: '0.25em',
   },
   nestedFolderPanel: {
@@ -95,6 +93,10 @@ const styles = theme => ({
   folderContentsGrid: {
     display: 'inline-block',
   },
+  folderLineItem: {
+    display: "flex",
+    flexDirection: "row",
+  },
   smallIcon: {},
 });
 
@@ -126,7 +128,7 @@ function isFile(file) {
   return false;
 }
 
-function FolderView({ projectID, item, classes, ...props }) {
+function FolderView({ projectID, item, classes }) {
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);

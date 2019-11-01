@@ -89,6 +89,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
     
   }, [search, page, sort, order]);
 
+  //TODO: this is a mess - is there a way to slim this down?  I hate it.
   return (
     <div className={classes.main}>
       {data && data.files && (

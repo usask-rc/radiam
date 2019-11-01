@@ -6,7 +6,7 @@ import {
     Description,
 } from '@material-ui/icons';
 const FolderDisplay = ({ classes, file }) => (
-    <Grid container alignItems="center">
+    <Grid container alignItems="center" className={classes.folderLineItem}>
         <Grid item xs={"auto"}>
             <Add />
         </Grid>
@@ -14,16 +14,13 @@ const FolderDisplay = ({ classes, file }) => (
             <Folder className={classes.folderIcon} />
         </Grid>
         <Grid item xs={9}>
-            <Typography className={classes.folderContentsName}>{`${
-                file.name
-                }`}</Typography>
+            <Typography className={classes.folderContentsName}>{`${file.name}`}</Typography>
         </Grid>
 
         <Grid
             item
             xs={"auto"}
-            className={classes.folderContentsGrid}
-        >
+            >
             <Description />
         </Grid>
         <Grid item xs={"auto"}>

@@ -59,6 +59,9 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                         resource={Constants.models.PROJECTS}
                         record={item}
                       >
+                      { 
+                        console.log("agentshow record is: ", item)
+                      }
                         <AgentShow />
                       </ReferenceField>
                     ) : key === Constants.model_fields.FILESIZE ? (
