@@ -9,6 +9,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.validators import UniqueValidator
 import django.contrib.auth.password_validation as password_validators
+from django_rest_passwordreset.models import ResetPasswordToken
+from django.conf import settings
 
 from radiam.api.documents import DatasetMetadataDoc
 from radiam.api.documents import ProjectMetadataDoc
@@ -203,10 +205,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
         # add the users to the 'All Users' group
         # all_users_group = ResearchGroup.objects.get(name='All Users')
+        HTTP_USER_AGENT_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_HTTP_USER_AGENT_HEADER',
+                                         'HTTP_USER_AGENT')
+        HTTP_IP_ADDRESS_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_IP_ADDRESS_HEADER', 'REMOTE_ADDR')
+        reset_password_token = ResetPasswordToken.objects.create(
+            user=user,
+            user_agent=self.context.get('request').META.get(HTTP_USER_AGENT_HEADER, ''),
+            ip_address=self.context.get('request').META.get(HTTP_IP_ADDRESS_HEADER, ''),
+        )
 
         # trigger the user create signal with request context
         radiam_user_created.send(sender=self.__class__,
                                  user=user,
+                                 reset_password_token=reset_password_token,
                                  request=self.context.get('request'))
 
         return user

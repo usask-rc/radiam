@@ -3,7 +3,6 @@ import os
 import sys
 
 from osf_api import api
-import logging
 import psycopg2
 import time
 
@@ -11,7 +10,7 @@ from radiam_api import RadiamAPI
 from configobj import ConfigObj
 import json
 import requests
-
+import multiprocessing
 
 def _setup_osf(osf_token):
     return api.OSF(token=osf_token)
@@ -55,49 +54,6 @@ def list_(osf_token, project_name, agent_id, location_id):
 def list_difference(list1,list2):
     return list(set(list1)-set(list2)), list(set(list2)-set(list1))
 
-
-def log_setup(logLevel):
-    """Set up logging for Radiam agent."""
-    radiam_logger = logging.getLogger('radiam')
-
-    logging.addLevelName(logging.INFO, logging.getLevelName(logging.INFO))
-    logging.addLevelName(logging.WARNING, logging.getLevelName(logging.WARNING))
-    logging.addLevelName(logging.ERROR, logging.getLevelName(logging.ERROR))
-    logging.addLevelName(logging.DEBUG, logging.getLevelName(logging.DEBUG))
-    logformatter = '%(asctime)s [%(levelname)s] %(message)s'
-    formatter = logging.Formatter(logformatter)
-    clean_logformatter = '%(message)s'
-    clean_formatter = logging.Formatter(clean_logformatter)
-
-    logging.basicConfig(format=logformatter, level=logging.INFO, filename=os.path.abspath("radiam_log.txt"), filemode='w')
-
-    console = logging.StreamHandler(sys.stdout)
-    if logLevel == "debug":
-        console.setLevel(logging.DEBUG)
-        radiam_logger.setLevel(logging.DEBUG)
-    elif logLevel == "error":
-        console.setLevel(logging.ERROR)
-        radiam_logger.setLevel(logging.ERROR)
-    elif logLevel == "warning":
-        console.setLevel(logging.WARNING)
-        radiam_logger.setLevel(logging.WARNING)
-    else:
-        console.setLevel(logging.INFO)
-        radiam_logger.setLevel(logging.INFO)
-    radiam_logger.info("Log level: {}".format(logLevel))
-
-    console.addFilter(lambda record: record.levelno <= logging.INFO)
-    console.setFormatter(clean_formatter)
-    logging.getLogger('').addHandler(console)
-
-    err_console = logging.StreamHandler()
-    err_console.setLevel(logging.WARNING)
-    err_console.setFormatter(formatter)
-    logging.getLogger('').addHandler(err_console)
-
-    return radiam_logger
-
-
 def update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id):
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
@@ -134,7 +90,7 @@ def main():
         raise Exception("Python 3 is required to run the Radiam agent")
 
     host = 'http://nginx'
-    logger = log_setup('info')
+    processes = []
 
     try:
         # db_config = ConfigObj(r"../config/db/db_env")
@@ -159,10 +115,14 @@ def main():
                     agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
                     API = RadiamAPI(**agent_config)
 
-                    update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id)
+                    p = multiprocessing.Process(target=update_info, args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
+                    # update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id)
+                    processes.append(p)
+                    p.start()
                 except Exception as e:
                     print('Error with OSF Project %s' %e)
-
+            for process in processes:
+                process.join()
             time.sleep(3600)
 
     except psycopg2.Error as e:
