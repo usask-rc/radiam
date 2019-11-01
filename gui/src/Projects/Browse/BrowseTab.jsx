@@ -19,9 +19,26 @@ function BrowseTab({ projectID, classes }) {
   const [status, setStatus] = useState({ loading: true, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
+  let _isMounted = false
   useEffect(() => {
-    getRootPaths(setListOfRootPaths, setStatus, projectID)
-    setStatus({loading: false});
+
+    _isMounted = true
+    
+    getRootPaths(projectID).then(data => {
+      if (_isMounted){      
+        setListOfRootPaths(data)
+        setStatus({loading: false})
+      }
+      return data
+    }).catch(err => {
+      setStatus({ loading: false, error: err })
+      console.error(err)
+    })
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
   }, [projectID]);
 
   return (
@@ -33,7 +50,7 @@ function BrowseTab({ projectID, classes }) {
       ) : listOfRootPaths && listOfRootPaths.length > 0 &&
           listOfRootPaths.map(item => {
             return <FolderView
-              expanded={true}
+              expanded={"true"}
               item={item}
               projectID={projectID}
               key={item.key}

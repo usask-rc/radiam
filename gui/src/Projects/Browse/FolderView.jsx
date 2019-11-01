@@ -1,3 +1,4 @@
+//FolderView.jsx
 import React, { useState, useEffect } from 'react';
 import {
   AddLocation,
@@ -126,16 +127,27 @@ function isFile(file) {
 }
 
 function FolderView({ projectID, item, classes, ...props }) {
+  let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);
   const [folderPath, setFolderPath] = useState(item.path);
   const [parentList, setParentList] = useState([item]);
 
   useEffect(() => {
-    getFolderFiles(setFiles, folderPath, projectID)
-  }, [folderPath]);
+    _isMounted = true
+    getFolderFiles(folderPath, projectID).then((data) => {
+      if (_isMounted){
+        setFiles(data)
+      }
+      return data
+    })
+    .catch((err => {console.error("error in getFiles is: ", err)}))
 
-  // className={classes.fileDisplay}
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+  }, [folderPath]);
 
   if (files) {
     return (

@@ -78,6 +78,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       filters={<GroupViewGrantFilter />}
       sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
       perPage={10}
+      bulkActionButtons={false}
       pagination={<CustomPagination />}
     >
       <Datagrid rowClick={Constants.resource_operations.SHOW}>

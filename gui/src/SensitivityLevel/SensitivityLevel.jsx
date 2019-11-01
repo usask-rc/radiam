@@ -17,6 +17,7 @@ import CustomPagination from "../_components/CustomPagination";
 export const SensitivityLevelList = props => (
   <List {...props} exporter={false}
     pagination={<CustomPagination />}
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TranslationField

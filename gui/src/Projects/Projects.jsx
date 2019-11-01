@@ -1,5 +1,5 @@
 //Projects.jsx
-import React, {Component} from "react";
+import React, {Component, useEffect, useState} from "react";
 import {
   Create,
   Datagrid,
@@ -22,6 +22,7 @@ import {
   withTranslate,
 } from 'react-admin';
 
+import { Field } from 'redux-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
 import * as Constants from "../_constants/index";
@@ -36,6 +37,8 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
+import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem } from "@material-ui/core";
 
 const styles = {
   actions: {
@@ -91,6 +94,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     filters={<ProjectFilter />}
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
@@ -175,8 +179,104 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     );
 }));
 
+
+
+const renderUserInput = ({ input, users }) => {
+  return (<React.Fragment>
+    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+      {...input}
+    >
+      {users && [...users].map(user => {
+        return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
+      })}
+    </Select>
+  </React.Fragment>)
+}
+
+const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
+
 export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
+  const [groupList, setGroupList] = useState([])
+  const [groupContactCandidates, setGroupContactCandidates] = useState({})
+  const [projectGroup, setProjectGroup] = useState(null)
+  const [groupContactList, setGroupContactList] = useState([])
+
+  let _isMounted = false
+  useEffect(() => {
+    _isMounted = true
+    if (projectGroup !== null){
+      getAllParentGroups(projectGroup)
+    }
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+  }, [projectGroup])
+
+  //TODO: handle potential setstate on unmounted component
+  const getAllParentGroups = group_id => {
+    if (group_id !== null){
+      getGroupData(group_id).then(
+        data => {
+
+          let tempGroupList = groupList
+          tempGroupList.push(data)
+
+          if (_isMounted){
+            setGroupList(tempGroupList)
+            getAllParentGroups(data.parent_group)
+          }
+          return data
+        }
+      ).catch(err => {
+        console.error("error returned in getallparentgroups: ", err)})
+    }
+    else{
+      //now get a list of users in each group
+      getPrimaryContactCandidates()
+    }
+  };
+
+  const getPrimaryContactCandidates = () => {
+    if (groupList){
+      let iteratedGroups = []
+
+      groupList.map(group => {
+        getUsersInGroup(group).then(data => {
+
+          let tempGroupContactCandidates = groupContactCandidates
+
+          data.map(item => {
+            tempGroupContactCandidates[item.id] = item
+          })
+
+          setGroupContactCandidates(tempGroupContactCandidates)
+          iteratedGroups.push(group)
+
+          if (iteratedGroups.length === groupList.length){
+            let groupContactList = []
+            Object.keys(tempGroupContactCandidates).map(key => {
+              groupContactList.push(groupContactCandidates[key])
+              
+            })
+
+            setGroupContactList(groupContactList)
+          }
+          
+        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+      })
+    }else{
+      console.error("no group selected from which to provide candidate contacts")
+    }
+  }
+
   if (canEditProject({ permissions, record })) {
+    if (record.group && projectGroup === null){
+      setProjectGroup(record.group)
+    }
+
     return <CardContentInner>
       <div>
         <TextInput
@@ -200,16 +300,6 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
       </div>
       <div>
         <ReferenceInput
-          resource="users"
-          className="input-small"
-          label={"en.models.projects.primary_contact_user"}
-          source={Constants.model_fields.PRIMARY_CONTACT_USER} reference="users"
-          validate={validatePrimaryContactUser}>
-          <SelectInput optionText={userSelect} />
-        </ReferenceInput>
-      </div>
-      <div>
-        <ReferenceInput
           resource="researchgroups"
           className="input-small"
           label={"en.models.projects.group"}
@@ -218,13 +308,26 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           validate={validateGroup}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
+        { groupContactList.length > 0 &&
+          <div>
+            <UserInput
+              required
+              label={"en.models.projects.primary_contact_user"}
+              placeholder={`Primary Contact`}
+              validate={validatePrimaryContactUser}
+              className="input-small"
+              users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+              />
+          </div>
+        }
         { record.id && (
-          <React.Fragment>
+          <div>
             <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
-          </React.Fragment>
-          )}
+          </div>
+        )}
       </div>
+      
     </CardContentInner>;
   }
 });

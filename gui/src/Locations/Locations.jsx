@@ -74,7 +74,11 @@ const LocationFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   </Filter>
 ));
 
-export const LocationList = withStyles(listStyles)(({ classes, ...props }) => (
+export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
+
+  const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
+
+  return(
   <List
     {...props}
     classes={{
@@ -86,9 +90,10 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => (
     filters={<LocationFilter />}
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW} {...props}>
+    <Datagrid rowClick={Constants.resource_operations.SHOW} {...other}>
       <TextField
         label={'en.models.locations.display_name'}
         source={Constants.model_fields.DISPLAY_NAME}
@@ -115,7 +120,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => (
       />
     </Datagrid>
   </List>
-));
+)});
 
 const GlobusEndpointShow = ({ record, ...rest }) =>
   record && record.globus_endpoint

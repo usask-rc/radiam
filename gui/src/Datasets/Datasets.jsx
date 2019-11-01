@@ -90,8 +90,8 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={Constants.models.DATA_COLLECTION_METHOD} source={Constants.model_fields.DATA_COLLECTION_METHOD}>
-          <SingleFieldList>
-            <TranslationChipField source={Constants.model_fields.LABEL} />
+          <SingleFieldList linkType={"show"}>
+            <TranslationChipField source={Constants.model_fields.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
 
@@ -108,7 +108,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={Constants.models.SENSITIVITY_LEVEL} source={Constants.model_fields.SENSITIVITY_LEVEL}>
-          <SingleFieldList>
+          <SingleFieldList linkType={"show"}>
             <TranslationChipField source={Constants.model_fields.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>
@@ -179,6 +179,8 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
     setDirty(true)
   }
 
+  console.log("props in datasetform are: ", props)
+
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={handleChange} redirect={Constants.resource_operations.LIST}>
     <TextInput
@@ -205,6 +207,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       source={Constants.model_fk_fields.PROJECT}
       reference={Constants.models.PROJECTS}
       validate={validateProject}
+      defaultValue={props.location.project ? props.location.project : null}
     >
       <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>

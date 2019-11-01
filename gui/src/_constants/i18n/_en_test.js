@@ -1,3 +1,4 @@
+//en.js
 import englishMessages from 'ra-language-english';
 
 export default {
@@ -254,6 +255,25 @@ export default {
       update_information: 'Update Account Information',
       password_prompt: 'Please enter and confirm a new password:',
     },
+    help: {
+      label: 'Help',
+      title: 'Radiam Help',
+      usermanual: {
+        title: 'User Manual: ',
+      },
+      developers: {
+        title: 'Developer Resources',
+        text: 'Developers can consult the Readme file located in the source repository: '
+      },
+      email: {
+        title: 'Email Support',
+        text: 'For assistance using this specific installation of Radiam, please email: ',
+      },
+      agentinstallation: 'Agent Installation',
+      download: {
+        text: 'The downloads for the Radiam agent are here: ',
+      }
+    },
     auth: {
       username: 'Username',
       password: 'Password',
@@ -376,6 +396,7 @@ export default {
       },
       groups: {
         name: 'Group Name',
+        active: 'Active',
         description: 'Description',
         parent_group: 'Parent Group',
       },
@@ -477,7 +498,6 @@ export default {
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
-        osf: 'OSF',
       },
     },
     distribution: {

@@ -65,7 +65,6 @@ export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = w
         component="span"
         variant="body1"
         className={className}
-        {...rest}
       >
         {first} {last} ({username})
         </Typography>
@@ -78,7 +77,6 @@ export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = w
         component="span"
         variant="body1"
         className={className}
-        {...rest}
       >
         {username}
       </Typography>

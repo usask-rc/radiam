@@ -11,6 +11,7 @@ import { Prompt } from 'react-router';
 export const GroupRoleList = props => (
   <List {...props} exporter={false}
     pagination={<CustomPagination />}
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TranslationField

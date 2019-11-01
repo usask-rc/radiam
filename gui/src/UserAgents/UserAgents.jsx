@@ -82,7 +82,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
-
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <ReferenceField
@@ -138,7 +138,7 @@ return(
      {controllerProps.record && controllerProps.record.project_config_list && 
       <ArrayField source={Constants.model_fields.PROJECT_CONFIG_LIST} label={"Target Projects"}>
         <SingleFieldList>
-          <ReferenceField source={Constants.model_fk_fields.PROJECT} reference={Constants.models.PROJECTS}>
+          <ReferenceField source={Constants.model_fk_fields.PROJECT} reference={Constants.models.PROJECTS} linkType="show">
             <ChipField source={Constants.model_fields.NAME} />
           </ReferenceField>
         </SingleFieldList>

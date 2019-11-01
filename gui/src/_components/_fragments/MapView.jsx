@@ -1,5 +1,5 @@
 //MapView.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import compose from 'recompose/compose';
 import { FeatureGroup, Map, Popup, TileLayer } from 'react-leaflet';
 import L from "leaflet";
@@ -34,6 +34,15 @@ const MapView = ({ classes, record }) => {
     const [mapLoading, setMapLoading] = useState(true)
     const [curFeature, setCurFeature] = useState({})
     const [mapRef, setMapRef] = useState(null)
+
+    useEffect(() => {
+        return function cleanup() {
+            if (mapRef){
+                console.log("mapRef is: ", mapRef)
+            }
+
+        }
+    }, [])
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {

@@ -6,8 +6,7 @@ const ProjectCards = ({ loading, projects }) =>
 (
     <Grid
         direction="row"
-        justify="left"
-        alignItems="start"
+        justify="flex-start"
         container
     >
         {!loading &&

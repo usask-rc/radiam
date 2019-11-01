@@ -10,6 +10,12 @@ var cloneDeep = require('lodash.clonedeep');
 export function getAPIEndpoint() {
   return `/${Constants.API_ENDPOINT}`;
 }
+/*
+//TODO: this is just needed for local testing.  this should eventually be removed.
+  if (window && window.location && window.location.port === '3000') {
+    return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
+  }
+  */
 
 export function toastErrors(data) {
   if (isObject(data)) {
@@ -28,7 +34,6 @@ export function toastErrors(data) {
       return item;
     });
   } else {
-    console.log('Error in toastErrors - what type of object is this?');
     toast.error(data);
   }
 }
@@ -54,7 +59,7 @@ export function getFirstCoordinate(layer) {
   }
 }
 
-export function getFolderFiles(setFiles, folderPath, projectID){
+export function getFolderFiles(folderPath, projectID){
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
@@ -62,8 +67,8 @@ export function getFolderFiles(setFiles, folderPath, projectID){
     pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
     sort: { field: 'last_modified', order: 'ASC' },
   };
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     
     dataProvider(
@@ -100,70 +105,26 @@ export function getFolderFiles(setFiles, folderPath, projectID){
             return 1;
           }
         });
-        resolve(setFiles(fileList));
+        resolve(fileList);
       })
-      .catch(error => {
-        //setStatus(status => (status = { loading: false, error: error }));
-        console.log('error in fetch from API: ', error);
-        reject(error)
+      .catch(err => {
+        reject(err)
       });
   });
 }
 
-export function getGroupUsers(setGroupMembers, record) {
-  return new Promise((resolve, reject) => {
-    let groupUsers = []
-
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
-    .then(groupRoles => {
-
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = record
-
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
-        }).then(response => {
-          return response.data})
-            .then(groupMembers => {
-                groupMembers.map(groupMember => {
-                    dataProvider(GET_ONE, Constants.models.USERS, {
-                        id: groupMember.user
-                    }).then(response => {
-                        return response.data
-                    }).then(user => {
-                        groupMember.user = user
-                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
-                        groupUsers = [...groupUsers, groupMember]
-                        if (groupUsers.length === groupMembers.length){
-                          setGroupMembers(groupMembers)
-                        }
-
-                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
-                    return groupMember
-                  })
-                  return groupMembers
-            })
-            .catch(err => {
-              reject("error in in get groupmembers: ", err)
-            })
-      return groupRoles
-    })
-  })
-}
-
-export function getRelatedDatasets(setDatasets, record){
+export function getRelatedDatasets(record){
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.DATASETS, 
       {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
     .then(assocDatasets => {
-      resolve(setDatasets(assocDatasets))
+      resolve(assocDatasets)
     }).catch(err => reject(err))
   })
 }
 
-export function getRootPaths(setListOfRootPaths, setStatus, projectID){
+export function getRootPaths(projectID){
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
     sort: { field: 'last_modified', order: 'ASC' },
@@ -203,21 +164,156 @@ export function getRootPaths(setListOfRootPaths, setStatus, projectID){
         for (var key in rootList) {
           rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
         }
-        resolve(setListOfRootPaths(rootPaths))
+        console.log("rootpaths being resolved: ", rootPaths)
+        resolve(rootPaths)
 
       })
       .catch(error => {
-        console.log("error in getrootpaths is: ", error)
-        reject(setStatus({ loading: false, error: error }));
+        reject(error);
       });
   });
 }
 
+export function getProjectFiles(params){
+
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+      dataProvider(
+        GET_LIST,
+        Constants.models.PROJECTS + '/' + params.id + '/search',
+        params
+      )
+      .then(response => {
+        resolve({ files: response.data, nbFiles: response.total })
+      })
+      .catch(err => {
+        reject({loading: false, error: err})
+      });
+    })
+};
+
+export function getGroupData(group_id){
+
+  return new Promise((resolve, reject) => {
+    
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
+    //get this group's details, then ascend if it has a parent.
+    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id }).then(response => {
+      resolve(response.data)
+
+    }).catch(err => {
+      reject(err)
+    })
+
+  })
+}
+
+export function getUserDetails(){
+
+  return new Promise((resolve, reject) => {
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
+      const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
+
+        if (response.data.id === localID) {
+          resolve(response.data)
+        }
+        else {
+          reject({redirect: true})
+          toastErrors(Constants.warnings.NO_AUTH_TOKEN)
+        }
+    }).catch(err => {
+      reject(err)
+      toastErrors("Could not connect to server.  Please login and try again.")
+    }
+    );
+  })
+}
+
+export function getUsersInGroup(record){
+  console.log("record called to getusersin group: ", record)
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const { id, is_active } = record
+
+    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+      filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+  }).then(response => {
+    console.log("getUsersInGroup queried with record: ", response)
+    if (response && response.total === 0){
+      resolve([])
+    }
+    return response.data
+  }).then(groupMembers => {
+
+      groupMembers.map(groupMember => {
+        dataProvider(GET_ONE, Constants.models.USERS, {
+          id: groupMember.user
+        }).then(response => {
+          return response.data
+        }).then(user => {
+          groupMember.user = user
+          groupUsers = [...groupUsers, user]
+
+          if (groupUsers.length === groupMembers.length){
+            console.log("data resolved is: ", groupUsers)
+            resolve(groupUsers)
+          }
+        }).catch(err => reject("error in attempt to get user: ", err))
+        return groupMember
+      })
+    return groupMembers
+  }).catch(err => reject("error in attempt to fetch groupMembers: ", err))
+})
+}
+
+export function getGroupUsers(record) {
+  return new Promise((resolve, reject) => {
+    let groupUsers = []
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
+    .then(groupRoles => {
+
+        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+        const { id, is_active } = record
+
+        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
+        }).then(response => {
+
+          return response.data})
+            .then(groupMembers => {
+                groupMembers.map(groupMember => {
+                    dataProvider(GET_ONE, Constants.models.USERS, {
+                        id: groupMember.user
+                    }).then(response => {
+                        return response.data
+                    }).then(user => {
+                        groupMember.user = user
+                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
+                        groupUsers = [...groupUsers, groupMember]
+                        if (groupUsers.length === groupMembers.length){
+                          resolve(groupMembers)
+                        }
+
+                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
+                    return groupMember
+                  })
+                  return groupMembers
+            })
+            .catch(err => {
+              reject("error in in get groupmembers: ", err)
+            })
+      return groupRoles
+    })
+  })
+}
+
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
-  
     let userGroupMembers = []
-
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
     .then(groupRoles => {
@@ -284,7 +380,9 @@ function updateObjectWithGeo(formData, geo, props){
   props.save(formData, Constants.resource_operations.LIST);
 }
 
-export function createObjectWithGeo(formData, geo, props, redirect){
+
+//TODO: When creating Projects, there is a failure somewhere here.
+export function createObjectWithGeo(formData, geo, props){
   let headers = new Headers({ "Content-Type": "application/json" });
   const token = localStorage.getItem(Constants.WEBTOKEN);
   
@@ -308,7 +406,7 @@ export function createObjectWithGeo(formData, geo, props, redirect){
           throw new Error(response.statusText);
       })
       .then(data => {
-        console.log("data in createobjectiwhtgeo is: ", data)
+        console.log("data in createobjectwithgeo is: ", data)
         //some data exists - add in the object ID before submission
         if (geo && geo.content_type) {
             data.geo = geo
@@ -341,7 +439,7 @@ export function createObjectWithGeo(formData, geo, props, redirect){
         })
         .then(data => {  
             console.log("data after update is: ", data)
-            props.history.push(`${redirect}/`)
+            props.history.push(`/${props.resource}`)
         })
       }
       )

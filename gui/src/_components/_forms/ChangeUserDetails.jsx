@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button, CardActions, TextField, Typography } from "@material-ui/core";
 import * as Constants from "../../_constants/index";
-import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
+import { getAPIEndpoint, toastErrors, getUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
 import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
@@ -58,6 +58,7 @@ const styles = theme => ({
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangeDetails extends Component {
 
+    
     handleSubmit = event => {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const params = { data: this.state, id: this.state.id }
@@ -75,35 +76,41 @@ class ChangeDetails extends Component {
         event.preventDefault();
     }
 
-    getUserDetails() {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
-            const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
-
-            console.log("id as stored in local storage is: ", localID)
-            if (response.data.id === localID) {
-                this.setState(response.data)
+    getCurrentUserDetails() {
+        getUserDetails().then(data => 
+        {
+            if (this.state.mounted){
+                this.setState(data)
             }
-            else {
+            else{
                 this.setState({redirect: true})
-                toastErrors(Constants.warnings.NO_AUTH_TOKEN)
             }
-        }).catch(err => {
-            this.setState({redirect: true})
-            toastErrors("Could not connect to server.  Please login and try again.")
-        }
-        );
+            return data
+        })
+        .catch(err => 
+            {
+                if (this.state.mounted)
+                {
+                    this.setState({redirect: true})
+                }
+            }
+        )
     }
 
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null }
+        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null, mounted: false }
     }
 
     componentDidMount() {
-        this.getUserDetails();
+        this.setState({mounted: true})
+        this.getCurrentUserDetails();
+    }
+
+    componentWillUnmount(){
+        this.setState({mounted: false})
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
@@ -155,7 +162,6 @@ class ChangeDetails extends Component {
                                             type={Constants.model_fields.EMAIL} />
                                     </div>
                                     <div className={styles.input}>
-
                                         <TextField
                                             id={Constants.model_fields.ORCID_ID}
                                             label={englishMessages.en.models.users.user_orcid_id}
