@@ -325,6 +325,15 @@ export default {
       file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
+      first_steps: {
+        subtitle: 'Getting Started',
+        admin: {
+          content: 'Welcome!  The first thing you should do to get started is to create a Research Group.  Head over to the Groups tab on the left hand menu to create a new Research Group that will host your Project.',
+        },
+        user: {
+          content: 'It seems that you aren\'t assigned to any Research Groups yet.  Contact your Group Administrator or Group Data Manager to have them add you to the appropriate Research Group.'
+        },
+      },
       grants: 'View Grants',
       groups: 'Groups',
       groupmembers: 'Group Membership',
@@ -344,7 +353,7 @@ export default {
       users: 'Users',
       welcome: {
         title: 'Radiam',
-        subtitle: 'Getting Started',
+        subtitle: 'Welcome',
         content:
           'Browse existing Project data in the Projects sidebar, or see the most recently updated files below.',
       },

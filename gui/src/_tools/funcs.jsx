@@ -8,14 +8,14 @@ var cloneDeep = require('lodash.clonedeep');
 
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
-  return `/${Constants.API_ENDPOINT}`;
-}
-/*
-//TODO: this is just needed for local testing.  this should eventually be removed.
+
+  //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
     return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
   }
-  */
+
+  return `/${Constants.API_ENDPOINT}`;
+}
 
 export function toastErrors(data) {
   if (isObject(data)) {

@@ -1,3 +1,4 @@
+//Dashboard.jsx
 import React, { Component } from 'react';
 import { GET_LIST } from 'react-admin';
 import { httpClient, radiamRestProvider } from '../_tools';

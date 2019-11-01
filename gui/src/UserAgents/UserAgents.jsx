@@ -160,10 +160,6 @@ return(
       }
     
       <TextField
-        label={"en.models.agents.crawl_minutes"}
-        source={Constants.model_fields.CRAWL_MINUTES}
-      />
-      <TextField
         label={"en.models.agents.version"}
         source={Constants.model_fields.VERSION}
       />
@@ -178,7 +174,6 @@ return(
 )};
 
 const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
-const validateCrawlTime = [number(), minValue(1)]
 const validateLocation=required('en.validate.useragents.location')
 const validateUser = required('en.validate.useragents.user');
 
@@ -236,9 +231,6 @@ export const UserAgentCreate = props => {
         </Grid>
         <Grid xs={12}>
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
-        </Grid>
-        <Grid xs={12}>
-        <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
         </Grid>
         <Grid xs={12}>
         <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
@@ -306,9 +298,6 @@ export const UserAgentEdit = props => {
           </SimpleFormIterator>
         </ArrayInput>
           <Grid container direction="row">
-          <Grid xs={12}>
-            <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
-          </Grid>
           <Grid xs={12}>
             <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
           </Grid>

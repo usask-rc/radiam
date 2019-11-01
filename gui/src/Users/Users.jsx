@@ -90,7 +90,6 @@ const PostBulkActionButtons = props => (
 
 
 export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
-  console.log("props in userList are: ", props)
 
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
 

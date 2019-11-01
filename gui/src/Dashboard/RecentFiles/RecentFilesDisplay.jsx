@@ -113,7 +113,7 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
             {translate('en.dashboard.recentfiles')}
             <TextField
               id="dateLimit"
-              label="Days Since Crawl"
+              label="Days Since Last Crawl"
               type="number"
               className={classes.dateLimitSelection}
               value={dateLimit}
