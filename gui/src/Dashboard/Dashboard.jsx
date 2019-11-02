@@ -92,6 +92,7 @@ class Dashboard extends Component {
               const now = moment();
 
               project.files = docs.filter(file => {
+                
                 const date_indexed = moment(file.indexed_date).toISOString();
 
                 const timeDiff = now.diff(date_indexed, 'days');
@@ -103,7 +104,6 @@ class Dashboard extends Component {
                 }
                 return null
               });
-
               this.setState({ loading: false, hasFiles: docs.length > 0 ? true : this.state.hasFiles });
             })
             .catch(error => {

@@ -16,7 +16,6 @@ export const AgentShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
     record = {},
     ...rest
 }) => {
-    console.log("agentshow record is: ", record)
     const display_location = get(record, Constants.model_fields.LOCATION);
     const display_user = get(record, Constants.model_fk_fields.USER);
     if (display_location) {

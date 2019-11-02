@@ -43,6 +43,51 @@ const styles = {
 Regular users / Mid Level - `you are not a member of any groups.  ask your group admin to add you to a group`
 Group Admins: `you are not a member of any research groups.  Please add yourself to at least one group. (and create if no such group exists)
 
+TODO: create an itemized list of helper steps.
+
+```
+(Admin)
+1. Create Group(s) (Completed)
+2. Create Users.
+3. Assign Users to associated group(s)
+4. Create a Location from which to assign a Crawler.
+5. Create a Project with which to Crawl to.
+  a. This in turn creates an associated Dataset.
+6. Crawl data to the associated Project.
+```
+(Group Admin)
+For GA and DM, in order to have this user role, they must already be assigned to some group.
+Therefore the warnings should only be `the group you are in has no users / no data managers other than yourself` or `project has no files` or `project does not exist` sort of thing.
+
+1. Create Group(s) (Completed) 
+2. Create Users.
+3. Assign Users to associated group(s)
+4. Create a Location from which to assign a Crawler.
+5. Create a Project with which to Crawl to.
+  a. This in turn creates an associated Dataset.
+6. Crawl data to the associated Project.
+
+For GA and DM, in order to have this user role, they must already be assigned to some group.
+Therefore the warnings should only be `the group you are in has no users / no data managers other than yourself` or `project has no files` or `project does not exist` sort of thing.
+
+
+(Data Manager)
+(review what permissions a DM should have)
+1.
+2.
+3.
+4.
+5.
+6.
+
+(User)
+1. n/a
+2. n/a
+3. `You are not in a group, ask your supervisor`
+4. n/a
+5. `You have no Project / Project View access.  request this from a supervisor`
+6. n/a
+
 
 `next steps` afterwards?
 */
