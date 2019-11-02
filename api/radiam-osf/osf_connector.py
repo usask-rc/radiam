@@ -93,11 +93,20 @@ def main():
     processes = []
 
     try:
-        # db_config = ConfigObj(r"../config/db/db_env")
         db_config = ConfigObj(r"/code/config/db/db_env")
-        # db_hostname = 'localhost'
-        db_hostname = 'db'
-        conn = psycopg2.connect(host=db_hostname, dbname=db_config['POSTGRES_DB'], user=db_config['POSTGRES_USER'], password=db_config['POSTGRES_PASSWORD'])
+        db_name = db_config['POSTGRES_DB']
+        db_user = db_config['POSTGRES_USER']
+        db_password = db_config['POSTGRES_PASSWORD']
+        if os.path.isdir('/run/secrets/'):
+            for filename in os.listdir('/run/secrets/'):
+                with open(os.path.join('/run/secrets/', filename), 'r') as secrets_file:
+                    os.environ[filename] = secrets_file.read()
+        if os.environ:
+            db_name = os.environ.get('POSTGRES_DB', db_name)
+            db_user = os.environ.get('POSTGRES_USER', db_user)
+            db_password = os.environ.get('POSTGRES_PASSWORD', db_password)
+
+        conn = psycopg2.connect(host='db', dbname=db_name, user=db_user, password=db_password)
         cursor = conn.cursor(cursor_factory=None)
 
         while True:
