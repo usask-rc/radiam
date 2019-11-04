@@ -24,6 +24,7 @@ const WelcomeCards = () => {
         }
     }
 
+    //TODO: protect against memory leakage
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     if (user){
         getUserGroups(user.id).then(data => {
