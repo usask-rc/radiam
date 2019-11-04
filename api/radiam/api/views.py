@@ -86,7 +86,8 @@ from .models import (
     SelectedSchema,
     SensitivityLevel,
     User,
-    UserAgent)
+    UserAgent,
+    UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_project_created, radiam_project_deleted
 
@@ -498,6 +499,21 @@ class UserAgentViewSet(RadiamViewSet):
        UserAgentOrderingFilter,
     )
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return UserAgentOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            return super().filter_queryset(queryset).filter(agent_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class ResearchGroupOrderingFilter(RadiamOrderingFilter):
     def get_replacements(self):
@@ -774,6 +790,27 @@ class LocationViewSet(RadiamViewSet):
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            agents = UserAgent.objects.all().filter(agent_id_qs)
+            if agents.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            location_id_qs = Q()
+            for agent in agents:
+                location_id_qs = location_id_qs | Q(id=agent.location.id)
+            return super().filter_queryset(queryset).filter(location_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class LocationTypeViewSet(RadiamViewSet):
     """
