@@ -25,6 +25,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
 from django.core.validators import RegexValidator
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -715,9 +716,12 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
-        entity = Entity.objects.get(project=self.id)
-        entity.delete()
-        
+        try:
+            entity = Entity.objects.get(project=self.id)
+            entity.delete()
+        except ObjectDoesNotExist:
+            pass
+
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
