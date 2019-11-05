@@ -35,12 +35,12 @@ const MapView = ({ classes, record }) => {
     const [curFeature, setCurFeature] = useState({})
     const [mapRef, setMapRef] = useState(null)
 
-    useEffect(() => {
-        return function cleanup() {
-            if (mapRef){
-                console.log("mapRef is: ", mapRef)
-            }
+    let _isMounted = false
 
+    useEffect(() => {
+        _isMounted = true
+        return function cleanup() {
+            _isMounted = false
         }
     }, [])
 
@@ -48,13 +48,17 @@ const MapView = ({ classes, record }) => {
     function _onLayerClick(e) {
         var layer = e.target;
 
-        setLocation([e.latlng.lat, e.latlng.lng])
-        setCurFeature(layer.feature)
-        setPopup({active: true, for: layer._leaflet_id})
+        if (_isMounted){
+            setLocation([e.latlng.lat, e.latlng.lng])
+            setCurFeature(layer.feature)
+            setPopup({active: true, for: layer._leaflet_id})
+        }
     }
 
     function _onPopupClose() {
+        if (_isMounted){
         setPopup({popup: {active: false, for: ""}})
+        }
     }
 
     //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
@@ -96,7 +100,8 @@ const MapView = ({ classes, record }) => {
                     return key
                 })
             }
-        setMapLoading(false)
+        if (_isMounted)
+        {setMapLoading(false)}
         
     }
 
@@ -134,8 +139,9 @@ const MapView = ({ classes, record }) => {
 
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
+            if (_isMounted){
             setLocation(latLng)
-            setMapLoading(false)
+            setMapLoading(false)}
         }
 
     }

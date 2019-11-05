@@ -91,7 +91,8 @@ Therefore the warnings should only be `the group you are in has no users / no da
 
 `next steps` afterwards?
 */
-const FirstSteps = ({ classes, userType, translate }) => (
+const FirstSteps = ({ classes, userType, translate }) => {
+  return(
     <Card className={classes.container}>
       <CardContent>
         <Typography className={classes.headlineTop} variant="h5" component="h5">
@@ -104,7 +105,7 @@ const FirstSteps = ({ classes, userType, translate }) => (
         <Button variant="contained" color="primary" href="/#/researchgroups/create" className={classes.button}>{`Create a Research Group`}</Button>
       </CardContent>
     </Card>
-  );
+  )};
   
   const enhance = compose(
     withStyles(styles),
