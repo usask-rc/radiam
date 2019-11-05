@@ -453,6 +453,23 @@ class UserAgentSerializer(serializers.ModelSerializer):
                 # no matching UserAgentProjectConfig exists for this agent
                 # create one from the passed in pro'project_config'
 
+    def validate_location(self, value):
+        """
+        Ensure the location being entered is valid
+        """
+        # Enforce unique OSF locations for agents
+        if value.location_type.label == "location.type.osf":
+            if self.context['view'].kwargs.get('pk') is None:
+                useragents = UserAgent.objects.all()
+            else:
+                useragents = UserAgent.objects.all().exclude(id=self.initial_data['id'])
+
+            for u in useragents:
+                if u.location == value:
+                    raise ValidationError("Duplicate OSF locations for agents is not allowed")
+                
+        return value
+
 
 class NestedProjectUserAgentProjectConfigSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
