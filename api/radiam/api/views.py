@@ -1113,61 +1113,66 @@ class ProjectSearchViewSet(viewsets.ViewSet):
             while True:
                 doc_id = self.cache.gets(key)
                 if doc_id is None:
-                    check_existing = RadiamService(project_id)
-                    search = check_existing.get_search() \
-                        .query('term', path__keyword=data['path']) \
-                        .query('term', name__keyword=data['name']) \
-                        .query('term', location__keyword=data['location']) \
-                        .query('term', agent__keyword=data['agent']) \
-                        .source(None)
+                    if self.cache.cas(key, "Caching"):
+                        check_existing = RadiamService(project_id)
+                        search = check_existing.get_search() \
+                            .query('term', path__keyword=data['path']) \
+                            .query('term', name__keyword=data['name']) \
+                            .query('term', location__keyword=data['location']) \
+                            .query('term', agent__keyword=data['agent']) \
+                            .source(None)
 
-                    if settings.TRACE:
-                        print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
-                    response = search.execute()
+                        if settings.TRACE:
+                            print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
+                        response = search.execute()
 
-                    if response.hits.total == 0:
-                        if settings.DEBUG:
-                            print("New doc for " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id)
-                        doc = ESDataset(**data)
-                        radiam_service.create_single_doc(project_id, doc)
-                        id = doc.meta["id"]
-                        if self.cache.cas(key, id):
-                            serializer = ESDatasetSerializer()
-                            response = Response(serializer.to_representation(doc))
-                            break
+                        if response.hits.total == 0:
+                                if settings.DEBUG:
+                                    print("New doc for " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id)
+                                doc = ESDataset(**data)
+                                radiam_service.create_single_doc(project_id, doc)
+                                id = doc.meta["id"]
+                                self.cache.set(key, id)
+                                serializer = ESDatasetSerializer()
+                                response = Response(serializer.to_representation(doc))
+                                break
+                        elif response.hits.total == 1:
+                            id = str(response.hits[0].meta.id)
+                            if settings.DEBUG:
+                                print("Updating " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with id " + id)
+                            try:
+                                response = self.update(request, project_id, id)
+                                self.cache.set(key, id)
+                                break;
+                            except es_exceptions.NotFoundError as e:
+                                self.cache.delete(key)
+                            except Exception as e:
+                                print("Unable to update " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with id " + id + " because " + str(e))
                         else:
                             if settings.DEBUG:
-                                print("Deleting duplicate doc " + id + " for " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " to try to get the document id from the cache instead.")
-                            # The document has been created while we have been searching and creating this doc.
-                            # Delete the one we created and try again to get the doc id from the cache.
-                            doc.delete()
-                    elif response.hits.total == 1:
-                        id = str(response.hits[0].meta.id)
-                        if settings.DEBUG:
-                            print("Updating " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with id " + id)
-                        # We don't mind if someone else has updated the id before us.
-                        response = self.update(request, project_id, id)
-                        self.cache.cas(key, id)
-                        break;
+                                print("Updating and deleting " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + ", and need to delete the older entries. There were a total of " + str(response.hits.total) + " docs")
+                            newest = response.hits[0]
+                            for hit in response.hits:
+                                if hit is not newest and hit.indexed_date > newest.indexed_date:
+                                    newest = hit
+                            for hit in response.hits:
+                                if hit is not newest:
+                                    self.perform_destroy(project_id, hit.meta.id)
+                            response = self.update(request, project_id, newest.meta.id)
+                            self.cache.set(key, newest.meta.id)
                     else:
-                        if settings.DEBUG:
-                            print("Updating and deleting " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + ", and need to delete the older entries. There were a total of " + str(response.hits.total) + " docs")
-                        newest = response.hits[0]
-                        for hit in response.hits:
-                            if hit is not newest and hit.indexed_date > newest.indexed_date:
-                                newest = hit
-                        for hit in response.hits:
-                            if hit is not newest:
-                                self.perform_destroy(project_id, hit.meta.id)
-                        response = self.update(request, project_id, newest.meta.id)
-                        if self.cache.cas(key, newest.meta.id):
-                            break
+                        if settings.TRACE:
+                            print("Someone else has already started creating the document and there is no doc id, we'll try again")
                 else:
-                    # The document was in the cache
-                    if settings.DEBUG:
-                        print("Updating using cache " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with doc id " + doc_id)
-                    response = self.update(request, project_id, doc_id)
-                    break
+                    if doc_id is not "Caching":
+                        # The document was in the cache
+                        if settings.DEBUG:
+                            print("Updating using cache " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with doc id " + doc_id)
+                        response = self.update(request, project_id, doc_id)
+                        break
+                    else:
+                        if settings.TRACE:
+                            print("Someone else has already started creating the document and our doc id is Caching, we'll try again")
 
             return response
 
