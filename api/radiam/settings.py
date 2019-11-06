@@ -245,6 +245,8 @@ if str(os.environ.get('SESSIONAUTH')) == "1":
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 
+MEMCACHE = 'api_memcached_1:11211'
+
 # Caching required for throttling of rest requests. Recommended to use either
 # database or memcaching in production. Mem should decrease load on database.
 # Will want to switch to IP
@@ -252,7 +254,7 @@ if str(os.environ.get('SESSIONAUTH')) == "1":
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'api_memcached_1:11211',
+        'LOCATION': MEMCACHE,
     }
 }
 
