@@ -1,0 +1,29 @@
+# Pull base image
+FROM python:3.7.3
+
+# Set environment varibles
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set Work directory
+WORKDIR /code
+
+RUN pip install --upgrade pip
+
+# Copy requirements.txt file and install
+## Copy the requirements and run pip install on a new line.
+## This is a Docker optimization that will pull these steps into their own 'layer'.
+## If this step is below the code copying step, then every time something changes in the
+## codebase, Docker will try to reinstall all the requirements, even if they didn't change.
+COPY radiam-osf/requirements.txt /code/requirements.txt
+RUN pip install -r /code/requirements.txt
+
+# copy code in
+## For some reason using the wildcard character 'radiam-osf/*' didnt copy the osf-api directory
+COPY radiam-osf/ /code/
+
+# Copy dev postgres credentials over
+COPY config /code/config
+
+# Install waitforit script for blocking until postgres is up
+RUN git clone https://github.com/usask-rc/wait-for-it.git /wait-for-it

@@ -4,6 +4,7 @@ import ConfirmPassword from "../_fragments/ConfirmPassword";
 import * as Constants from "../../_constants/index";
 import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
 import RequestPassword from "../_fragments/RequestPassword";
+import {Redirect} from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast } from "react-toastify";
 
@@ -58,7 +59,8 @@ class ChangePassword extends Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = { password: "", newPassword: "", confirmPassword: ""}
+    this.state = { password: "", newPassword: "", confirmPassword: "", redirect:false}
+    this.changePassword = this.changePassword.bind(this)
   }
 
   changePassword(userID) {
@@ -66,6 +68,7 @@ class ChangePassword extends Component {
 
     const token = localStorage.getItem(Constants.WEBTOKEN);
 
+    console.log("token and userid are: ", token, userID)
     if (token) {
       const parsedToken = JSON.parse(token);
       headers.set("Authorization", `Bearer ${parsedToken.access}`);
@@ -75,7 +78,7 @@ class ChangePassword extends Component {
       toastErrors(
         Constants.warnings.NO_AUTH_TOKEN
       );
-      return;
+      this.setState({redirect: true})
     }
 
     const request = new Request(
@@ -119,7 +122,6 @@ class ChangePassword extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-
     //get uuid from storage
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     if (user && user.id) {
@@ -134,18 +136,21 @@ class ChangePassword extends Component {
     }
     //TODO: if we're somehow here and there is no user in localstorage, we need to log out. Probably want a toast to indicate this.
     else {
+      toastErrors(
+        Constants.warnings.NO_AUTH_TOKEN
+      );
+      this.setState({redirect: true})
     }
   };
 
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
   };
-
-  //TODO: the strings below aren't in the translation file - I can't figure out how to get them to translate properly here.
-  //TODO: tags below (form, h4) should be converted to material-ui element.
-  state = {};
+  
   render() {
+    console.log("state in changepassword is: ", this.state)
     return (
+      <React.Fragment>
       <Responsive
         medium={
           <React.Fragment>
@@ -173,6 +178,8 @@ class ChangePassword extends Component {
           </React.Fragment>
         }
       />
+      {this.state.redirect && <Redirect to="/login"/>}
+      </React.Fragment>
     );
   }
 }

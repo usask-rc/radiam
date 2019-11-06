@@ -1,3 +1,4 @@
+//FileDetails.jsx
 import React from 'react';
 import { AgentShow } from '../_fields/AgentShow';
 import compose from 'recompose/compose';

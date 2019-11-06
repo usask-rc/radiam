@@ -25,14 +25,15 @@ const styles = theme => ({
 
 export const ProjectAvatarsList = withStyles(styles)(({ classes, ...props }) => (
   <List {...props} exporter={false}
-    sort={{ field: "avatar_image", order: "DESC" }}
+    sort={{ field: Constants.model_fields.AVATAR_IMAGE, order: "DESC" }}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <ImageField
         classes={classes}
-        source="avatar_image"
-        title="avatar_image"
+        source={Constants.model_fields.AVATAR_IMAGE}
+        title={Constants.model_fields.AVATAR_IMAGE}
         label={"en.models.project_avatars.avatar_image"} />
       <NumberField
         source="width"
@@ -49,8 +50,8 @@ export const ProjectAvatarsShow = withStyles(styles)(({ classes, ...props }) => 
     <SimpleShowLayout>
       <ImageField
         classes={classes}
-        source="avatar_image"
-        title="avatar_image"
+        source={Constants.model_fields.AVATAR_IMAGE}
+        title={Constants.model_fields.AVATAR_IMAGE}
         label={"en.models.project_avatars.avatar_image"} />
       <NumberField
         source="width"
@@ -68,15 +69,15 @@ const ProjectAvatarForm = ({ classes, translate, ...props }) => {
   return <SimpleForm {...props} redirect={Constants.resource_operations.LIST}>
     <ImageInput
       wultiple={false}
-      source="avatar_image"
+      source={Constants.model_fields.AVATAR_IMAGE}
       label="en.models.project_avatars.avatar_image"
       accept="image/*"
       placeholder={translate('en.models.project_avatars.drop_image')}
       validate={validateAvatar}>
       <ImageField
         classes={classes}
-        source="avatar_image"
-        title="title"
+        source={Constants.model_fields.AVATAR_IMAGE}
+        title={Constants.model_fields.TITLE}
       />
     </ImageInput>
   </SimpleForm>

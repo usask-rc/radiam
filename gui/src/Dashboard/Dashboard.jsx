@@ -1,3 +1,4 @@
+//Dashboard.jsx
 import React, { Component } from 'react';
 import { GET_LIST } from 'react-admin';
 import { httpClient, radiamRestProvider } from '../_tools';
@@ -6,15 +7,17 @@ import { Responsive } from 'react-admin';
 import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
 import moment from 'moment';
-import WelcomeGrid from './Welcome/WelcomeCards';
+import WelcomeCards from './Welcome/WelcomeCards';
 import RecentFiles from './RecentFiles/RecentFiles';
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
+    console.log("props of dashboard are: ", props)
     this.state = { loading: true, hasFiles: false };
   }
 
+  //TODO: handle potential setstate on unmounted component
   getRecentUsers = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
@@ -32,6 +35,7 @@ class Dashboard extends Component {
       });
   };
 
+  //TODO: handle potential setstate on unmounted component
   getRecentGroups = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
@@ -53,6 +57,7 @@ class Dashboard extends Component {
 
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
+  //TODO: handle potential setstate on unmounted component
   getRecentProjects = (dateLimit = 21) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
@@ -87,6 +92,7 @@ class Dashboard extends Component {
               const now = moment();
 
               project.files = docs.filter(file => {
+                
                 const date_indexed = moment(file.indexed_date).toISOString();
 
                 const timeDiff = now.diff(date_indexed, 'days');
@@ -98,7 +104,6 @@ class Dashboard extends Component {
                 }
                 return null
               });
-
               this.setState({ loading: false, hasFiles: docs.length > 0 ? true : this.state.hasFiles });
             })
             .catch(error => {
@@ -126,7 +131,7 @@ class Dashboard extends Component {
       <Responsive
         medium={
           <React.Fragment>
-            <WelcomeGrid />
+            <WelcomeCards />
             {!this.state.loading &&
               <React.Fragment>
                 <ProjectCards {...this.state} />

@@ -1,13 +1,12 @@
+//Groups.jsx
 import React, { Component, useEffect, useState } from "react";
 import {
   BooleanField,
   BooleanInput,
-  CreateButton,
   Create,
   Datagrid,
   DateInput,
   Edit,
-  ExportButton,
   Filter,
   List,
   ReferenceField,
@@ -23,20 +22,17 @@ import {
   translate,
   withTranslate,
 } from "react-admin";
-import { Typography } from "@material-ui/core";
-import { EditToolbar } from "../_components";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
-import { withStyles } from "@material-ui/core/styles";
+import compose from "recompose/compose";
+import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
+import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import compose from "recompose/compose";
 import { Prompt } from 'react-router';
-import { CardActions } from "@material-ui/core";
 import RelatedUsers from "./RelatedUsers";
+import { withStyles } from "@material-ui/core/styles";
+import { Typography } from "@material-ui/core";
 
 
 const styles = {
@@ -77,10 +73,16 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
     </ReferenceInput>
+    <BooleanInput
+      label={"en.models.groups.active"}
+      defaultValue={true}
+      source={Constants.model_fields.ACTIVE} />
   </Filter>
 ));
 
-export const GroupList = withStyles(styles)(({ classes, ...props }) => (
+export const GroupList = withStyles(styles)(({ classes, ...props }) => {
+
+  return(
   <List
     {...props}
     classes={{
@@ -93,7 +95,8 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
-  >
+    bulkActionButtons={false}>
+
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TextField
         label={"en.models.groups.name"}
@@ -117,13 +120,15 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => (
       </ReferenceField>
     </Datagrid>
   </List>
-));
+)
+
+});
 
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
     return(
   <Show title={<GroupTitle />} {...props}>
     <SimpleShowLayout>
-    <RelatedUsers {...props} />
+      <RelatedUsers {...props} />
 
       <TextField
         label={"en.models.groups.name"}
@@ -150,11 +155,11 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         />
       </ReferenceField>
 
-      /** Needs a ShowController to get the record into the ShowMetadata **/
+      {/** Needs a ShowController to get the record into the ShowMetadata **/}
       <ShowController translate={translate} {...props}>
         { controllerProps => (
           <ShowMetadata
-            type="group"
+            type={Constants.model_fk_fields.GROUP}
             translate={translate}
             record={controllerProps.record}
             basePath={controllerProps.basePath}
@@ -202,45 +207,46 @@ const GroupForm = props =>
   function handleChange(data){
     setIsFormDirty(true)
   }
-return(
-  <SimpleForm
-    {...props}
-    toolbar={<EditToolbar />}
-    asyncValidate={asyncValidate}
-    asyncBlurFields={[ Constants.model_fields.NAME ]}
-    onChange={handleChange}
-    save={handleSubmit}
-  >
-    <TextInput
-      label={"en.models.groups.name"}
-      source={Constants.model_fields.NAME}
-      validate={validateName}
-    />
-    <TextInput
-      label={"en.models.groups.description"}
-      source={Constants.model_fields.DESCRIPTION}
-      validate={validateDescription}
-    />
-    <BooleanInput
-      label={"en.models.generic.active"}
-      defaultValue={true}
-      source={Constants.model_fields.ACTIVE}
-    />
-    <ReferenceInput
-      label={"en.models.groups.parent_group"}
-      source={Constants.model_fk_fields.PARENT_GROUP}
-      reference={Constants.models.GROUPS}
-      validate={validateParentGroup}
-      allowEmpty
+
+  return(
+    <SimpleForm
+      {...props}
+      toolbar={<EditToolbar />}
+      asyncValidate={asyncValidate}
+      asyncBlurFields={[ Constants.model_fields.NAME ]}
+      onChange={handleChange}
+      save={handleSubmit}
     >
-      <SelectInput
+      <TextInput
         label={"en.models.groups.name"}
-        optionText={Constants.model_fields.NAME}
+        source={Constants.model_fields.NAME}
+        validate={validateName}
       />
-    </ReferenceInput>
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-  </SimpleForm>
-)
+      <TextInput
+        label={"en.models.groups.description"}
+        source={Constants.model_fields.DESCRIPTION}
+        validate={validateDescription}
+      />
+      <BooleanInput
+        label={"en.models.generic.active"}
+        defaultValue={true}
+        source={Constants.model_fields.ACTIVE}
+      />
+      <ReferenceInput
+        label={"en.models.groups.parent_group"}
+        source={Constants.model_fk_fields.PARENT_GROUP}
+        reference={Constants.models.GROUPS}
+        validate={validateParentGroup}
+        allowEmpty
+      >
+        <SelectInput
+          label={"en.models.groups.name"}
+          optionText={Constants.model_fields.NAME}
+        />
+      </ReferenceInput>
+      <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    </SimpleForm>
+  )
 };
 
 export const GroupCreate = props => {
@@ -261,10 +267,6 @@ class BaseGroupEdit extends Component {
   }
 
   render() {
-    const closeDrawer = () => event => {
-      this.setState({ config:  false});
-    };
-
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 
@@ -302,8 +304,8 @@ class BaseGroupEdit extends Component {
         </ReferenceInput>
         { this.props.id && (
           <React.Fragment>
-            <EditMetadata id={this.props.id} type="group"/>
-            <ConfigMetadata id={this.props.id} type="group"/>
+            <EditMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
+            <ConfigMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
           </React.Fragment>
           )}
       </SimpleForm>

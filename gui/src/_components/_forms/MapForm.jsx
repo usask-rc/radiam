@@ -1,11 +1,14 @@
+//MapForm.jsx
 import React, { Component } from 'react'
 import { Map, TileLayer, FeatureGroup, Popup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
 import L from "leaflet";
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
-import { withStyles } from '@material-ui/core';
+import { withStyles, Typography } from '@material-ui/core';
 import equal from "fast-deep-equal"
+import { getFirstCoordinate } from '../../_tools/funcs';
+import * as Constants from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -14,25 +17,24 @@ const styles = {
     },
     mapPopup: {
         width: '260px',
+    },
+    mapTitle: {
+        marginTop: "2em",
+        marginBottom: "2em",
     }
-  };
+};
 //NOTE: adding returns in the arrow functions somehow breaks the map.  the warnings will persist for now.
 //TODO: some duplicate processing occurs here and needs to be refactored.
 class MapForm extends Component {
     constructor(props){
         super(props);
-        this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapLoading: true, features: {}, popup:{active:false, for:""}, prevProperties: {}}
+        console.log("imported props from parent in MapForm is: ", this.props)
+        this.state = {geo: props.recordGeo ? props.recordGeo : {}, mapRef: null, mapLoading: true, features: {}, notDisplayedFeatures: [], popup:{active:false, for:""}, prevProperties: {}}
         this.updateGeo = this.updateGeo.bind(this)
         this._updateFeatures = this._updateFeatures.bind(this)
         this.featuresCallback = this.featuresCallback.bind(this)
         this.success = this.success.bind(this)
         this._onPopupClose = this._onPopupClose.bind(this)
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot){
-        if (!equal(prevState.geo, this.state.geo)){
-            console.log("geo has updated in mapform.  new state: ", this.state)
-        }
     }
 
     error(err) {
@@ -41,7 +43,6 @@ class MapForm extends Component {
 
     //here is where we handle different data management cases for features
     featuresCallback = (layer) => {
-        console.log("feature sent to featurescallback is: ", layer)
         if (typeof layer === 'string'){
             const featureList = {...this.state.features};
             delete featureList[layer]
@@ -68,6 +69,7 @@ class MapForm extends Component {
         else if (layer._latlngs && typeof layer._latlngs[0] === 'object' && layer._latlngs[0].lat){
             layer._latlngs.map(coord => {
                 coords = [...coords, [this._normLng(coord.lng), coord.lat]]
+                return coord
             })
         }
         //if we have an object on the third layer down, it's a polygon.
@@ -77,6 +79,7 @@ class MapForm extends Component {
 
             layer._latlngs[0].map(coord => {
                 coords = [[...coords[0], [this._normLng(coord.lng), coord.lat]]]
+                return coord
             })
 
             //if the last point is unequal to the first, we need to correct this to create valid geojson
@@ -89,6 +92,8 @@ class MapForm extends Component {
             return {}
         }
 
+        console.log("layer in _generateFeature is: ", layer)
+
         let newFeature = {
             id: layer._leaflet_id, //may have to remove before submission to API
             type: 'Feature',
@@ -98,23 +103,6 @@ class MapForm extends Component {
                 },
         };
         return newFeature
-    }
-
-    _getFirstCoordinate = layer => {
-        if (layer.feature){
-            const layerGeo = layer.feature.geometry
-            switch (layerGeo.type){
-                case "Point":
-                    return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
-                case "LineString":
-                        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
-                case "Polygon":
-                        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
-                default:
-                    console.error("invalid feature type sent to _getFirstCoordinate, setting to [0, 0]")
-                    return [0, 0]
-            }
-        }
     }
 
     //latitude should never require normalizing, but a bug exists in Leaflet that causes the map to repeat itself longitudinally.
@@ -140,19 +128,24 @@ class MapForm extends Component {
             let latLng = [pos.coords.latitude, pos.coords.longitude]
 
             if (this.state.geo && this.state.geo.geojson && this.state.geo.geojson.features && this.state.geo.geojson.features.length > 0) {
+
+                console.log("geojson before feature parse is: ", this.state.geo.geojson)
                 const firstFeature = this.state.geo.geojson.features[0]
 
                 if (firstFeature.geometry.type === 'Point'){
                     latLng = [firstFeature.geometry.coordinates[1], firstFeature.geometry.coordinates[0]]
                 }
-                else if (firstFeature.geometry.type === 'LineString'){
+                else if (firstFeature.geometry.type === 'LineString' || firstFeature.geometry.type === 'MultiPoint'){
                     latLng = [firstFeature.geometry.coordinates[0][1], firstFeature.geometry.coordinates[0][0]]
                 }
-                else if (firstFeature.geometry.type === 'Polygon'){
+                else if (firstFeature.geometry.type === 'Polygon' || firstFeature.geometry.type === 'MultiLineString'){
                     latLng = [firstFeature.geometry.coordinates[0][0][1], firstFeature.geometry.coordinates[0][0][0]]
                 }
+                else if (firstFeature.geometry.type === 'MultiPolygon'){
+                    latLng = [firstFeature.geometry.coordinates[0][0][0][1], firstFeature.geometry.coordinates[0][0][0][0]]
+                }
                 else{
-                    console.error("Unknown feature type loaded, defaulting map to user location")
+                    console.error("Unknown feature type loaded, defaulting map to user location.  Feature: ", firstFeature)
                 }
             }
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
@@ -173,7 +166,16 @@ class MapForm extends Component {
         let featuresList = []
         Object.keys(this.state.features).map(key => {
             featuresList.push(this.state.features[key])
+            return key
         })
+
+        console.log("in updategeo, notdisplayedfeatures is: ", this.state.notDisplayedFeatures)
+        Object.keys(this.state.notDisplayedFeatures).map(key => {
+            featuresList.push(this.state.notDisplayedFeatures[key])
+            return key
+        })
+
+        console.log('full featureslist before push is:', featuresList)
         let localGeo = {}
         if (featuresList.length > 0){
             localGeo = {
@@ -197,14 +199,16 @@ class MapForm extends Component {
             click: this._onLayerClick.bind(this)
         })
         layer.feature = this._generateFeature(layer)
-        this.setState({location: this._getFirstCoordinate(layer)})
+        this.setState({location: getFirstCoordinate(layer)}) //TODO: there has to be a way to remove this one as well.
         this.setState({prevProperties: {}})
         this.setState({popup:{active: true, for:layer.feature.id}}, this.featuresCallback(layer.feature))
     };
 
     _onDeleted = e => {
+        console.log("ondeleted event e:" ,e)
         Object.keys(e.layers._layers).map(key => {
             this.featuresCallback(key)
+            return key
         })
     };
     //block / unblock popup display
@@ -216,6 +220,7 @@ class MapForm extends Component {
     }
 
     //get all edited values and push them up to the update function.
+    //this occurs when we hit 'Save' after editing
     _onEdited = e => {
 
         Object.keys(e.layers._layers).map(item => {
@@ -224,9 +229,9 @@ class MapForm extends Component {
             let newFeature = this._generateFeature(layer)
 
             //TODO: at some point, this callback will need to happen for each edited object to update their descriptions
-            this.setState({location: this._getFirstCoordinate(layer)})
             this.setState({prevProperties: this.state.features[item].properties ? this.state.features[item].properties : {}})
             this.setState({popup:{active: true, for:newFeature.id}}, this.featuresCallback(newFeature))
+            return item
         })
     };
 
@@ -235,8 +240,10 @@ class MapForm extends Component {
         var layer = e.target;
         let prevProperties = this.state.features[layer._leaflet_id].properties ? this.state.features[layer._leaflet_id].properties : {}
 
+        console.log("layer clicked with value e: ", e, "and state: ", this.state)
+
         if (!this.state.blockPopup){
-            this.setState({location: this._getFirstCoordinate(layer)})
+            this.setState({location: ([e.latlng.lat, e.latlng.lng])})
             this.setState({prevProperties: prevProperties})
             this.setState({popup: {active: true, for: layer._leaflet_id}})
         }
@@ -249,39 +256,77 @@ class MapForm extends Component {
             return;
         }
         
-            if (this.state.geo && this.state.geo.geojson && this.state.geo.geojson.features.length > 0){
+            if (this.state.geo && this.state.geo.geojson && this.state.geo.geojson.features && this.state.geo.geojson.features.length > 0){
 
                 //features must be loaded in one at a time, not in bulk.
                 let localFeatures = {}
                 let output = {}
+                let notDisplayedFeatures = []
 
                 this.state.geo.geojson.features.map(feature => {
                     let leafletGeoJSON = new L.GeoJSON(feature);
                 
                     leafletGeoJSON.eachLayer(layer => 
                         {
-                            //add layer to the map
-                            output = ref.leafletElement.addLayer(layer)
-                            layer.on({
-                                click: this._onLayerClick.bind(this)
-                            })
+                            const layerType = layer.feature.geometry.type
+
+                            if (layerType === "LineString" || layerType === "Polygon" || layerType === "Point")
+                            {
+                                //add layer to the map
+                                output = ref.leafletElement.addLayer(layer)
+                                layer.on({
+                                    click: this._onLayerClick.bind(this)
+                                })
+                            }
+                            else{
+                                //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
+                                //multi___ are unsupported by Leaflet.js itself, but maybe we can patch it on top?
+                                //when a multipoint is created, 
+                                notDisplayedFeatures = [...notDisplayedFeatures, layer.feature]
+
+                                //console.log("layer to not be editable is: ", layer)
+                                //console.log("feature to not display is: ", layer.feature.properties.name)
+                                //output = ref.leafletElement.addLayer(layer)
+                                /*
+                                layer.on({
+                                    click: this._onLayerClick.bind(this)
+                                })*/
+                            }
                         }
                         );
+                        return feature
                     })
                 //initialize our features
                 Object.keys(output._layers).map(key => {
+                    //the solution for multi_ values is likely here.
                     output._layers[key].feature.id = key
                     localFeatures[key] = output._layers[key].feature
+                    return key
                 })
-                this.setState({features: localFeatures})                
+
+
+                if (notDisplayedFeatures.length > 0){
+                    alert("There is at least one Multi feature in your geoJSON dataset This information will not be Editable or Viewable on this Edit page, but may be viewed on this item's Show page.")
+                    console.log("notdisplayedfeatures prompt is: ", notDisplayedFeatures)
+                    console.log("localfeatures prompt is: ", localFeatures)
+                }
+                this.setState({features: localFeatures}, () =>
+                this.setState({notDisplayedFeatures: notDisplayedFeatures})
+                )                
             }
         this.setState({mapLoading: false})
-        
     }
 
     _onPopupClose = () => {
         this.setState({prevProperties: {}})
         this.setState({popup: {active: false, for: ""}})
+    }
+
+    _setMapRef = (ref) => {
+        this.setState({mapRef: ref})
+        console.log("mapref is: ", ref)
+        console.log("ref leafletelement is: ", ref.leafletElement)
+        
     }
 
     render() { 
@@ -294,52 +339,63 @@ class MapForm extends Component {
         return(
             <React.Fragment>
             {this.state.location && this.state.location.length > 0 && (
-            <Map
-            center={this.state.location}
-            className={this.props.classes.mapDisplay}
-            zoom={10}
-            minZoom={4}
-            maxZoom={16}
-            noWrap={true}
-            >
-                <TileLayer
-                    attribution={
-                    'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+            <React.Fragment>
+                <Typography className={this.props.classes.mapTitle} component={"p"}>
+                    {`Geolocation Map Input`}
+                </Typography>
+                <Map
+                ref = {(ref) => {
+                        if (!this.state.mapRef){
+                            this._setMapRef(ref)
+                        }
                     }
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
-                />
-
-                <FeatureGroup ref = {(reactFGref) =>{this._onFeatureGroupReady(reactFGref);}} >
-                    <EditControl
-                    position="topleft"
-                    onCreated={this._onCreated}
-                    onEdited={this._onEdited}
-                    onDeleted={this._onDeleted}
-                    onDeleteStart={this._onDeleteStart}
-                    onDeleteStop={this._onDeleteStop}
-                    draw={{
-                        rectangle: false,
-                        circle: false,
-                        circlemarker: false,
-                    }}
-                    />
-                </FeatureGroup>
-
-                {this.state.popup.active && 
-                <Popup className={this.props.classes.mapPopup}
-                    position={this.state.location}
-                    onClose={this._onPopupClose}
-                    >
-                        <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
-                </Popup>
                 }
-            </Map>
+                center={this.state.location}
+                className={this.props.classes.mapDisplay}
+                zoom={this.state.mapRef && this.state.mapRef.leafletElement ? this.state.mapRef.leafletElement.getZoom() : 7}
+                minZoom={4}
+                maxZoom={13}
+                noWrap={true}
+                >
+                    <TileLayer
+                        attribution={
+                        'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+                        }
+                        userAgent={navigator.userAgent}
+                        url={Constants.OSMTILEURL}
+                    />
+
+                    <FeatureGroup ref = {(reactFGref) =>{this._onFeatureGroupReady(reactFGref);}} >
+                        <EditControl
+                        position="topleft"
+                        onCreated={this._onCreated}
+                        onEdited={this._onEdited}
+                        onDeleted={this._onDeleted}
+                        onDeleteStart={this._onDeleteStart}
+                        onDeleteStop={this._onDeleteStop}
+                        draw={{
+                            rectangle: false,
+                            circle: false,
+                            circlemarker: false,
+                        }}
+                        />
+                    </FeatureGroup>
+
+                    {this.state.popup.active && 
+                    <Popup className={this.props.classes.mapPopup}
+                        position={this.state.location}
+                        onClose={this._onPopupClose}
+                        >
+                        <DynamicForm prevProperties={this.state.prevProperties} setProperties={this.setProperties} />
+                    </Popup>
+                    }
+                </Map>
+            </React.Fragment>
             )}
             </React.Fragment>
         )
     }
 }
- 
-const enhance = compose(withStyles(styles));
 
+const enhance = compose(withStyles(styles));
 export default enhance(MapForm);

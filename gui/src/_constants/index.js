@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-  API_ENDPOINT: "/api",
+  API_ENDPOINT: "api",
   API_PORT: "8100",
   AVATAR_HEIGHT: "36px",
   I18N_TLE: "en", //TODO: modularize this or remove it.
@@ -9,7 +9,13 @@ module.exports = Object.freeze({
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
   LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
   ROLE_USER: "user",
+  OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",
+  RADIAMAGENTREADMEURL: "https://gitlab.com/usask-rc/radiam",
   WEBTOKEN: "token",
+  SUPPORTEMAIL: "support@radiam.ca",
+  USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
+  USERMANUALFILENAME: "Radiam_user_manual.pdf",
   fields: {
     PASSWORD: "password",
     SUBMIT: "submit"
@@ -133,6 +139,7 @@ module.exports = Object.freeze({
     ORCID_ID: "user_orcid_id",
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
+    PROJECT_CONFIG_LIST: "project_config_list",
     REMOTE_USER: "remote_user",
     SENSITIVITY_LEVEL: "sensitivity_level",
     STUDY_SITE: "study_site",
@@ -144,7 +151,7 @@ module.exports = Object.freeze({
   warnings: {
     TOO_MANY_ROLES: "This user is already assigned a role in this group. Only one role is allowed per group.",
     UNSAVED_CHANGES: "This form contains unsaved changes.  Leave without saving?",
-    NO_AUTH_TOKEN: "No authentication token detected.  Please return to the login page, then return here and try again.",
+    NO_AUTH_TOKEN: "No authentication token detected.  Returning to the login page.  Please login and try again.",
     NO_CONNECTION: "Could not connect to the API.  Please refresh the page and try again.",
   }
 });

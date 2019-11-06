@@ -62,6 +62,8 @@ const styles = theme => ({
   titleIcon: {
     marginRight: '8px',
     marginBottom: '-5px',
+    height: "28px",
+    width: "28px",
   },
   value: {
     padding: '0 16px',
@@ -87,7 +89,7 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
   function handleChange(event, newValue) {
     setValue(newValue);
   }
-  const handleDateLimit = name => event => {
+  const handleDateLimit = event => {
 
     if (!isNaN(event.target.value)) {
       let daysSince = Number(parseInt(event.target.value))
@@ -102,30 +104,24 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
     <Card className={classes.container}>
 
       <React.Fragment>
-        <div className={classes.headlineTop}>
-          <div
-            className={classes.recentFiles}
+          <Typography
+            className={classes.headlineTop}
+            variant="h5"
+            component="h5"
           >
-            <Typography
-              className={classes.recentFilesText}
-              variant="h5"
-              component="h5"
-            >
-              <ScheduleIcon className={classes.titleIcon} />
-              {translate('en.dashboard.recentfiles')}
-            </Typography>
+            <ScheduleIcon className={classes.titleIcon} />
+            {translate('en.dashboard.recentfiles')}
             <TextField
               id="dateLimit"
-              label="Days Since Crawl"
+              label="Days Since Last Crawl"
               type="number"
               className={classes.dateLimitSelection}
               value={dateLimit}
-              onChange={handleDateLimit('date')}
+              onChange={handleDateLimit}
             >
             </TextField>
-          </div>
-        </div>
-
+          </Typography>
+          
         {projects.length > 0 ? (
           <div>
             <Tabs
@@ -141,16 +137,16 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
                 return item.files && item.files.length > 0 &&
                   <Tab label={<React.Fragment><ReferenceField
                     record={item}
-                    basePath="projects"
+                    basePath={Constants.models.PROJECTS}
                     linkType={false}
-                    source={'avatar'}
-                    reference={'projectavatars'}
+                    source={Constants.model_fields.AVATAR}
+                    reference={Constants.models.PROJECTAVATARS}
                     className={classes.projectName}
                     allowEmpty
                   >
                     <ImageField
                       classes={{ image: classes.image }}
-                      source="avatar_image"
+                      source={Constants.model_fields.AVATAR_IMAGE}
                     />
                   </ReferenceField>{item.name}</React.Fragment>} value={i} key={item.id} className={classes.tabText}>
                   </Tab>

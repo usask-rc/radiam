@@ -1,20 +1,15 @@
-import React, { Component, useState, useEffect } from 'react';
+//Datasets.jsx
+import React, { useState, useEffect } from 'react';
 import {
-  CardActions,
   Create,
-  Datagrid,
   Edit,
-  Filter,
-  List,
   ReferenceArrayField,
   ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
-  RefreshButton,
   required,
   SelectInput,
   Show,
-  ShowButton,
   ShowController,
   SimpleForm,
   SimpleShowLayout,
@@ -24,25 +19,20 @@ import {
   translate,
   withTranslate,
 } from 'react-admin';
-import { Typography } from "@material-ui/core";
+import compose from "recompose/compose";
+import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import * as Constants from '../_constants/index';
-import CustomPagination from '../_components/CustomPagination';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import { Prompt } from "react-router"
+import PropTypes from 'prop-types';
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Drawer from '@material-ui/core/Drawer';
-import SettingsIcon from '@material-ui/icons/Settings';
-import PropTypes from 'prop-types';
-import compose from "recompose/compose";
-import { Prompt } from "react-router"
 
 const listStyles = {
   actions: {
@@ -59,68 +49,6 @@ const listStyles = {
     whiteSpace: "pre-wrap",
   },
 };
-
-const filterStyles = {
-  form: {
-    backgroundColor: 'inherit',
-  },
-};
-
-//This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
-const DatasetFilter = withStyles(filterStyles)(({ classes, ...props }) => (
-  <Filter classes={classes} {...props}>
-    <ReferenceInput
-      label={'en.models.datasets.project'}
-      source={Constants.model_fk_fields.PROJECT}
-      reference={Constants.models.PROJECTS}
-    >
-      <SelectInput optionText={Constants.model_fields.NAME} />
-    </ReferenceInput>
-    <TextInput
-      label={'en.models.datasets.title'}
-      source={Constants.model_fields.TITLE}
-    />
-    <TextInput
-      label={'en.models.datasets.study_site'}
-      source={Constants.model_fields.STUDY_SITE}
-    />
-  </Filter>
-));
-
-export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => (
-  <List
-    {...props}
-    classes={{
-      root: classes.root,
-      header: classes.header,
-      actions: classes.actions,
-    }}
-    exporter={false}
-    filters={<DatasetFilter />}
-    sort={{ field: Constants.model_fields.TITLE, order: 'DESC' }}
-    perPage={10}
-    pagination={<CustomPagination />}
-  >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
-      <TextField
-        label={'en.models.datasets.title'}
-        source={Constants.model_fields.TITLE}
-      />
-      <ReferenceField
-        linkType={false}
-        label={"en.models.datasets.project"}
-        source={Constants.model_fk_fields.PROJECT}
-        reference={Constants.models.PROJECTS}
-      >
-        <ProjectName label={"en.models.projects.name"}/>
-      </ReferenceField>
-      <TextField
-        label={'en.models.datasets.study_site'}
-        source={Constants.model_fields.STUDY_SITE}
-      />
-    </Datagrid>
-  </List>
-));
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show title={<DatasetTitle />} {...props}>
@@ -162,8 +90,8 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={Constants.models.DATA_COLLECTION_METHOD} source={Constants.model_fields.DATA_COLLECTION_METHOD}>
-          <SingleFieldList>
-            <TranslationChipField source={Constants.model_fields.LABEL} />
+          <SingleFieldList linkType={"show"}>
+            <TranslationChipField source={Constants.model_fields.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
 
@@ -180,12 +108,12 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={Constants.models.SENSITIVITY_LEVEL} source={Constants.model_fields.SENSITIVITY_LEVEL}>
-          <SingleFieldList>
+          <SingleFieldList linkType={"show"}>
             <TranslationChipField source={Constants.model_fields.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>
 
-        /** Needs a ShowController to get the record into the ShowMetadata **/
+        {/** Needs a ShowController to get the record into the ShowMetadata **/}
         <ShowController translate={translate} {...props}>
           { controllerProps => (
             <ShowMetadata
@@ -199,12 +127,12 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
             />
           )}
         </ShowController>
-
-
         <MapView/>
     </SimpleShowLayout>
   </Show>
 ));
+        
+
 
 const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
 const validateDataCollectionMethod = required('en.validate.dataset.data_collection_method');
@@ -251,6 +179,8 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
     setDirty(true)
   }
 
+  console.log("props in datasetform are: ", props)
+
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={handleChange} redirect={Constants.resource_operations.LIST}>
     <TextInput
@@ -258,6 +188,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.title"}
       source={Constants.model_fields.TITLE}
       validate={validateTitle}
+      
     />
     <TextInput
       className="input-large"
@@ -276,6 +207,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       source={Constants.model_fk_fields.PROJECT}
       reference={Constants.models.PROJECTS}
       validate={validateProject}
+      defaultValue={props.location.project ? props.location.project : null}
     >
       <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
@@ -321,7 +253,7 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { props.mode == "edit" && props.id && (
+    { props.mode === Constants.resource_operations.EDIT && props.id && (
       <React.Fragment>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />
@@ -354,7 +286,7 @@ export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit title={<DatasetTitle />} actions={<MetadataEditActions />} {...props} >
-      <DatasetForm mode={"edit"} {...other} />
+      <DatasetForm mode={Constants.resource_operations.EDIT} {...other} />
     </Edit>
   );
 });

@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, permission_classes
 
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.settings import api_settings, settings
 
@@ -85,7 +86,8 @@ from .models import (
     SelectedSchema,
     SensitivityLevel,
     User,
-    UserAgent)
+    UserAgent,
+    UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_project_created, radiam_project_deleted
 
@@ -234,9 +236,11 @@ class MetadataViewset():
             print("Passed a non dictionary to sanitize_empty_values which seems wrong. Returning " + str(metadata))
             return metadata
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         if pk is not None and self.request.data is not None:
             metadata = self.request.data.get("metadata")
+            if metadata is None:
+                return None
             metadata = self.sanitize_empty_values(metadata)
             parser_classes = (JSONParser,)
             try:
@@ -257,6 +261,9 @@ class MetadataViewset():
                 raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
 
             return None
+
+    def partial_update(self, request, pk, **kwargs):
+        return MetadataViewset.update(self, request, pk, **kwargs)
 
 class RadiamOrderingFilter(OrderingFilter):
     """
@@ -500,6 +507,21 @@ class UserAgentViewSet(RadiamViewSet):
        UserAgentOrderingFilter,
     )
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return UserAgentOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            return super().filter_queryset(queryset).filter(agent_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class ResearchGroupOrderingFilter(RadiamOrderingFilter):
     def get_replacements(self):
@@ -536,12 +558,20 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     def create(self, request, *args, **kwargs):
         return MetadataViewset.create(self, request, *args, **kwargs)
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         response = MetadataViewset.update(self, request, pk)
         if response is not None:
             return response
         else:
-            return super().update(request, pk)
+            return super().update(request, pk, **kwargs)
+
+    def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
+        response = MetadataViewset.partial_update(self, request, pk)
+        if response is not None:
+            return response
+        else:
+            return super().partial_update(request, pk, **kwargs)
 
 
 class GroupRoleViewSet(RadiamViewSet):
@@ -614,12 +644,20 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     def create(self, request, *args, **kwargs):
         return MetadataViewset.create(self, request, *args, **kwargs)
 
-    def update(self, request, pk):
+    def update(self, request, pk, **kwargs):
         response = MetadataViewset.update(self, request, pk)
         if response is not None:
             return response
         else:
             return super().update(request, pk)
+
+    def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
+        response = MetadataViewset.partial_update(self, request, pk, **kwargs)
+        if response is not None:
+            return response
+        else:
+            return super().update(request, pk, **kwargs)
 
     def destroy(self, request, pk, *args, **kwargs):
         dataset = Dataset.objects.get(id=pk)
@@ -760,6 +798,27 @@ class LocationViewSet(RadiamViewSet):
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            agents = UserAgent.objects.all().filter(agent_id_qs)
+            if agents.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            location_id_qs = Q()
+            for agent in agents:
+                location_id_qs = location_id_qs | Q(id=agent.location.id)
+            return super().filter_queryset(queryset).filter(location_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class LocationTypeViewSet(RadiamViewSet):
     """
@@ -875,6 +934,14 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         else:
             return super().update(request, pk)
 
+    def partial_update(self, request, pk, **kwargs):
+        kwargs['partial'] = True
+        response = MetadataViewset.partial_update(self, request, pk, **kwargs)
+        if response is not None:
+            return response
+        else:
+            return super().update(request, pk, **kwargs)
+
 class ProjectAvatarViewSet(RadiamViewSet):
     """
     API endpoint that allows project avatars to be viewed or edited.
@@ -883,6 +950,36 @@ class ProjectAvatarViewSet(RadiamViewSet):
     serializer_class = ProjectAvatarSerializer
 
     permission_classes = (IsAuthenticated, DRYPermissions,)
+
+
+class UserAgentTokenViewSet(viewsets.GenericViewSet):
+    """
+    Generate and return a new JWT access and refresh token set for this user agent
+    """
+    serializer_class = UserAgentSerializer
+    permission_classes = [AllowAny]
+
+    def list(self, request, useragent_id, action):
+        # Restricted to internal Docker network requests
+        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
+            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+
+        useragent = UserAgent.objects.get(id=useragent_id)
+
+        if (action and action == "new") or (useragent.local_refresh_token is None):
+            useragent.generate_tokens()
+            useragent.save()
+
+        data = {
+            "id": useragent_id,
+            "user_id": useragent.user_id,
+            "access_token": useragent.local_access_token,
+            "refresh_token": useragent.local_refresh_token,
+            "host": request.META.get('HTTP_X_FORWARDED_FOR')
+        }
+
+        return Response(data)
 
 
 class SearchViewSet(viewsets.GenericViewSet):
@@ -919,12 +1016,23 @@ class SearchViewSet(viewsets.GenericViewSet):
             else:
                 radiam_service.add_generic_search(value)
 
+        # Check to see if there are no docs, we can't sort if there are no docs
+        # as it causes a 500 error that we don't actually mind.
+        if sort:
+            if radiam_service.no_docs(project_id):
+                empty = {}
+                empty["count"] = 0
+                empty["next"] = None
+                empty["previous"] = None
+                empty["results"] = []
+                return Response(empty)
+
         self.queryset = radiam_service.get_search()
 
-        if not sort:
-            self.queryset = self.queryset.sort()
-        else:
+        if sort:
             self.queryset = self.queryset.sort(sort)
+        else:
+            self.queryset = self.queryset.sort()
 
         page = self.paginate_queryset(self.queryset)
         serializer = self.get_serializer(page, many=True)

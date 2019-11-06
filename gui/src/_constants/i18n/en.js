@@ -1,3 +1,4 @@
+//en.js
 import englishMessages from 'ra-language-english';
 
 export default {
@@ -254,10 +255,29 @@ export default {
       update_information: 'Update Account Information',
       password_prompt: 'Please enter and confirm a new password:',
     },
+    help: {
+      label: 'Help',
+      title: 'Radiam Help',
+      usermanual: {
+        title: 'User Manual: ',
+      },
+      developers: {
+        title: 'Developer Resources',
+        text: 'Developers can consult the Readme file located in the source repository: '
+      },
+      email: {
+        title: 'Email Support',
+        text: 'For assistance using this specific installation of Radiam, please email: ',
+      },
+      agentinstallation: 'Agent Installation',
+      download: {
+        text: 'The downloads for the Radiam agent are here: ',
+      }
+    },
     auth: {
       username: 'Username',
       password: 'Password',
-      forgot: 'Forgot Password?',
+      forgot: 'Reset Password',
       sign_in: 'Sign In',
       email: 'Email',
       send_email: 'Send Confirmation',
@@ -305,6 +325,15 @@ export default {
       file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
+      first_steps: {
+        subtitle: 'Getting Started',
+        admin: {
+          content: 'Welcome!  The first thing you should do to get started is to create a Research Group.  Head over to the Groups tab on the left hand menu to create a new Research Group that will host your Project.',
+        },
+        user: {
+          content: 'It seems that you aren\'t assigned to any Research Groups yet.  Contact your Group Administrator or Group Data Manager to have them add you to the appropriate Research Group.'
+        },
+      },
       grants: 'View Grants',
       groups: 'Groups',
       groupmembers: 'Group Membership',
@@ -324,9 +353,9 @@ export default {
       users: 'Users',
       welcome: {
         title: 'Radiam',
-        subtitle: 'Welcome to Radiam',
+        subtitle: 'Welcome',
         content:
-          'Browse your Project data in the left sidebar, or see the most recently updated files below.',
+          'Browse existing Project data in the Projects sidebar, or see the most recently updated files below.',
       },
     },
     models: {
@@ -350,8 +379,8 @@ export default {
         version: 'Agent Version',
         projects: 'Associated Project', 
         rootdir: 'Project Root Directory',
-        remoteapiusername: 'Remote System Username',
-        remoteapitoken: 'Remote System Token',
+        remoteapiusername: 'Remote Username',
+        remoteapitoken: 'Remote Token',
         active: 'Active?',
         project_name: 'Name of Project'
       },
@@ -376,6 +405,7 @@ export default {
       },
       groups: {
         name: 'Group Name',
+        active: 'Active',
         description: 'Description',
         parent_group: 'Parent Group',
       },
@@ -397,7 +427,7 @@ export default {
         host_name: 'Host Name',
         name: 'Name',
         notes: 'Notes',
-        osf_project: 'OSF Project',
+        osf_project: 'OSF Project ID',
         portal_url: 'Portal Url',
         type: 'Location Type',
       },
@@ -477,7 +507,6 @@ export default {
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
-        osf: 'OSF',
       },
     },
     distribution: {

@@ -1,6 +1,6 @@
-import React, {Component} from "react";
+//Projects.jsx
+import React, {Component, useEffect, useState} from "react";
 import {
-  CardActions,
   Create,
   Datagrid,
   Edit,
@@ -9,11 +9,9 @@ import {
   List,
   ReferenceField,
   ReferenceInput,
-  RefreshButton,
   required,
   SelectInput,
   Show,
-  ShowButton,
   ShowController,
   SimpleForm,
   Tab,
@@ -24,9 +22,8 @@ import {
   withTranslate,
 } from 'react-admin';
 
+import { Field } from 'redux-form'
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import Divider from '@material-ui/core/Divider';
 import { CardContentInner } from "ra-ui-materialui";
 import * as Constants from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
@@ -37,16 +34,11 @@ import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
-import Button from '@material-ui/core/Button';
-import SettingsIcon from '@material-ui/icons/Settings';
 import compose from "recompose/compose";
-import { FormDataConsumer } from 'ra-core';
-import DeleteButton from 'ra-ui-materialui/lib/button/DeleteButton';
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { Drawer } from '@material-ui/core';
-import { DatasetCreate } from '../Datasets/Datasets';
-import { Route } from "react-router"
+import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem } from "@material-ui/core";
 
 const styles = {
   actions: {
@@ -102,6 +94,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     filters={<ProjectFilter />}
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
@@ -133,7 +126,6 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-    const { record } = props;
     return (
       <Show {...props}>
         <TabbedShowLayout>
@@ -158,11 +150,11 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             >
               <TextField source={Constants.model_fields.NAME} />
             </ReferenceField>
-            /** Needs a ShowController to get the record into the ShowMetadata **/
+            {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
                 <ShowMetadata
-                  type="project"
+                  type={Constants.model_fk_fields.PROJECT}
                   translate={translate}
                   record={controllerProps.record}
                   basePath={controllerProps.basePath}
@@ -187,8 +179,104 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     );
 }));
 
+
+
+const renderUserInput = ({ input, users }) => {
+  return (<React.Fragment>
+    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+      {...input}
+    >
+      {users && [...users].map(user => {
+        return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
+      })}
+    </Select>
+  </React.Fragment>)
+}
+
+const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
+
 export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
+  const [groupList, setGroupList] = useState([])
+  const [groupContactCandidates, setGroupContactCandidates] = useState({})
+  const [projectGroup, setProjectGroup] = useState(null)
+  const [groupContactList, setGroupContactList] = useState([])
+
+  let _isMounted = false
+  useEffect(() => {
+    _isMounted = true
+    if (projectGroup !== null){
+      getAllParentGroups(projectGroup)
+    }
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+  }, [projectGroup])
+
+  //TODO: handle potential setstate on unmounted component
+  const getAllParentGroups = group_id => {
+    if (group_id !== null){
+      getGroupData(group_id).then(
+        data => {
+
+          let tempGroupList = groupList
+          tempGroupList.push(data)
+
+          if (_isMounted){
+            setGroupList(tempGroupList)
+            getAllParentGroups(data.parent_group)
+          }
+          return data
+        }
+      ).catch(err => {
+        console.error("error returned in getallparentgroups: ", err)})
+    }
+    else{
+      //now get a list of users in each group
+      getPrimaryContactCandidates()
+    }
+  };
+
+  const getPrimaryContactCandidates = () => {
+    if (groupList){
+      let iteratedGroups = []
+
+      groupList.map(group => {
+        getUsersInGroup(group).then(data => {
+
+          let tempGroupContactCandidates = groupContactCandidates
+
+          data.map(item => {
+            tempGroupContactCandidates[item.id] = item
+          })
+
+          setGroupContactCandidates(tempGroupContactCandidates)
+          iteratedGroups.push(group)
+
+          if (iteratedGroups.length === groupList.length){
+            let groupContactList = []
+            Object.keys(tempGroupContactCandidates).map(key => {
+              groupContactList.push(groupContactCandidates[key])
+              
+            })
+
+            setGroupContactList(groupContactList)
+          }
+          
+        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+      })
+    }else{
+      console.error("no group selected from which to provide candidate contacts")
+    }
+  }
+
   if (canEditProject({ permissions, record })) {
+    if (record.group && projectGroup === null){
+      setProjectGroup(record.group)
+    }
+
     return <CardContentInner>
       <div>
         <TextInput
@@ -198,27 +286,17 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           validate={validateName} />
       </div>
         <ReferenceInput
-          resource="projectavatars"
+          resource={Constants.models.PROJECTAVATARS}
           className="input-small"
-          label="Avatar"
-          source={"avatar"} reference="projectavatars">
-            <SelectInput source="avatar_image" optionText={<ImageField classes={{image: classes.image}} source="avatar_image" />}/>
+          label={Constants.model_fields.AVATAR} 
+          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
+            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
         </ReferenceInput>
       <div>
         <TextInput
           className="input-small"
           label={"en.models.projects.keywords"}
           source={Constants.model_fields.KEYWORDS} />
-      </div>
-      <div>
-        <ReferenceInput
-          resource="users"
-          className="input-small"
-          label={"en.models.projects.primary_contact_user"}
-          source={Constants.model_fields.PRIMARY_CONTACT_USER} reference="users"
-          validate={validatePrimaryContactUser}>
-          <SelectInput optionText={userSelect} />
-        </ReferenceInput>
       </div>
       <div>
         <ReferenceInput
@@ -230,13 +308,26 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           validate={validateGroup}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
+        { groupContactList.length > 0 &&
+          <div>
+            <UserInput
+              required
+              label={"en.models.projects.primary_contact_user"}
+              placeholder={`Primary Contact`}
+              validate={validatePrimaryContactUser}
+              className="input-small"
+              users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+              />
+          </div>
+        }
         { record.id && (
-          <React.Fragment>
-            <EditMetadata id={record.id} type="project"/>
-            <ConfigMetadata id={record.id} type="project"/>
-          </React.Fragment>
-          )}
+          <div>
+            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+            <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+          </div>
+        )}
       </div>
+      
     </CardContentInner>;
   }
 });
@@ -276,14 +367,6 @@ const enhance = compose(
   translate,
   withStyles(styles),
 );
-
-const TagCreateActions = ({record}) =>
-{
-return(
-  <CardActions>
-    <RelatedDatasets record={record} />
-  </CardActions>
-)};
 
 export const ProjectEdit = enhance(BaseProjectEdit);
 

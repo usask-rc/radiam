@@ -1,24 +1,25 @@
 import React from "react";
 import CustomPagination from "../_components/CustomPagination";
 import {
+  ArrayField,
   BooleanField,
   BooleanInput,
+  ChipField,
   Create,
   Datagrid,
   Edit,
   Filter,
   List,
   NumberInput,
-  ReferenceArrayInput,
   ReferenceField,
   ReferenceInput,
   required,
-  SelectArrayInput,
   SelectInput,
-  Show,
+  ShowView,
   SimpleForm,
   SimpleFormIterator,
   SimpleShowLayout,
+  SingleFieldList,
   TextField,
   TextInput,
 } from "react-admin";
@@ -26,10 +27,9 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { regex, number, minValue, FormDataConsumer } from "ra-core";
-import { Grid, Typography } from "@material-ui/core";
+import { regex, number, minValue, FormDataConsumer, ShowController } from "ra-core";
+import { Grid } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
-import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 
 const filterStyles = {
   form: {
@@ -82,7 +82,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
-
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <ReferenceField
@@ -102,12 +102,22 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
       >
         <LocationShow />
       </ReferenceField>
+      
     </Datagrid>
   </List>
 ));
 
-export const UserAgentShow = props => (
-  <Show title={<UserAgentTitle />} {...props}>
+export const UserAgentShow = props => {
+console.log("props in useragentshow are; ", props);
+return(
+  <ShowController {...props}>
+    {controllerProps => 
+    {
+
+      console.log("controllerProps is: ", controllerProps)
+
+    return(
+  <ShowView title={<UserAgentTitle />} {...props} {...controllerProps}>
     <SimpleShowLayout>
       <ReferenceField
         linkType={false}
@@ -125,18 +135,30 @@ export const UserAgentShow = props => (
       >
         <LocationShow />
       </ReferenceField>
+     {controllerProps.record && controllerProps.record.project_config_list && 
+      <ArrayField source={Constants.model_fields.PROJECT_CONFIG_LIST} label={"Target Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={Constants.model_fk_fields.PROJECT} reference={Constants.models.PROJECTS} linkType="show">
+            <ChipField source={Constants.model_fields.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+      }
+
+      {controllerProps.record && controllerProps.record.remote_api_username && controllerProps.record.remote_api_token && 
+      <React.Fragment>
       <TextField
         label={"en.models.agents.remote_api_username"}
         source={Constants.model_fields.REMOTE_API_USERNAME}
       />
+      
       <TextField
         label={"en.models.agents.remote_api_token"}
         source={Constants.model_fields.REMOTE_API_TOKEN}
       />
-      <TextField
-        label={"en.models.agents.crawl_minutes"}
-        source={Constants.model_fields.CRAWL_MINUTES}
-      />
+      </React.Fragment>
+      }
+    
       <TextField
         label={"en.models.agents.version"}
         source={Constants.model_fields.VERSION}
@@ -146,11 +168,12 @@ export const UserAgentShow = props => (
         source={Constants.model_fields.ACTIVE}
       />
     </SimpleShowLayout>
-  </Show>
-);
+  </ShowView>)}
+}
+  </ShowController>
+)};
 
 const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
-const validateCrawlTime = [number(), minValue(1)]
 const validateLocation=required('en.validate.useragents.location')
 const validateUser = required('en.validate.useragents.user');
 
@@ -160,11 +183,17 @@ export const UserAgentTitle = ({ record }) => {
 
 //TODO: some values must be moved to the Strings file.
 export const UserAgentCreate = props => {
-
+  console.log("props in useragentcreate are: ", props)
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
-    <Create {...props}>
-      <SimpleForm {...props} redirect={Constants.resource_operations.LIST}>
+    <Create {...other}>
+      <SimpleForm {...other} redirect={Constants.resource_operations.LIST}>
+      <FormDataConsumer>
+      {({formData, ...rest}) => 
+      {
+        return(
+        <Grid container direction="row">
+        <Grid xs={12}>  
         <ReferenceInput
         label={"en.models.agents.user"}
         source={Constants.model_fk_fields.USER}
@@ -173,6 +202,8 @@ export const UserAgentCreate = props => {
         >
           <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
         </ReferenceInput>
+        </Grid>
+        <Grid xs={12}>
         <ReferenceInput
           label={"en.models.agents.location"}
           source={Constants.model_fk_fields.LOCATION}
@@ -182,30 +213,40 @@ export const UserAgentCreate = props => {
         >
           <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
         </ReferenceInput>
-       
-        <ArrayInput source="project_config_list">
+        </Grid>
+        <Grid xs={12}>
+        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
           <SimpleFormIterator>
             <ReferenceInput
             label={"en.models.agents.projects"}
-            source={"project"}
+            source={Constants.model_fk_fields.PROJECT}
             reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={"name"}/>
+              <SelectInput optionText={Constants.model_fields.NAME}/>
             </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
-    
-        
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
-        <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
+        </Grid>
+        <Grid xs={12}>
         <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
+        </Grid>
+        <Grid xs={12}>
         <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+        </Grid>
+        </Grid>
+        )
+      }
+      }
+        </FormDataConsumer>
       </SimpleForm>
     </Create>
   )
 };
-
-const WithProps = ({children, ...props}) => children(props)
 
 //TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
@@ -232,36 +273,39 @@ export const UserAgentEdit = props => {
       >
         <UserShow />
       </ReferenceField>
-
-      <ArrayInput source="project_config_list">
-          <SimpleFormIterator disableRemove disableAdd>
-            <ReferenceInput
-            label={"en.models.agents.projects"}
-            source={"project"}
-            reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={"name"} disabled/>
-            </ReferenceInput>
-          </SimpleFormIterator>
-        </ArrayInput>
-
       <FormDataConsumer>
       {({formData, ...rest}) => 
       {
       if (formData && formData.remote_api_token && formData.remote_api_username){
-        formData.project_config_list.map(project => delete project.config)
+        formData.project_config_list.map(project => {
+          const newProj = project
+          delete newProj.config
+          return newProj
+        })
       }
 
-        return(<Grid container direction="row">
-          <Grid xs={12}>
-            <NumberInput source="crawl_minutes" defaultValue={15} validate={validateCrawlTime} label={"en.models.agents.crawl_minutes"} />
-          </Grid>
+        return(
+          <React.Fragment>
+          <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
+          <SimpleFormIterator disableRemove disableAdd>
+            <ReferenceInput
+            label={"en.models.agents.projects"}
+            source={Constants.model_fk_fields.PROJECT}
+            reference={Constants.models.PROJECTS}>
+              <SelectInput optionText={Constants.model_fields.NAME} disabled/>
+            </ReferenceInput>
+            {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+          </SimpleFormIterator>
+        </ArrayInput>
+          <Grid container direction="row">
           <Grid xs={12}>
             <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
           </Grid>
           <Grid xs={12}>
             <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
           </Grid>
-        </Grid>)
+        </Grid>
+        </React.Fragment>)
       }
       }
       </FormDataConsumer>
@@ -270,13 +314,3 @@ export const UserAgentEdit = props => {
 
   );
 }
-/*
-<ReferenceField
-        linkType={false}
-        label={"en.models.agents.location"}
-        source={Constants.model_fk_fields.LOCATION}
-        reference={Constants.models.LOCATIONS}
-      >
-        <TextField source={Constants.model_fields.DISPLAY_NAME} />
-      </ReferenceField>
-*/

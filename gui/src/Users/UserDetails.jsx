@@ -1,3 +1,4 @@
+//UserDetails.jsx
 import React, { Component } from 'react';
 import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-admin";
 import * as Constants from "../_constants/index"
@@ -5,14 +6,6 @@ import { getUserGroups } from '../_tools/funcs';
 import UserGroupsDisplay from './UserGroupsDisplay';
 import { withStyles } from '@material-ui/styles';
 
-//we want a horizontal display to match our other chip displays elsewhere in the application.
-const styles = theme => ({
-    chipDisplay: {
-        display: 'flex',
-        justifyContent: 'left',
-        flexWrap: 'wrap',
-    },
-});
 
 class UserDetails extends Component {
 
@@ -55,12 +48,12 @@ class UserDetails extends Component {
                         label={"en.models.generic.active"}
                         source={Constants.model_fields.ACTIVE}
                     />
-                    {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay classes={styles} groupMembers={groupMembers}/>}
+                    {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
                 </SimpleShowLayout>
         )
     }
 }
 
-export default withStyles(styles)(UserDetails)
+export default UserDetails
 
 

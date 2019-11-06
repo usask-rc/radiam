@@ -1,3 +1,4 @@
+//LocationTypes.jsx
 import React, { useState, useEffect } from "react";
 import { Create, Datagrid, Edit, List, required, Show, SimpleForm, SimpleShowLayout, TextInput } from "react-admin";
 import * as Constants from "../_constants/index";
@@ -7,6 +8,7 @@ import { Prompt } from 'react-router';
 
 export const LocationTypeList = props => (
   <List {...props} exporter={false}
+    bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
@@ -43,7 +45,7 @@ const LocationTypeForm = props => {
     if (data && Object.keys(data).length > 0) {
       props.save(data)
     }
-  }, [data])
+  }, [data, props])
 
   function handleSubmit(formData) {
     setIsFormDirty(false)

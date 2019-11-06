@@ -1,3 +1,4 @@
+//Login.jsx
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { propTypes, reduxForm, Field } from "redux-form";
@@ -32,6 +33,9 @@ const styles = theme => ({
     margin: "1em",
     display: "flex",
     justifyContent: "center"
+  },
+  button: {
+    textTransform: "none",
   },
   card: {
     minWidth: 300,
@@ -107,7 +111,7 @@ class Login extends Component {
 
 
   //TODO: the below Toasts need to be put in the Constants or the Translation file.
-  forgotPassword = () => {
+  forgotPassword = (e) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: this.state.email
@@ -118,10 +122,10 @@ class Login extends Component {
       .catch(err =>
         toast.success("Please check your email for a password reset link.")
       );
-    this.toggleForgotPassword();
   };
 
-  toggleForgotPassword = () => {
+  toggleForgotPassword = (e) => {
+    e.preventDefault()
     this.setState({forgotpassword: !this.state.forgotpassword });
   };
 
@@ -181,8 +185,8 @@ class Login extends Component {
               </form>
               <div className={classes.forgotContainer}>
                 <Link
+                  href="#"
                   onClick={this.toggleForgotPassword}
-                  fullWidth
                 >
                   {translate("en.auth.forgot")}
                 </Link>
@@ -218,16 +222,13 @@ class Login extends Component {
                       {translate("en.auth.send_email")}
                     </Button>
                   </CardActions>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    disabled={isLoading}
-                    className={classes.button}
-                    onClick={this.toggleForgotPassword}
-                    fullWidth
-                  >
-                    {translate("en.auth.return_to_login")}
-                  </Button>
+                  <div className={classes.forgotContainer}>
+                    <Link
+                    href="#"
+                    onClick={this.toggleForgotPassword}>
+                      {translate("en.auth.return_to_login")}
+                    </Link>
+                  </div>
                 </form>
               </React.Fragment>
             )}
@@ -256,12 +257,15 @@ const enhance = compose(
     validate: (values, props) => {
       const errors = {};
       const { translate } = props;
-      if (!values.username) {
-        errors.username = translate("ra.validation.required");
+      if (props.anyTouched){
+        if (!values.username) {
+          errors.username = translate("ra.validation.required");
+        }
+        if (!values.password) {
+          errors.password = translate("ra.validation.required");
+        }
       }
-      if (!values.password) {
-        errors.password = translate("ra.validation.required");
-      }
+
       return errors;
     }
   }),

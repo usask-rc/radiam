@@ -1,7 +1,7 @@
+//GroupRoles.jsx
 import React, { useState, useEffect } from "react";
 import { Create, Datagrid, Edit, List, required, Show, SimpleForm, SimpleShowLayout, TextInput } from "react-admin";
 import * as Constants from "../_constants/index";
-
 import TranslationField from "../_components/_fields/TranslationField";
 import CustomPagination from "../_components/CustomPagination";
 import { Divider } from "@material-ui/core";
@@ -11,6 +11,7 @@ import { Prompt } from 'react-router';
 export const GroupRoleList = props => (
   <List {...props} exporter={false}
     pagination={<CustomPagination />}
+    bulkActionButtons={false}
   >
     <Datagrid rowClick={Constants.resource_operations.SHOW}>
       <TranslationField
@@ -60,7 +61,7 @@ const GroupRoleForm = props => {
     if (data && Object.keys(data).length > 0) {
       props.save(data)
     }
-  }, [data])
+  }, [data, props])
 
   function handleSubmit(formData) {
     setIsFormDirty(false)

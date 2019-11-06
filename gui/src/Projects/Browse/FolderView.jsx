@@ -1,3 +1,4 @@
+//FolderView.jsx
 import React, { useState, useEffect } from 'react';
 import {
   AddLocation,
@@ -13,12 +14,12 @@ import {
 } from '@material-ui/core';
 import FileSummary from '../../_components/files/FileSummary';
 import FolderDisplay from './FolderDisplay';
-import { getAPIEndpoint, httpClient,radiamRestProvider } from '../../_tools';
-import { GET_LIST, translate } from 'ra-core';
+import { translate } from 'ra-core';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
+import { getFolderFiles } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -59,8 +60,6 @@ const styles = theme => ({
     marginRight: '20em',
   },
   folderIcon: {
-    height: '1em',
-    width: '1em',
     marginRight: '0.25em',
   },
   nestedFolderPanel: {
@@ -94,6 +93,10 @@ const styles = theme => ({
   folderContentsGrid: {
     display: 'inline-block',
   },
+  folderLineItem: {
+    display: "flex",
+    flexDirection: "row",
+  },
   smallIcon: {},
 });
 
@@ -125,68 +128,28 @@ function isFile(file) {
   return false;
 }
 
-function FolderView({ projectID, item, classes, ...props }) {
+function FolderView({ projectID, item, classes }) {
+  let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);
   const [folderPath, setFolderPath] = useState(item.path);
   const [parentList, setParentList] = useState([item]);
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   useEffect(() => {
-    //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
-    const params = {
-      //folderPath may or may not contain an item itself.
-      filter: { path_parent: folderPath },
-      pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
-      sort: { field: 'last_modified', order: 'ASC' },
-    };
+    _isMounted = true
+    getFolderFiles(folderPath, projectID).then((data) => {
+      if (_isMounted){
+        setFiles(data)
+      }
+      return data
+    })
+    .catch((err => {console.error("error in getFiles is: ", err)}))
 
-    const fetchData = async () => {
-      await dataProvider(
-        GET_LIST,
-        Constants.models.PROJECTS + '/' + projectID + '/search',
-        params
-      )
-        .then(response => {
-          let fileList = [];
-          response.data.map(file => {
-            const newFile = file;
-            newFile.children = [];
-            newFile.key = file.id;
-            fileList = [...fileList, newFile];
-            return file;
-          });
-
-          fileList.sort(function (a, b) {
-            if (a.items) {
-              if (b.items) {
-                if (a.name < b.name) {
-                  return -1;
-                }
-                return 1;
-              }
-              return -1;
-            } else {
-              if (b.items) {
-                return 1;
-              }
-              if (a.name < b.name) {
-                return -1;
-              }
-              return 1;
-            }
-          });
-          setFiles(fileList);
-        })
-        .catch(error => {
-          //setStatus(status => (status = { loading: false, error: error }));
-          console.log('error in fetch from API: ', error);
-        });
-    };
-    fetchData();
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
   }, [folderPath]);
-
-  // className={classes.fileDisplay}
 
   if (files) {
     return (
@@ -202,9 +165,9 @@ function FolderView({ projectID, item, classes, ...props }) {
             label={'en.models.agents.location'}
             source={Constants.model_fk_fields.LOCATION}
             reference={Constants.models.LOCATIONS}
-            linkType="show"
-            basePath="/projects"
-            resource="projects"
+            linkType={Constants.resource_operations.SHOW}
+            basePath={`/${Constants.models.PROJECTS}`}
+            resource={Constants.models.PROJECTS}
             record={files[0]}
           >
             <LocationShow />

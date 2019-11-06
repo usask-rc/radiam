@@ -1,3 +1,4 @@
+//Appbar.jsx
 import React from "react";
 import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
@@ -6,6 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
+import { Help } from "@material-ui/icons";
 
 const styles = {
   appBarText: {
@@ -39,16 +41,23 @@ const CustomUserMenu = translate(({ translate, ...props }) => (
       primaryText={translate("en.settings.label")}
       leftIcon={<SettingsIcon />}
     />
+    <MenuItemLink
+    to="/help"
+    primaryText={translate("en.help.label")}
+    leftIcon={<Help/>}
+    />
   </UserMenu>
 ));
 
-const CustomAppBar = ({ classes, ...props }) => (
+const CustomAppBar = ({ classes, ...props }) => {
+
+  return(
   <AppBar {...props} userMenu={<CustomUserMenu />}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />
     <Typography className={classes.appBarText}>{localStorage.getItem(Constants.model_fields.USERNAME)}</Typography>
   </AppBar>
-);
+)};
 
 export default withStyles(styles)(CustomAppBar);

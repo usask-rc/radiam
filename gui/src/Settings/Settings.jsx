@@ -46,7 +46,6 @@ const Settings = ({ translate }) => (
       </ExpansionPanelDetails>
     </ExpansionPanel>
     <ToastContainer />
-
   </React.Fragment>
 );
 

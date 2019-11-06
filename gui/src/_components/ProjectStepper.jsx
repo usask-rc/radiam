@@ -26,7 +26,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getGroupUsers, getUsersInGroup } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 
@@ -123,21 +123,20 @@ return(
       onChange={handleChange}
     />
     <ReferenceInput
-      resource={"projectavatars"}
+      resource={Constants.models.PROJECTAVATARS}
       className="input-small"
       label="en.models.projects.avatar"
       validate={validateAvatar}
       allowEmpty={false}
       perPage={1000}
       sort={{ field: 'random', order: 'ASC' }}
-      source={"avatar"} reference="projectavatars"
+      source={Constants.model_fields.AVATAR} reference={Constants.models.PROJECTAVATARS}
       defaultValue={props.record.avatar || ""}
     >
       <SelectInput
-        source="avatar_image"
-        optionText={<ImageField classes={{ image: classes.image }} source="avatar_image" />}
-        onChange={handleChange}
-         />
+        source={Constants.model_fields.AVATAR_IMAGE}
+        optionText={<ImageField classes={{ image: classes.image }} source={Constants.model_fields.AVATAR_IMAGE} />}
+        onChange={handleChange}/>
     </ReferenceInput>
     <TextInput
       className="input-medium"
@@ -169,31 +168,32 @@ class PageThree extends Component {
     }
   };
 
-  handleSubmit = data => {
-    this.setState({isFormDirty: false}, () => {
-      submitObjectWithGeo(data, this.state.geo, this.props)
-    }
+  handleSubmit = (data, redirect) => {
+
+    console.log("data in handlesubmit is: ", data)
+      this.setState({isFormDirty: false}, () => {
+        submitObjectWithGeo(data, this.state.geo, this.props, redirect)
+      }
     )
   };
 
-
   handleChange = data => {
-    this.setState({isFormDirty: true})
+    if (data && data.timeStamp){
+      this.setState({isFormDirty: true})
+    }
   }
 
   render(){
     const { handleBack, record } = this.props
     return(
       <React.Fragment>
-      <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
-        {record && 
-          <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
-        }
-      </SimpleForm>
-      <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-
-</React.Fragment>
-
+        <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
+          {record && 
+            <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
+          }
+        </SimpleForm>
+        <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+      </React.Fragment>
     )
   }
 }
@@ -201,12 +201,11 @@ class PageThree extends Component {
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, userList: new Set() }
+    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, groupContactList: [], isMounted: false }
   }
 
   handleChange = (event, index, id, value) => {
-    console.log("handlechange in pagetwo trigger")
-    this.setState({ group: index, groupList: [], isFormDirty: true, userList: new Set() })
+    this.setState({ group: index, groupList: [], isFormDirty: true, groupContactCandidates: {},  groupContactList: [] })
     this.getAllParentGroups(index)
   };
 
@@ -214,62 +213,84 @@ class PageTwo extends Component {
     //I don't know why this can't use dot notation, but apparently group appears in prop and can only be accessed in Dict notation.
     const { group, primary_contact_user } = this.props.record
 
+    this.setState({ groupList: [], isMounted: true })
     //Accessing in Edit Mode
     if (group) {
-      this.setState({ group: group, primary_contact_user: primary_contact_user })
+      this.setState({ group: group, primary_contact_user: primary_contact_user})
       this.getAllParentGroups(group)
-      //TODO: ADM-1153 Despite receiving the Primary Contact User information, the value does not get filled into the drop-down by default.
     }
     else {
       //Accessing in Creation mode - is there anything extra needed here?
     }
   }
 
+  componentWillUnmount(){
+    this.setState({isMounted: false})
+  }
+
   getAllParentGroups = group_id => {
-    //get this group and any parent group
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    if (group_id !== null){
+      getGroupData(group_id).then(
+        data => {
 
-    //get this group's details, then ascend if it has a parent.
-    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id }).then(response => {
-      const responseGroup = response.data
-      this.setState({ groupList: [...this.state.groupList, responseGroup] })
+          let groupList = this.state.groupList
+          groupList.push(data)
 
-      if (responseGroup.parent_group !== null) {
-        this.getAllParentGroups(responseGroup.parent_group);
-      }
+          if (this.state.isMounted){
+            this.setState(groupList)
+            this.getAllParentGroups(data.parent_group)
+          }
 
-      this.getUserList(group_id)
-
-    }).catch(err => {
-      console.error("Error in getAllParentGroups: ", err)
-    })
+          return data
+        }
+      ).catch(err => {
+        console.error("error returned in getallparentgroups: ", err)})
+    }
+    else{
+      //now get a list of users in each group
+      this.getPrimaryContactCandidates()
+    }
   };
 
-  //TODO: this can result in duplicate users, but the functionality itself is just fine.  This eventually should be fixed but is just an aesthetic issue.
-  getUserList = group => {
+  getPrimaryContactCandidates = () => {
+    if (this.state.groupList){
+      let iteratedGroups = []
+      this.state.groupList.map(group => {
+        getUsersInGroup(group).then(data => {
+          let groupContactCandidates = this.state.groupContactCandidates
 
-    const params = { filter: { group: group }, pagination: { page: 1, perPage: 100 }, sort: { field: "id", order: "DESC" } }
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+          data.map(item => {
+            groupContactCandidates[item.id] = item
+          })
 
-    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, params).then(response => {
-      response.data.map(groupMember => {
-        dataProvider(GET_ONE, Constants.models.USERS, {
-          id: groupMember.user, is_active: groupMember.is_active
-        }).then(response => {
-          this.setState({ userList: new Set([...this.state.userList, response.data]) })
+          if (this.state.isMounted){
+            this.setState({groupContactCandidates:groupContactCandidates})
+            iteratedGroups.push(group)
+          }
 
-        })
-        return groupMember
+          if (iteratedGroups.length === this.state.groupList.length){
+            let groupContactList = []
+            Object.keys(groupContactCandidates).map(key => {
+              groupContactList.push(groupContactCandidates[key])
+            })
+            console.log("groupContactList to be set is: ", groupContactList)
+            this.setState({groupContactList: groupContactList})
+          }
+          
+        }).catch(err => console.error('error returned from getgroupusers is: ', err))
       })
-    }).catch(err => {
-      console.error("in useeffect hook in pagethree, error is: ", err)
-    })
-  };
+    }else{
+      console.error("no group selected from which to provide candidate contacts")
+    }
+  }
+  
 
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
-    const { userList } = this.state
+    const { groupContactCandidates, groupContactList } = this.state
+
+    console.log("groupContactList is: ", groupContactList)
 
     return (
       <React.Fragment>
@@ -288,18 +309,17 @@ class PageTwo extends Component {
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
       </div>
-      <div>
-        {(primary_contact_user || (userList && userList.size) > 0) &&
+      {groupContactList.length > 0 && <div>
           <UserInput
             required
             label={"en.models.projects.primary_contact_user"}
             placeholder={`Primary Contact`}
             validate={validatePrimaryContactUser}
             className="input-small"
-            users={userList} id={"primary_contact_user"} name={"primary_contact_user"}
-            defaultValue={primary_contact_user} />
-        }
+            users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+            defaultValue={primary_contact_user || ""} />
       </div>
+      }
     </SimpleForm>
     <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
     </React.Fragment>
@@ -309,8 +329,8 @@ class PageTwo extends Component {
 
 const renderUserInput = ({ input, users }) => {
   return (<React.Fragment>
-    <InputLabel htmlFor="primary_contact_user">{`Primary Contact`}</InputLabel>
-    <Select id={"primary_contact_user"} name={"primary_contact_user"}
+    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
       {...input}
     >
       {users && [...users].map(user => {

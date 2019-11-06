@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+//MapView.jsx
+import React, { useState, useEffect } from 'react'
 import compose from 'recompose/compose';
 import { FeatureGroup, Map, Popup, TileLayer } from 'react-leaflet';
 import L from "leaflet";
 import { Typography, Divider } from '@material-ui/core';
 import withStyles from '@material-ui/core/styles/withStyles';
+import * as Constants from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -31,31 +33,24 @@ const MapView = ({ classes, record }) => {
     const [location, setLocation] = useState([])
     const [mapLoading, setMapLoading] = useState(true)
     const [curFeature, setCurFeature] = useState({})
+    const [mapRef, setMapRef] = useState(null)
+
+    useEffect(() => {
+        return function cleanup() {
+            if (mapRef){
+                console.log("mapRef is: ", mapRef)
+            }
+
+        }
+    }, [])
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
         var layer = e.target;
 
-        setLocation(getFirstCoordinate(layer))
+        setLocation([e.latlng.lat, e.latlng.lng])
         setCurFeature(layer.feature)
         setPopup({active: true, for: layer._leaflet_id})
-    }
-
-    function getFirstCoordinate(layer){
-        if (layer.feature){
-            const layerGeo = layer.feature.geometry
-            switch (layerGeo.type){
-                case "Point":
-                    return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
-                case "LineString":
-                        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
-                case "Polygon":
-                        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
-                default:
-                    console.error("invalid feature type sent to getFirstCoordinate, setting to [0, 0]")
-                    return [0, 0]
-            }
-        }
     }
 
     function _onPopupClose() {
@@ -71,7 +66,7 @@ const MapView = ({ classes, record }) => {
         
         const _editableFG = ref;
 
-            if (record.geo && record.geo.geojson && record.geo.geojson.features.length > 0){
+            if (record.geo && record.geo.geojson && record.geo.geojson.features && record.geo.geojson.features.length > 0){
                 //features must be loaded in one at a time, not in bulk.
                 let localFeatures = {}
                 let output = {}
@@ -98,6 +93,7 @@ const MapView = ({ classes, record }) => {
                     let feature = output._layers[key].feature
                     feature.id = key
                     localFeatures[key] = feature
+                    return key
                 })
             }
         setMapLoading(false)
@@ -116,20 +112,23 @@ const MapView = ({ classes, record }) => {
         if (mapLoading){
             let latLng = [pos.coords.latitude, pos.coords.longitude]
 
-            if (record.geo && record.geo.geojson && record.geo.geojson.features.length > 0) {
+            if (record.geo && record.geo.geojson && record.geo.geojson.features && record.geo.geojson.features.length > 0) {
                 const firstFeature = record.geo.geojson.features[0]
 
                 if (firstFeature.geometry.type === 'Point'){
                     latLng = [firstFeature.geometry.coordinates[1], firstFeature.geometry.coordinates[0]]
                 }
-                else if (firstFeature.geometry.type === 'LineString'){
+                else if (firstFeature.geometry.type === 'LineString' || firstFeature.geometry.type === 'MultiPoint'){
                     latLng = [firstFeature.geometry.coordinates[0][1], firstFeature.geometry.coordinates[0][0]]
                 }
-                else if (firstFeature.geometry.type === 'Polygon'){
+                else if (firstFeature.geometry.type === 'Polygon' || firstFeature.geometry.type === 'MultiLineString'){
                     latLng = [firstFeature.geometry.coordinates[0][0][1], firstFeature.geometry.coordinates[0][0][0]]
                 }
+                else if (firstFeature.geometry.type === 'MultiPolygon'){
+                    latLng = [firstFeature.geometry.coordinates[0][0][0][1], firstFeature.geometry.coordinates[0][0][0][0]]
+                }
                 else{
-                    console.error("Unknown feature type loaded, defaulting map to user location")
+                    console.error("Unknown feature type loaded, defaulting map to user location.  Feature: ", firstFeature)
                 }
             }
 
@@ -154,48 +153,53 @@ const MapView = ({ classes, record }) => {
     return(
         <React.Fragment>
             {location && location.length > 0 && (
-            <Map
-            center={location}
-            className={classes.mapDisplay}
-            zoom={10}
-            minZoom={4}
-            maxZoom={16}
-            noWrap={true}
-            >
-                <TileLayer
-                    attribution={
-                    'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
-                    }
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
-                />
-
-                <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
-
-                {popup && popup.active &&
-                <Popup className={classes.mapPopup}
-                position = {location}
-                onClose={_onPopupClose}
+            <React.Fragment>
+                <Typography variant={"h5"} component={"h5"}>
+                    {`GeoJSON Map Data`}
+                </Typography>
+                <Map
+                ref={(ref) => {setMapRef(ref)}}
+                center={location}
+                className={classes.mapDisplay}
+                zoom={mapRef && mapRef.leafletElement ? mapRef.leafletElement.getZoom() : 7}
+                minZoom={4}
+                maxZoom={13}
+                noWrap={true}
                 >
-                {curFeature.properties && 
-                <React.Fragment>
-                    <Typography variant="h5" className={classes.mapPopupTitle}>
-                        {`Feature Data:`}
-                    </Typography>
-                    <Divider/>
-                    {Object.keys(curFeature.properties).map(key => {
-                        return(
-                        <Typography className={classes.mapPopupDetails}>
-                            {`${key} : ${curFeature.properties[key]}`}
+                    <TileLayer
+                        attribution={
+                        'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+                        }
+                        url={Constants.OSMTILEURL}
+                        //url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                    />
+
+                    <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
+
+                    {popup && popup.active &&
+                    <Popup className={classes.mapPopup}
+                    position = {location}
+                    onClose={_onPopupClose}
+                    >
+                    {curFeature.properties && 
+                    <React.Fragment>
+                        <Typography variant="h5" className={classes.mapPopupTitle}>
+                            {`Feature Data:`}
                         </Typography>
-                        );
-                    })}
-                    </React.Fragment>
-                }
-                </Popup>
-                }
-
-
-            </Map>
+                        <Divider/>
+                        {Object.keys(curFeature.properties).map(key => {
+                            return(
+                            <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
+                                {`${key} : ${curFeature.properties[key]}`}
+                            </Typography>
+                            );
+                        })}
+                        </React.Fragment>
+                    }
+                    </Popup>
+                    }
+                </Map>
+                </React.Fragment>
             )}
         </React.Fragment>
     )

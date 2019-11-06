@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { translate } from 'react-admin';
 import UserIcon from "@material-ui/icons/PersonAdd";
 import CardIcon from "./CardIcon";
+import * as Constants from "../_constants/index"
 
 const styles = theme => ({
     main: {
@@ -50,7 +51,7 @@ const NewUsers = ({ users = [], nb, translate, classes }) => (
                 {users.map(user => (
                     <ListItem
                         button
-                        to={`/users/${user.id}/show`}
+                        to={`/${Constants.models.USERS}/${user.id}/${Constants.resource_operations.SHOW}`}
                         component={Link}
                         key={user.id}
                     >

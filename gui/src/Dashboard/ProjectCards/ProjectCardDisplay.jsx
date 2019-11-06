@@ -1,3 +1,4 @@
+//ProjectCardDisplay.jsx
 import React, { useState } from 'react';
 import { translate } from 'react-admin';
 import {
@@ -66,7 +67,7 @@ const styles = {
     color: "DarkGray",
     textAlign: "left",
     width: "inherit",
-    alignItems: "start"
+    alignItems: "flex-start"
   }
 };
 

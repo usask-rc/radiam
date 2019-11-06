@@ -9,6 +9,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.validators import UniqueValidator
 import django.contrib.auth.password_validation as password_validators
+from django_rest_passwordreset.models import ResetPasswordToken
+from django.conf import settings
 
 from radiam.api.documents import DatasetMetadataDoc
 from radiam.api.documents import ProjectMetadataDoc
@@ -203,10 +205,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
         # add the users to the 'All Users' group
         # all_users_group = ResearchGroup.objects.get(name='All Users')
+        HTTP_USER_AGENT_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_HTTP_USER_AGENT_HEADER',
+                                         'HTTP_USER_AGENT')
+        HTTP_IP_ADDRESS_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_IP_ADDRESS_HEADER', 'REMOTE_ADDR')
+        reset_password_token = ResetPasswordToken.objects.create(
+            user=user,
+            user_agent=self.context.get('request').META.get(HTTP_USER_AGENT_HEADER, ''),
+            ip_address=self.context.get('request').META.get(HTTP_IP_ADDRESS_HEADER, ''),
+        )
 
         # trigger the user create signal with request context
         radiam_user_created.send(sender=self.__class__,
                                  user=user,
+                                 reset_password_token=reset_password_token,
                                  request=self.context.get('request'))
 
         return user
@@ -318,6 +329,17 @@ class PasswordSerializer(serializers.Serializer):
         else:
             return data
 
+class UserAgentTokenSerializer(serializers.ModelSerializer):
+    """
+    User Agent Token serializer.
+    """
+    class Meta:
+        model = UserAgent
+        fields = ('id',
+                  'local_access_token',
+                  'local_refresh_token'
+                  )
+
 
 class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
@@ -354,6 +376,8 @@ class UserAgentSerializer(serializers.ModelSerializer):
                   'project_config_list',
                   'remote_api_username',
                   'remote_api_token',
+                  'local_access_token',
+                  'local_refresh_token',
                   'crawl_minutes',
                   'is_active'
                   )
@@ -389,7 +413,18 @@ class UserAgentSerializer(serializers.ModelSerializer):
 
         instance.remote_api_username = validated_data.get('remote_api_username', instance.remote_api_username)
         instance.remote_api_token = validated_data.get('remote_api_token', instance.remote_api_token)
+        instance.local_access_token = validated_data.get('local_access_token', instance.local_access_token)
+        instance.local_refresh_token = validated_data.get('local_refresh_token', instance.local_refresh_token)
         instance.crawl_minutes = validated_data.get('crawl_minutes', instance.crawl_minutes)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        if instance.user != validated_data.get('user', instance.user):
+            instance.local_access_token = None
+            instance.local_refresh_token = None
+        instance.user = validated_data.get('user', instance.user)
+        instance.location = validated_data.get('location', instance.location)
+        instance.version = validated_data.get('version', instance.version)
+        instance.date_created = validated_data.get('date_created', instance.date_created)
+        instance.date_updated = validated_data.get('date_updated', instance.date_updated)
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
 
@@ -417,6 +452,23 @@ class UserAgentSerializer(serializers.ModelSerializer):
                 user_agent_project_config.save()
                 # no matching UserAgentProjectConfig exists for this agent
                 # create one from the passed in pro'project_config'
+
+    def validate_location(self, value):
+        """
+        Ensure the location being entered is valid
+        """
+        # Enforce unique OSF locations for agents
+        if value.location_type.label == "location.type.osf":
+            if self.context['view'].kwargs.get('pk') is None:
+                useragents = UserAgent.objects.all()
+            else:
+                useragents = UserAgent.objects.all().exclude(id=self.initial_data['id'])
+
+            for u in useragents:
+                if u.location == value:
+                    raise ValidationError("Duplicate OSF locations for agents is not allowed")
+                
+        return value
 
 
 class NestedProjectUserAgentProjectConfigSerializer(serializers.ModelSerializer):

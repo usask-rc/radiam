@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Button, CardActions, TextField, Typography } from "@material-ui/core";
 import * as Constants from "../../_constants/index";
-import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
+import { getAPIEndpoint, toastErrors, getUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
+import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
@@ -57,6 +58,7 @@ const styles = theme => ({
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangeDetails extends Component {
 
+    
     handleSubmit = event => {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const params = { data: this.state, id: this.state.id }
@@ -64,7 +66,7 @@ class ChangeDetails extends Component {
         dataProvider(UPDATE, Constants.models.USERS, params).then(response => {
             toast.success("Account information successfully updated.")
         }).catch(err => {
-            toastErrors("Error in updating your information: ", err)
+            console.log("error in user details update is: ", err)
         })
         event.preventDefault();
     };
@@ -74,34 +76,41 @@ class ChangeDetails extends Component {
         event.preventDefault();
     }
 
-    getUserDetails() {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
-            const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
-
-            console.log("id as stored in local storage is: ", localID)
-            if (response.data.id === localID) {
-                this.setState(response.data)
+    getCurrentUserDetails() {
+        getUserDetails().then(data => 
+        {
+            if (this.state.mounted){
+                this.setState(data)
             }
-            else {
-                //TODO: user in storage does not match.  Log the user out.  Figure out how to do that.
-                toastErrors(Constants.warnings.NO_AUTH_TOKEN)
+            else{
+                this.setState({redirect: true})
             }
-        }).catch(err => {
-            toastErrors("Could not connect to server.  Please refresh the page and then try again.")
-        }
-        );
+            return data
+        })
+        .catch(err => 
+            {
+                if (this.state.mounted)
+                {
+                    this.setState({redirect: true})
+                }
+            }
+        )
     }
 
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
+        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null, mounted: false }
     }
 
     componentDidMount() {
-        this.getUserDetails();
+        this.setState({mounted: true})
+        this.getCurrentUserDetails();
+    }
+
+    componentWillUnmount(){
+        this.setState({mounted: false})
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
@@ -150,10 +159,9 @@ class ChangeDetails extends Component {
                                             label={englishMessages.en.models.users.email}
                                             value={this.state.email}
                                             onChange={this.handleChange(Constants.model_fields.EMAIL)}
-                                            type={"email"} />
+                                            type={Constants.model_fields.EMAIL} />
                                     </div>
                                     <div className={styles.input}>
-
                                         <TextField
                                             id={Constants.model_fields.ORCID_ID}
                                             label={englishMessages.en.models.users.user_orcid_id}
@@ -183,6 +191,7 @@ class ChangeDetails extends Component {
                             </div>
                         </div>
                         <ToastContainer />
+                        {this.state.redirect && <Redirect to="/login"/>}
                     </React.Fragment>
                 }
             />

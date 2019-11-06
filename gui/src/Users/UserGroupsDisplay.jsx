@@ -1,8 +1,17 @@
+//UserGroupsDisplay.jsx
 import React from 'react';
 import { Chip } from '@material-ui/core';
 import * as Constants from "../_constants/index"
-//TODO: some text here needs to be moved to the constants file
-//TODO: eventually want the ability to remove associations from this page.
+import { withStyles } from '@material-ui/styles';
+
+const styles = theme => ({
+    chipDisplay: {
+        display: 'flex',
+        justifyContent: 'left',
+        flexWrap: 'wrap',
+    },
+});
+
 const UserGroupsDisplay = ({ classes, groupMembers }) => {
     return (
         <div className={classes.chipDisplay}>            
@@ -29,4 +38,4 @@ const UserGroupsDisplay = ({ classes, groupMembers }) => {
         </div>)
 }
 
-export default UserGroupsDisplay
+export default withStyles(styles)(UserGroupsDisplay)

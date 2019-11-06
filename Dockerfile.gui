@@ -11,12 +11,12 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
 # install and cache app dependencies
-COPY package.json /usr/src/app/package.json
+COPY gui/package.json /usr/src/app/package.json
 
 RUN npm install
 RUN npm install react-scripts@1.1.1 -g
 
-COPY ./ /usr/src/app
+COPY ./gui /usr/src/app
 
 # Add version file to container filesystem
 COPY VERSION /etc/version

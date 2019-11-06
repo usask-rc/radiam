@@ -1,10 +1,17 @@
 import React, { useState } from 'react'
 import { AddCircleOutline, RemoveCircleOutline } from '@material-ui/icons'
 import { Button, Divider, FormControl, IconButton, TextField,  } from '@material-ui/core';
-
+import { withStyles } from "@material-ui/core/styles"
 //a form that can contain an indefinite number of inputs, expanded and contracted with + and -, made to be displayed in a Modal.
 
-const DynamicForm = ({prevProperties, setProperties}) => {
+const styles = {
+    featureItem: {
+        display: "flex",
+        flexDirection: "row",
+    }
+  };
+
+const DynamicForm = ({classes, prevProperties, setProperties}) => {
 
     const [featureParamLabel, setFeatureParamLabel] = useState("")
     const [featureParams, setFeatureParams] = useState(Object.keys(prevProperties).length > 0 ? prevProperties :
@@ -43,7 +50,7 @@ const DynamicForm = ({prevProperties, setProperties}) => {
 
     return(
     <FormControl>
-        <div>
+        <div className={classes.featureItem}>
             <TextField key="addFeatureField" type="text" onChange={handleFeatureParamChange} value={featureParamLabel} placeholder="eg: Last Visited" />        
             <IconButton name={"addIconFeatureField"} aria-label="add" onClick={(e) => addLabel(e)}>
                 <AddCircleOutline/>
@@ -53,7 +60,7 @@ const DynamicForm = ({prevProperties, setProperties}) => {
         {featureParams && 
         Object.keys(featureParams).map(key => {
             return (
-                    <div key={key}>
+                    <div className={classes.featureItem} key={key}>
                         <TextField type="text" label={key} name={key} key={key} defaultValue={featureParams[key]} onChange={handleChange} />
                         <IconButton name={key} aria-label="remove" onClick={(e) => removeLabel(e, key)}>
                             <RemoveCircleOutline />
@@ -71,4 +78,4 @@ const DynamicForm = ({prevProperties, setProperties}) => {
     
 };
 
-export default DynamicForm
+export default withStyles(styles)(DynamicForm)

@@ -1,3 +1,4 @@
+//FilesTab.jsx
 import React, { useState, useEffect } from 'react';
 import compose from 'recompose/compose';
 import { withRouter } from 'react-router';
@@ -10,6 +11,7 @@ import FileList from '../../_components/files/FileList';
 import { Search } from '@material-ui/icons';
 
 import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
+import { getProjectFiles } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -60,10 +62,10 @@ function FilesTab({ projectID, classes, translate, ...props }) {
   const handleChange = e => {
     setSearchField(e.target.value);
   };
-
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+  let _isMounted = false
 
   useEffect(() => {
+    _isMounted = true
     const params = {
       q: search,
       id: projectID,
@@ -71,23 +73,23 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       sort: { field: sort, order: order },
     };
 
-    const fetchData = async () => {
-      await dataProvider(
-        GET_LIST,
-        Constants.models.PROJECTS + '/' + projectID + '/search',
-        params
-      )
-        .then(response => {
-          setData({ files: response.data, nbFiles: response.total });
-          setStatus({ loading: false });
-        })
-        .catch(error => {
-          setStatus({ loading: false, error: error });
-        });
-    };
-    fetchData();
+    getProjectFiles(params).then(data => {
+      if (_isMounted){
+        setData(data)
+        setStatus({loading: false})
+      }
+    }).catch(err => {
+      setStatus({loading: false, error: err})
+    })
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+    
   }, [search, page, sort, order]);
 
+  //TODO: this is a mess - is there a way to slim this down?  I hate it.
   return (
     <div className={classes.main}>
       {data && data.files && (

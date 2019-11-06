@@ -37,7 +37,7 @@ TRACE = False
 # By default try to send emails, turn off in development environments.
 SEND_EMAIL = os.environ.get('SEND_EMAIL', "True") == "True"
 
-ALLOWED_HOSTS = ['.radiam.ca', '.computecanada.ca', '127.0.0.1', 'localhost', 'testserver', '.frdr.ca']
+ALLOWED_HOSTS = ['.radiam.ca', '.computecanada.ca', '127.0.0.1', 'localhost', 'testserver', '.frdr.ca', 'nginx','radiamapi']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

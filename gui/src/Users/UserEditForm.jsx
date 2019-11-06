@@ -1,28 +1,21 @@
+//UserEditForm.jsx
 import React, { Component } from 'react';
 import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
 import * as Constants from "../_constants/index"
-import { getAPIEndpoint, radiamRestProvider, httpClient } from '../_tools';
+import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { email, maxLength, minLength, required, GET_LIST, GET_ONE } from 'ra-core';
+import { email, maxLength, minLength, required } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
-import { Prompt } from 'react-router';
+import { Prompt, Redirect } from 'react-router';
 import UserGroupsDisplay from './UserGroupsDisplay';
 
-const validateUsername = [required('en.validate.user.username'), minLength(5), maxLength(20)];
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
 
-//we want a horizontal display to match our other chip displays elsewhere in the application.
-const styles = theme => ({
-    chipDisplay: {
-        display: 'flex',
-        justifyContent: 'left',
-        flexWrap: 'wrap',
-    },
-});
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
-        this.state = { ...props.record, groupMembers: [], isFormDirty: false }
+        this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false }
     }
 
     async componentDidMount() {
@@ -38,10 +31,10 @@ class UserEditForm extends Component {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);
         } else {
-            //TODO: logout the user.
             toastErrors(
                 Constants.warnings.NO_AUTH_TOKEN
             );
+            this.setState({redirect: true})
         }
 
         const request = new Request(
@@ -56,7 +49,7 @@ class UserEditForm extends Component {
             this.setState({isFormDirty: false}, () => {
             return fetch(request).then(response => {
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
-                    this.props.history.push("/users");
+                    this.props.history.push(`/${Constants.models.USERS}`);
                     return response.json();
                 }
                 throw new Error(response.statusText);
@@ -69,19 +62,27 @@ class UserEditForm extends Component {
             })
         }
         else {
-            toastErrors("Please enter your Username and Email Address.");
+            toastErrors("Please enter the new User's Username and Email Address.");
         }
     };
 
     handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
-        this.setState({isFormDirty: true})
+
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
+
+        console.log("value of e in handlechange is: ", e)
     };
 
     //strangely, the selects and date need a different change handler.
-    handleSelectChange = (key_in_dict, value, prevValue, target) => {
+    handleSelectChange = (e, value, prevValue, target) => {
         this.setState({ [target]: value })
-        this.setState({isFormDirty: true})
+
+        if (e && e.timeStamp){
+            this.setState({isFormDirty: true})
+        }
     };
 
     render() {
@@ -113,7 +114,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.last_name}
                 />
                 <TextInput
-                    type="email"
+                    type={Constants.model_fields.EMAIL}
                     label={"en.models.users.email"}
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}
@@ -132,7 +133,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
-                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay classes={styles} groupMembers={groupMembers}/>}
+                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
 
             </SimpleForm>
             <Toolbar>
@@ -141,6 +142,7 @@ class UserEditForm extends Component {
                 />
             </Toolbar>
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            {this.state.redirect && <Redirect to="/login"/>}
         </React.Fragment>
         );
     }

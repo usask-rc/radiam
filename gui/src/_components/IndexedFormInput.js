@@ -1,11 +1,9 @@
+//IndexedFormInput.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles, createStyles } from '@material-ui/core/styles';
-
 import { Labeled } from 'react-admin';
-
-import { Typography } from "@material-ui/core";
 
 const sanitizeRestProps = ({ basePath, record, ...rest }) => rest;
 

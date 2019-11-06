@@ -1,5 +1,7 @@
 import json
 
+from unittest import mock
+
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import force_authenticate
@@ -77,14 +79,19 @@ class TestSuperuserResearchGroupPermissions(APITestCase):
             text="",
             status_code=200)
 
-    def test_superuser_write_researchgroup_detail(self):
+    @mock.patch("radiam.api.documents.ResearchGroupMetadataDoc")
+    def test_superuser_write_researchgroup_detail(self, doc):
         """
         Test Superuser can update an existing research group
         """
+        doc.get.return_value = doc
+        doc.update.return_value = None
+
         detail_researchgroup = ResearchGroup.objects.get(name='Test Research Group 1')
 
         body = {
-            "description": "updated description",
+            "name": "testgroup",
+            "description": "Some Test Group"
         }
 
         request = self.factory.patch(reverse('researchgroup-detail', args=[detail_researchgroup.id]))
