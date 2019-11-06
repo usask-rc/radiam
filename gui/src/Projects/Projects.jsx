@@ -37,12 +37,16 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { getGroupUsers, getGroupData, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem } from "@material-ui/core";
+import MapForm from "../_components/_forms/MapForm";
 
 const styles = {
   actions: {
     backgroundColor: 'inherit',
+  },
+  formDisplay: {
+    width: "auto",
   },
   header: {
     backgroundColor: 'inherit',
@@ -53,6 +57,9 @@ const styles = {
   root: {
     backgroundColor: 'inherit',
   },
+  mapView: {
+    width: "100%"
+  }
 };
 
 const filterStyles = {
@@ -180,12 +187,16 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 }));
 
 
+//you'd think there would be an easier way to do this, and I'm sure there is, but sending a hook down here to change the value works.  touch it at your own risk.
+const renderUserInput = ({ input, users, ...props }) => {
+  
+  const handleChange=(e) => {
+    props.setPrimaryContactUser(e.target.value)
+  }
 
-const renderUserInput = ({ input, users }) => {
   return (<React.Fragment>
     <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
-    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
-      {...input}
+    <Select value={props.defaultValue} onChange={handleChange} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
     >
       {users && [...users].map(user => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
@@ -194,15 +205,19 @@ const renderUserInput = ({ input, users }) => {
   </React.Fragment>)
 }
 
-const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
+const UserInput = ({ source, ...props }) => {
+  return(<Field name={source} component={renderUserInput} {...props} />)}
 
-export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
+export const ProjectEditForm = withStyles(styles)(({ classes, permissions, record }) => {
   const [groupList, setGroupList] = useState([])
   const [groupContactCandidates, setGroupContactCandidates] = useState({})
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
+  const [geo, setGeo] = useState(record.geo ? record.geo : {})
+  const [primaryContactUser, setPrimaryContactUser] = useState(record.primary_contact_user)
 
   let _isMounted = false
+
   useEffect(() => {
     _isMounted = true
     if (projectGroup !== null){
@@ -238,6 +253,35 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
       getPrimaryContactCandidates()
     }
   };
+
+  const handleSubmit = (e) => {
+    console.log('handlesubmit e is: ', e)
+    //submitObjectWithGeo()
+  }
+
+  const handleChange = (e) => {
+    console.log("handleChange e: ", e)
+  }
+
+
+  const geoDataCallback = geo => {
+    if (geo && Object.keys(geo).length > 0) {
+
+      setGeo(geo)
+      
+      //this isn't needed unless we re-introduce the geoJSON text form.
+      //this.setState({geoText: JSON.stringify(geo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: this.state.jsonTextFormKey + 1})));
+    } else {
+      //this will likely have to be changed
+      setGeo({})
+    }
+  }
+    /*
+
+    //mark as dirty if prop value does not equal state value.  If they're equal, leave isDirty as is.
+    if (this.state.geo !== this.props.record.geo) {
+      this.setState({ isFormDirty: true });
+    }*/
 
   const getPrimaryContactCandidates = () => {
     if (groupList){
@@ -276,60 +320,70 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     if (record.group && projectGroup === null){
       setProjectGroup(record.group)
     }
+  }
+  console.log("primary contact user is: ", record.primary_contact_user)
 
-    return <CardContentInner>
-      <div>
-        <TextInput
-          className="input-small"
-          label={"en.models.projects.name"}
-          source={Constants.model_fields.NAME}
-          validate={validateName} />
-      </div>
-        <ReferenceInput
-          resource={Constants.models.PROJECTAVATARS}
-          className="input-small"
-          label={Constants.model_fields.AVATAR} 
-          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
-            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
-        </ReferenceInput>
-      <div>
-        <TextInput
-          className="input-small"
-          label={"en.models.projects.keywords"}
-          source={Constants.model_fields.KEYWORDS} />
-      </div>
-      <div>
+    return (<SimpleForm redirect={Constants.resource_operations.LIST} save={handleSubmit} onChange={handleChange}>
+      <TextInput
+        className="input-small"
+        label={"en.models.projects.name"}
+        source={Constants.model_fields.NAME}
+        defaultValue={record.name}
+        validate={validateName} />
+      <ReferenceInput
+        resource={Constants.models.PROJECTAVATARS}
+        className="input-small"
+        label={`Icon`} 
+        perPage={100} 
+        defaultValue={record.avatar}
+        source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
+          <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
+      </ReferenceInput>
+      <TextInput
+        className="input-small"
+        label={"en.models.projects.keywords"}
+        source={Constants.model_fields.KEYWORDS}
+        defaultValue={record.keywords}
+        />
+
         <ReferenceInput
           resource="researchgroups"
           className="input-small"
           label={"en.models.projects.group"}
           source={Constants.model_fields.GROUP}
           reference={Constants.models.GROUPS}
-          validate={validateGroup}>
+          validate={validateGroup}
+          defaultValue={record.group}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
-        { groupContactList.length > 0 &&
-          <div>
-            <UserInput
-              required
-              label={"en.models.projects.primary_contact_user"}
-              placeholder={`Primary Contact`}
-              validate={validatePrimaryContactUser}
-              className="input-small"
-              users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
-              />
-          </div>
-        }
+
+        <UserInput
+          required
+          label={"en.models.projects.primary_contact_user"}
+          placeholder={`Primary Contact`}
+          //this blocks form submission , probably because of how gross this UserInput value is. validate={validatePrimaryContactUser}
+          className="input-small"
+          defaultValue={primaryContactUser}
+          setPrimaryContactUser={setPrimaryContactUser}
+          users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+          />
+          
         { record.id && (
           <div>
-            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}
+            />
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </div>
         )}
-      </div>
-      
-    </CardContentInner>;
-  }
+        {record && 
+          <div className={classes.mapView}>
+            <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
+          </div>
+        }
+        
+      </SimpleForm>)
+
+  
 });
 
 export const ProjectCreate = withTranslate(
@@ -356,9 +410,7 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={Constants.resource_operations.LIST}>
-        <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
-      </SimpleForm>
+      <ProjectEditForm classes={classes} permissions={permissions} record={record} {...others} />
     </Edit>;
   }
 };

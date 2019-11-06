@@ -34,7 +34,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
 
-const listStyles = {
+const styles = {
   actions: {
     backgroundColor: 'inherit',
   },
@@ -48,6 +48,13 @@ const listStyles = {
   showBreaks: {
     whiteSpace: "pre-wrap",
   },
+
+  label: {
+    fontSize: '1em',
+  },
+  hint: {
+  fontSize: '2em',
+  }
 };
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
@@ -131,7 +138,6 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
     </SimpleShowLayout>
   </Show>
 ));
-        
 
 
 const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
@@ -142,8 +148,13 @@ const validateSensitivityLevel = required('en.validate.dataset.sensitivity_level
 const validateTitle = required('en.validate.dataset.title');
 
 
+const CustomLabel = ({classes, translate, labelText} ) => {
+  return <p className={classes.label}>{translate(labelText)}</p>
+}
 
-const DatasetForm = ({ basePath, classes, ...props }) => {
+
+
+const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record.geo ? props.record.geo : {})
   const [dirty, setDirty] = useState(false)
   const [data, setData] = useState({})
@@ -180,12 +191,12 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
   }
 
   console.log("props in datasetform are: ", props)
+  console.log("props classes in datasetform are: ", classes)
 
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={handleChange} redirect={Constants.resource_operations.LIST}>
     <TextInput
-      className="input-small"
-      label={"en.models.datasets.title"}
+      label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
       source={Constants.model_fields.TITLE}
       validate={validateTitle}
       
@@ -264,8 +275,6 @@ const DatasetForm = ({ basePath, classes, ...props }) => {
       <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
     }
     <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-
-
   </SimpleForm>)
 };
 
@@ -293,12 +302,14 @@ export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
 
 const enhance = compose(
   translate,
-  withStyles(listStyles),
+  withStyles(styles),
 );
 
 BaseDatasetEdit.propTypes = {
   translate: PropTypes.func.isRequired,
 };
 
+export const CustomFormLabel = translate(CustomLabel)
+export const DatasetForm = enhance(BaseDatasetForm)
 
 export const DatasetEdit = enhance(BaseDatasetEdit);
