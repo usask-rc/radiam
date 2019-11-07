@@ -1,5 +1,5 @@
 //Appbar.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -7,7 +7,9 @@ import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
-import { Help } from "@material-ui/icons";
+import { Help, HelpOutline } from "@material-ui/icons";
+import UserAvatar from "react-user-avatar"
+import { getUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
   appBarText: {
@@ -34,8 +36,12 @@ const styles = {
 };
 
 // "Menu" is the drop-down that you get when you click the Profile button.
-const CustomUserMenu = translate(({ translate, ...props }) => (
-  <UserMenu {...props}>
+const CustomUserMenu = translate(({ translate, user, ...props }) => (
+  <UserMenu  {...props} icon={
+    user && user.first_name && user.last_name ? 
+    <UserAvatar size="36" name={`${user.first_name} ${user.last_name}`} />
+    : <HelpOutline />
+  }>
     <MenuItemLink
       to="/settings"
       primaryText={translate("en.settings.label")}
@@ -50,9 +56,26 @@ const CustomUserMenu = translate(({ translate, ...props }) => (
 ));
 
 const CustomAppBar = ({ classes, ...props }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getUserDetails().then(data => 
+      {
+        console.log("data returned from get current user details is: ", data)
+        setUser(data)
+      })
+      .catch(err => 
+          {
+              if (this.state.mounted)
+              {
+                  this.setState({redirect: true})
+              }
+          }
+      )
+  }, [])
 
   return(
-  <AppBar {...props} userMenu={<CustomUserMenu />}>
+  <AppBar {...props} userMenu={<CustomUserMenu user={user} />}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />
