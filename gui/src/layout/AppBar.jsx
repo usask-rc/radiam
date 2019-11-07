@@ -57,21 +57,30 @@ const CustomUserMenu = translate(({ translate, user, ...props }) => (
 
 const CustomAppBar = ({ classes, ...props }) => {
   const [user, setUser] = useState(null);
+  let _isMounted = false
 
   useEffect(() => {
+    _isMounted = true
     getUserDetails().then(data => 
       {
         console.log("data returned from get current user details is: ", data)
-        setUser(data)
+        if (_isMounted){
+          setUser(data)
+        }
       })
       .catch(err => 
           {
-              if (this.state.mounted)
+              if (_isMounted)
               {
                   this.setState({redirect: true})
               }
           }
       )
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
   }, [])
 
   return(
