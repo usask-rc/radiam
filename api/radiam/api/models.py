@@ -884,6 +884,19 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
     class Meta:
         db_table = "rdm_data_project_statistics"
 
+
+class SearchModel(models.Model):
+    """
+    SearchModel to hold JSONField representing Search object for persistent storage
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT, help_text="The dataset associated with this search")
+    search = JSONField()
+
+    class Meta:
+        db_table = "rdm_searches"
+
+
 class MetadataUIType(models.Model, MetadataSchemaPermissionMixin):
     """
     MetadataUIType

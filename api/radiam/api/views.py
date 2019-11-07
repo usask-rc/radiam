@@ -1,6 +1,7 @@
 from elasticsearch import exceptions as es_exceptions
 import memcache
 
+from elasticsearch_dsl import Search
 from rest_framework.parsers import JSONParser
 
 # from django.contrib.auth.models import User, Group
@@ -82,6 +83,7 @@ from .models import (
     ProjectStatistics,
     ResearchGroup,
     Schema,
+    SearchModel,
     SelectedField,
     SelectedSchema,
     SensitivityLevel,
@@ -705,7 +707,7 @@ class DatasetDataCollectionMethodViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        RadiamAuthDatasetDetailFilter,
+        RadiamAuthDatasetFilter,
     )
 
     filter_fields=('dataset', 'data_collection_method')
@@ -745,7 +747,7 @@ class DatasetSensitivityViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        RadiamAuthDatasetDetailFilter,
+        RadiamAuthDatasetFilter,
     )
 
     filter_fields=('dataset', 'sensitivity')
@@ -1053,11 +1055,13 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         """
 
         radiam_service = RadiamService(project_id)
+        search = Search(index=project_id)
+        search_service = _SearchService(search)
 
         if radiam_service.index_exists(project_id):
             # TODO: Do any queries need to be added here for auth?
 
-            rawresponse = radiam_service.execute()
+            rawresponse = search_service.execute()
             data = rawresponse.to_dict()
 
             return Response(data)
@@ -1236,6 +1240,91 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         Delete a Document from a given index
         """
         return self.perform_destroy(project_id, pk)
+
+
+class DatasetDocsViewSet(viewsets.ViewSet):
+    """
+    Dataset search endpoint
+    """
+
+    def list(self, request, dataset_id):
+        """
+        List documents in an Index/Project filtered by Dataset query
+        """
+
+        radiam_service = RadiamService(dataset_id)
+
+        # get the search object/query for this object and ensure it
+        # is assigned to the project's index. Then execute search
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(search_model.search)
+        search = search.index(str(project.id))
+
+        print(search.to_dict())
+
+        search_service = _SearchService(search)
+        rawresponse = search_service.execute()
+        data = rawresponse.to_dict()
+
+        return Response(data)
+
+
+class DatasetSearchViewSet(viewsets.GenericViewSet):
+    """
+    Elasticsearch Search
+    """
+
+    serializer_class = ESDatasetSerializer
+    pagination_class = PageNumberPagination
+
+    def list(self, request, dataset_id):
+        """
+        Test some basic ES search
+        """
+        # any more validation that needs to be done?
+        dataset = Dataset.objects.get(id=dataset_id)
+
+        # radiam_service = RadiamService(str(dataset.id))
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(search_model.search)
+        search = search.index(str(project.id))
+
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key,value in request.query_params.items():
+            if key in ['page_size','page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            elif key != 'q':
+                # squeeze Windows double-backslashes in path/path_parent
+                if key in ['path', 'path_parent']:
+                    value = value.replace("\\\\", "\\")
+
+                search_service.add_match(key, value)
+            else:
+                search_service.add_generic_search(value)
+
+        self.queryset = search_service.search
+        if not sort:
+            self.queryset = self.queryset.sort()
+        else:
+            self.queryset = self.queryset.sort(sort)
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
 
 class MetadataUITypeViewSet(RadiamViewSet):
     queryset = MetadataUIType.objects.all().order_by('key')

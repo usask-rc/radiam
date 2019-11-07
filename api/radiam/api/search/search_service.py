@@ -2,19 +2,12 @@
 from elasticsearch_dsl import Search
 from radiam.api.exceptions import *
 
-from .documents import ESDataset
-
 class _SearchService:
     """_SearchService dispatches commands using elasticsearch-dsl Search API
     """
 
-    def __init__(self, index_name):
-        self.search = Search(index=index_name)
-        self.search.extra(explain=True)
-
-    def add_filter(self, key, value):
-        self.search.filter('term', **{ key : value })
-        return self
+    def __init__(self, search):
+        self.search = search
 
     def add_match(self, key, value):
         """
