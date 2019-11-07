@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('search', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('dataset', models.ForeignKey(help_text='The dataset associated with this search', on_delete=django.db.models.deletion.PROTECT, to='api.Dataset')),
+                ('dataset', models.ForeignKey(help_text='The dataset associated with this search', unique=True, on_delete=django.db.models.deletion.PROTECT, to='api.Dataset')),
             ],
             options={
                 'db_table': 'rdm_searches',
