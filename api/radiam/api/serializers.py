@@ -357,6 +357,8 @@ class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
 
 class UserAgentSerializer(serializers.ModelSerializer):
 
+    id = serializers.UUIDField(required=False)
+
     # Do these need to be protected via auth model?
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
