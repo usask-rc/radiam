@@ -40,6 +40,7 @@ import RelatedDatasets from '../Datasets/RelatedDatasets';
 import { getGroupUsers, getGroupData, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
+import ProjectEditPage from "./ProjectEditPage";
 
 const styles = {
   actions: {
@@ -410,7 +411,7 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
-      <ProjectEditForm classes={classes} permissions={permissions} record={record} {...others} />
+      <ProjectEditPage classes={classes} permissions={permissions} record={record} {...others} />
     </Edit>;
   }
 };
