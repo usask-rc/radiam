@@ -129,17 +129,25 @@ function isFile(file) {
 }
 
 function FolderView({ projectID, item, classes }) {
+
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
+  const basePath = item.path //we dont want to be able to go higher than the base path.
   const [files, setFiles] = useState([]);
   const [folderPath, setFolderPath] = useState(item.path);
-  const [parentList, setParentList] = useState([item]);
+  const [parents, setParents] = useState(item.path_parent);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log("useeffect firing in folderview")
     _isMounted = true
     getFolderFiles(folderPath, projectID).then((data) => {
+      console.log("data ret from getfolderfiles is: ", data)
       if (_isMounted){
         setFiles(data)
+        
+        setParent(data[0].path_parent) //any value in data should suit here.
+        setLoading(false)
       }
       return data
     })
@@ -151,11 +159,11 @@ function FolderView({ projectID, item, classes }) {
     }
   }, [folderPath]);
 
-  if (files) {
+  if (!loading) {
     return (
       <ReducedExpansionPanel
         key={folderPath}
-        expanded={true}
+        expanded={"true"}
         className={classes.parentPanel}
         TransitionProps={{ unmountOnExit: true }}
       >
@@ -175,11 +183,19 @@ function FolderView({ projectID, item, classes }) {
         </div>
         <ExpansionPanelSummary
           onClick={() => {
-            if (parentList.length > 0) {
-              const parentListItem = parentList.pop();
-              setFolderPath(parentListItem.path_parent);
+            console.log("folder up clicked, parent, basepath: ", parent, basePath)
+
+            if (folderPath !== basePath){
+              setLoading(true);
+              setFolderPath(parent);
             }
-          }}
+            else{
+              //do nothing
+            }
+
+              
+            }
+          }
         >
           <FolderOpen className={classes.folderIcon} />
           <Typography
@@ -203,8 +219,9 @@ function FolderView({ projectID, item, classes }) {
                     <ExpansionPanelSummary
                       className={classes.nestedFolderPanel}
                       onClick={() => {
-                        setFolderPath(file.path);
-                        setParentList([...parentList, file]);
+                          setLoading(true)
+                          setParent(folderPath)
+                          setFolderPath(file.path);
                       }}
                     >
                       <FolderDisplay classes={classes} file={file} />

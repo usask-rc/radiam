@@ -146,8 +146,8 @@ export const UserTitle = ({ record }) => {
 export const UserShow = props => {
 
   return (<Show title={<UserTitle />}  {...props}>
-    <UserDetails {...props} />
-    </Show>
+            <UserDetails {...props} />
+          </Show>
   )
 };
 
