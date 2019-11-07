@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from radiam.api.models import User, Project
 from radiam.api.views import ProjectSearchViewSet
 from radiam.api.search import _SearchService
+from radiam.api.serializers import ESDatasetSerializer
 
 from .elasticsearch.basesearchtestcase import BaseSearchTestCase
 from .elasticsearch.testdata import *
@@ -201,8 +202,6 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.assertContains(response=response, text="", status_code=200)
         self.assertEquals(updated_doc.meta['id'], doc.meta['id'])
         self.assertNotEquals(updated_doc['keywords'], doc['keywords'])
-
-        # self.assertEqual(True, False)
 
     def tearDown(self):
         super().tearDown()

@@ -1221,7 +1221,8 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         doc_updates = self.request.data
         result = radiam_service.update_doc_partial(project_id, pk, doc_updates)
 
-        return Response(result)
+        serializer = ESDatasetSerializer()
+        return Response(serializer.to_representation(result))
 
     def perform_destroy(self, project_id, pk):
         # ES Python clients don't actually return anything on delete,
