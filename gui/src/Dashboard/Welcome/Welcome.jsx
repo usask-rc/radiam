@@ -26,7 +26,6 @@ const styles = {
     width: "28px",
   },
   container: {
-    width: "36em",
     margin: "1em",
     textAlign: "flex-start",
     minHeight: "12em",
