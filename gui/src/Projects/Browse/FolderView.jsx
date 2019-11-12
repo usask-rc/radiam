@@ -132,21 +132,28 @@ function FolderView({ projectID, item, classes }) {
 
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
-  const basePath = item.path //we dont want to be able to go higher than the base path.
   const [files, setFiles] = useState([]);
-  const [folderPath, setFolderPath] = useState(item.path);
-  const [parents, setParents] = useState(item.path_parent);
+  const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
 
+  const addParent = (parent) => {
+    let tempParents = [...parents, parent]
+    setParents(tempParents)
+    //add a path to the list of parents at the end of the list
+  }
+  const removeParent = () => {
+    let tempParents = [...parents]
+    tempParents.splice(tempParents.length - 1, 1)
+    setParents(tempParents)
+    //remove the topmost parent from the list
+  }
+
   useEffect(() => {
-    console.log("useeffect firing in folderview")
+    let folderPath = parents[parents.length - 1]
     _isMounted = true
     getFolderFiles(folderPath, projectID).then((data) => {
-      console.log("data ret from getfolderfiles is: ", data)
       if (_isMounted){
-        setFiles(data)
-        
-        setParent(data[0].path_parent) //any value in data should suit here.
+        setFiles(data.files)
         setLoading(false)
       }
       return data
@@ -157,12 +164,12 @@ function FolderView({ projectID, item, classes }) {
     return function cleanup() {
       _isMounted = false;
     }
-  }, [folderPath]);
+  }, [parents]);
 
   if (!loading) {
     return (
       <ReducedExpansionPanel
-        key={folderPath}
+        key={parents[parents.length - 1]}
         expanded={"true"}
         className={classes.parentPanel}
         TransitionProps={{ unmountOnExit: true }}
@@ -183,24 +190,17 @@ function FolderView({ projectID, item, classes }) {
         </div>
         <ExpansionPanelSummary
           onClick={() => {
-            console.log("folder up clicked, parent, basepath: ", parent, basePath)
-
-            if (folderPath !== basePath){
-              setLoading(true);
-              setFolderPath(parent);
-            }
-            else{
-              //do nothing
-            }
-
-              
+              if (parents.length > 1){
+                setLoading(true);
+                removeParent()
+              }
             }
           }
         >
           <FolderOpen className={classes.folderIcon} />
           <Typography
             className={classes.baseFolderText}
-          >{`${folderPath}`}</Typography>
+          >{`${parents[parents.length - 1]}`}</Typography>
         </ExpansionPanelSummary>
 
         {files &&
@@ -220,8 +220,7 @@ function FolderView({ projectID, item, classes }) {
                       className={classes.nestedFolderPanel}
                       onClick={() => {
                           setLoading(true)
-                          setParent(folderPath)
-                          setFolderPath(file.path);
+                          addParent(file.path) //TODO: this is probably wrong we want to use setparent to create a list of parents
                       }}
                     >
                       <FolderDisplay classes={classes} file={file} />

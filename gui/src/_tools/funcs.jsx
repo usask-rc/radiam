@@ -61,12 +61,12 @@ export function getFirstCoordinate(layer) {
   }
 }
 
-export function getFolderFiles(folderPath, projectID){
+export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
     filter: { path_parent: folderPath },
-    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    pagination: { page: page, perPage: numFiles },
     sort: { field: 'last_modified', order: 'ASC' },
   };
 
@@ -88,6 +88,8 @@ export function getFolderFiles(folderPath, projectID){
           return file;
         });
 
+        console.log("response to getfolderfiles is: ", response)
+
         fileList.sort(function (a, b) {
           if (a.items) {
             if (b.items) {
@@ -107,7 +109,7 @@ export function getFolderFiles(folderPath, projectID){
             return 1;
           }
         });
-        resolve(fileList);
+        resolve({files:fileList, total:response.total, next:response.text});
       })
       .catch(err => {
         reject(err)
@@ -126,10 +128,12 @@ export function getRelatedDatasets(record){
   })
 }
 
+//gets the root folder paths for a given project
 export function getRootPaths(projectID){
   const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: 'ASC' },
+    filter: { type: 'directory'}
   };
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -144,14 +148,13 @@ export function getRootPaths(projectID){
         let rootList = {}
 
         response.data.map(file => {
-          //new location that we haven't seen yet.  Add it to the dictionary.
+          //find the root paths by taking the smallest length parent paths at each location
           if (typeof file.location !== "undefined") {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             }
-            //we've seen this location before.  Compare for the shorter string.
             else {
-              //take the smaller value of the two.  They must share a parent path as they are in the same location.
+              
               if (rootList[file.location].length > file.path_parent) {
                 rootList[file.location] = file.path_parent
               }
@@ -162,11 +165,10 @@ export function getRootPaths(projectID){
 
         let rootPaths = []
 
-        //create dummy root folder items.
+        //create dummy root folder items for display
         for (var key in rootList) {
           rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
         }
-        console.log("rootpaths being resolved: ", rootPaths)
         resolve(rootPaths)
 
       })
@@ -176,7 +178,16 @@ export function getRootPaths(projectID){
   });
 }
 
-export function getProjectFiles(params){
+export function getProjectData(params, folders=false){
+
+  //get only folders if true, otherwise get only files
+  if (folders) {
+    params.type="directory"
+    //ordering=-file_num_in_dir
+  }
+  else{
+    params.type="file"
+  }
 
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
