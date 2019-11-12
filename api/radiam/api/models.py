@@ -484,7 +484,7 @@ class GroupRole(models.Model, SuperuserOnlyPermissionMixin):
     A role assigned to a group
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="The label for this role")
+    label = models.CharField(max_length=80, null=False, unique=True, help_text="The label for this role")
     description = models.CharField(max_length=500, blank=True, null=False, help_text="A description of this role")
 
     class Meta:
