@@ -357,6 +357,8 @@ class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
 
 class UserAgentSerializer(serializers.ModelSerializer):
 
+    id = serializers.UUIDField(required=False)
+
     # Do these need to be protected via auth model?
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
@@ -467,7 +469,7 @@ class UserAgentSerializer(serializers.ModelSerializer):
             for u in useragents:
                 if u.location == value:
                     raise ValidationError("Duplicate OSF locations for agents is not allowed")
-                
+
         return value
 
 
@@ -1020,8 +1022,12 @@ class ESDatasetSerializer(serializers.Serializer):
 
         representation = {}
 
-        # first add the doc id if its the first 'layer'
-        representation.update({'id': instance.meta.id})
+        if not instance:
+            return representation
+
+        if instance and instance.meta and instance.meta.id:
+            # first add the doc id if its the first 'layer'
+            representation.update({'id': instance.meta.id})
         # convert the rest of the result object into a dict and append it to rep
         representation.update(instance.to_dict())
         return representation
