@@ -2,6 +2,7 @@
 from .search_service import _SearchService
 from .document_service import _DocumentService
 from .index_service import _IndexService
+from elasticsearch_dsl import Search
 
 class RadiamService:
     """RadiamService acts as a Facade to other ES-related services.
@@ -19,7 +20,8 @@ class RadiamService:
     """
 
     def __init__(self, index_name):
-        self.search_service = _SearchService(index_name)
+        search = Search(index=index_name)
+        self.search_service = _SearchService(search)
         self.index_service = _IndexService(index_name)
         self.document_service = _DocumentService()
 
