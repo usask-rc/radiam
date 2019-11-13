@@ -34,7 +34,12 @@ function BrowseTab({ projectID, classes }) {
         getProjectData(params).then(data => {
 
           if (data && data.files.length > 0){ //else there are no project files
-          setListOfRootPaths([data.files[0].path_parent])
+
+            console.log("data is: ", data)
+
+          let folderItem = { id: `${data.files[0].id}`, key: `${data.files[0].key}`, path_parent: data.files[0].path_parent, path: data.files[0].path }
+
+          setListOfRootPaths([folderItem])
           setStatus({loading: false})
           }
         })
