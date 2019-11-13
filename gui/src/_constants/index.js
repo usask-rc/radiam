@@ -11,7 +11,7 @@ module.exports = Object.freeze({
   ROLE_USER: "user",
   OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",
-  RADIAMAGENTREADMEURL: "https://gitlab.com/usask-rc/radiam",
+  RADIAMAGENTREADMEURL: "https://github.com/usask-rc/radiam",
   WEBTOKEN: "token",
   SUPPORTEMAIL: "support@radiam.ca",
   USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
