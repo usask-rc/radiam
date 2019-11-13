@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths } from '../../_tools/funcs';
+import { getRootPaths, getProjectData } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -25,11 +25,28 @@ function BrowseTab({ projectID, classes }) {
     _isMounted = true
     
     getRootPaths(projectID).then(data => {
-      if (_isMounted){      
-        setListOfRootPaths(data)
-        setStatus({loading: false})
+      if (data.length === 0){
+        //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
+        const params = {
+          id: projectID,
+          pagination: { page: 1, perPage: 1 },
+        };
+        getProjectData(params).then(data => {
+
+          if (data && data.files.length > 0){ //else there are no project files
+          setListOfRootPaths([data.files[0].path_parent])
+          setStatus({loading: false})
+          }
+        })
       }
-      return data
+      else{
+        if (_isMounted){      
+          setListOfRootPaths(data)
+          setStatus({loading: false})
+        }
+        return data
+      }
+
     }).catch(err => {
       setStatus({ loading: false, error: err })
       console.error(err)
