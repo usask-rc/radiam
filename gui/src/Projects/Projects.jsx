@@ -200,13 +200,14 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const [groupList, setGroupList] = useState([])
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
-  const [error, setError] = useState({primary_contact: false})
+  const [status, setStatus] = useState({error: false, loading: true})
   let _isMounted = false
 
 
   const handleSelectChange = (e, value, prevValue, target) => {
     console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
     if (target === 'group' && value !== prevValue){
+      setStatus({loading: true})
       setGroupList([])
       setProjectGroup(value)
     }
@@ -239,11 +240,11 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           return data
         }
       ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)})
+        console.error("error returned in getallparentgroups: ", err)
+      })
     }
     else{
       //now get a list of users in each group
-      const newEmpty = {}
       setGroupContactList([])
       getPrimaryContactCandidates()
     }
@@ -274,18 +275,19 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               if (groupContactList.length > 0)
               {
                 setGroupContactList(groupContactList)
-                setError({primary_contact: false})
+                setStatus({error: false, loading: false})
               }
               else{
                   setGroupContactList([])
-                  setError({primary_contact: true})
+                  setStatus({error: false, loading: false})
                   //TODO: block form submission if we don't have a PCU.
               }
         }
         
 
           
-        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+        }).catch(err => 
+          setStatus({error: err, loading: false}))
       })
     }else{
       console.error("no group selected from which to provide candidate contacts")
@@ -341,13 +343,18 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               />
           </div>)
           :
-          error.primary_contact ? 
+          !status.loading && groupContactList.length === 0 ? 
           (<div>
-          <Typography styles={{color: 'red'}}>{`No Eligible Users were found in the selected Group.  Please ensure the selected group contains Users, or select another group.`}</Typography>
+          <Typography>{`No Eligible Users were found in the selected Group. Primary Contact will remain as the previously set user.`}</Typography>
+          </div>)
+          :
+          status.loading ? 
+          (<div>
+            <Typography>{`Loading Associated Users...`}</Typography>
           </div>)
           :
           <div>
-            <Typography>{`Loading...`}</Typography>
+            <Typography>{`Error loading users: ${status.error}`}</Typography>
           </div>
         }
         { record.id && (
