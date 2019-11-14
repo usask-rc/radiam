@@ -172,7 +172,7 @@ const App = props => {
             list={permissions.is_admin ? GroupRoleList : null}
             show={permissions.is_admin ? GroupRoleShow : null}
             create={null}
-            edit={permissions.is_admin ? GroupRoleEdit : null}
+            edit={null}
           />,
 
           <Resource
@@ -201,7 +201,7 @@ const App = props => {
             list={permissions.is_admin ? LocationTypeList : null}
             show={permissions.is_admin ? LocationTypeShow : null}
             create={null}
-            edit={permissions.is_admin ? LocationTypeEdit : null}
+            edit={null}
           />,
 
           <Resource
@@ -250,7 +250,7 @@ const App = props => {
             list={permissions.is_admin ? DataCollectionStatusList : null}
             show={permissions.is_admin ? DataCollectionStatusShow : null}
             create={null}
-            edit={permissions.is_admin ? DataCollectionStatusEdit : null}
+            edit={null}
           />,
 
           <Resource
@@ -260,7 +260,7 @@ const App = props => {
             list={permissions.is_admin ? DataCollectionMethodList : null}
             show={permissions.is_admin ? DataCollectionMethodShow : null}
             create={null}
-            edit={permissions.is_admin ? DataCollectionMethodEdit : null}
+            edit={null}
           />,
 
           <Resource
@@ -270,7 +270,7 @@ const App = props => {
             list={permissions.is_admin ? DistributionRestrictionList : null}
             show={permissions.is_admin ? DistributionRestrictionShow : null}
             create={null}
-            edit={permissions.is_admin ? DistributionRestrictionEdit : null}
+            edit={null}
           />,
 
           <Resource
@@ -280,7 +280,7 @@ const App = props => {
             list={permissions.is_admin ? SensitivityLevelList : null}
             show={permissions.is_admin ? SensitivityLevelShow : null}
             create={null}
-            edit={permissions.is_admin ? SensitivityLevelEdit : null}
+            edit={null}
           />,
 
           <Resource

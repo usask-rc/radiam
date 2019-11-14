@@ -40,7 +40,7 @@ function BrowseTab({ projectID, classes }) {
           setStatus({loading: false, error: false})
           }
           else{
-            setStatus({loading: false, error: "No Files were found in this project"})
+            setStatus({loading: false, error: "No files were found in this project"})
           }
         })
       }
