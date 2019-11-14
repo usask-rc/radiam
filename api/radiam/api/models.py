@@ -890,7 +890,7 @@ class SearchModel(models.Model):
     SearchModel to hold JSONField representing Search object for persistent storage
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT, unique=True, help_text="The dataset associated with this search")
+    dataset = models.OneToOneField(Dataset, on_delete=models.PROTECT, unique=True, help_text="The dataset associated with this search")
     search = JSONField()
 
     class Meta:
