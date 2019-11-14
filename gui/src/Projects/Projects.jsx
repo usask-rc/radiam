@@ -279,7 +279,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               else{
                   setGroupContactList([])
                   setError({primary_contact: true})
-                
+                  //TODO: block form submission if we don't have a PCU.
               }
         }
         
