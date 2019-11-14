@@ -96,10 +96,7 @@ class Dashboard extends Component {
                 const date_indexed = moment(file.indexed_date).toISOString();
 
                 const timeDiff = now.diff(date_indexed, 'days');
-                if (timeDiff > dateLimit) {
-                  console.log(`greater than ${dateLimit} days, removing from recent list`);
-                }
-                else {
+                if (timeDiff <= dateLimit) {
                   return file
                 }
                 return null

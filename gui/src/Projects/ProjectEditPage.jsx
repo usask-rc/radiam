@@ -60,7 +60,7 @@ const validatePrimaryContactUser = required('en.validate.project.primary_contact
         return(<Field name={source} component={renderUserInput} {...props} />)}
 
 class ProjectEditPage extends Component {
-    state = {}
+    
     
     constructor(props){
         super(props)
@@ -96,6 +96,7 @@ class ProjectEditPage extends Component {
   */  
       //TODO: handle potential setstate on unmounted component
     getAllParentGroups = group_id => {
+        console.log("getAllParentGroups called with group id: ", group_id)
         if (group_id !== null){
             getGroupData(group_id).then(
             data => {
@@ -113,6 +114,7 @@ class ProjectEditPage extends Component {
         }
         else{
             //now get a list of users in each group
+            this.setState({groupContactCandidates: {}})
             this.getPrimaryContactCandidates()
         }
     };
@@ -121,11 +123,13 @@ class ProjectEditPage extends Component {
         if (this.state.groupList){
             let iteratedGroups = []
 
+            console.log("state when getprimarycontactcandidates called is: ", this.state)
             
 
             this.state.groupList.map(group => {
             getUsersInGroup(group).then(data => {
 
+                console.log("data returned from getusersingroup is: ", data)
                 let tempGroupContactCandidates = this.state.groupContactCandidates
 
                 data.map(item => {
@@ -143,6 +147,8 @@ class ProjectEditPage extends Component {
                 Object.keys(tempGroupContactCandidates).map(key => {
                     groupContactList.push(this.state.groupContactCandidates[key])                    
                 })
+
+                console.log("groupcontactlist after adding all users is: ", groupContactList)
 
                 //TODO: why is this also necessary when considering the candidates list above?
                 this.setState({groupContactList: groupContactList})
@@ -182,16 +188,17 @@ class ProjectEditPage extends Component {
     handleSelectChange(e, value, prevValue, target){
         if (target === 'group'){
             if (prevValue !== value){
-                this.setState({groupContactCandidates: {}, groupContactList: []}, {[target]:value}, this.getAllParentGroups(value))
+                console.log("before this setstate in selectchange: ", this.state)
+                this.setState({groupContactCandidates: {}, groupContactList: []}, this.setState({[target]:value}, this.getAllParentGroups(value)))
             }
         }
     }
 
 
     render() { 
-        console.log("groupContactList is: ", this.state.groupContactList)
+        console.log("props are: ", this.props)
         const { classes, permissions, record, ...others } = this.props;
-        const { primary_contact_user } = this.state
+        const { primary_contact_user, groupContactList } = this.state
         
         
         return (<SimpleForm redirect={Constants.resource_operations.LIST} save={this.handleSubmit} onChange={this.handleChange}>
@@ -228,6 +235,20 @@ class ProjectEditPage extends Component {
                 defaultValue={record.group}>
                 <SelectInput optionText={Constants.model_fields.NAME} />
             </ReferenceInput>
+
+            {groupContactList && groupContactList.length > 0 &&
+            
+            <UserInput
+            required
+            label={"en.models.projects.primary_contact_user"}
+            placeholder={`Primary Contact`}
+            //this blocks form submission , probably because of how gross this UserInput value is. validate={validatePrimaryContactUser}
+            className="input-small"
+            defaultValue={this.props.record.primary_contact_user}
+            users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+            />
+            }
+
 
     
             { record.id && (

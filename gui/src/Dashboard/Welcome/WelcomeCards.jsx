@@ -81,8 +81,6 @@ const WelcomeCards = () => {
         }
     }, [])
 
-    console.log("userGroups value is: ", userGroups)
-
     return(
     <Grid
         direction="row"
