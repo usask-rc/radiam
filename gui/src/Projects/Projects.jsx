@@ -38,7 +38,7 @@ import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
 import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem } from "@material-ui/core";
+import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
 
 const styles = {
   actions: {
@@ -198,11 +198,20 @@ const UserInput = ({ source, ...props }) => <Field name={source} component={rend
 
 export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
   const [groupList, setGroupList] = useState([])
-  const [groupContactCandidates, setGroupContactCandidates] = useState({})
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
-
+  const [error, setError] = useState({primary_contact: false})
   let _isMounted = false
+
+
+  const handleSelectChange = (e, value, prevValue, target) => {
+    console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
+    if (target === 'group' && value !== prevValue){
+      setGroupList([])
+      setProjectGroup(value)
+    }
+  }
+
   useEffect(() => {
     _isMounted = true
     if (projectGroup !== null){
@@ -224,10 +233,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           let tempGroupList = groupList
           tempGroupList.push(data)
 
-          if (_isMounted){
-            setGroupList(tempGroupList)
-            getAllParentGroups(data.parent_group)
-          }
+          setGroupList(tempGroupList)
+          getAllParentGroups(data.parent_group)
+
           return data
         }
       ).catch(err => {
@@ -235,6 +243,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
     else{
       //now get a list of users in each group
+      const newEmpty = {}
+      setGroupContactList([])
       getPrimaryContactCandidates()
     }
   };
@@ -242,28 +252,38 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const getPrimaryContactCandidates = () => {
     if (groupList){
       let iteratedGroups = []
+      let groupContactCandidates = {} //using a dict to prevent duplicates
 
       groupList.map(group => {
+
+        console.log("getting contacts from group: ", group)
         getUsersInGroup(group).then(data => {
-
-          let tempGroupContactCandidates = groupContactCandidates
-
-          data.map(item => {
-            tempGroupContactCandidates[item.id] = item
-          })
-
-          setGroupContactCandidates(tempGroupContactCandidates)
-          iteratedGroups.push(group)
-
-          if (iteratedGroups.length === groupList.length){
-            let groupContactList = []
-            Object.keys(tempGroupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-              
+          
+            data.map(item => {
+              groupContactCandidates[item.id] = item
             })
 
-            setGroupContactList(groupContactList)
-          }
+            iteratedGroups.push(group)
+
+            if (iteratedGroups.length === groupList.length){
+              let groupContactList = []
+              Object.keys(groupContactCandidates).map(key => {
+                groupContactList.push(groupContactCandidates[key])
+              })
+
+              if (groupContactList.length > 0)
+              {
+                setGroupContactList(groupContactList)
+                setError({primary_contact: false})
+              }
+              else{
+                  setGroupContactList([])
+                  setError({primary_contact: true})
+                
+              }
+        }
+        
+
           
         }).catch(err => console.error('error returned from getgroupusers is: ', err))
       })
@@ -305,11 +325,12 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           label={"en.models.projects.group"}
           source={Constants.model_fields.GROUP}
           reference={Constants.models.GROUPS}
+          onChange={handleSelectChange}
           validate={validateGroup}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
-        { groupContactList.length > 0 &&
-          <div>
+        { groupContactList.length > 0 ?
+          (<div>
             <UserInput
               required
               label={"en.models.projects.primary_contact_user"}
@@ -318,6 +339,15 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               className="input-small"
               users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
               />
+          </div>)
+          :
+          error.primary_contact ? 
+          (<div>
+          <Typography styles={{color: 'red'}}>{`No Eligible Users were found in the selected Group.  Please ensure the selected group contains Users, or select another group.`}</Typography>
+          </div>)
+          :
+          <div>
+            <Typography>{`Loading...`}</Typography>
           </div>
         }
         { record.id && (
