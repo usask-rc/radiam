@@ -46,9 +46,6 @@ const styles = {
   actions: {
     backgroundColor: 'inherit',
   },
-  formDisplay: {
-    width: "auto",
-  },
   header: {
     backgroundColor: 'inherit',
   },
@@ -58,9 +55,6 @@ const styles = {
   root: {
     backgroundColor: 'inherit',
   },
-  mapView: {
-    width: "100%"
-  }
 };
 
 const filterStyles = {
@@ -188,16 +182,12 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 }));
 
 
-//you'd think there would be an easier way to do this, and I'm sure there is, but sending a hook down here to change the value works.  touch it at your own risk.
-const renderUserInput = ({ input, users, ...props }) => {
-  
-  const handleChange=(e) => {
-    props.setPrimaryContactUser(e.target.value)
-  }
 
+const renderUserInput = ({ input, users }) => {
   return (<React.Fragment>
     <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
-    <Select value={props.defaultValue} onChange={handleChange} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+      {...input}
     >
       {users && [...users].map(user => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
@@ -206,14 +196,14 @@ const renderUserInput = ({ input, users, ...props }) => {
   </React.Fragment>)
 }
 
-const UserInput = ({ source, ...props }) => {
-  return(<Field name={source} component={renderUserInput} {...props} />)}
+const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
 
-export const ProjectEditForm = withStyles(styles)(({ classes, permissions, record }) => {
+export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
   const [groupList, setGroupList] = useState([])
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
   const [status, setStatus] = useState({error: false, loading: true})
+  const [formGeo, setFormGeo] = useState({})
   let _isMounted = false
 
 
@@ -263,13 +253,6 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
     }
   };
 
-    /*
-
-    //mark as dirty if prop value does not equal state value.  If they're equal, leave isDirty as is.
-    if (this.state.geo !== this.props.record.geo) {
-      this.setState({ isFormDirty: true });
-    }*/
-
   const getPrimaryContactCandidates = () => {
     if (groupList){
       let iteratedGroups = []
@@ -318,32 +301,29 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
     if (record.group && projectGroup === null){
       setProjectGroup(record.group)
     }
-  }
-  console.log("primary contact user is: ", record.primary_contact_user)
 
-    return (<CardContentInner>
-      <TextInput
-        className="input-small"
-        label={"en.models.projects.name"}
-        source={Constants.model_fields.NAME}
-        defaultValue={record.name}
-        validate={validateName} />
-      <ReferenceInput
-        resource={Constants.models.PROJECTAVATARS}
-        className="input-small"
-        label={`Icon`} 
-        perPage={100} 
-        defaultValue={record.avatar}
-        source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
-          <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
-      </ReferenceInput>
-      <TextInput
-        className="input-small"
-        label={"en.models.projects.keywords"}
-        source={Constants.model_fields.KEYWORDS}
-        defaultValue={record.keywords}
-        />
-
+    return <CardContentInner>
+      <div>
+        <TextInput
+          className="input-small"
+          label={"en.models.projects.name"}
+          source={Constants.model_fields.NAME}
+          validate={validateName} />
+      </div>
+        <ReferenceInput
+          resource={Constants.models.PROJECTAVATARS}
+          className="input-small"
+          label={Constants.model_fields.AVATAR} 
+          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
+            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
+        </ReferenceInput>
+      <div>
+        <TextInput
+          className="input-small"
+          label={"en.models.projects.keywords"}
+          source={Constants.model_fields.KEYWORDS} />
+      </div>
+      <div>
         <ReferenceInput
           resource="researchgroups"
           className="input-small"
@@ -382,33 +362,32 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
         }
         { record.id && (
           <div>
-            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}
-            />
+            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </div>
         )}
-        <div>
-          <FormDataConsumer>
-            {({formData, ...rest} ) =>
-            {
-              //NOTE: This FormDataConsumer area is required for the map implementation.
-              const geoDataCallback = geo => {
-                formData.geo = geo
-              };
 
-              return(
-                <div>
-                  <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
-                </div>
-              )
-            }
-            }
-          </FormDataConsumer>
+        <FormDataConsumer>
+          {({formData, ...rest} ) =>
+          {
+            //NOTE: This FormDataConsumer area is required for the map implementation.
+            const geoDataCallback = geo => {
+              formData.geo = geo
+            };
 
-        </div>
+            return(
+              <div>
+                <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
+              </div>
+            )
+          }
+          }
+        </FormDataConsumer>
+
+      </div>
       
-    </CardContentInner>
-    )
+    </CardContentInner>;
+  }
 });
 
 export const ProjectCreate = withTranslate(
@@ -435,7 +414,9 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={Constants.resource_operations.LIST}/>
+      <SimpleForm redirect={Constants.resource_operations.LIST}>
+        <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
+      </SimpleForm>
     </Edit>;
   }
 };
