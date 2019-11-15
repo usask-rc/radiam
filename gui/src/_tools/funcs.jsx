@@ -15,8 +15,8 @@ export function getAPIEndpoint() {
   /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-  }
-  */
+  }*/
+  
 
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -327,6 +327,7 @@ export function getGroupUsers(record) {
 }
 
 export function getUserGroups(record) {
+  console.log("getusergroups called with rec: ", record)
   return new Promise((resolve, reject) => {
     let userGroupMembers = []
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);

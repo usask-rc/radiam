@@ -1,13 +1,12 @@
-import React, { Component, useState, useEffect } from 'react';
+//ProjectStepper.jsx
+import React, { Component, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import compose from "recompose/compose";
 import { connect } from 'react-redux';
 import * as Constants from "../_constants/index";
 import { DisabledInput } from 'ra-ui-materialui/lib/input';
 import { Field } from 'redux-form'
-import { getAPIEndpoint, httpClient, radiamRestProvider } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { GET_LIST, GET_ONE } from 'ra-core';
 import {
   ImageField,
   ReferenceInput,
@@ -26,7 +25,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getGroupUsers, getUsersInGroup } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getUsersInGroup } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 
