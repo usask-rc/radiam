@@ -708,7 +708,7 @@ class DatasetDataCollectionMethodViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        RadiamAuthDatasetFilter,
+        RadiamAuthDatasetDetailFilter,
     )
 
     filter_fields=('dataset', 'data_collection_method')
@@ -748,7 +748,7 @@ class DatasetSensitivityViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        RadiamAuthDatasetFilter,
+        RadiamAuthDatasetDetailFilter,
     )
 
     filter_fields=('dataset', 'sensitivity')
