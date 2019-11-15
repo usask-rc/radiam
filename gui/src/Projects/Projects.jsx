@@ -32,12 +32,12 @@ import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from 
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
-import { userSelect, UserShow } from "../_components/_fields/UserShow";
+import { UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { getGroupData, getUsersInGroup } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
