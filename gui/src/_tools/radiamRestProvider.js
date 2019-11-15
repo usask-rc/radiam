@@ -174,6 +174,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case UPDATE:
         url = `${apiUrl}/${resource}/${params.id}/`;
 
+
+        console.log("params and options in update are: ", params, options)
+
+
         options.method = 'PUT';
         if (
           resource === Constants.models.PROJECTAVATARS &&
@@ -185,8 +189,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           console.log("params data before update is: ", params.data)
           params.data = translateResource(resource, params.data, 1);
           options.body = JSON.stringify(params.data);
-
-          console.log("options body after update is: ", options.body)
         }
 
         break;

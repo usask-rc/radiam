@@ -40,10 +40,10 @@ const Welcome = ({ classes, translate }) => (
       </Typography>
       <Typography variant="body2" component="p">
         {translate("en.dashboard.welcome.content")}
-      </Typography>
+      </Typography><br/>
       <Typography variant={"body2"} component="p">
-        {`View the User Manual `} 
-        <a href={Constants.USERMANUALPATH}>{Constants.USERMANUALFILENAME}</a>
+        {translate("en.dashboard.welcome.content2")}
+        <a href={Constants.USERMANUALPATH}>{translate("en.dashboard.welcome.usermanual")}</a>
       </Typography> 
     </CardContent>
   </Card>
