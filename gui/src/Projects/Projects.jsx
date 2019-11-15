@@ -39,6 +39,8 @@ import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
 import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import MapForm from "../_components/_forms/MapForm";
+import { FormDataConsumer } from "ra-core";
 
 const styles = {
   actions: {
@@ -201,6 +203,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
   const [status, setStatus] = useState({error: false, loading: true})
+  const [formGeo, setFormGeo] = useState({})
   let _isMounted = false
 
 
@@ -363,6 +366,24 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </div>
         )}
+
+        <FormDataConsumer>
+          {({formData, ...rest} ) =>
+          {
+            //NOTE: This FormDataConsumer area is required for the map implementation.
+            const geoDataCallback = geo => {
+              formData.geo = geo
+            };
+
+            return(
+              <div>
+                <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
+              </div>
+            )
+          }
+          }
+        </FormDataConsumer>
+
       </div>
       
     </CardContentInner>;
