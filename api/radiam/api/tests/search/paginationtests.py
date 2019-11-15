@@ -4,7 +4,7 @@ from rest_framework.test import force_authenticate
 from django.urls import reverse
 
 from radiam.api.models import User, Project
-from radiam.api.views import SearchViewSet
+from radiam.api.views import ProjectViewSet
 
 from ..elasticsearch.basesearchtestcase import BaseSearchTestCase
 from ..elasticsearch.testdata import *
@@ -24,7 +24,7 @@ class PaginationTests(BaseSearchTestCase):
         """
         super().setUp()
         self.factory = APIRequestFactory()
-        self.user = User.objects.get(username='bobrobb')
+        self.user = User.objects.get(username='admin')
 
     #
     # def test_pagination(self):
@@ -56,21 +56,14 @@ class PaginationTests(BaseSearchTestCase):
 
         PAGE_SIZE = 0
 
-        params = {
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search', args=[project.id]) + '?page_size=' + str(PAGE_SIZE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
-
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), len(TEST_DATA_MULTIPLE_DOCS))
@@ -88,22 +81,14 @@ class PaginationTests(BaseSearchTestCase):
 
         PAGE_SIZE = -1
 
-        params = {
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search', args=[project.id]) + '?page_size=' + str(PAGE_SIZE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
-
-        # print(response.data[])
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), len(TEST_DATA_MULTIPLE_DOCS))
@@ -120,21 +105,14 @@ class PaginationTests(BaseSearchTestCase):
 
         PAGE_SIZE = 100
 
-        params = {
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search', args=[project.id]) + '?page_size=' + str(PAGE_SIZE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
-
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), len(TEST_DATA_MULTIPLE_DOCS))
@@ -150,21 +128,14 @@ class PaginationTests(BaseSearchTestCase):
 
         PAGE_SIZE = 2
 
-        params = {
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search', args=[project.id]) + '?page_size=' + str(PAGE_SIZE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
-
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), PAGE_SIZE)
@@ -182,22 +153,15 @@ class PaginationTests(BaseSearchTestCase):
         PAGE = 2
         PAGE_SIZE = 2
 
-        params = {
-            'page': PAGE,
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search',
+                       args=[project.id]) + '?page_size=' + str(PAGE_SIZE) + '&page=' + str(PAGE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
-
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), PAGE_SIZE)
@@ -214,21 +178,15 @@ class PaginationTests(BaseSearchTestCase):
         PAGE = 3
         PAGE_SIZE = 2
 
-        params = {
-            'page': PAGE,
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search',
+                       args=[project.id]) + '?page_size=' + str(PAGE_SIZE) + '&page=' + str(PAGE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='', status_code=200)
         self.assertEquals(len(response.data['results']), response.data['count'] % PAGE_SIZE)
@@ -245,21 +203,15 @@ class PaginationTests(BaseSearchTestCase):
         PAGE = -1
         PAGE_SIZE = 2
 
-        params = {
-            'page': PAGE,
-            'page_size': PAGE_SIZE
-        }
-
-        request = self.factory.get(reverse(
-            'radiamsearch-list',
-            args=[project.id]),
-            params)
+        path = reverse('project-search',
+                       args=[project.id]) + '?page_size=' + str(PAGE_SIZE) + '&page=' + str(PAGE)
+        request = self.factory.post(path)
 
         request.user = self.user
         force_authenticate(request, user=request.user)
 
-        response = SearchViewSet.as_view(
-            {'get': 'list'})(request, project_id=project.id)
+        response = ProjectViewSet.as_view(
+            {'post': 'search'})(request, pk=project.id)
 
         self.assertContains(response=response, text='Invalid', status_code=404)
 

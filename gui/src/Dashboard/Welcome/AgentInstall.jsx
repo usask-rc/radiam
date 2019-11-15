@@ -24,7 +24,6 @@ const styles = {
     width: "28px",
   },
   container: {
-    width: "36em",
     margin: "1em 0em 0em 0em",
     textAlign: "flex-start",
     minHeight: "12em",
@@ -39,7 +38,7 @@ const AgentInstall = ({ classes, translate }) => (
       </Typography>
       <Typography variant="body2" component="p">
         {translate("en.dashboard.agent.description")}
-      </Typography>
+      </Typography><br/>
       <Typography variant="body2" component="p">
         {translate("en.dashboard.agent.available_at")}
         <a

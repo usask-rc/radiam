@@ -945,58 +945,16 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         else:
             return super().update(request, pk, **kwargs)
 
-class ProjectAvatarViewSet(RadiamViewSet):
-    """
-    API endpoint that allows project avatars to be viewed or edited.
-    """
-    queryset = ProjectAvatar.objects.all()
-    serializer_class = ProjectAvatarSerializer
-
-    permission_classes = (IsAuthenticated, DRYPermissions,)
-
-
-class UserAgentTokenViewSet(viewsets.GenericViewSet):
-    """
-    Generate and return a new JWT access and refresh token set for this user agent
-    """
-    serializer_class = UserAgentSerializer
-    permission_classes = [AllowAny]
-
-    def list(self, request, useragent_id, action):
-        # Restricted to internal Docker network requests
-        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
-            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
-            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
-
-        useragent = UserAgent.objects.get(id=useragent_id)
-
-        if (action and action == "new") or (useragent.local_refresh_token is None):
-            useragent.generate_tokens()
-            useragent.save()
-
-        data = {
-            "id": useragent_id,
-            "user_id": useragent.user_id,
-            "access_token": useragent.local_access_token,
-            "refresh_token": useragent.local_refresh_token,
-            "host": request.META.get('HTTP_X_FORWARDED_FOR')
-        }
-
-        return Response(data)
-
-
-class SearchViewSet(viewsets.GenericViewSet):
-    """
-    Elasticsearch Search
-    """
-
-    serializer_class = ESDatasetSerializer
-    pagination_class = PageNumberPagination
-
-    def list(self, request, project_id):
+    @action(methods=['post'],
+            detail=True,
+            url_name='search')
+    def search(self, request, pk=None):
         """
-        Test some basic ES search
+        Elasticsearch Search within a specific project's index.
         """
+        project_id = pk
+
+        self.serializer_class = ESDatasetSerializer
 
         query = request.data
 
@@ -1047,6 +1005,112 @@ class SearchViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(page, many=True)
 
         return self.get_paginated_response(serializer.data)
+
+
+class ProjectAvatarViewSet(RadiamViewSet):
+    """
+    API endpoint that allows project avatars to be viewed or edited.
+    """
+    queryset = ProjectAvatar.objects.all()
+    serializer_class = ProjectAvatarSerializer
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+
+class UserAgentTokenViewSet(viewsets.GenericViewSet):
+    """
+    Generate and return a new JWT access and refresh token set for this user agent
+    """
+    serializer_class = UserAgentSerializer
+    permission_classes = [AllowAny]
+
+    def list(self, request, useragent_id, action):
+        # Restricted to internal Docker network requests
+        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
+            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+
+        useragent = UserAgent.objects.get(id=useragent_id)
+
+        if (action and action == "new") or (useragent.local_refresh_token is None):
+            useragent.generate_tokens()
+            useragent.save()
+
+        data = {
+            "id": useragent_id,
+            "user_id": useragent.user_id,
+            "access_token": useragent.local_access_token,
+            "refresh_token": useragent.local_refresh_token,
+            "host": request.META.get('HTTP_X_FORWARDED_FOR')
+        }
+
+        return Response(data)
+
+
+# class SearchViewSet(viewsets.GenericViewSet):
+#     """
+#     Elasticsearch Search
+#     """
+#
+#     serializer_class = ESDatasetSerializer
+#     pagination_class = PageNumberPagination
+#
+#     def list(self, request, project_id):
+#         """
+#         Test some basic ES search
+#         """
+#
+#         print(dir(self))
+#
+#         query = request.data
+#
+#         # any more validation that needs to be done?
+#         project = Project.objects.get(id=project_id)
+#
+#         search = Search.from_dict(query)
+#         search = search.index(str(project.id))
+#
+#         search_service = _SearchService(search)
+#
+#         sort = None
+#         order = None
+#
+#         for key,value in request.query_params.items():
+#             if key in ['page_size','page']:
+#                 continue
+#             elif key == 'ordering':
+#                 sort = value
+#             # elif key != 'q':
+#             #     # squeeze Windows double-backslashes in path/path_parent
+#             #     if key in ['path', 'path_parent']:
+#             #         value = value.replace("\\\\", "\\")
+#             #
+#             #     radiam_service.add_match(key, value)
+#             else:
+#                 pass
+#
+#         # Check to see if there are no docs, we can't sort if there are no docs
+#         # as it causes a 500 error that we don't actually mind.
+#         if sort:
+#             if search_service.no_docs(project_id):
+#                 empty = {}
+#                 empty["count"] = 0
+#                 empty["next"] = None
+#                 empty["previous"] = None
+#                 empty["results"] = []
+#                 return Response(empty)
+#
+#         self.queryset = search_service.search
+#
+#         if sort:
+#             self.queryset = self.queryset.sort(sort)
+#         else:
+#             self.queryset = self.queryset.sort()
+#
+#         page = self.paginate_queryset(self.queryset)
+#         serializer = self.get_serializer(page, many=True)
+#
+#         return self.get_paginated_response(serializer.data)
 
 
 class ProjectSearchViewSet(viewsets.ViewSet):

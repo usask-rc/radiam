@@ -61,9 +61,6 @@ router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
 router.register(r'projects/(?P<project_id>[-\w]+)/docs',
                 views.ProjectSearchViewSet,
                 basename='radiamprojectdocs')
-router.register(r'projects/(?P<project_id>[-\w]+)/search',
-                views.SearchViewSet,
-                basename='radiamsearch')
 
 router.register(r'datasets/(?P<dataset_id>[-\w]+)/docs',
                 views.DatasetDocsViewSet,
