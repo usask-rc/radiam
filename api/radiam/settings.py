@@ -32,6 +32,8 @@ SECRET_KEY = os.environ.get('PROD_SECRET_KEY', 'i_d58xix$0l%c0b^@lz%1#f@61^12yom
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', "True") == "True"
 
+TRACE = False
+
 # By default try to send emails, turn off in development environments.
 SEND_EMAIL = os.environ.get('SEND_EMAIL', "True") == "True"
 
@@ -243,6 +245,8 @@ if str(os.environ.get('SESSIONAUTH')) == "1":
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 
+MEMCACHE = 'radiam_memcached_1:11211'
+
 # Caching required for throttling of rest requests. Recommended to use either
 # database or memcaching in production. Mem should decrease load on database.
 # Will want to switch to IP
@@ -250,7 +254,7 @@ if str(os.environ.get('SESSIONAUTH')) == "1":
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'api_memcached_1:11211',
+        'LOCATION': MEMCACHE,
     }
 }
 

@@ -25,6 +25,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
 from django.core.validators import RegexValidator
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -483,7 +484,7 @@ class GroupRole(models.Model, SuperuserOnlyPermissionMixin):
     A role assigned to a group
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="The label for this role")
+    label = models.CharField(max_length=80, null=False, unique=True, help_text="The label for this role")
     description = models.CharField(max_length=500, blank=True, null=False, help_text="A description of this role")
 
     class Meta:
@@ -715,9 +716,12 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
-        entity = Entity.objects.get(project=self.id)
-        entity.delete()
-        
+        try:
+            entity = Entity.objects.get(project=self.id)
+            entity.delete()
+        except ObjectDoesNotExist:
+            pass
+
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
@@ -879,6 +883,19 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
 
     class Meta:
         db_table = "rdm_data_project_statistics"
+
+
+class SearchModel(models.Model):
+    """
+    SearchModel to hold JSONField representing Search object for persistent storage
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dataset = models.OneToOneField(Dataset, on_delete=models.PROTECT, unique=True, help_text="The dataset associated with this search")
+    search = JSONField()
+
+    class Meta:
+        db_table = "rdm_searches"
+
 
 class MetadataUIType(models.Model, MetadataSchemaPermissionMixin):
     """

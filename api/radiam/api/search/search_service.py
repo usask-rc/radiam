@@ -2,18 +2,12 @@
 from elasticsearch_dsl import Search
 from radiam.api.exceptions import *
 
-from .documents import ESDataset
-
 class _SearchService:
     """_SearchService dispatches commands using elasticsearch-dsl Search API
     """
 
-    def __init__(self, index_name):
-        self.search = Search(index=index_name)
-
-    # def add_filter(self):
-    #     self.search.filter('term', name__keyword="can't phylogenetic enormous.txt")
-    #     return self
+    def __init__(self, search):
+        self.search = search
 
     def add_match(self, key, value):
         """
@@ -56,5 +50,17 @@ class _SearchService:
     def execute(self):
         return self.search.execute()
 
+    def no_docs(self, index_name):
+        """
+        Do a quick search for only metadata to determine how many docs this index has
+        """
+        from elasticsearch_dsl import Search
+        s = Search(index=index_name)
+        s = s.source(False)
+        s.execute()
+        if s.count() > 0:
+            return False
+        else:
+            return True
 
     #TODO: Authorization and Permissions requirements will probably affect this class

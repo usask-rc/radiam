@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths } from '../../_tools/funcs';
+import { getRootPaths, getProjectData } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -25,14 +25,35 @@ function BrowseTab({ projectID, classes }) {
     _isMounted = true
     
     getRootPaths(projectID).then(data => {
-      if (_isMounted){      
-        setListOfRootPaths(data)
-        setStatus({loading: false})
+      if (data.length === 0){
+        //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
+        const params = {
+          id: projectID,
+          pagination: { page: 1, perPage: 1 },
+        };
+        getProjectData(params).then(data => {
+
+          if (data && data.files && data.files.length > 0){ //else there are no project files
+          let folderItem = { id: `${data.files[0].id}`, key: `${data.files[0].key}`, path_parent: data.files[0].path_parent, path: data.files[0].path }
+
+          setListOfRootPaths([folderItem])
+          setStatus({loading: false, error: false})
+          }
+          else{
+            setStatus({loading: false, error: "No files were found in this project"})
+          }
+        })
       }
-      return data
+      else{
+        if (_isMounted){      
+          setListOfRootPaths(data)
+          setStatus({loading: false, error: false})
+        }
+        return data
+      }
+
     }).catch(err => {
       setStatus({ loading: false, error: err })
-      console.error(err)
     })
 
     //if we unmount, lock out the component from being able to use the state
@@ -43,11 +64,11 @@ function BrowseTab({ projectID, classes }) {
 
   return (
     <div className={classes.main}>
-    {status && status.error ? 
-      <Typography>{`Error loading File Data.  Please Refresh the page and try again.`}</Typography>
-      : status && status.loading ? (
-        <Typography>{`Loading File Data...`}</Typography>
-      ) : listOfRootPaths && listOfRootPaths.length > 0 &&
+    {!status.loading && status.error ? 
+      <Typography>{status.error}</Typography>
+      : status.loading ? (
+        <Typography>{`Loading...`}</Typography>
+      ) : listOfRootPaths.length > 0 &&
           listOfRootPaths.map(item => {
             return <FolderView
               expanded={"true"}

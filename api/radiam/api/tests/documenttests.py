@@ -5,6 +5,8 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import force_authenticate
 
+from elasticsearch_dsl import Search
+
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from radiam.api.models import User, Project
 from radiam.api.views import ProjectSearchViewSet
 from radiam.api.search import _SearchService
+from radiam.api.serializers import ESDatasetSerializer
 
 from .elasticsearch.basesearchtestcase import BaseSearchTestCase
 from .elasticsearch.testdata import *
@@ -36,7 +39,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.index_test_docs(TEST_DATA_MULTIPLE_DOCS)
 
         # Search for all docs
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         result = self.searchservice.execute()
 
         if result.hits.total != 5:
@@ -49,7 +53,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         response = ProjectSearchViewSet.as_view({'get': 'list'})(request, project_id=project_id)
 
         # Search for all docs
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         result = self.searchservice.execute()
 
         self.assertContains(response=response, text="", status_code=200)
@@ -85,7 +90,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.index_test_docs(TEST_DATA_SINGLE_DOC)
 
         # Need to grab the id of a document before we can try to retrieve by id.
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name','maw doghouse node.txt')
         result = self.searchservice.execute()
 
@@ -101,7 +107,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         response = ProjectSearchViewSet.as_view({'delete': 'destroy'})(request, project_id=project_id, pk=doc_id)
 
         # Search for the deleted document should not return any results
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name','maw doghouse node.txt')
         result = self.searchservice.execute()
 
@@ -118,7 +125,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.index_test_docs(TEST_DATA_SINGLE_DOC)
 
         # Need to grab the id of a document before we can try to retrieve by id.
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name','maw doghouse node.txt')
         initial_result = self.searchservice.execute()
 
@@ -141,7 +149,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         response = ProjectSearchViewSet.as_view({'put': 'update'})(request, project_id=project_id, pk=doc.meta['id'])
 
         # search for the updated document
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name','millstone ambitious reign.txt')
         updated_result = self.searchservice.execute()
 
@@ -164,7 +173,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.index_test_docs(TEST_DATA_SINGLE_DOC)
 
         # Need to grab the id of a document before we can try to retrieve by id.
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name','maw doghouse node.txt')
         initial_result = self.searchservice.execute()
 
@@ -189,7 +199,8 @@ class TestDocumentAPI(BaseSearchTestCase):
         response = ProjectSearchViewSet.as_view({'patch': 'partial_update'})(request, project_id=project_id, pk=doc.meta['id'])
 
         # search for the updated document
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
         self.searchservice.add_match('name', 'maw doghouse node.txt')
         updated_result = self.searchservice.execute()
 
@@ -201,8 +212,6 @@ class TestDocumentAPI(BaseSearchTestCase):
         self.assertContains(response=response, text="", status_code=200)
         self.assertEquals(updated_doc.meta['id'], doc.meta['id'])
         self.assertNotEquals(updated_doc['keywords'], doc['keywords'])
-
-        # self.assertEqual(True, False)
 
     def tearDown(self):
         super().tearDown()

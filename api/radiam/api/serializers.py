@@ -61,10 +61,12 @@ class MetadataSerializer():
             else:
                 ret.update({"metadata" : None})
         except ElasticSearchRequestError as error:
-            print("Unable to get metadata from elastic search index due to elastic search error " + str(error))
+            if settings.TRACE:
+                print("Unable to get metadata from elastic search index due to elastic search error " + str(error))
             ret.update({"metadata" : None})
         except Exception as error:
-            print("Unable to get metadata from elastic search index because " + str(error))
+            if settings.TRACE:
+                print("Unable to get metadata from elastic search index because " + str(error))
             ret.update({"metadata" : None})
         return ret
 
@@ -357,6 +359,8 @@ class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
 
 class UserAgentSerializer(serializers.ModelSerializer):
 
+    id = serializers.UUIDField(required=False)
+
     # Do these need to be protected via auth model?
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
@@ -421,6 +425,11 @@ class UserAgentSerializer(serializers.ModelSerializer):
             instance.local_access_token = None
             instance.local_refresh_token = None
         instance.user = validated_data.get('user', instance.user)
+        instance.location = validated_data.get('location', instance.location)
+        instance.version = validated_data.get('version', instance.version)
+        instance.date_created = validated_data.get('date_created', instance.date_created)
+        instance.date_updated = validated_data.get('date_updated', instance.date_updated)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
 
         return instance
@@ -447,6 +456,23 @@ class UserAgentSerializer(serializers.ModelSerializer):
                 user_agent_project_config.save()
                 # no matching UserAgentProjectConfig exists for this agent
                 # create one from the passed in pro'project_config'
+
+    def validate_location(self, value):
+        """
+        Ensure the location being entered is valid
+        """
+        # Enforce unique OSF locations for agents
+        if value.location_type.label == "location.type.osf":
+            if self.context['view'].kwargs.get('pk') is None:
+                useragents = UserAgent.objects.all()
+            else:
+                useragents = UserAgent.objects.all().exclude(id=self.initial_data['id'])
+
+            for u in useragents:
+                if u.location == value:
+                    raise ValidationError("Duplicate OSF locations for agents is not allowed")
+
+        return value
 
 
 class NestedProjectUserAgentProjectConfigSerializer(serializers.ModelSerializer):
@@ -998,8 +1024,12 @@ class ESDatasetSerializer(serializers.Serializer):
 
         representation = {}
 
-        # first add the doc id if its the first 'layer'
-        representation.update({'id': instance.meta.id})
+        if not instance:
+            return representation
+
+        if instance and instance.meta and instance.meta.id:
+            # first add the doc id if its the first 'layer'
+            representation.update({'id': instance.meta.id})
         # convert the rest of the result object into a dict and append it to rep
         representation.update(instance.to_dict())
         return representation

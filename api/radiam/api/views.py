@@ -1,6 +1,8 @@
-from elasticsearch_dsl import Search
 from elasticsearch import exceptions as es_exceptions
+import memcache
 
+from elasticsearch_dsl import Search
+from elasticsearch_dsl import Q as ES_Q
 from rest_framework.parsers import JSONParser
 
 # from django.contrib.auth.models import User, Group
@@ -11,7 +13,7 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
+from rest_framework.settings import api_settings, settings
 
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -82,11 +84,13 @@ from .models import (
     ProjectStatistics,
     ResearchGroup,
     Schema,
+    SearchModel,
     SelectedField,
     SelectedSchema,
     SensitivityLevel,
     User,
-    UserAgent)
+    UserAgent,
+    UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_project_created, radiam_project_deleted
 
@@ -201,7 +205,15 @@ class MetadataViewset():
         except ElasticSearchRequestError as error:
             raise ItemNotCreatedException(detail=error.info['error']['root_cause'][0]['reason'])
         except Exception as error:
-            raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+            if hasattr(error, 'info') and \
+                hasattr(error.info, 'error') and \
+                hasattr(error.info['error'], 'root_cause') and \
+                hasattr(error.info['error']['root_cause'].length > 0) and \
+                hasattr(error.info['error']['root_cause'][0], 'reason'):
+                raise InternalErrorException(detail=error.info['error']['root_cause'][0]['reason'])
+            else:
+                raise InternalErrorException(detail=error)
+
         else:
             #success
             headers = self.get_success_headers(serializer.data)
@@ -498,6 +510,21 @@ class UserAgentViewSet(RadiamViewSet):
        UserAgentOrderingFilter,
     )
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return UserAgentOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            return super().filter_queryset(queryset).filter(agent_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class ResearchGroupOrderingFilter(RadiamOrderingFilter):
     def get_replacements(self):
@@ -774,6 +801,27 @@ class LocationViewSet(RadiamViewSet):
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
 
+    def get_project_filter(self):
+        return self.request.query_params.get("project")
+
+    def filter_queryset(self, queryset):
+        project = self.get_project_filter()
+        if project:
+            configs = UserAgentProjectConfig.objects.all().filter(project=project)
+            if configs.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            agent_id_qs = Q()
+            for config in configs:
+                agent_id_qs = agent_id_qs | Q(id=config.agent.id)
+            agents = UserAgent.objects.all().filter(agent_id_qs)
+            if agents.count() == 0:
+                return LocationOrderingFilter.objects.none()
+            location_id_qs = Q()
+            for agent in agents:
+                location_id_qs = location_id_qs | Q(id=agent.location.id)
+            return super().filter_queryset(queryset).filter(location_id_qs)
+        else:
+            return super().filter_queryset(queryset)
 
 class LocationTypeViewSet(RadiamViewSet):
     """
@@ -949,10 +997,16 @@ class SearchViewSet(viewsets.GenericViewSet):
         """
         Test some basic ES search
         """
+
+        query = request.data
+
         # any more validation that needs to be done?
         project = Project.objects.get(id=project_id)
 
-        radiam_service = RadiamService(str(project.id))
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        search_service = _SearchService(search)
 
         sort = None
         order = None
@@ -962,19 +1016,19 @@ class SearchViewSet(viewsets.GenericViewSet):
                 continue
             elif key == 'ordering':
                 sort = value
-            elif key != 'q':
-                # squeeze Windows double-backslashes in path/path_parent
-                if key in ['path', 'path_parent']:
-                    value = value.replace("\\\\", "\\")
-
-                radiam_service.add_match(key, value)
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     radiam_service.add_match(key, value)
             else:
-                radiam_service.add_generic_search(value)
+                pass
 
         # Check to see if there are no docs, we can't sort if there are no docs
         # as it causes a 500 error that we don't actually mind.
         if sort:
-            if radiam_service.no_docs(project_id):
+            if search_service.no_docs(project_id):
                 empty = {}
                 empty["count"] = 0
                 empty["next"] = None
@@ -982,7 +1036,7 @@ class SearchViewSet(viewsets.GenericViewSet):
                 empty["results"] = []
                 return Response(empty)
 
-        self.queryset = radiam_service.get_search()
+        self.queryset = search_service.search
 
         if sort:
             self.queryset = self.queryset.sort(sort)
@@ -996,6 +1050,8 @@ class SearchViewSet(viewsets.GenericViewSet):
 
 
 class ProjectSearchViewSet(viewsets.ViewSet):
+    # memcache client used to track creation of file documents
+    cache = memcache.Client([settings.MEMCACHE], debug=0)
     """
     CRUD operations on an ES index
     """
@@ -1006,11 +1062,13 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         """
 
         radiam_service = RadiamService(project_id)
+        search = Search(index=project_id)
+        search_service = _SearchService(search)
 
         if radiam_service.index_exists(project_id):
             # TODO: Do any queries need to be added here for auth?
 
-            rawresponse = radiam_service.execute()
+            rawresponse = search_service.execute()
             data = rawresponse.to_dict()
 
             return Response(data)
@@ -1061,11 +1119,73 @@ class ProjectSearchViewSet(viewsets.ViewSet):
             raise BadRequestException("No request data found")
 
         if type(data).__name__ not in 'list':
-            doc = ESDataset(**data)
 
-            result = radiam_service.create_single_doc(project_id, doc)
+            key = "{}.{}.{}.{}".format(project_id, data['location'], data['agent'], data['path'])
+            while True:
+                doc_id = self.cache.gets(key)
+                if doc_id is None:
+                    if self.cache.cas(key, "Caching"):
+                        check_existing = RadiamService(project_id)
+                        search = check_existing.get_search() \
+                            .query('term', path__keyword=data['path']) \
+                            .query('term', name__keyword=data['name']) \
+                            .query('term', location__keyword=data['location']) \
+                            .query('term', agent__keyword=data['agent']) \
+                            .source(None)
 
-            return Response(result)
+                        if settings.TRACE:
+                            print('curl -X GET "localhost:9200/' + project_id + '/_search?pretty" -H "Content-Type: application/json" -d\'' + str(search.to_dict()).replace("'", "\"") + "'")
+                        response = search.execute()
+
+                        if response.hits.total == 0:
+                                if settings.DEBUG:
+                                    print("New doc for " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id)
+                                doc = ESDataset(**data)
+                                radiam_service.create_single_doc(project_id, doc)
+                                id = doc.meta["id"]
+                                self.cache.set(key, id)
+                                serializer = ESDatasetSerializer()
+                                response = Response(serializer.to_representation(doc))
+                                break
+                        elif response.hits.total == 1:
+                            id = str(response.hits[0].meta.id)
+                            if settings.DEBUG:
+                                print("Updating " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with id " + id)
+                            try:
+                                response = self.update(request, project_id, id)
+                                self.cache.set(key, id)
+                                break;
+                            except es_exceptions.NotFoundError as e:
+                                self.cache.delete(key)
+                            except Exception as e:
+                                print("Unable to update " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with id " + id + " because " + str(e))
+                        else:
+                            if settings.DEBUG:
+                                print("Updating and deleting " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + ", and need to delete the older entries. There were a total of " + str(response.hits.total) + " docs")
+                            newest = response.hits[0]
+                            for hit in response.hits:
+                                if hit is not newest and hit.indexed_date > newest.indexed_date:
+                                    newest = hit
+                            for hit in response.hits:
+                                if hit is not newest:
+                                    self.perform_destroy(project_id, hit.meta.id)
+                            response = self.update(request, project_id, newest.meta.id)
+                            self.cache.set(key, newest.meta.id)
+                    else:
+                        if settings.TRACE:
+                            print("Someone else has already started creating the document and there is no doc id, we'll try again")
+                else:
+                    if doc_id is not "Caching":
+                        # The document was in the cache
+                        if settings.DEBUG:
+                            print("Updating using cache " + data['path'] + " in location " + data['location'] + " from agent " + data['agent'] + " in project " + project_id + " with doc id " + doc_id)
+                        response = self.update(request, project_id, doc_id)
+                        break
+                    else:
+                        if settings.TRACE:
+                            print("Someone else has already started creating the document and our doc id is Caching, we'll try again")
+
+            return response
 
         else:
             results = radiam_service.create_many_docs(project_id, data)
@@ -1081,19 +1201,21 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         # else:
         #     return Response("Creation failed")
 
+    def perform_update(self, request, project_id, pk):
+        serializer = ESDatasetSerializer()
+        radiam_service = RadiamService(project_id)
+        # Update the doc
+        updated_doc = self.request.data
+        result = radiam_service.update_doc(project_id, pk, updated_doc)
+        result = serializer.to_representation(result)
+        return Response(result)
+
     def update(self, request, project_id, pk):
         """
         Update a document in an index
         """
         parser_classes = (JSONParser,)
-
-        radiam_service = RadiamService(project_id)
-
-        # Update the doc
-        updated_doc = self.request.data
-        result = radiam_service.update_doc(project_id, pk, updated_doc)
-
-        return Response(result)
+        return self.perform_update(request, project_id, pk)
 
     def partial_update(self, request, project_id, pk):
         """
@@ -1110,20 +1232,115 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         doc_updates = self.request.data
         result = radiam_service.update_doc_partial(project_id, pk, doc_updates)
 
+        serializer = ESDatasetSerializer()
+        return Response(serializer.to_representation(result))
+
+    def perform_destroy(self, project_id, pk):
+        # ES Python clients don't actually return anything on delete,
+        # API calls right to ES would... is this a problem?
+        radiam_service = RadiamService(project_id)
+        result = radiam_service.delete_doc(project_id, pk)
         return Response(result)
 
     def destroy(self, request, project_id, pk):
         """
         Delete a Document from a given index
         """
-        # ES Python clients don't actually return anything on delete,
-        # API calls right to ES would... is this a problem?
+        return self.perform_destroy(project_id, pk)
 
-        radiam_service = RadiamService(project_id)
 
-        result = radiam_service.delete_doc(project_id, pk)
+class DatasetDocsViewSet(viewsets.ViewSet):
+    """
+    Dataset search endpoint
+    """
 
-        return Response(result)
+    def list(self, request, dataset_id):
+        """
+        List documents in an Index/Project filtered by Dataset query
+        """
+
+        radiam_service = RadiamService(dataset_id)
+
+        # get the search object/query for this object and ensure it
+        # is assigned to the project's index. Then execute search
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(search_model.search)
+        search = search.index(str(project.id))
+
+        print(search.to_dict())
+
+        search_service = _SearchService(search)
+        rawresponse = search_service.execute()
+        data = rawresponse.to_dict()
+
+        return Response(data)
+
+
+class DatasetSearchViewSet(viewsets.GenericViewSet):
+    """
+    Elasticsearch Search
+    """
+
+    serializer_class = ESDatasetSerializer
+    pagination_class = PageNumberPagination
+
+    def list(self, request, dataset_id):
+        """
+        Test some basic ES search
+        """
+
+        query = request.data
+
+        # any more validation that needs to be done?
+        dataset = Dataset.objects.get(id=dataset_id)
+
+        # radiam_service = RadiamService(str(dataset.id))
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        # Are the Service classes needed anymore?
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key,value in request.query_params.items():
+            if key in ['page_size','page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     search_service.add_match(key, value)
+            else:
+                pass
+
+        # Is it possible for a Dataset to be the entire contents of a project index?
+        # In that case, create another code path that doesn't apply a filter
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+
+        self.queryset = search_service.search
+        if not sort:
+            self.queryset = self.queryset.sort()
+        else:
+            self.queryset = self.queryset.sort(sort)
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
 
 class MetadataUITypeViewSet(RadiamViewSet):
     queryset = MetadataUIType.objects.all().order_by('key')

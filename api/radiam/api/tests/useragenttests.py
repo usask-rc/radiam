@@ -52,8 +52,9 @@ class TestUserAgentSerializer(TestCase):
     fixtures = ['grouphierarchy',]
 
     @staticmethod
-    def _make_useragent_data(user, location, version, project_config_list):
+    def _make_useragent_data(id, user, location, version, project_config_list):
         return {
+            'id': id,
             'user': user,
             'version': version,
             'location': location,
@@ -70,12 +71,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'user' is missing.
         :return:
         """
-
+        id = '22c71cad-fb30-429a-b4f5-946175acd98a'
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         version = '0.0.1'
         project_name = 'test'
 
         user_agent_data = {
+            "id": id,
             "version": version,
             "location": location_id,
             "project_config_list": [{
@@ -100,12 +102,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'user' is null.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         version = '0.0.1'
         project_name = 'test'
 
         user_agent_data = {
+            "id": id,
             "user": None,
             "version": version,
             "location": location_id,
@@ -131,12 +134,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'version' is missing.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         project_name = 'test'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "location": location_id,
             "project_config_list": [{
@@ -161,12 +165,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'version' is null.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         project_name = 'test'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": None,
             "location": location_id,
@@ -192,7 +197,7 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'location' is missing.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         project_name = 'test'
         version = '0.0.1'
@@ -200,6 +205,7 @@ class TestUserAgentSerializer(TestCase):
         value = '/test/folder'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": '0.0.1',
             "project_config_list": [{
@@ -224,7 +230,7 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'location' is null.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         project_name = 'test'
         version = '0.0.1'
@@ -232,6 +238,7 @@ class TestUserAgentSerializer(TestCase):
         value = '/test/folder'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": '0.0.1',
             "location": None,
@@ -257,12 +264,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'project_config' is missing.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         version = '0.0.1'
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": version,
             "location": location_id
@@ -282,12 +290,13 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation fails if 'project_config' is null.
         :return:
         """
-
+        id = '12785dfb-1791-4771-953e-09febcb8b103'
         user = User.objects.get(username='testuser1')
         version = '0.0.1'
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": version,
             "location": location_id,
@@ -309,7 +318,7 @@ class TestUserAgentSerializer(TestCase):
         """
         Test that UserAgent creation is successful
         """
-
+        id = '22c71cad-fb30-429a-b4f5-946175acd98a'
         user = User.objects.get(username='testuser1')
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         # project_id = '69c35620-cca7-4fd6-a84e-35ff3b34b24a'
@@ -319,6 +328,7 @@ class TestUserAgentSerializer(TestCase):
         value = '/test/folder'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "location": location_id,
             "version": version,
@@ -352,7 +362,7 @@ class TestUserAgentSerializer(TestCase):
         Test that UserAgent creation is successful with multiple
         project configs for one UserAgent.
         """
-
+        id = '22c71cad-fb30-429a-b4f5-946175acd98a'
         user = User.objects.get(username='testuser1')
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
         version = '0.0.1'
@@ -363,6 +373,7 @@ class TestUserAgentSerializer(TestCase):
         value = '/test/folder'
 
         user_agent_data = {
+            "id": id,
             "user": user.id,
             "version": version,
             "location": location_id,
@@ -399,7 +410,7 @@ class TestUserAgentSerializer(TestCase):
         """
         Test Updating a UserAgent Location using serializers.
         """
-
+        id = '22c71cad-fb30-429a-b4f5-946175acd98a'
         user = User.objects.get(username='testuser1')
         version = '0.0.1'
         location_id = '0ae20ca5-87d1-4cdf-9d56-84943e14898e'
@@ -414,7 +425,7 @@ class TestUserAgentSerializer(TestCase):
             }
         }]
         user_agent_data = self._make_useragent_data(
-            user.id, location_id, version, project_config_list
+            id, user.id, location_id, version, project_config_list
         )
 
         serializer = UserAgentSerializer(
@@ -438,7 +449,7 @@ class TestUserAgentSerializer(TestCase):
             "config": updated_config
         }]
         updated_model_data = self._make_useragent_data(
-            user.id, location_id, version, updated_config_list
+            id, user.id, location_id, version, updated_config_list
         )
 
         serializer_update = UserAgentSerializer(

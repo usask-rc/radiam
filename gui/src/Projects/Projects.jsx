@@ -37,10 +37,10 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupUsers, getGroupData, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem } from "@material-ui/core";
+import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
-import ProjectEditPage from "./ProjectEditPage";
+import { FormDataConsumer } from "ra-core";
 
 const styles = {
   actions: {
@@ -211,13 +211,20 @@ const UserInput = ({ source, ...props }) => {
 
 export const ProjectEditForm = withStyles(styles)(({ classes, permissions, record }) => {
   const [groupList, setGroupList] = useState([])
-  const [groupContactCandidates, setGroupContactCandidates] = useState({})
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
-  const [geo, setGeo] = useState(record.geo ? record.geo : {})
-  const [primaryContactUser, setPrimaryContactUser] = useState(record.primary_contact_user)
-
+  const [status, setStatus] = useState({error: false, loading: true})
   let _isMounted = false
+
+
+  const handleSelectChange = (e, value, prevValue, target) => {
+    console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
+    if (target === 'group' && value !== prevValue){
+      setStatus({loading: true})
+      setGroupList([])
+      setProjectGroup(value)
+    }
+  }
 
   useEffect(() => {
     _isMounted = true
@@ -240,43 +247,22 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
           let tempGroupList = groupList
           tempGroupList.push(data)
 
-          if (_isMounted){
-            setGroupList(tempGroupList)
-            getAllParentGroups(data.parent_group)
-          }
+          setGroupList(tempGroupList)
+          getAllParentGroups(data.parent_group)
+
           return data
         }
       ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)})
+        console.error("error returned in getallparentgroups: ", err)
+      })
     }
     else{
       //now get a list of users in each group
+      setGroupContactList([])
       getPrimaryContactCandidates()
     }
   };
 
-  const handleSubmit = (e) => {
-    console.log('handlesubmit e is: ', e)
-    //submitObjectWithGeo()
-  }
-
-  const handleChange = (e) => {
-    console.log("handleChange e: ", e)
-  }
-
-
-  const geoDataCallback = geo => {
-    if (geo && Object.keys(geo).length > 0) {
-
-      setGeo(geo)
-      
-      //this isn't needed unless we re-introduce the geoJSON text form.
-      //this.setState({geoText: JSON.stringify(geo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: this.state.jsonTextFormKey + 1})));
-    } else {
-      //this will likely have to be changed
-      setGeo({})
-    }
-  }
     /*
 
     //mark as dirty if prop value does not equal state value.  If they're equal, leave isDirty as is.
@@ -287,30 +273,41 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
   const getPrimaryContactCandidates = () => {
     if (groupList){
       let iteratedGroups = []
+      let groupContactCandidates = {} //using a dict to prevent duplicates
 
       groupList.map(group => {
+
+        console.log("getting contacts from group: ", group)
         getUsersInGroup(group).then(data => {
-
-          let tempGroupContactCandidates = groupContactCandidates
-
-          data.map(item => {
-            tempGroupContactCandidates[item.id] = item
-          })
-
-          setGroupContactCandidates(tempGroupContactCandidates)
-          iteratedGroups.push(group)
-
-          if (iteratedGroups.length === groupList.length){
-            let groupContactList = []
-            Object.keys(tempGroupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-              
+          
+            data.map(item => {
+              groupContactCandidates[item.id] = item
             })
 
-            setGroupContactList(groupContactList)
-          }
+            iteratedGroups.push(group)
+
+            if (iteratedGroups.length === groupList.length){
+              let groupContactList = []
+              Object.keys(groupContactCandidates).map(key => {
+                groupContactList.push(groupContactCandidates[key])
+              })
+
+              if (groupContactList.length > 0)
+              {
+                setGroupContactList(groupContactList)
+                setStatus({error: false, loading: false})
+              }
+              else{
+                  setGroupContactList([])
+                  setStatus({error: false, loading: false})
+                  //TODO: block form submission if we don't have a PCU.
+              }
+        }
+        
+
           
-        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+        }).catch(err => 
+          setStatus({error: err, loading: false}))
       })
     }else{
       console.error("no group selected from which to provide candidate contacts")
@@ -324,7 +321,7 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
   }
   console.log("primary contact user is: ", record.primary_contact_user)
 
-    return (<SimpleForm redirect={Constants.resource_operations.LIST} save={handleSubmit} onChange={handleChange}>
+    return (<CardContentInner>
       <TextInput
         className="input-small"
         label={"en.models.projects.name"}
@@ -353,22 +350,36 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
           label={"en.models.projects.group"}
           source={Constants.model_fields.GROUP}
           reference={Constants.models.GROUPS}
-          validate={validateGroup}
-          defaultValue={record.group}>
+          onChange={handleSelectChange}
+          validate={validateGroup}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
-
-        <UserInput
-          required
-          label={"en.models.projects.primary_contact_user"}
-          placeholder={`Primary Contact`}
-          //this blocks form submission , probably because of how gross this UserInput value is. validate={validatePrimaryContactUser}
-          className="input-small"
-          defaultValue={primaryContactUser}
-          setPrimaryContactUser={setPrimaryContactUser}
-          users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
-          />
-          
+        { groupContactList.length > 0 ?
+          (<div>
+            <UserInput
+              required
+              label={"en.models.projects.primary_contact_user"}
+              placeholder={`Primary Contact`}
+              validate={validatePrimaryContactUser}
+              className="input-small"
+              users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+              />
+          </div>)
+          :
+          !status.loading && groupContactList.length === 0 ? 
+          (<div>
+          <Typography>{`No Eligible Users were found in the selected Group. Primary Contact will remain as the previously set user.`}</Typography>
+          </div>)
+          :
+          status.loading ? 
+          (<div>
+            <Typography>{`Loading Associated Users...`}</Typography>
+          </div>)
+          :
+          <div>
+            <Typography>{`Error loading users: ${status.error}`}</Typography>
+          </div>
+        }
         { record.id && (
           <div>
             <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}
@@ -376,15 +387,28 @@ export const ProjectEditForm = withStyles(styles)(({ classes, permissions, recor
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </div>
         )}
-        {record && 
-          <div className={classes.mapView}>
-            <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
-          </div>
-        }
-        
-      </SimpleForm>)
+        <div>
+          <FormDataConsumer>
+            {({formData, ...rest} ) =>
+            {
+              //NOTE: This FormDataConsumer area is required for the map implementation.
+              const geoDataCallback = geo => {
+                formData.geo = geo
+              };
 
-  
+              return(
+                <div>
+                  <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
+                </div>
+              )
+            }
+            }
+          </FormDataConsumer>
+
+        </div>
+      
+    </CardContentInner>
+    )
 });
 
 export const ProjectCreate = withTranslate(
@@ -411,7 +435,7 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
-      <ProjectEditPage classes={classes} permissions={permissions} record={record} {...others} />
+      <SimpleForm redirect={Constants.resource_operations.LIST}/>
     </Edit>;
   }
 };

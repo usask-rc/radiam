@@ -210,7 +210,8 @@ class MetadataComponent extends Component {
           "entityschemafields",
           params
         ).then(response => {
-          if (response && response.data && response.data.length === 0) {
+          if (!fromParent && response && response.data && response.data.length === 0) {
+            // Don't create this entity if we are just checking if a parent exists.
             this.createEntity(fromParent);
           } else {
             this.parseEntitySchemasFields(response, id, type, fromParent);
