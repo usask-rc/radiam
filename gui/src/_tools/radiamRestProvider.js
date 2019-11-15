@@ -23,7 +23,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     const options = {};
     switch (type) {
 
+      case "GET_FILES": {
+        break;
+      }
+
       case GET_LIST: {
+        console.log("GET_LIST being accessed.  params, options: ", params, options, url, formData, httpClient)
+
         //TODO: this needs refactoring badly.
         //types of request:
         //sort
@@ -40,7 +46,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //everything else contains 'sort' and 'pagination'.  Base classes contain an empty 'filter', and projects/browse contains a 'filter' for searching path_parent.
 
         //'filter' is empty on base models.
-        //paginatino and sort both always have values
+        //pagination and sort both always have values
 
 
         //this is used in /search browser  (to look for parent paths)
@@ -48,7 +54,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
+        // /search endpoint needs to be handled differently than the base models.
+        let lastElement = resource.split('/').pop()
+
         if (
+          lastElement === Constants.paths.SEARCH || //TODO: remove this and make a more permanent solution.
           params &&
           params.filter &&
           params.sort && //new - adding this might have broken things.
@@ -59,6 +69,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           let query
 
           // /search endpoint needs to be handled differently than the base models.
+          let lastElement = resource.split('/').pop()
+          console.log("last element in url is: ", lastElement)
+
           if (resource.split('/').pop() !== Constants.paths.SEARCH) {
             query = {
               ...fetchUtils.flattenObject(params.filter),
@@ -70,13 +83,17 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
 
           }
-          else {
+          else {//this is for accessing /search in projects to find Files.
+            console.log("/search being accessed.  params, options: ", params, options)
+            options.method = Constants.methods.POST;
+            
             query = {
               ...fetchUtils.flattenObject(params.filter),
             };
             url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}`;
 
           }
+
 
         }
         //should be all other cases.  I don't see why we would ever have use for a page designation.
@@ -111,7 +128,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         if (params && params.q) {
           url = url + `&q=${params.q}`;
         }
+
+        console.log("url and options leaving get_list are: ", url, options)
+
         break;
+
       }
 
       case 'CURRENT_USER': {

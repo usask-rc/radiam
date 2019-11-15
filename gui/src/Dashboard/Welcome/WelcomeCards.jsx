@@ -5,6 +5,7 @@ import { Grid } from '@material-ui/core';
 import * as Constants from "../../_constants/index"
 import { getUserGroups, getUsersInGroup } from '../../_tools/funcs';
 import FirstSteps from './FirstSteps';
+import SecondSteps from './SecondSteps';
 
 
 const WelcomeCards = () => {
@@ -93,6 +94,11 @@ const WelcomeCards = () => {
             <FirstSteps userType={userType}/>
         </Grid>
         }
+
+        <Grid item xs={4}>
+            <SecondSteps userType={userType}/>
+        </Grid>
+        
         <Grid item xs={4}>
             <Welcome />
         </Grid>
