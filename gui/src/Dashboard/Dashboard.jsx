@@ -69,8 +69,8 @@ class Dashboard extends Component {
       .then(projects => {
         projects.map(project => {
           dataProvider(
-            GET_LIST,
-            Constants.models.PROJECTS + '/' + project.id + '/search',
+            "GET_FILES",
+            Constants.models.PROJECTS + '/' + project.id,
             {
               sort: {
                 field: Constants.model_fields.INDEXED_DATE,

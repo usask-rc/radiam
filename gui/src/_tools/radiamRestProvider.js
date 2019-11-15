@@ -19,11 +19,35 @@ import get from 'lodash/get';
 export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
   const convertDataRequestToHTTP = (type, resource, params) => {
     let url = '';
+    let sort = '';
     let formData = new FormData();
     const options = {};
     switch (type) {
 
+      
       case "GET_FILES": {
+
+        let {page, perPage} = params.pagination
+
+        url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
+        options.method = Constants.methods.POST
+
+        console.log("values in GET_FILES are: ", resource, type, params, options, url, formData, httpClient)
+        console.log("GET_FILES URL IS: ", url)
+        let query = {
+          ...fetchUtils.flattenObject(params.filter),
+        };
+        
+        if (params && params.sort)
+        {
+          let sign = '';
+          if (params.sort.order && params.sort.order === 'DESC') {
+            sign = '-';
+          }
+          sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
+        }
+
+        url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}${sort}`;
         break;
       }
 
@@ -54,11 +78,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
-        // /search endpoint needs to be handled differently than the base models.
-        let lastElement = resource.split('/').pop()
-
         if (
-          lastElement === Constants.paths.SEARCH || //TODO: remove this and make a more permanent solution.
           params &&
           params.filter &&
           params.sort && //new - adding this might have broken things.
@@ -266,10 +286,24 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return { data: json };
       }
 
-      case GET_LIST:
+      case "GET_FILES":
+
         json.results = translateResource(resource, json.results);
 
         let ret = {
+          data: json.results,
+          total: json.count,
+          next: json.next,
+          previous: json.previous,
+        };
+
+        ret.data.map(item => (item.key = item.id));
+        return ret;
+
+      case GET_LIST:
+        json.results = translateResource(resource, json.results);
+
+        ret = {
           data: json.results,
           total: json.count,
           next: json.next,

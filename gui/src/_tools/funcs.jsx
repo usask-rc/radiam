@@ -76,8 +76,8 @@ export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
   return new Promise((resolve, reject) => {
     
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      "GET_FILES",
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -141,8 +141,8 @@ export function getRootPaths(projectID){
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      "GET_FILES",
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -194,8 +194,8 @@ export function getProjectData(params, folders=false){
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
       dataProvider(
-        GET_LIST,
-        Constants.models.PROJECTS + '/' + params.id + '/search',
+        "GET_FILES",
+        Constants.models.PROJECTS + '/' + params.id,
         params
       )
       .then(response => {
