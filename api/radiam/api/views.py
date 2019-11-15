@@ -1270,8 +1270,6 @@ class DatasetDocsViewSet(viewsets.ViewSet):
         search = Search.from_dict(search_model.search)
         search = search.index(str(project.id))
 
-        print(search.to_dict())
-
         search_service = _SearchService(search)
         rawresponse = search_service.execute()
         data = rawresponse.to_dict()

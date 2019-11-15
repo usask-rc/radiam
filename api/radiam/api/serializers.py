@@ -1177,8 +1177,6 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
         If the linked GeoData object exists, update it. If not, create it.
         """
 
-        print(geo)
-
         geojson_geometry = geo.get('geojson')
         ctype = ContentType.objects.get_for_model(instance)
 
