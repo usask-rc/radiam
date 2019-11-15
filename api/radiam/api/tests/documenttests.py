@@ -92,7 +92,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # Need to grab the id of a document before we can try to retrieve by id.
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name','maw doghouse node.txt')
+        self.searchservice.add_match('name', 'Scienceves.png')
         result = self.searchservice.execute()
 
         if result.hits.total != 1:
@@ -109,7 +109,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # Search for the deleted document should not return any results
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name','maw doghouse node.txt')
+        self.searchservice.add_match('name', 'Scienceves.png')
         result = self.searchservice.execute()
 
         self.assertContains(response=response, text="", status_code=200)
@@ -127,7 +127,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # Need to grab the id of a document before we can try to retrieve by id.
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name','maw doghouse node.txt')
+        self.searchservice.add_match('name', 'Scienceves.png')
         initial_result = self.searchservice.execute()
 
         if initial_result.hits.total != 1:
@@ -151,7 +151,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # search for the updated document
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name','millstone ambitious reign.txt')
+        self.searchservice.add_match('name', 'Fire.png')
         updated_result = self.searchservice.execute()
 
         if updated_result.hits.total != 1:
@@ -175,7 +175,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # Need to grab the id of a document before we can try to retrieve by id.
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name','maw doghouse node.txt')
+        self.searchservice.add_match('name', 'Scienceves.png')
         initial_result = self.searchservice.execute()
 
         if initial_result.hits.total != 1:
@@ -201,7 +201,7 @@ class TestDocumentAPI(BaseSearchTestCase):
         # search for the updated document
         search = Search(index=self.TEST_INDEX_ID)
         self.searchservice = _SearchService(search)
-        self.searchservice.add_match('name', 'maw doghouse node.txt')
+        self.searchservice.add_match('name', 'Scienceves.png')
         updated_result = self.searchservice.execute()
 
         if updated_result.hits.total != 1:
