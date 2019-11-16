@@ -25,7 +25,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     switch (type) {
 
       
-      case "GET_FILES": {
+      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
 
         let {page, perPage} = params.pagination
 
@@ -47,7 +47,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
         }
 
-        url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}${sort}`;
+        url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
+
+        //TODO: parameters should now be handled in the body rather than the url.
+        /*
+        if (params && params.q) {
+          url = url + `&q=${params.q}`;
+        }*/
+
+        console.log("prior to submission, url in GET_FILES is: ", url)
         break;
       }
 
@@ -78,6 +86,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
+        if (params.pagination){
+          
+        }
+
         if (
           params &&
           params.filter &&
@@ -92,7 +104,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           let lastElement = resource.split('/').pop()
           console.log("last element in url is: ", lastElement)
 
-          if (resource.split('/').pop() !== Constants.paths.SEARCH) {
+          
             query = {
               ...fetchUtils.flattenObject(params.filter),
               _sort: sortField ? sortField : null,
@@ -102,32 +114,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             };
             url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
 
-          }
-          else {//this is for accessing /search in projects to find Files.
-            console.log("/search being accessed.  params, options: ", params, options)
-            options.method = Constants.methods.POST;
-            
-            query = {
-              ...fetchUtils.flattenObject(params.filter),
-            };
-            url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}`;
-
-          }
-
-
         }
         //should be all other cases.  I don't see why we would ever have use for a page designation.
         else if (params && (params.pagination || params.sort)) {
           let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
-          let sort = '';
-
-          if (params.sort) {
-            let sign = '';
-            if (params.sort.order && params.sort.order === 'DESC') {
-              sign = '-';
-            }
-            sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
-          }
 
           url = `${apiUrl}/${resource}/?`;
           if (page && sort) {

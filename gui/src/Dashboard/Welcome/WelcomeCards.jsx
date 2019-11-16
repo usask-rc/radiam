@@ -94,10 +94,11 @@ const WelcomeCards = () => {
             <FirstSteps userType={userType}/>
         </Grid>
         }
-
-        <Grid item xs={4}>
-            <SecondSteps userType={userType}/>
-        </Grid>
+        { false && //to be replaced once we know what's going here.
+            <Grid item xs={4}>
+                <SecondSteps userType={userType}/>
+            </Grid>
+        }
         
         <Grid item xs={4}>
             <Welcome />
