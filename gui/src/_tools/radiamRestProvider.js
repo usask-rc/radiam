@@ -28,12 +28,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
 
         let {page, perPage} = params.pagination
-
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
 
-        console.log("values in GET_FILES are: ", resource, type, params, options, url, formData, httpClient)
-        console.log("GET_FILES URL IS: ", url)
         let query = {
           ...fetchUtils.flattenObject(params.filter),
         };
@@ -55,57 +52,25 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           url = url + `&q=${params.q}`;
         }*/
 
-        console.log("prior to submission, url in GET_FILES is: ", url)
         break;
       }
 
       case GET_LIST: {
-        console.log("GET_LIST being accessed.  params, options: ", params, options, url, formData, httpClient)
-
-        //TODO: this needs refactoring badly.
-        //types of request:
-        //sort
-        //filter
-        //paginate (most requests)
-        //no paginate 'i want all items' - needed for the browser view and for drop-down lists.
-        //no parameters (default pagination of 25 per page)
-
-        //pagination + sort but NO FILTER means it's a typical list - react-admin handles this.
-        //this again has to be postponed until the browser view is reworked into a page by page system.
-
-        //projects/search contains 'ordering' and 'pagination'.  The former is unique to this portion of the API & elasticsearch.
-
-        //everything else contains 'sort' and 'pagination'.  Base classes contain an empty 'filter', and projects/browse contains a 'filter' for searching path_parent.
-
-        //'filter' is empty on base models.
-        //pagination and sort both always have values
-
-
-        //this is used in /search browser  (to look for parent paths)
-        //this is used in any filter throughout the app.
-        //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
-        if (params.pagination){
-          
-        }
+        console.log("params sent to get_list are: ", params)
 
-        if (
-          params &&
-          params.filter &&
-          params.sort && //new - adding this might have broken things.
-          Object.keys(params.filter).length > 0
-        ) {
-          const { page, perPage } = params.pagination;
-          const { sortField, sortOrder } = params.sort;
-          let query
+        if (params)
+        {
+          if (
+            params.filter &&
+            params.sort && //new - adding this might have broken things.
+            Object.keys(params.filter).length > 0
+          ) {
+            const { page, perPage } = params.pagination;
+            const { sortField, sortOrder } = params.sort;
 
-          // /search endpoint needs to be handled differently than the base models.
-          let lastElement = resource.split('/').pop()
-          console.log("last element in url is: ", lastElement)
-
-          
-            query = {
+            let query = {
               ...fetchUtils.flattenObject(params.filter),
               _sort: sortField ? sortField : null,
               _order: sortOrder ? sortOrder : null,
@@ -113,36 +78,27 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               _end: page * perPage,
             };
             url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
-
-        }
-        //should be all other cases.  I don't see why we would ever have use for a page designation.
-        else if (params && (params.pagination || params.sort)) {
-          let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
-
-          url = `${apiUrl}/${resource}/?`;
-          if (page && sort) {
-            url = `${url}${page}&${sort}`;
-          } else if (page) {
-            url = `${url}${page}`;
-          } else if (sort) {
-            url = `${url}${sort}`;
           }
-          if (params.query) {
-            url = url + `&${stringify(params.query)}`;
+          //should be all other cases.  I don't see why we would ever have use for a page designation.
+          else if (params.pagination || params.sort) {
+            let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
+
+            url = `${apiUrl}/${resource}/?`;
+            if (page && sort) {
+              url = `${url}${page}&${sort}`;
+            } else if (page) {
+              url = `${url}${page}`;
+            } else if (sort) {
+              url = `${url}${sort}`;
+            }
+            if (params.query) {
+              url = url + `&${stringify(params.query)}`;
+            }
           }
         }
-        else {
-          url = `${apiUrl}/${resource}/`;
-        }
 
-        if (params && params.q) {
-          url = url + `&q=${params.q}`;
-        }
-
-        console.log("url and options leaving get_list are: ", url, options)
-
+        console.log("url receiving get_list query is: ", url)
         break;
-
       }
 
       case 'CURRENT_USER': {
