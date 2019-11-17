@@ -11,7 +11,7 @@ import FileList from '../../_components/files/FileList';
 import { Search } from '@material-ui/icons';
 
 import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
-import { getProjectFiles } from '../../_tools/funcs';
+import { getProjectData } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -73,7 +73,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       sort: { field: sort, order: order },
     };
 
-    getProjectFiles(params).then(data => {
+    getProjectData(params).then(data => {
       if (_isMounted){
         setData(data)
         setStatus({loading: false})

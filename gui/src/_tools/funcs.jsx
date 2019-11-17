@@ -1,3 +1,4 @@
+//funcs.jsx
 import * as Constants from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
@@ -9,10 +10,12 @@ var cloneDeep = require('lodash.clonedeep');
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-
+  
+  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
+  */
 
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -65,20 +68,24 @@ export function getFirstCoordinate(layer) {
   }
 }
 
+<<<<<<< HEAD
 export function getFolderFiles(folderPath, projectID) {
+=======
+export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
     filter: { path_parent: folderPath },
-    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    pagination: { page: page, perPage: numFiles },
     sort: { field: 'last_modified', order: 'ASC' },
   };
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      "GET_FILES",
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -91,7 +98,13 @@ export function getFolderFiles(folderPath, projectID) {
           return file;
         });
 
+<<<<<<< HEAD
         fileList.sort(function(a, b) {
+=======
+        console.log("response to getfolderfiles is: ", response)
+
+        fileList.sort(function (a, b) {
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
           if (a.items) {
             if (b.items) {
               if (a.name < b.name) {
@@ -110,7 +123,7 @@ export function getFolderFiles(folderPath, projectID) {
             return 1;
           }
         });
-        resolve(fileList);
+        resolve({files:fileList, total:response.total, next:response.text});
       })
       .catch(err => {
         reject(err);
@@ -134,31 +147,41 @@ export function getRelatedDatasets(record) {
   });
 }
 
+<<<<<<< HEAD
 export function getRootPaths(projectID) {
+=======
+//gets the root folder paths for a given project
+export function getRootPaths(projectID){
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
   const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: 'ASC' },
+    filter: { type: 'directory'}
   };
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      "GET_FILES",
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
         let rootList = {};
 
         response.data.map(file => {
+<<<<<<< HEAD
           //new location that we haven't seen yet.  Add it to the dictionary.
           if (typeof file.location !== 'undefined') {
+=======
+          //find the root paths by taking the smallest length parent paths at each location
+          if (typeof file.location !== "undefined") {
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             }
-            //we've seen this location before.  Compare for the shorter string.
             else {
-              //take the smaller value of the two.  They must share a parent path as they are in the same location.
+              
               if (rootList[file.location].length > file.path_parent) {
                 rootList[file.location] = file.path_parent;
               }
@@ -169,7 +192,7 @@ export function getRootPaths(projectID) {
 
         let rootPaths = [];
 
-        //create dummy root folder items.
+        //create dummy root folder items for display
         for (var key in rootList) {
           rootPaths.push({
             id: `${key}${rootList[key]}`,
@@ -178,8 +201,13 @@ export function getRootPaths(projectID) {
             path: rootList[key],
           });
         }
+<<<<<<< HEAD
         console.log('rootpaths being resolved: ', rootPaths);
         resolve(rootPaths);
+=======
+        resolve(rootPaths)
+
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
       })
       .catch(error => {
         reject(error);
@@ -187,6 +215,7 @@ export function getRootPaths(projectID) {
   });
 }
 
+<<<<<<< HEAD
 export function getProjectFiles(params) {
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -195,6 +224,26 @@ export function getProjectFiles(params) {
       Constants.models.PROJECTS + '/' + params.id + '/search',
       params
     )
+=======
+export function getProjectData(params, folders=false){
+
+  //get only folders if true, otherwise get only files
+  if (folders) {
+    params.type="directory"
+    //ordering=-file_num_in_dir
+  }
+  else{
+    params.type="file"
+  }
+
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+      dataProvider(
+        "GET_FILES",
+        Constants.models.PROJECTS + '/' + params.id,
+        params
+      )
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
       .then(response => {
         resolve({ files: response.data, nbFiles: response.total });
       })
@@ -243,8 +292,14 @@ export function getUserDetails() {
   });
 }
 
+<<<<<<< HEAD
 export function getUsersInGroup(record) {
   console.log('record called to getusersin group: ', record);
+=======
+//TODO: this can probably be consolidated with getGroupUsers
+export function getUsersInGroup(record){
+  console.log("record called to getusersin group: ", record)
+>>>>>>> 94eee9fd402cf8679fd11cf44a8f22c9a17461e3
   return new Promise((resolve, reject) => {
     let groupUsers = [];
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -343,6 +398,7 @@ export function getGroupUsers(record) {
 }
 
 export function getUserGroups(record) {
+  console.log("getusergroups called with rec: ", record)
   return new Promise((resolve, reject) => {
     let userGroupMembers = [];
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);

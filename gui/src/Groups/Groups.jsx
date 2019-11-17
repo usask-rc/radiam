@@ -9,6 +9,7 @@ import {
   Edit,
   Filter,
   List,
+  LongTextInput,
   ReferenceField,
   ReferenceInput,
   required,
@@ -81,7 +82,6 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
 ));
 
 export const GroupList = withStyles(styles)(({ classes, ...props }) => {
-
   return(
   <List
     {...props}
@@ -222,7 +222,7 @@ const GroupForm = props =>
         source={Constants.model_fields.NAME}
         validate={validateName}
       />
-      <TextInput
+      <LongTextInput
         label={"en.models.groups.description"}
         source={Constants.model_fields.DESCRIPTION}
         validate={validateDescription}
@@ -281,10 +281,11 @@ class BaseGroupEdit extends Component {
           source={Constants.model_fields.NAME}
           validate={validateName}
         />
-        <TextInput
+        <LongTextInput
           label={"en.models.groups.description"}
           source={Constants.model_fields.DESCRIPTION}
           validate={validateDescription}
+          style={{"max-width": "80%"}}
         />
         <BooleanInput
           label={"en.models.generic.active"}

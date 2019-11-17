@@ -1,6 +1,8 @@
 from elasticsearch import exceptions as es_exceptions
 import memcache
 
+from elasticsearch_dsl import Search
+from elasticsearch_dsl import Q as ES_Q
 from rest_framework.parsers import JSONParser
 
 # from django.contrib.auth.models import User, Group
@@ -82,6 +84,7 @@ from .models import (
     ProjectStatistics,
     ResearchGroup,
     Schema,
+    SearchModel,
     SelectedField,
     SelectedSchema,
     SensitivityLevel,
@@ -942,6 +945,68 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         else:
             return super().update(request, pk, **kwargs)
 
+    @action(methods=['post'],
+            detail=True,
+            url_name='search')
+    def search(self, request, pk=None):
+        """
+        Elasticsearch Search within a specific project's index.
+        """
+        project_id = pk
+
+        self.serializer_class = ESDatasetSerializer
+
+        query = request.data
+
+        # any more validation that needs to be done?
+        project = Project.objects.get(id=project_id)
+
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key,value in request.query_params.items():
+            if key in ['page_size','page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     radiam_service.add_match(key, value)
+            else:
+                pass
+
+        # Check to see if there are no docs, we can't sort if there are no docs
+        # as it causes a 500 error that we don't actually mind.
+        if sort:
+            if search_service.no_docs(project_id):
+                empty = {}
+                empty["count"] = 0
+                empty["next"] = None
+                empty["previous"] = None
+                empty["results"] = []
+                return Response(empty)
+
+        self.queryset = search_service.search
+
+        if sort:
+            self.queryset = self.queryset.sort(sort)
+        else:
+            self.queryset = self.queryset.sort()
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
+
 class ProjectAvatarViewSet(RadiamViewSet):
     """
     API endpoint that allows project avatars to be viewed or edited.
@@ -982,62 +1047,70 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
         return Response(data)
 
 
-class SearchViewSet(viewsets.GenericViewSet):
-    """
-    Elasticsearch Search
-    """
-
-    serializer_class = ESDatasetSerializer
-    pagination_class = PageNumberPagination
-
-    def list(self, request, project_id):
-        """
-        Test some basic ES search
-        """
-        # any more validation that needs to be done?
-        project = Project.objects.get(id=project_id)
-
-        radiam_service = RadiamService(str(project.id))
-
-        sort = None
-        order = None
-
-        for key,value in request.query_params.items():
-            if key in ['page_size','page']:
-                continue
-            elif key == 'ordering':
-                sort = value
-            elif key != 'q':
-                # squeeze Windows double-backslashes in path/path_parent
-                if key in ['path', 'path_parent']:
-                    value = value.replace("\\\\", "\\")
-
-                radiam_service.add_match(key, value)
-            else:
-                radiam_service.add_generic_search(value)
-
-        # Check to see if there are no docs, we can't sort if there are no docs
-        # as it causes a 500 error that we don't actually mind.
-        if sort:
-            if radiam_service.no_docs(project_id):
-                empty = {}
-                empty["count"] = 0
-                empty["next"] = None
-                empty["previous"] = None
-                empty["results"] = []
-                return Response(empty)
-
-        self.queryset = radiam_service.get_search()
-
-        if sort:
-            self.queryset = self.queryset.sort(sort)
-        else:
-            self.queryset = self.queryset.sort()
-
-        page = self.paginate_queryset(self.queryset)
-        serializer = self.get_serializer(page, many=True)
-
-        return self.get_paginated_response(serializer.data)
+# class SearchViewSet(viewsets.GenericViewSet):
+#     """
+#     Elasticsearch Search
+#     """
+#
+#     serializer_class = ESDatasetSerializer
+#     pagination_class = PageNumberPagination
+#
+#     def list(self, request, project_id):
+#         """
+#         Test some basic ES search
+#         """
+#
+#         print(dir(self))
+#
+#         query = request.data
+#
+#         # any more validation that needs to be done?
+#         project = Project.objects.get(id=project_id)
+#
+#         search = Search.from_dict(query)
+#         search = search.index(str(project.id))
+#
+#         search_service = _SearchService(search)
+#
+#         sort = None
+#         order = None
+#
+#         for key,value in request.query_params.items():
+#             if key in ['page_size','page']:
+#                 continue
+#             elif key == 'ordering':
+#                 sort = value
+#             # elif key != 'q':
+#             #     # squeeze Windows double-backslashes in path/path_parent
+#             #     if key in ['path', 'path_parent']:
+#             #         value = value.replace("\\\\", "\\")
+#             #
+#             #     radiam_service.add_match(key, value)
+#             else:
+#                 pass
+#
+#         # Check to see if there are no docs, we can't sort if there are no docs
+#         # as it causes a 500 error that we don't actually mind.
+#         if sort:
+#             if search_service.no_docs(project_id):
+#                 empty = {}
+#                 empty["count"] = 0
+#                 empty["next"] = None
+#                 empty["previous"] = None
+#                 empty["results"] = []
+#                 return Response(empty)
+#
+#         self.queryset = search_service.search
+#
+#         if sort:
+#             self.queryset = self.queryset.sort(sort)
+#         else:
+#             self.queryset = self.queryset.sort()
+#
+#         page = self.paginate_queryset(self.queryset)
+#         serializer = self.get_serializer(page, many=True)
+#
+#         return self.get_paginated_response(serializer.data)
 
 
 class ProjectSearchViewSet(viewsets.ViewSet):
@@ -1053,11 +1126,13 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         """
 
         radiam_service = RadiamService(project_id)
+        search = Search(index=project_id)
+        search_service = _SearchService(search)
 
         if radiam_service.index_exists(project_id):
             # TODO: Do any queries need to be added here for auth?
 
-            rawresponse = radiam_service.execute()
+            rawresponse = search_service.execute()
             data = rawresponse.to_dict()
 
             return Response(data)
@@ -1236,6 +1311,100 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         Delete a Document from a given index
         """
         return self.perform_destroy(project_id, pk)
+
+
+class DatasetDocsViewSet(viewsets.ViewSet):
+    """
+    Dataset search endpoint
+    """
+
+    def list(self, request, dataset_id):
+        """
+        List documents in an Index/Project filtered by Dataset query
+        """
+
+        radiam_service = RadiamService(dataset_id)
+
+        # get the search object/query for this object and ensure it
+        # is assigned to the project's index. Then execute search
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(search_model.search)
+        search = search.index(str(project.id))
+
+        print(search.to_dict())
+
+        search_service = _SearchService(search)
+        rawresponse = search_service.execute()
+        data = rawresponse.to_dict()
+
+        return Response(data)
+
+
+class DatasetSearchViewSet(viewsets.GenericViewSet):
+    """
+    Elasticsearch Search
+    """
+
+    serializer_class = ESDatasetSerializer
+    pagination_class = PageNumberPagination
+
+    def list(self, request, dataset_id):
+        """
+        Test some basic ES search
+        """
+
+        query = request.data
+
+        # any more validation that needs to be done?
+        dataset = Dataset.objects.get(id=dataset_id)
+
+        # radiam_service = RadiamService(str(dataset.id))
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        # Are the Service classes needed anymore?
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key,value in request.query_params.items():
+            if key in ['page_size','page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     search_service.add_match(key, value)
+            else:
+                pass
+
+        # Is it possible for a Dataset to be the entire contents of a project index?
+        # In that case, create another code path that doesn't apply a filter
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+
+        self.queryset = search_service.search
+        if not sort:
+            self.queryset = self.queryset.sort()
+        else:
+            self.queryset = self.queryset.sort(sort)
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
 
 class MetadataUITypeViewSet(RadiamViewSet):
     queryset = MetadataUIType.objects.all().order_by('key')

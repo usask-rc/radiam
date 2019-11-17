@@ -6,6 +6,8 @@ from elasticsearch import exceptions as es_exceptions
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import force_authenticate
 
+from elasticsearch_dsl import Search
+
 from django.urls import reverse
 
 from radiam.api.models import (
@@ -329,8 +331,9 @@ class TestProjectAPI(BaseSearchTestCase):
         self.index_test_docs(TEST_DATA_MULTIPLE_DOCS)
 
         # need to grab the id of a document before we can try to retrieve by it.
-        self.searchservice = _SearchService(self.TEST_INDEX_ID)
-        self.searchservice.add_match('name','millstone ambitious reign.txt')
+        search = Search(index=self.TEST_INDEX_ID)
+        self.searchservice = _SearchService(search)
+        self.searchservice.add_match('name', 'Hotproc.png')
         result = self.searchservice.execute()
 
         if result.hits.total != 1:
@@ -351,7 +354,7 @@ class TestProjectAPI(BaseSearchTestCase):
 
         self.assertContains(
             response=response,
-            text='millstone ambitious reign.txt',
+            text='Hotproc.png',
             status_code=200)
 
     @mock.patch("radiam.api.models.ProjectMetadataDoc.get")

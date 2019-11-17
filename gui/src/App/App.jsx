@@ -48,7 +48,6 @@ import {
 import {
   GroupRoleList,
   GroupRoleShow,
-  GroupRoleCreate,
   GroupRoleEdit,
 } from '../GroupRoles/GroupRoles';
 import {
@@ -172,8 +171,8 @@ const App = props => {
             options={{ label: 'en.sidebar.roles' }}
             list={permissions.is_admin ? GroupRoleList : null}
             show={permissions.is_admin ? GroupRoleShow : null}
-            create={permissions.is_admin ? GroupRoleCreate : null}
-            edit={permissions.is_admin ? GroupRoleEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource
@@ -201,8 +200,8 @@ const App = props => {
             options={{ label: 'en.sidebar.locationtypes' }}
             list={permissions.is_admin ? LocationTypeList : null}
             show={permissions.is_admin ? LocationTypeShow : null}
-            create={permissions.is_admin ? LocationTypeCreate : null}
-            edit={permissions.is_admin ? LocationTypeEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource
@@ -250,8 +249,8 @@ const App = props => {
             options={{ label: 'en.sidebar.data_collection_status' }}
             list={permissions.is_admin ? DataCollectionStatusList : null}
             show={permissions.is_admin ? DataCollectionStatusShow : null}
-            create={permissions.is_admin ? DataCollectionStatusCreate : null}
-            edit={permissions.is_admin ? DataCollectionStatusEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource
@@ -260,8 +259,8 @@ const App = props => {
             options={{ label: 'en.sidebar.data_collection_method' }}
             list={permissions.is_admin ? DataCollectionMethodList : null}
             show={permissions.is_admin ? DataCollectionMethodShow : null}
-            create={permissions.is_admin ? DataCollectionMethodCreate : null}
-            edit={permissions.is_admin ? DataCollectionMethodEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource
@@ -270,10 +269,8 @@ const App = props => {
             options={{ label: 'en.sidebar.distribution_restriction' }}
             list={permissions.is_admin ? DistributionRestrictionList : null}
             show={permissions.is_admin ? DistributionRestrictionShow : null}
-            create={
-              permissions.is_admin ? DistributionRestrictionCreate : null
-            }
-            edit={permissions.is_admin ? DistributionRestrictionEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource
@@ -282,8 +279,8 @@ const App = props => {
             options={{ label: 'en.sidebar.sensitivity_level' }}
             list={permissions.is_admin ? SensitivityLevelList : null}
             show={permissions.is_admin ? SensitivityLevelShow : null}
-            create={permissions.is_admin ? SensitivityLevelCreate : null}
-            edit={permissions.is_admin ? SensitivityLevelEdit : null}
+            create={null}
+            edit={null}
           />,
 
           <Resource

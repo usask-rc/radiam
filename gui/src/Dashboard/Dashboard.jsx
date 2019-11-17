@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { GET_LIST } from 'react-admin';
 import { httpClient, radiamRestProvider } from '../_tools';
-import { getAPIEndpoint } from '../_tools/funcs';
+import { getAPIEndpoint, getUsersInGroup, getGroupData } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
 import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
@@ -14,10 +14,11 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     console.log("props of dashboard are: ", props)
-    this.state = { loading: true, hasFiles: false };
+    this.state = { loading: true, hasFiles: false, managedGroups:{} };
   }
 
   //TODO: handle potential setstate on unmounted component
+  /*
   getRecentUsers = () => {
     const lastMonth = new Date();
     lastMonth.setDate(lastMonth.getDate() - 30);
@@ -33,7 +34,9 @@ class Dashboard extends Component {
         this.setState({ newUsers });
         this.setState({ nbNewUsers: newUsers.reduce(nb => ++nb, 0) });
       });
-  };
+  };*/
+
+  
 
   //TODO: handle potential setstate on unmounted component
   getRecentGroups = () => {
@@ -69,8 +72,8 @@ class Dashboard extends Component {
       .then(projects => {
         projects.map(project => {
           dataProvider(
-            GET_LIST,
-            Constants.models.PROJECTS + '/' + project.id + '/search',
+            "GET_FILES",
+            Constants.models.PROJECTS + '/' + project.id,
             {
               sort: {
                 field: Constants.model_fields.INDEXED_DATE,
@@ -96,10 +99,7 @@ class Dashboard extends Component {
                 const date_indexed = moment(file.indexed_date).toISOString();
 
                 const timeDiff = now.diff(date_indexed, 'days');
-                if (timeDiff > dateLimit) {
-                  console.log(`greater than ${dateLimit} days, removing from recent list`);
-                }
-                else {
+                if (timeDiff <= dateLimit) {
                   return file
                 }
                 return null
@@ -120,6 +120,7 @@ class Dashboard extends Component {
     //this.getRecentUsers();
     //this.getRecentGroups();
     this.getRecentProjects();
+
   }
 
   handleDateLimitChange = daysSince => {

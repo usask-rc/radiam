@@ -15,8 +15,8 @@ class UserDetails extends Component {
     }
 
     async componentDidMount() {
-        let abc = await getUserGroups(this.props.record)
-        this.setState({groupMembers: abc})
+        let groupMembers = await getUserGroups(this.props.record)
+        this.setState({groupMembers: groupMembers})
     }
 
     render() {

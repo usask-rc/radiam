@@ -61,10 +61,12 @@ class MetadataSerializer():
             else:
                 ret.update({"metadata" : None})
         except ElasticSearchRequestError as error:
-            print("Unable to get metadata from elastic search index due to elastic search error " + str(error))
+            if settings.TRACE:
+                print("Unable to get metadata from elastic search index due to elastic search error " + str(error))
             ret.update({"metadata" : None})
         except Exception as error:
-            print("Unable to get metadata from elastic search index because " + str(error))
+            if settings.TRACE:
+                print("Unable to get metadata from elastic search index because " + str(error))
             ret.update({"metadata" : None})
         return ret
 

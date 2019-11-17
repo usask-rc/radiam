@@ -98,7 +98,7 @@ class TestGroupHierarchyPermissions(APITestCase):
         """
         Test Grandchild Admin user can only read grandchild node
         """
-        child_user = User.objects.get(username='grandchilduser1')
+        child_user = User.objects.get(username='gchilduser1')
 
         request = self.factory.get(reverse('researchgroup-list'))
         request.user = child_user

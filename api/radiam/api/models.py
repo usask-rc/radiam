@@ -484,7 +484,7 @@ class GroupRole(models.Model, SuperuserOnlyPermissionMixin):
     A role assigned to a group
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    label = models.CharField(max_length=80, blank=True, null=False, unique=True, help_text="The label for this role")
+    label = models.CharField(max_length=80, null=False, unique=True, help_text="The label for this role")
     description = models.CharField(max_length=500, blank=True, null=False, help_text="A description of this role")
 
     class Meta:
@@ -883,6 +883,19 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
 
     class Meta:
         db_table = "rdm_data_project_statistics"
+
+
+class SearchModel(models.Model):
+    """
+    SearchModel to hold JSONField representing Search object for persistent storage
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dataset = models.OneToOneField(Dataset, on_delete=models.PROTECT, unique=True, help_text="The dataset associated with this search")
+    search = JSONField()
+
+    class Meta:
+        db_table = "rdm_searches"
+
 
 class MetadataUIType(models.Model, MetadataSchemaPermissionMixin):
     """

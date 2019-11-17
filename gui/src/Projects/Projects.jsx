@@ -32,13 +32,15 @@ import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from 
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { ProjectStepper } from "../_components/ProjectStepper.jsx";
-import { userSelect, UserShow } from "../_components/_fields/UserShow";
+import { UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupUsers, getGroupData, getUsersInGroup } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem } from "@material-ui/core";
+import { getGroupData, getUsersInGroup } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import MapForm from "../_components/_forms/MapForm";
+import { FormDataConsumer } from "ra-core";
 
 const styles = {
   actions: {
@@ -198,11 +200,22 @@ const UserInput = ({ source, ...props }) => <Field name={source} component={rend
 
 export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
   const [groupList, setGroupList] = useState([])
-  const [groupContactCandidates, setGroupContactCandidates] = useState({})
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
-
+  const [status, setStatus] = useState({error: false, loading: true})
+  const [formGeo, setFormGeo] = useState({})
   let _isMounted = false
+
+
+  const handleSelectChange = (e, value, prevValue, target) => {
+    console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
+    if (target === 'group' && value !== prevValue){
+      setStatus({loading: true})
+      setGroupList([])
+      setProjectGroup(value)
+    }
+  }
+
   useEffect(() => {
     _isMounted = true
     if (projectGroup !== null){
@@ -224,17 +237,18 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           let tempGroupList = groupList
           tempGroupList.push(data)
 
-          if (_isMounted){
-            setGroupList(tempGroupList)
-            getAllParentGroups(data.parent_group)
-          }
+          setGroupList(tempGroupList)
+          getAllParentGroups(data.parent_group)
+
           return data
         }
       ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)})
+        console.error("error returned in getallparentgroups: ", err)
+      })
     }
     else{
       //now get a list of users in each group
+      setGroupContactList([])
       getPrimaryContactCandidates()
     }
   };
@@ -242,30 +256,41 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const getPrimaryContactCandidates = () => {
     if (groupList){
       let iteratedGroups = []
+      let groupContactCandidates = {} //using a dict to prevent duplicates
 
       groupList.map(group => {
+
+        console.log("getting contacts from group: ", group)
         getUsersInGroup(group).then(data => {
-
-          let tempGroupContactCandidates = groupContactCandidates
-
-          data.map(item => {
-            tempGroupContactCandidates[item.id] = item
-          })
-
-          setGroupContactCandidates(tempGroupContactCandidates)
-          iteratedGroups.push(group)
-
-          if (iteratedGroups.length === groupList.length){
-            let groupContactList = []
-            Object.keys(tempGroupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-              
+          
+            data.map(item => {
+              groupContactCandidates[item.id] = item
             })
 
-            setGroupContactList(groupContactList)
-          }
+            iteratedGroups.push(group)
+
+            if (iteratedGroups.length === groupList.length){
+              let groupContactList = []
+              Object.keys(groupContactCandidates).map(key => {
+                groupContactList.push(groupContactCandidates[key])
+              })
+
+              if (groupContactList.length > 0)
+              {
+                setGroupContactList(groupContactList)
+                setStatus({error: false, loading: false})
+              }
+              else{
+                  setGroupContactList([])
+                  setStatus({error: false, loading: false})
+                  //TODO: block form submission if we don't have a PCU.
+              }
+        }
+        
+
           
-        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+        }).catch(err => 
+          setStatus({error: err, loading: false}))
       })
     }else{
       console.error("no group selected from which to provide candidate contacts")
@@ -305,11 +330,12 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           label={"en.models.projects.group"}
           source={Constants.model_fields.GROUP}
           reference={Constants.models.GROUPS}
+          onChange={handleSelectChange}
           validate={validateGroup}>
           <SelectInput optionText={Constants.model_fields.NAME} />
         </ReferenceInput>
-        { groupContactList.length > 0 &&
-          <div>
+        { groupContactList.length > 0 ?
+          (<div>
             <UserInput
               required
               label={"en.models.projects.primary_contact_user"}
@@ -318,6 +344,20 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               className="input-small"
               users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
               />
+          </div>)
+          :
+          !status.loading && groupContactList.length === 0 ? 
+          (<div>
+          <Typography>{`No Eligible Users were found in the selected Group. Primary Contact will remain as the previously set user.`}</Typography>
+          </div>)
+          :
+          status.loading ? 
+          (<div>
+            <Typography>{`Loading Associated Users...`}</Typography>
+          </div>)
+          :
+          <div>
+            <Typography>{`Error loading users: ${status.error}`}</Typography>
           </div>
         }
         { record.id && (
@@ -326,6 +366,24 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
             <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
           </div>
         )}
+
+        <FormDataConsumer>
+          {({formData, ...rest} ) =>
+          {
+            //NOTE: This FormDataConsumer area is required for the map implementation.
+            const geoDataCallback = geo => {
+              formData.geo = geo
+            };
+
+            return(
+              <div>
+                <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
+              </div>
+            )
+          }
+          }
+        </FormDataConsumer>
+
       </div>
       
     </CardContentInner>;
