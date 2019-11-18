@@ -91,8 +91,11 @@ Therefore the warnings should only be `the group you are in has no users / no da
 
 
 `next steps` afterwards?
+
+//For 
 */
 const SecondSteps = ({ classes, userType, translate }) => {
+
     return(
       <Card className={classes.container}>
         <CardContent>

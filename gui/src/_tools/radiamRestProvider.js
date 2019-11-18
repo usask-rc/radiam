@@ -19,61 +19,58 @@ import get from 'lodash/get';
 export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
   const convertDataRequestToHTTP = (type, resource, params) => {
     let url = '';
+    let sort = '';
     let formData = new FormData();
     const options = {};
     switch (type) {
 
-      case "GET_FILES": {
+      
+      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+
+        let {page, perPage} = params.pagination
+        url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
+        options.method = Constants.methods.POST
+
+        let query = {
+          ...fetchUtils.flattenObject(params.filter),
+        };
+        
+        if (params && params.sort)
+        {
+          let sign = '';
+          if (params.sort.order && params.sort.order === 'DESC') {
+            sign = '-';
+          }
+          sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
+        }
+
+        url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
+
+        //TODO: parameters should now be handled in the body rather than the url.
+        /*
+        if (params && params.q) {
+          url = url + `&q=${params.q}`;
+        }*/
+
         break;
       }
 
       case GET_LIST: {
-        console.log("GET_LIST being accessed.  params, options: ", params, options, url, formData, httpClient)
-
-        //TODO: this needs refactoring badly.
-        //types of request:
-        //sort
-        //filter
-        //paginate (most requests)
-        //no paginate 'i want all items' - needed for the browser view and for drop-down lists.
-        //no parameters (default pagination of 25 per page)
-
-        //pagination + sort but NO FILTER means it's a typical list - react-admin handles this.
-        //this again has to be postponed until the browser view is reworked into a page by page system.
-
-        //projects/search contains 'ordering' and 'pagination'.  The former is unique to this portion of the API & elasticsearch.
-
-        //everything else contains 'sort' and 'pagination'.  Base classes contain an empty 'filter', and projects/browse contains a 'filter' for searching path_parent.
-
-        //'filter' is empty on base models.
-        //pagination and sort both always have values
-
-
-        //this is used in /search browser  (to look for parent paths)
-        //this is used in any filter throughout the app.
-        //this is used in the User Show page where we are viewing individual groups a user is in.
         url = `${apiUrl}/${resource}/`;
 
-        // /search endpoint needs to be handled differently than the base models.
-        let lastElement = resource.split('/').pop()
+        console.log("params sent to get_list are: ", params)
 
-        if (
-          lastElement === Constants.paths.SEARCH || //TODO: remove this and make a more permanent solution.
-          params &&
-          params.filter &&
-          params.sort && //new - adding this might have broken things.
-          Object.keys(params.filter).length > 0
-        ) {
-          const { page, perPage } = params.pagination;
-          const { sortField, sortOrder } = params.sort;
-          let query
+        if (params)
+        {
+          if (
+            params.filter &&
+            params.sort && //new - adding this might have broken things.
+            Object.keys(params.filter).length > 0
+          ) {
+            const { page, perPage } = params.pagination;
+            const { sortField, sortOrder } = params.sort;
 
-          // /search endpoint needs to be handled differently than the base models.
-          let lastElement = resource.split('/').pop()
-          console.log("last element in url is: ", lastElement)
-
-          if (resource.split('/').pop() !== Constants.paths.SEARCH) {
-            query = {
+            let query = {
               ...fetchUtils.flattenObject(params.filter),
               _sort: sortField ? sortField : null,
               _order: sortOrder ? sortOrder : null,
@@ -81,58 +78,27 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               _end: page * perPage,
             };
             url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
-
           }
-          else {//this is for accessing /search in projects to find Files.
-            console.log("/search being accessed.  params, options: ", params, options)
-            options.method = Constants.methods.POST;
-            
-            query = {
-              ...fetchUtils.flattenObject(params.filter),
-            };
-            url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}`;
+          //should be all other cases.  I don't see why we would ever have use for a page designation.
+          else if (params.pagination || params.sort) {
+            let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
 
-          }
-
-
-        }
-        //should be all other cases.  I don't see why we would ever have use for a page designation.
-        else if (params && (params.pagination || params.sort)) {
-          let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
-          let sort = '';
-
-          if (params.sort) {
-            let sign = '';
-            if (params.sort.order && params.sort.order === 'DESC') {
-              sign = '-';
+            url = `${apiUrl}/${resource}/?`;
+            if (page && sort) {
+              url = `${url}${page}&${sort}`;
+            } else if (page) {
+              url = `${url}${page}`;
+            } else if (sort) {
+              url = `${url}${sort}`;
             }
-            sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
-          }
-
-          url = `${apiUrl}/${resource}/?`;
-          if (page && sort) {
-            url = `${url}${page}&${sort}`;
-          } else if (page) {
-            url = `${url}${page}`;
-          } else if (sort) {
-            url = `${url}${sort}`;
-          }
-          if (params.query) {
-            url = url + `&${stringify(params.query)}`;
+            if (params.query) {
+              url = url + `&${stringify(params.query)}`;
+            }
           }
         }
-        else {
-          url = `${apiUrl}/${resource}/`;
-        }
 
-        if (params && params.q) {
-          url = url + `&q=${params.q}`;
-        }
-
-        console.log("url and options leaving get_list are: ", url, options)
-
+        console.log("url receiving get_list query is: ", url)
         break;
-
       }
 
       case 'CURRENT_USER': {
@@ -266,10 +232,24 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return { data: json };
       }
 
-      case GET_LIST:
+      case "GET_FILES":
+
         json.results = translateResource(resource, json.results);
 
         let ret = {
+          data: json.results,
+          total: json.count,
+          next: json.next,
+          previous: json.previous,
+        };
+
+        ret.data.map(item => (item.key = item.id));
+        return ret;
+
+      case GET_LIST:
+        json.results = translateResource(resource, json.results);
+
+        ret = {
           data: json.results,
           total: json.count,
           next: json.next,

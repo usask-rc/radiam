@@ -9,14 +9,13 @@ var cloneDeep = require('lodash.clonedeep');
 
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
-
   //TODO: this is just needed for local testing.  this should eventually be removed.
-  
+
   /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-  }*/
-  
+  }
+  */
 
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -43,27 +42,38 @@ export function toastErrors(data) {
 }
 
 export function getFirstCoordinate(layer) {
-  if (layer.feature){
-      const layerGeo = layer.feature.geometry
-      switch (layerGeo.type){
-          case "Point":
-              return [layerGeo.coordinates[1], layerGeo.coordinates[0]]
-          case "MultiPoint":
-          case "LineString":
-                  return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]]
-          case "MultiLineString":
-          case "Polygon":
-                  return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]]
-          case "MultiPolygon":
-                  return [layerGeo.coordinates[0][0][0][1], layerGeo.coordinates[0][0][0][0]]
-          default:
-              console.error("Invalid feature type sent to _getFirstCoordinate.  Layer: ", layer)
-              return [0, 0]
-      }
+  if (layer.feature) {
+    const layerGeo = layer.feature.geometry;
+    switch (layerGeo.type) {
+      case 'Point':
+        return [layerGeo.coordinates[1], layerGeo.coordinates[0]];
+      case 'MultiPoint':
+      case 'LineString':
+        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]];
+      case 'MultiLineString':
+      case 'Polygon':
+        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]];
+      case 'MultiPolygon':
+        return [
+          layerGeo.coordinates[0][0][0][1],
+          layerGeo.coordinates[0][0][0][0],
+        ];
+      default:
+        console.error(
+          'Invalid feature type sent to _getFirstCoordinate.  Layer: ',
+          layer
+        );
+        return [0, 0];
+    }
   }
 }
 
-export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
+export function getFolderFiles(
+  folderPath,
+  projectID,
+  numFiles = 1000,
+  page = 1
+) {
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
@@ -74,10 +84,9 @@ export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
-    
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      'GET_FILES',
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -90,9 +99,9 @@ export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
           return file;
         });
 
-        console.log("response to getfolderfiles is: ", response)
+        console.log('response to getfolderfiles is: ', response);
 
-        fileList.sort(function (a, b) {
+        fileList.sort(function(a, b) {
           if (a.items) {
             if (b.items) {
               if (a.name < b.name) {
@@ -111,68 +120,78 @@ export function getFolderFiles(folderPath, projectID, numFiles=1000, page=1){
             return 1;
           }
         });
-        resolve({files:fileList, total:response.total, next:response.text});
+        resolve({
+          files: fileList,
+          total: response.total,
+          next: response.text,
+        });
       })
       .catch(err => {
-        reject(err)
+        reject(err);
       });
   });
 }
 
-export function getRelatedDatasets(record){
+export function getRelatedDatasets(record) {
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.DATASETS, 
-      {filter: { project: record.id, is_active: true}, pagination: {page:1, perPage: 1000}, sort: {field: Constants.model_fields.TITLE, order: "DESC"}}).then(response => response.data)
-    .then(assocDatasets => {
-      resolve(assocDatasets)
-    }).catch(err => reject(err))
-  })
+    dataProvider(GET_LIST, Constants.models.DATASETS, {
+      filter: { project: record.id, is_active: true },
+      pagination: { page: 1, perPage: 1000 },
+      sort: { field: Constants.model_fields.TITLE, order: 'DESC' },
+    })
+      .then(response => response.data)
+      .then(assocDatasets => {
+        resolve(assocDatasets);
+      })
+      .catch(err => reject(err));
+  });
 }
 
 //gets the root folder paths for a given project
-export function getRootPaths(projectID){
+export function getRootPaths(projectID) {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: 'ASC' },
-    filter: { type: 'directory'}
+    filter: { type: 'directory' },
   };
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
-      GET_LIST,
-      Constants.models.PROJECTS + '/' + projectID + '/search',
+      'GET_FILES',
+      Constants.models.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
-
-        let rootList = {}
+        let rootList = {};
 
         response.data.map(file => {
           //find the root paths by taking the smallest length parent paths at each location
-          if (typeof file.location !== "undefined") {
+          if (typeof file.location !== 'undefined') {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
-            }
-            else {
-              
+            } else {
               if (rootList[file.location].length > file.path_parent) {
-                rootList[file.location] = file.path_parent
+                rootList[file.location] = file.path_parent;
               }
             }
           }
           return file;
-        })
+        });
 
-        let rootPaths = []
+        let rootPaths = [];
 
         //create dummy root folder items for display
         for (var key in rootList) {
-          rootPaths.push({ id: `${key}${rootList[key]}`, key: `${key}${rootList[key]}`, path_parent: rootList[key], path: rootList[key] })
+          rootPaths.push({
+            id: `${key}${rootList[key]}`,
+            key: `${key}${rootList[key]}`,
+            path_parent: rootList[key],
+            path: rootList[key],
+          });
         }
-        resolve(rootPaths)
-
+        resolve(rootPaths);
       })
       .catch(error => {
         reject(error);
@@ -180,300 +199,332 @@ export function getRootPaths(projectID){
   });
 }
 
-export function getProjectData(params, folders=false){
-
+export function getProjectData(params, folders = false) {
   //get only folders if true, otherwise get only files
   if (folders) {
-    params.type="directory"
+    params.type = 'directory';
     //ordering=-file_num_in_dir
-  }
-  else{
-    params.type="file"
+  } else {
+    params.type = 'file';
   }
 
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-      dataProvider(
-        GET_LIST,
-        Constants.models.PROJECTS + '/' + params.id + '/search',
-        params
-      )
+    dataProvider(
+      'GET_FILES',
+      Constants.models.PROJECTS + '/' + params.id,
+      params
+    )
       .then(response => {
-        resolve({ files: response.data, nbFiles: response.total })
+        resolve({ files: response.data, nbFiles: response.total });
       })
       .catch(err => {
-        reject({loading: false, error: err})
+        reject({ loading: false, error: err });
       });
-    })
-};
+  });
+}
 
-export function getGroupData(group_id){
-
+export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
-    
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
     //get this group's details, then ascend if it has a parent.
-    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id }).then(response => {
-      resolve(response.data)
-
-    }).catch(err => {
-      reject(err)
-    })
-
-  })
+    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
 }
 
-export function getUserDetails(){
-
+export function getUserDetails() {
   return new Promise((resolve, reject) => {
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider("CURRENT_USER", Constants.models.USERS).then(response => {
-      const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    dataProvider('CURRENT_USER', Constants.models.USERS)
+      .then(response => {
+        const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+          .id;
 
         if (response.data.id === localID) {
-          resolve(response.data)
+          resolve(response.data);
+        } else {
+          reject({ redirect: true });
+          toastErrors(Constants.warnings.NO_AUTH_TOKEN);
         }
-        else {
-          reject({redirect: true})
-          toastErrors(Constants.warnings.NO_AUTH_TOKEN)
-        }
-    }).catch(err => {
-      reject(err)
-      toastErrors("Could not connect to server.  Please login and try again.")
-    }
-    );
-  })
+      })
+      .catch(err => {
+        reject(err);
+        toastErrors(
+          'Could not connect to server.  Please login and try again.'
+        );
+      });
+  });
 }
 
-export function getUsersInGroup(record){
-  console.log("record called to getusersin group: ", record)
+//TODO: this can probably be consolidated with getGroupUsers
+export function getUsersInGroup(record) {
+  console.log('record called to getusersin group: ', record);
   return new Promise((resolve, reject) => {
-    let groupUsers = []
+    let groupUsers = [];
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    const { id, is_active } = record
+    const { id, is_active } = record;
 
     dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-      filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
-  }).then(response => {
-    console.log("getUsersInGroup queried with record: ", response)
-    if (response && response.total === 0){
-      resolve([])
-    }
-    return response.data
-  }).then(groupMembers => {
-
-      groupMembers.map(groupMember => {
-        dataProvider(GET_ONE, Constants.models.USERS, {
-          id: groupMember.user
-        }).then(response => {
-          return response.data
-        }).then(user => {
-          groupMember.user = user
-          groupUsers = [...groupUsers, user]
-
-          if (groupUsers.length === groupMembers.length){
-            console.log("data resolved is: ", groupUsers)
-            resolve(groupUsers)
-          }
-        }).catch(err => reject("error in attempt to get user: ", err))
-        return groupMember
+      filter: { group: id, is_active: is_active },
+      pagination: { page: 1, perPage: 1000 },
+      sort: { field: Constants.model_fields.USER, order: 'DESC' },
+    })
+      .then(response => {
+        console.log('getUsersInGroup queried with record: ', response);
+        if (response && response.total === 0) {
+          resolve([]);
+        }
+        return response.data;
       })
-    return groupMembers
-  }).catch(err => reject("error in attempt to fetch groupMembers: ", err))
-})
+      .then(groupMembers => {
+        groupMembers.map(groupMember => {
+          dataProvider(GET_ONE, Constants.models.USERS, {
+            id: groupMember.user,
+          })
+            .then(response => {
+              return response.data;
+            })
+            .then(user => {
+              groupMember.user = user;
+              groupUsers = [...groupUsers, user];
+
+              if (groupUsers.length === groupMembers.length) {
+                console.log('data resolved is: ', groupUsers);
+                resolve(groupUsers);
+              }
+            })
+            .catch(err => reject('error in attempt to get user: ', err));
+          return groupMember;
+        });
+        return groupMembers;
+      })
+      .catch(err => reject('error in attempt to fetch groupMembers: ', err));
+  });
 }
 
 export function getGroupUsers(record) {
   return new Promise((resolve, reject) => {
-    let groupUsers = []
+    let groupUsers = [];
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
-    .then(groupRoles => {
-
+    dataProvider(GET_LIST, Constants.models.ROLES)
+      .then(response => response.data)
+      .then(groupRoles => {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = record
+        const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-            filter: { group: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.USER, order: "DESC" }
-        }).then(response => {
-
-          return response.data})
-            .then(groupMembers => {
-                groupMembers.map(groupMember => {
-                    dataProvider(GET_ONE, Constants.models.USERS, {
-                        id: groupMember.user
-                    }).then(response => {
-                        return response.data
-                    }).then(user => {
-                        groupMember.user = user
-                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
-                        groupUsers = [...groupUsers, groupMember]
-                        if (groupUsers.length === groupMembers.length){
-                          resolve(groupMembers)
-                        }
-
-                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
-                    return groupMember
-                  })
-                  return groupMembers
-            })
-            .catch(err => {
-              reject("error in in get groupmembers: ", err)
-            })
-      return groupRoles
-    })
-  })
+          filter: { group: id, is_active: is_active },
+          pagination: { page: 1, perPage: 1000 },
+          sort: { field: Constants.model_fields.USER, order: 'DESC' },
+        })
+          .then(response => {
+            return response.data;
+          })
+          .then(groupMembers => {
+            groupMembers.map(groupMember => {
+              dataProvider(GET_ONE, Constants.models.USERS, {
+                id: groupMember.user,
+              })
+                .then(response => {
+                  return response.data;
+                })
+                .then(user => {
+                  groupMember.user = user;
+                  groupMember.group_role = groupRoles.filter(
+                    role => role.id === groupMember.group_role
+                  )[0];
+                  groupUsers = [...groupUsers, groupMember];
+                  if (groupUsers.length === groupMembers.length) {
+                    resolve(groupMembers);
+                  }
+                })
+                .catch(err =>
+                  reject(
+                    'error in attempt to get researchgroup with associated groupmember: ' +
+                      err
+                  )
+                );
+              return groupMember;
+            });
+            return groupMembers;
+          })
+          .catch(err => {
+            reject('error in in get groupmembers: ', err);
+          });
+        return groupRoles;
+      });
+  });
 }
 
 export function getUserGroups(record) {
-  console.log("getusergroups called with rec: ", record)
+  console.log('getusergroups called with rec: ', record);
   return new Promise((resolve, reject) => {
-    let userGroupMembers = []
+    let userGroupMembers = [];
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    dataProvider(GET_LIST, Constants.models.ROLES).then(response => response.data)
-    .then(groupRoles => {
-
+    dataProvider(GET_LIST, Constants.models.ROLES)
+      .then(response => response.data)
+      .then(groupRoles => {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const { id, is_active } = record
+        const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
-            filter: { user: id, is_active: is_active }, pagination: { page: 1, perPage: 1000 }, sort: { field: Constants.model_fields.GROUP, order: "DESC" }
-        }).then(response => {
-          return response.data})
-            .then(groupMembers => {
-                groupMembers.map(groupMember => {
-                    dataProvider(GET_ONE, Constants.models.GROUPS, {
-                        id: groupMember.group
-                    }).then(response => {
-                        return response.data
-                    }).then(researchgroup => {
-                        groupMember.group = researchgroup
-                        groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0]
-                        userGroupMembers = [...userGroupMembers, groupMember]
-                        if (userGroupMembers.length === groupMembers.length){
-                          resolve(groupMembers)
-                        }
-
-                    }).catch(err => reject("error in attempt to get researchgroup with associated groupmember: " + err))
-                    return groupMember
-                  })
-                  return groupMembers
-            })
-            .catch(err => {
-              reject("error in in get groupmembers: ", err)
-            })
-      return groupRoles
-    })
-  })
+          filter: { user: id, is_active: is_active },
+          pagination: { page: 1, perPage: 1000 },
+          sort: { field: Constants.model_fields.GROUP, order: 'DESC' },
+        })
+          .then(response => {
+            return response.data;
+          })
+          .then(groupMembers => {
+            groupMembers.map(groupMember => {
+              dataProvider(GET_ONE, Constants.models.GROUPS, {
+                id: groupMember.group,
+              })
+                .then(response => {
+                  return response.data;
+                })
+                .then(researchgroup => {
+                  groupMember.group = researchgroup;
+                  groupMember.group_role = groupRoles.filter(
+                    role => role.id === groupMember.group_role
+                  )[0];
+                  userGroupMembers = [...userGroupMembers, groupMember];
+                  if (userGroupMembers.length === groupMembers.length) {
+                    resolve(groupMembers);
+                  }
+                })
+                .catch(err =>
+                  reject(
+                    'error in attempt to get researchgroup with associated groupmember: ' +
+                      err
+                  )
+                );
+              return groupMember;
+            });
+            return groupMembers;
+          })
+          .catch(err => {
+            reject('error in in get groupmembers: ', err);
+          });
+        return groupRoles;
+      });
+  });
 }
 
-export function submitObjectWithGeo(formData, geo, props, redirect=Constants.resource_operations.LIST ){
-  console.log("formData heading into submitobjectwithgeo is: ", formData)
-  if (formData.id){
-    updateObjectWithGeo(formData, geo, props, redirect)
-  }
-  else{
+export function submitObjectWithGeo(
+  formData,
+  geo,
+  props,
+  redirect = Constants.resource_operations.LIST
+) {
+  console.log('formData heading into submitobjectwithgeo is: ', formData);
+  if (formData.id) {
+    updateObjectWithGeo(formData, geo, props, redirect);
+  } else {
     createObjectWithGeo(formData, geo, props);
   }
 }
 
-function updateObjectWithGeo(formData, geo, props){
-  if (geo && Object.keys(geo).length > 0){
-    formData.geo = geo
-  }
-  else{
-      //api wont allow null geojson, so replace it with an empty list of features.
-      formData.geo = {
-          object_id: formData.id,
-          content_type: props.resource.substring(0, props.resource.length - 1),
-              geojson: {
-                  type: "FeatureCollection",
-                  features: []
-              }
-      }
+function updateObjectWithGeo(formData, geo, props) {
+  if (geo && Object.keys(geo).length > 0) {
+    formData.geo = geo;
+  } else {
+    //api wont allow null geojson, so replace it with an empty list of features.
+    formData.geo = {
+      object_id: formData.id,
+      content_type: props.resource.substring(0, props.resource.length - 1),
+      geojson: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    };
   }
   props.save(formData, Constants.resource_operations.LIST);
 }
 
-
 //TODO: When creating Projects, there is a failure somewhere here.
-export function createObjectWithGeo(formData, geo, props){
-  let headers = new Headers({ "Content-Type": "application/json" });
+export function createObjectWithGeo(formData, geo, props) {
+  let headers = new Headers({ 'Content-Type': 'application/json' });
   const token = localStorage.getItem(Constants.WEBTOKEN);
-  
+
   if (token) {
-      const parsedToken = JSON.parse(token);
-      headers.set("Authorization", `Bearer ${parsedToken.access}`);
+    const parsedToken = JSON.parse(token);
+    headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-      console.log("formData sent in creation request is: ", formData)
-      const request = new Request(
-          getAPIEndpoint() + `/${props.resource}/`, {
-              method: Constants.methods.POST,
-              body: JSON.stringify({ ...formData }),
-              headers: headers
-          }
-      )
-      return fetch(request).then(response => {
-
-          if (response.status >= 200 && response.status < 300) {
-              return response.json();
-          }
-          throw new Error(response.statusText);
+    console.log('formData sent in creation request is: ', formData);
+    const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
+      method: Constants.methods.POST,
+      body: JSON.stringify({ ...formData }),
+      headers: headers,
+    });
+    return fetch(request)
+      .then(response => {
+        if (response.status >= 200 && response.status < 300) {
+          return response.json();
+        }
+        throw new Error(response.statusText);
       })
       .then(data => {
-        console.log("data in createobjectwithgeo is: ", data)
+        console.log('data in createobjectwithgeo is: ', data);
         //some data exists - add in the object ID before submission
         if (geo && geo.content_type) {
-            data.geo = geo
-            data.geo.object_id = data.id
+          data.geo = geo;
+          data.geo.object_id = data.id;
+        } else {
+          //no value - can't send null into geo, so make a basic structure.
+          data.geo = {
+            object_id: data.id,
+            content_type: props.resource.substring(
+              0,
+              props.resource.length - 1
+            ),
+            geojson: {
+              type: 'FeatureCollection',
+              features: [],
+            },
+          };
         }
-        else{ //no value - can't send null into geo, so make a basic structure.
-            data.geo = {
-                object_id: data.id,
-                content_type: props.resource.substring(0, props.resource.length - 1),
-                    geojson: {
-                        type: "FeatureCollection",
-                        features: []
-                    }
-            }
-        }
-        
-        const request = new Request(
-            getAPIEndpoint() + `/${props.resource}/${data.id}/`, {
-                method: Constants.methods.PUT,
-                body: JSON.stringify({ ...data }),
-                headers: headers
-            }
-        )
 
-        return fetch(request).then(response => {
+        const request = new Request(
+          getAPIEndpoint() + `/${props.resource}/${data.id}/`,
+          {
+            method: Constants.methods.PUT,
+            body: JSON.stringify({ ...data }),
+            headers: headers,
+          }
+        );
+
+        return fetch(request)
+          .then(response => {
             if (response.status >= 200 && response.status < 300) {
-                return response.json();
+              return response.json();
             }
             throw new Error(response.statusText);
-        })
-        .then(data => {  
-            console.log("data after update is: ", data)
-            props.history.push(`/${props.resource}`)
-        })
-      }
-      )
-      
-  }
-  else {
-      //TODO: logout the user.
-      toastErrors(
-          Constants.warnings.NO_AUTH_TOKEN
-      );
+          })
+          .then(data => {
+            console.log('data after update is: ', data);
+            props.history.push(`/${props.resource}`);
+          });
+      });
+  } else {
+    //TODO: logout the user.
+    toastErrors(Constants.warnings.NO_AUTH_TOKEN);
 
-      if (props && props.history)
-      {
-        props.history.push(`/login`)
-      }
-      else{
-        console.error("no props sent to createobjectwithgeo - how did this happen?  formData: ", formData)
-      }
+    if (props && props.history) {
+      props.history.push(`/login`);
+    } else {
+      console.error(
+        'no props sent to createobjectwithgeo - how did this happen?  formData: ',
+        formData
+      );
+    }
   }
 }
 
