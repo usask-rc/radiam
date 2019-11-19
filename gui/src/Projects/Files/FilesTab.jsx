@@ -35,7 +35,6 @@ const styles = theme => ({
 //TODO: indexed_date is currently the default display method, but should be passed into the files display as a parameter if coming from the button on the front page.
 function FilesTab({ projectID, classes, translate, ...props }) {
   const [status, setStatus] = useState({ loading: true });
-  const [searchField, setSearchField] = useState('');
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
@@ -56,12 +55,10 @@ function FilesTab({ projectID, classes, translate, ...props }) {
   );
 
   const handleSubmit = e => {
-    setSearch(searchField);
+    e.preventDefault()
+    setSearch(e.target.elements.search.value)
   };
 
-  const handleChange = e => {
-    setSearchField(e.target.value);
-  };
   let _isMounted = false
 
   useEffect(() => {
@@ -94,17 +91,15 @@ function FilesTab({ projectID, classes, translate, ...props }) {
     <div className={classes.main}>
       {data && data.files && (
         <form className={classes.flex} onSubmit={handleSubmit}>
-          <React.Fragment>
-            <TextField
-              id={Constants.paths.SEARCH}
-              type={Constants.paths.SEARCH}
-              className={classes.textField}
-              defaultValue={search || ''}
-              placeholder={`Search Files`}
-              onChange={handleChange}
-            />
-            <Search className={classes.searchIcon} />
-          </React.Fragment>
+          <TextField
+            id={Constants.paths.SEARCH}
+            name={Constants.paths.SEARCH}
+            type={Constants.paths.SEARCH}
+            className={classes.textField}
+            defaultValue={search || ''}
+            placeholder={`Search Files`}
+          />
+          <Search className={classes.searchIcon} />
           <Select
             id={'sort-select'}
             label={`Sort By`}
