@@ -31,10 +31,26 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
 
-        let query = {
-          ...fetchUtils.flattenObject(params.filter),
-        };
-        
+        /*
+         * If there was a query parameter passed from the component,
+         * create a valid Elasticsearch request body to POST to /search.
+         */
+
+        // TODO: Maybe this should be pulled out into a separate function?
+        if (params.q) {
+          let query = {
+            "query": {
+              "multi_match": {
+                "query": params.q,
+                "fields": ["*"],
+                "lenient": "true"
+              }
+            }
+          };
+
+          options.body = JSON.stringify(query);
+        }
+
         if (params && params.sort)
         {
           let sign = '';
@@ -44,7 +60,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
         }
 
-        url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
+        // url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
+        url = url + `?page=${page}&page_size=${perPage}&${sort}`;
 
         //TODO: parameters should now be handled in the body rather than the url.
         /*
