@@ -16,6 +16,7 @@ export function getAPIEndpoint() {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
   */
+  
 
   return `/${Constants.API_ENDPOINT}`;
 }

@@ -202,7 +202,7 @@ export const LocationShow = props =>
 export const LocationCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Create {...props}>
+    <Create submitOnEnter={false} {...props}>
       <LocationForm {...other} mode={"create"} />
     </Create>
   );
@@ -215,7 +215,7 @@ export const LocationTitle = ({ record }) => {
 export const LocationEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<LocationTitle />} {...props} >
+    <Edit title={<LocationTitle />} submitOnEnter={false} {...props} >
       <LocationForm {...other} mode={Constants.resource_operations.EDIT} />
     </Edit>
   );

@@ -203,7 +203,6 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
   const [status, setStatus] = useState({error: false, loading: true})
-  const [formGeo, setFormGeo] = useState({})
   let _isMounted = false
 
 
@@ -262,33 +261,30 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
 
         console.log("getting contacts from group: ", group)
         getUsersInGroup(group).then(data => {
-          
-            data.map(item => {
-              groupContactCandidates[item.id] = item
+        
+          data.map(item => {
+            groupContactCandidates[item.id] = item
+          })
+
+          iteratedGroups.push(group)
+
+          if (iteratedGroups.length === groupList.length){
+            let groupContactList = []
+            Object.keys(groupContactCandidates).map(key => {
+              groupContactList.push(groupContactCandidates[key])
             })
 
-            iteratedGroups.push(group)
-
-            if (iteratedGroups.length === groupList.length){
-              let groupContactList = []
-              Object.keys(groupContactCandidates).map(key => {
-                groupContactList.push(groupContactCandidates[key])
-              })
-
-              if (groupContactList.length > 0)
-              {
-                setGroupContactList(groupContactList)
+            if (groupContactList.length > 0)
+            {
+              setGroupContactList(groupContactList)
+              setStatus({error: false, loading: false})
+            }
+            else{
+                setGroupContactList([])
                 setStatus({error: false, loading: false})
-              }
-              else{
-                  setGroupContactList([])
-                  setStatus({error: false, loading: false})
-                  //TODO: block form submission if we don't have a PCU.
-              }
-        }
-        
-
-          
+                //TODO: block form submission if we don't have a PCU.
+            }
+          }
         }).catch(err => 
           setStatus({error: err, loading: false}))
       })
@@ -392,7 +388,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
 
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
-    <Create {...props}>
+    <Create submitOnEnter={false} {...props}>
       <ProjectStepper classes={classes} translate={translate} {...props} />
     </Create>
   ))
@@ -414,7 +410,7 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={Constants.resource_operations.LIST}>
+      <SimpleForm redirect={Constants.resource_operations.LIST} submitOnEnter={false}>
         <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
     </Edit>;
