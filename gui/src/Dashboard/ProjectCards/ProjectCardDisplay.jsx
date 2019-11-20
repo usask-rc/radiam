@@ -97,6 +97,7 @@ const ProjectCardDisplay = ({ classes, project }) => {
       )}
     </Card>
   );
+
 };
 
 const enhance = compose(

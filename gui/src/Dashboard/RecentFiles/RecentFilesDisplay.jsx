@@ -20,7 +20,8 @@ const styles = theme => ({
     float: 'right',
     fontSize: "1em",
     borderRadius: "4px",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    marginLeft: "-200px", //this prevents this element from extending the card to the right - there's a better way to do this.
   },
   dateLimitSelectionLabel: {
     float: 'right',
@@ -110,7 +111,8 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
             component="h5"
           >
             <ScheduleIcon className={classes.titleIcon} />
-            {translate('en.dashboard.recentfiles')}
+            {translate('en.dashboard.recentfiles')} 
+            {/*TODO: the css needs fixing here and i have no idea how to do it.  This should be in the same element as the recently added files area to its left, but it extends the below area to the right erroneously*/}
             <TextField
               id="dateLimit"
               label="Days Since Last Crawl"

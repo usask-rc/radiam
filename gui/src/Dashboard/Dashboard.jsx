@@ -1,5 +1,5 @@
 //Dashboard.jsx
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { GET_LIST } from 'react-admin';
 import { httpClient, radiamRestProvider } from '../_tools';
 import { getAPIEndpoint, getUsersInGroup, getGroupData } from '../_tools/funcs';
@@ -16,6 +16,7 @@ class Dashboard extends Component {
     console.log("props of dashboard are: ", props)
     this.state = { loading: true, hasFiles: false, managedGroups:{} };
   }
+
 
   //TODO: handle potential setstate on unmounted component
   /*
@@ -63,6 +64,8 @@ class Dashboard extends Component {
   //TODO: handle potential setstate on unmounted component
   getRecentProjects = (dateLimit = 21) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    let projectCtr = 0
+
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
       order: { field: Constants.model_fields.NAME },
@@ -70,7 +73,11 @@ class Dashboard extends Component {
     })
       .then(response => response.data)
       .then(projects => {
+
+        //Get the files from each project
+        //TODO: once we can search we can search files on age range and avoid this entire filtering process
         projects.map(project => {
+
           dataProvider(
             "GET_FILES",
             Constants.models.PROJECTS + '/' + project.id,
@@ -84,34 +91,38 @@ class Dashboard extends Component {
                 perPage: 25,
               },
             }
-          ) //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
-            .then(response => {
-              project.nbFiles = response.total;
+          //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
+          ).then(response => {
+            project.nbFiles = response.total;
+            return response.data;
+          })
 
-              return response.data;
-            })
-            .then(docs => {
+          //upon receiving said files, filter files for recency
+          .then(docs => {
 
-              const now = moment();
+            const now = moment();
 
-              project.files = docs.filter(file => {
-                
-                const date_indexed = moment(file.indexed_date).toISOString();
-
-                const timeDiff = now.diff(date_indexed, 'days');
-                if (timeDiff <= dateLimit) {
-                  return file
-                }
-                return null
-              });
-              this.setState({ loading: false, hasFiles: docs.length > 0 ? true : this.state.hasFiles });
-            })
-            .catch(error => {
-              console.log('error in getrecentproj is: ', error);
+            project.files = docs.filter(file => {
+              const date_indexed = moment(file.indexed_date).toISOString();
+              const timeDiff = now.diff(date_indexed, 'days');
+              if (timeDiff <= dateLimit) {
+                return file
+              }
+              return null
             });
+            this.setState({ hasFiles: docs.length > 0 ? true : this.state.hasFiles });
+          }).catch(error => {
+            console.log('error in getrecentproj is: ', error);
+          });
+          
+          projectCtr += 1
+
           return project;
         });
-        this.setState({ projects });
+        if (projectCtr === projects.length)
+        {
+          this.setState({ projects, loading:false });
+        }
       });
   };
 
@@ -128,6 +139,8 @@ class Dashboard extends Component {
   };
 
   render() {
+    console.log("Dashboard being rendered, props state: ", this.props, this.state)
+
     return (
       <Responsive
         medium={
