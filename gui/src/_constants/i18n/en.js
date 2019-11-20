@@ -345,7 +345,7 @@ export default {
       new_users: 'Recent Users',
       new_groups: 'Your Recent Groups',
       new_projects: 'Recently Updated Projects',
-      recentfiles: 'Recently Added Files',
+      recentfiles: 'Files Added in the last 30 Days',
       roles: 'User Roles',
       show_all: 'Show All',
       files: 'Files',

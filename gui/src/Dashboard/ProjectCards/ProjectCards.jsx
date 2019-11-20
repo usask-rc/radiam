@@ -15,6 +15,8 @@ const ProjectCards = ({ loading, projects }) =>
                 projects &&
                 projects.length > 0 &&
                 projects.map((project, idx) => {
+
+                    console.log("project idx and details are: ", idx, project.nbFiles)
                     
                     if (project.nbFiles > 0) {
                         return (

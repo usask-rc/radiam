@@ -10,7 +10,7 @@ import moment from 'moment';
 import WelcomeCards from './Welcome/WelcomeCards';
 import RecentFiles from './RecentFiles/RecentFiles';
 
-class Dashboard extends Component {
+class Dashboard extends PureComponent {
   constructor(props) {
     super(props);
     console.log("props of dashboard are: ", props)
@@ -62,9 +62,11 @@ class Dashboard extends Component {
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
   //TODO: handle potential setstate on unmounted component
-  getRecentProjects = (dateLimit = 21) => {
+  getRecentProjects = (dateLimit = 30) => {
+    console.log("getrecentprojects run on dashboard")
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     let projectCtr = 0
+    let projectList = []
 
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
@@ -93,16 +95,12 @@ class Dashboard extends Component {
             }
           //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
           ).then(response => {
-            project.nbFiles = response.total;
-            return response.data;
-          })
-
-          //upon receiving said files, filter files for recency
-          .then(docs => {
+            const newProject = project
+            newProject.nbFiles = response.total;
 
             const now = moment();
 
-            project.files = docs.filter(file => {
+            newProject.files = response.data.filter(file => {
               const date_indexed = moment(file.indexed_date).toISOString();
               const timeDiff = now.diff(date_indexed, 'days');
               if (timeDiff <= dateLimit) {
@@ -110,19 +108,35 @@ class Dashboard extends Component {
               }
               return null
             });
-            this.setState({ hasFiles: docs.length > 0 ? true : this.state.hasFiles });
+
+            projectCtr += 1
+            console.log("project being pushed to list is: ", newProject)
+            projectList.push(newProject)
+
+            if (!this.state.hasFiles && newProject.files.length > 0){
+              this.setState({ hasFiles: true });
+            }
+
+
+            if (projectCtr === projects.length)
+            {
+              console.log("projectcounter equals projects length.  setting state")
+              this.setState({ projects: projectList, loading:false });
+            }
+
           }).catch(error => {
             console.log('error in getrecentproj is: ', error);
-          });
-          
-          projectCtr += 1
+            projectCtr += 1
 
+            if (projectCtr === projects.length)
+            {
+              console.log("projectcounter equals projects length.  setting state")
+              this.setState({ projects: projectList, loading:false });
+            }
+
+          });
           return project;
         });
-        if (projectCtr === projects.length)
-        {
-          this.setState({ projects, loading:false });
-        }
       });
   };
 
@@ -131,15 +145,9 @@ class Dashboard extends Component {
     //this.getRecentUsers();
     //this.getRecentGroups();
     this.getRecentProjects();
-
   }
 
-  handleDateLimitChange = daysSince => {
-    this.getRecentProjects(daysSince)
-  };
-
   render() {
-    console.log("Dashboard being rendered, props state: ", this.props, this.state)
 
     return (
       <Responsive
@@ -148,8 +156,8 @@ class Dashboard extends Component {
             <WelcomeCards />
             {!this.state.loading &&
               <React.Fragment>
-                <ProjectCards {...this.state} />
-                <RecentFiles {...this.state} handleDateLimitChange={this.handleDateLimitChange} />
+                <ProjectCards loading={this.state.loading} projects={this.state.projects} />
+                <RecentFiles {...this.state} />
               </React.Fragment>
             }
           </React.Fragment>

@@ -345,7 +345,7 @@ export default {
       new_users: 'Recent Users',
       new_groups: 'Your Recent Groups',
       new_projects: 'Recently Updated Projects',
-      recentfiles: 'Recently Added Files',
+      recentfiles: 'Files Added in the last 30 Days',
       roles: 'User Roles',
       show_all: 'Show All',
       files: 'Files',
@@ -354,8 +354,9 @@ export default {
       welcome: {
         title: 'Radiam',
         subtitle: 'Welcome',
-        content:
-          'Browse existing Project data in the Projects sidebar, or see the most recently updated files below.',
+        content: 'Browse existing project data in the Projects sidebar, or see the most recently updated files below.',
+        content2: 'View the ',
+        usermanual: 'User Manual',
       },
     },
     models: {

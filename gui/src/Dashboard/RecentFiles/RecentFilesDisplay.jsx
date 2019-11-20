@@ -72,9 +72,8 @@ const styles = theme => ({
   },
 });
 
-function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChange }) {
+function RecentFilesDisplay({ projects, translate, classes }) {
   const [value, setValue] = React.useState(null);
-  const [dateLimit, setDateLimit] = React.useState(21);
 
   //TODO: for some reason i couldn't run a function n the useState to get the first project with recent files.  There has to be a nicer way to do this, but this works for now.
   if (value === null) {
@@ -90,16 +89,6 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
   function handleChange(event, newValue) {
     setValue(newValue);
   }
-  const handleDateLimit = event => {
-
-    if (!isNaN(event.target.value)) {
-      let daysSince = Number(parseInt(event.target.value))
-      if (daysSince > 0) {
-        setDateLimit(daysSince)
-        handleDateLimitChange(daysSince)
-      }
-    }
-  }
 
   return (
     <Card className={classes.container}>
@@ -112,16 +101,6 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
           >
             <ScheduleIcon className={classes.titleIcon} />
             {translate('en.dashboard.recentfiles')} 
-            {/*TODO: the css needs fixing here and i have no idea how to do it.  This should be in the same element as the recently added files area to its left, but it extends the below area to the right erroneously*/}
-            <TextField
-              id="dateLimit"
-              label="Days Since Last Crawl"
-              type="number"
-              className={classes.dateLimitSelection}
-              value={dateLimit}
-              onChange={handleDateLimit}
-            >
-            </TextField>
           </Typography>
           
         {projects.length > 0 ? (
