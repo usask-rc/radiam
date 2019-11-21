@@ -257,8 +257,14 @@ class RadiamAPI(object):
         return self.api_delete(index_url)
 
     def search_endpoint_by_path(self, index_url, path):
-        if path is None:
-            self.log("Path argument is missing for endpoint search")
+        return self.search_endpoint_by_fieldname(index_url, path, "path.keyword")
+
+    def search_endpoint_by_fieldname(self, index_url, target, fieldname):
+        if fieldname is None:
+            self.log(target + " field name is missing for endpoint search")
+            return None
+        if target is None:
+            self.log(fieldname + " argument is missing for endpoint search")
             return None
         index_url = index_url + "search/"
         body = {
@@ -266,20 +272,13 @@ class RadiamAPI(object):
                     "bool" : {
                         "filter" : {
                             "term" : {
-                                "path.keyword" : path
+                                fieldname : target
                             }
                         }
                     }
                 }
             }
         return self.api_post(index_url, json.dumps(body))
-
-    def search_endpoint_by_fieldname(self, index_url, target, fieldname):
-        if target is None:
-            self.log("Path argument is missing for endpoint search")
-            return None
-        index_url = index_url+"search?" + fieldname + "=" + target
-        return self.api_get(index_url)
 
     def search_endpoint_by_name(self, endpoint, name, namefield="name"):
         if name is None:
