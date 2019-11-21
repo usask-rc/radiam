@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Tab, TextField, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';
 import * as Constants from "../../_constants/index"
@@ -20,7 +20,8 @@ const styles = theme => ({
     float: 'right',
     fontSize: "1em",
     borderRadius: "4px",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    marginLeft: "-200px", //this prevents this element from extending the card to the right - there's a better way to do this.
   },
   dateLimitSelectionLabel: {
     float: 'right',
@@ -71,33 +72,17 @@ const styles = theme => ({
   },
 });
 
-function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChange }) {
-  const [value, setValue] = React.useState(null);
-  const [dateLimit, setDateLimit] = React.useState(21);
+function RecentFilesDisplay({ projects, translate, classes }) {
+  const [value, setValue] =  useState(null);
 
-  //TODO: for some reason i couldn't run a function n the useState to get the first project with recent files.  There has to be a nicer way to do this, but this works for now.
-  if (value === null) {
-    for (var i = 0; i < projects.length; i++) {
-      if (projects[i].files && projects[i].files.length > 0) {
-        setValue(i)
-        break
-      }
-    }
-  }
+  useEffect(() => {
+    const first = projects.findIndex((project) => project.files && project.files.length > 0)
+    setValue(first)
+  }, [])
 
   //TODO: these can and likely should be combined
   function handleChange(event, newValue) {
     setValue(newValue);
-  }
-  const handleDateLimit = event => {
-
-    if (!isNaN(event.target.value)) {
-      let daysSince = Number(parseInt(event.target.value))
-      if (daysSince > 0) {
-        setDateLimit(daysSince)
-        handleDateLimitChange(daysSince)
-      }
-    }
   }
 
   return (
@@ -110,16 +95,7 @@ function RecentFilesDisplay({ projects, translate, classes, handleDateLimitChang
             component="h5"
           >
             <ScheduleIcon className={classes.titleIcon} />
-            {translate('en.dashboard.recentfiles')}
-            <TextField
-              id="dateLimit"
-              label="Days Since Last Crawl"
-              type="number"
-              className={classes.dateLimitSelection}
-              value={dateLimit}
-              onChange={handleDateLimit}
-            >
-            </TextField>
+            {translate('en.dashboard.recentfiles')} 
           </Typography>
           
         {projects.length > 0 ? (

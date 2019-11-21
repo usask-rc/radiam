@@ -23,20 +23,14 @@ import { getAPIEndpoint } from '../_tools/funcs';
 import {
   DataCollectionMethodList,
   DataCollectionMethodShow,
-  DataCollectionMethodEdit,
-  DataCollectionMethodCreate,
 } from '../DataCollectionMethod/DataCollectionMethod';
 import {
   DataCollectionStatusList,
   DataCollectionStatusShow,
-  DataCollectionStatusEdit,
-  DataCollectionStatusCreate,
 } from '../DataCollectionStatus/DataCollectionStatus';
 import {
   DistributionRestrictionList,
   DistributionRestrictionShow,
-  DistributionRestrictionEdit,
-  DistributionRestrictionCreate,
 } from '../DistributionRestriction/DistributionRestriction';
 import { GroupList, GroupCreate, GroupEdit, GroupShow } from '../Groups/Groups';
 import {
@@ -57,8 +51,6 @@ import {
   GroupViewGrantCreate,
 } from '../GroupViewGrants/GroupViewGrants';
 import {
-  LocationTypeCreate,
-  LocationTypeEdit,
   LocationTypeList,
   LocationTypeShow,
 } from '../LocationTypes/LocationTypes';
@@ -71,8 +63,6 @@ import {
 import {
   SensitivityLevelList,
   SensitivityLevelShow,
-  SensitivityLevelEdit,
-  SensitivityLevelCreate,
 } from '../SensitivityLevel/SensitivityLevel';
 import {
   UserList,

@@ -31,25 +31,63 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
 
+
+        console.log("type res params: ", type, resource, params)
         /*
          * If there was a query parameter passed from the component,
          * create a valid Elasticsearch request body to POST to /search.
          */
 
-        // TODO: Maybe this should be pulled out into a separate function?
-        if (params.q) {
-          let query = {
-            "query": {
-              "multi_match": {
-                "query": params.q,
-                "fields": ["*"],
-                "lenient": "true"
+        let query = {query:{}}
+
+        let matches = {}
+
+        //create kvp for any filters.
+
+        if (params.filter){
+
+          Object.keys(params.filter).map(key => {
+              //for any value where there are slashes, we need exact matches
+              if (key === "path_parent"){
+                matches[`${key}.keyword`] = params.filter[key]
+              }
+              else{
+                matches[key] = params.filter[key]
               }
             }
-          };
-
-          options.body = JSON.stringify(query);
+          )
         }
+
+
+        if (matches){
+          query.query = {
+            "bool" : {
+              "filter" : [
+              ],
+            }
+          }
+
+          //TODO: there must be a way to do this in-line above.
+          Object.keys(matches).map(match => {
+
+            query.query.bool.filter.push({"term": {[match]:matches[match]}})
+            return match
+          })
+        }
+
+        if (params.q){
+          
+          query.query["multi_match"] = {
+            "query": params.q,
+            "fields": ["*"],
+            "lenient": "true"
+          }
+        }
+
+        console.log("query before being stringified is: ", query)
+          options.body = JSON.stringify(query);
+
+        console.log("options body being sent is: ", options.body)
 
         if (params && params.sort)
         {
@@ -259,6 +297,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           next: json.next,
           previous: json.previous,
         };
+
+        console.log("get_file return is: ", ret)
 
         ret.data.map(item => (item.key = item.id));
         return ret;
