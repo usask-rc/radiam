@@ -11,11 +11,11 @@ var cloneDeep = require('lodash.clonedeep');
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   
-  
+  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  
+  */
   
 
   return `/${Constants.API_ENDPOINT}`;
@@ -203,13 +203,7 @@ export function getRootPaths(projectID) {
 
 export function getProjectData(params, folders = false) {
   //get only folders if true, otherwise get only files
-  if (folders) {
-    params.type = 'directory';
-    //ordering=-file_num_in_dir
-  } else {
-    params.type = 'file';
-  }
-
+  
   return new Promise((resolve, reject) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(

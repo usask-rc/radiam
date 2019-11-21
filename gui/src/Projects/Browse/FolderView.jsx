@@ -140,6 +140,8 @@ function FolderView({ projectID, item, classes }) {
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
     setLoading(true)
+    setFolders([])
+    setFiles([])
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
@@ -148,15 +150,18 @@ function FolderView({ projectID, item, classes }) {
     let tempParents = [...parents]
     tempParents.splice(tempParents.length - 1, 1)
     setLoading(true)
+    setFolders([])
+    setFiles([])
     setParents(tempParents)
   }
 
   useEffect(() => {
+
     let folderPath = parents[parents.length - 1]
     _isMounted = true
     getFolderFiles(folderPath, projectID, 25, 1, "directory").then((data) => {
       if (_isMounted){
-        setFiles(data.files)
+        setFolders(data.files)
       }
       return data
     }).then(() => {
@@ -164,11 +169,11 @@ function FolderView({ projectID, item, classes }) {
         setLoading(false)
       }
     })
-    .catch((err => {console.error("error in getFiles is: ", err)}))
+    .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
     getFolderFiles(folderPath, projectID, 25, 1, "file").then((data) => {
       if (_isMounted){
-        setFolders(data.files)
+        setFiles(data.files)
       }
     }).then(() => 
     {
@@ -177,14 +182,21 @@ function FolderView({ projectID, item, classes }) {
         setLoading(false)
       }
     }
-    )
+    ).catch((err => {console.error("error in getFiles is: ", err)}))
+
+    console.log("parent list is: ", parents)
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
   }, [parents]);
 
+  console.log("folders, files: ", folders, files)
+
+
   if (!loading) {
+
+
     return (
       <ReducedExpansionPanel
         key={parents[parents.length - 1]}
@@ -209,7 +221,6 @@ function FolderView({ projectID, item, classes }) {
         <ExpansionPanelSummary
           onClick={() => {
               if (parents.length > 1){
-                setLoading(true);
                 removeParent()
               }
             }
@@ -227,7 +238,6 @@ function FolderView({ projectID, item, classes }) {
                     <ExpansionPanelSummary
                       className={classes.nestedFolderPanel}
                       onClick={() => {
-                          setLoading(true)
                           addParent(folder.path) //TODO: this is probably wrong we want to use setparent to create a list of parents
                       }}
                     >
