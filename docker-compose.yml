@@ -112,6 +112,7 @@ services:
   # Web server for both the GUI and API
   nginx:
     image: nginx:${NGINX_VERSION}
+    command: [nginx-debug, '-g', 'daemon off;']
     ports:
       - "8100:80"
     volumes:

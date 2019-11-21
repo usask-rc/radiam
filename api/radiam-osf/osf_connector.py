@@ -11,6 +11,7 @@ from configobj import ConfigObj
 import json
 import requests
 import multiprocessing
+import logging
 
 def _setup_osf(osf_token):
     return api.OSF(token=osf_token)
@@ -92,7 +93,16 @@ def main():
     host = 'http://nginx'
     processes = []
 
+    logger = logging.getLogger(__name__)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
     try:
+        logger.debug("In start")
         db_config = ConfigObj(r"/code/config/db/db_env")
         db_name = db_config['POSTGRES_DB']
         db_user = db_config['POSTGRES_USER']
@@ -110,29 +120,35 @@ def main():
         cursor = conn.cursor(cursor_factory=None)
 
         while True:
+            logger.debug("In loop")
             cursor.execute(
                 "select agents.id as user_agent_id, agents.remote_api_token, loc.id as loc_id, loc.osf_project, agent_config.project_id from rdm_locations loc join rdm_location_types loc_type on loc.location_type_id = loc_type.id join rdm_user_agents agents on agents.location_id = loc.id join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id where loc_type.label = %(str)s;",
                 {'str': 'location.type.osf'})
             for item in cursor:
                 try:
+                    logger.debug("Found configuration")
                     agent_id = item[0]
                     osf_token = item[1]
                     location_id = item[2]
                     project_name = item[3]
                     radiam_project_id = item[4]
                     radiam_tokens = get_radiam_token_for_osf(agent_id)
-                    agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
-                    API = RadiamAPI(**agent_config)
+                    if (radiam_tokens == None):
+                        logger.error("Not able to retrieve radiam tokens for agent %s, continuing." %agent_id)
+                    else:
+                        agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
+                        API = RadiamAPI(**agent_config)
+                        API.setLogger(logger)
 
-                    p = multiprocessing.Process(target=update_info, args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
-                    # update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id)
-                    processes.append(p)
-                    p.start()
+                        p = multiprocessing.Process(target=update_info, args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
+                        processes.append(p)
+                        p.start()
                 except Exception as e:
-                    print('Error with OSF Project %s' %e)
+                    logger.error('Error with OSF Project %s' %e)
+                    sys.exit(1)
             for process in processes:
                 process.join()
-            time.sleep(3600)
+            time.sleep(120)
 
     except psycopg2.Error as e:
         print('Database Error %s' %e.pgerror)

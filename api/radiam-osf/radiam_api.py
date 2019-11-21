@@ -3,6 +3,7 @@ import json
 import time
 import os
 import urllib
+import logging
 
 class RadiamAPI(object):
     def __init__(self, **kwargs):
