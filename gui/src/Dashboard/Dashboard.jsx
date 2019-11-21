@@ -62,7 +62,7 @@ class Dashboard extends PureComponent {
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
   //TODO: handle potential setstate on unmounted component
-  getRecentProjects = (dateLimit = 30) => {
+  getRecentProjects = (dateLimit = 300) => {
     console.log("getrecentprojects run on dashboard")
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     let projectCtr = 0
@@ -157,7 +157,7 @@ class Dashboard extends PureComponent {
             {!this.state.loading &&
               <React.Fragment>
                 <ProjectCards loading={this.state.loading} projects={this.state.projects} />
-                <RecentFiles {...this.state} />
+                <RecentFiles projects={this.state.projects} hasFiles={this.state.hasFiles} />
               </React.Fragment>
             }
           </React.Fragment>

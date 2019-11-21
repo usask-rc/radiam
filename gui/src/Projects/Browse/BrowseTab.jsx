@@ -13,6 +13,9 @@ const styles = theme => ({
     marginRight: '2em',
     textAlign: 'right',
   },
+  loading: {
+    textAlign: 'left',
+  },
 });
 
 function BrowseTab({ projectID, classes }) {
@@ -64,21 +67,21 @@ function BrowseTab({ projectID, classes }) {
 
   return (
     <div className={classes.main}>
-    {!status.loading && status.error ? 
-      <Typography>{status.error}</Typography>
-      : status.loading ? (
-        <Typography>{`Loading...`}</Typography>
-      ) : listOfRootPaths.length > 0 &&
-          listOfRootPaths.map(item => {
-            return <FolderView
-              expanded={"true"}
-              item={item}
-              projectID={projectID}
-              key={item.key}
-              classes={classes}
-            />
-          }
-          )
+    {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :
+    !status.loading && status.error ? 
+      <Typography className={classes.loading}>{status.error}</Typography>
+      
+      : listOfRootPaths.length > 0 &&
+        listOfRootPaths.map(item => {
+          return <FolderView
+            expanded={"true"}
+            item={item}
+            projectID={projectID}
+            key={item.key}
+            classes={classes}
+          />
+        }
+      )
     }
     </div>
   );

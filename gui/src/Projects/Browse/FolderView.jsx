@@ -133,33 +133,51 @@ function FolderView({ projectID, item, classes }) {
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
+    setLoading(true)
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
+
   const removeParent = () => {
     let tempParents = [...parents]
     tempParents.splice(tempParents.length - 1, 1)
+    setLoading(true)
     setParents(tempParents)
-    //remove the topmost parent from the list
   }
 
   useEffect(() => {
     let folderPath = parents[parents.length - 1]
     _isMounted = true
-    getFolderFiles(folderPath, projectID).then((data) => {
+    getFolderFiles(folderPath, projectID, 25, 1, "directory").then((data) => {
       if (_isMounted){
         setFiles(data.files)
-        setLoading(false)
       }
       return data
+    }).then(() => {
+      if (_isMounted && folders){
+        setLoading(false)
+      }
     })
     .catch((err => {console.error("error in getFiles is: ", err)}))
 
+    getFolderFiles(folderPath, projectID, 25, 1, "file").then((data) => {
+      if (_isMounted){
+        setFolders(data.files)
+      }
+    }).then(() => 
+    {
+      if (_isMounted && files)
+      {
+        setLoading(false)
+      }
+    }
+    )
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
@@ -203,36 +221,43 @@ function FolderView({ projectID, item, classes }) {
           >{`${parents[parents.length - 1]}`}</Typography>
         </ExpansionPanelSummary>
 
+        {folders && folders.length > 0 && folders.map(folder => {
+          return (
+              <ReducedExpansionPanelDetails key={`nested_file:${folder.key}`}>
+                    <ExpansionPanelSummary
+                      className={classes.nestedFolderPanel}
+                      onClick={() => {
+                          setLoading(true)
+                          addParent(folder.path) //TODO: this is probably wrong we want to use setparent to create a list of parents
+                      }}
+                    >
+                      <FolderDisplay classes={classes} file={folder} />
+                    </ExpansionPanelSummary>
+              </ReducedExpansionPanelDetails>
+            );
+        })}
+
         {files &&
           files.length > 0 &&
           files.map(file => {
             return (
               <ReducedExpansionPanelDetails key={`nested_file:${file.key}`}>
-                {isFile(file) ? (
                   <FileSummary
                     item={file}
                     key={file.key}
                     caller={`browser`}
                     className={classes.fileSummary}
                   />
-                ) : (
-                    <ExpansionPanelSummary
-                      className={classes.nestedFolderPanel}
-                      onClick={() => {
-                          setLoading(true)
-                          addParent(file.path) //TODO: this is probably wrong we want to use setparent to create a list of parents
-                      }}
-                    >
-                      <FolderDisplay classes={classes} file={file} />
-                    </ExpansionPanelSummary>
-                  )}
               </ReducedExpansionPanelDetails>
             );
           })}
       </ReducedExpansionPanel>
     );
-  } else {
-    return <React.Fragment>{`Loading...`}</React.Fragment>;
+  } else if (_isMounted && loading) {
+    return <Typography>{`Loading...`}</Typography>
+  }
+  else{
+    return null
   }
 }
 

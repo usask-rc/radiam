@@ -72,13 +72,14 @@ export function getFirstCoordinate(layer) {
 export function getFolderFiles(
   folderPath,
   projectID,
-  numFiles = 1000,
-  page = 1
+  numFiles = 50,
+  page = 1,
+  type,
 ) {
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const params = {
     //folderPath may or may not contain an item itself.
-    filter: { path_parent: folderPath },
+    filter: { path_parent: folderPath, type:type },
     pagination: { page: page, perPage: numFiles },
     sort: { field: 'last_modified', order: 'ASC' },
   };

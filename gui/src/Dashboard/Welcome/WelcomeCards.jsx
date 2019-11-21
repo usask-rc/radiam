@@ -75,7 +75,7 @@ const WelcomeCards = () => {
         })
     }
 
-
+    //TODO: this should move up to Dashboard rather than being down here in welcome cards.
     useEffect(() => {
         _isMounted = true
         //TODO: protect against memory leakage

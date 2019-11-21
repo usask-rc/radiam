@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Tab, TextField, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';
 import * as Constants from "../../_constants/index"
@@ -73,17 +73,12 @@ const styles = theme => ({
 });
 
 function RecentFilesDisplay({ projects, translate, classes }) {
-  const [value, setValue] = React.useState(null);
+  const [value, setValue] =  useState(null);
 
-  //TODO: for some reason i couldn't run a function n the useState to get the first project with recent files.  There has to be a nicer way to do this, but this works for now.
-  if (value === null) {
-    for (var i = 0; i < projects.length; i++) {
-      if (projects[i].files && projects[i].files.length > 0) {
-        setValue(i)
-        break
-      }
-    }
-  }
+  useEffect(() => {
+    const first = projects.findIndex((project) => project.files && project.files.length > 0)
+    setValue(first)
+  }, [])
 
   //TODO: these can and likely should be combined
   function handleChange(event, newValue) {

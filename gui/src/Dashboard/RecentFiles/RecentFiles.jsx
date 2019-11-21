@@ -9,7 +9,7 @@ const RecentFiles = ({ projects, hasFiles }) => (
     direction="row"
     alignItems="flex-start"
     container>
-        { projects && projects.length > 0 && hasFiles ? (
+        { hasFiles && projects && projects.length > 0 ? (
             <Grid item xs={12}>
                 <RecentFilesDisplay projects={projects} />
             </Grid>

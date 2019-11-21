@@ -4,7 +4,6 @@ import ProjectCardDisplay from './ProjectCardDisplay';
 
 const ProjectCards = ({ loading, projects }) => 
 {
-
     return(
         <Grid
             direction="row"
@@ -14,16 +13,12 @@ const ProjectCards = ({ loading, projects }) =>
             {!loading &&
                 projects &&
                 projects.length > 0 &&
-                projects.map((project, idx) => {
-
-                    console.log("project idx and details are: ", idx, project.nbFiles)
-                    
+                projects.map((project) => {
                     if (project.nbFiles > 0) {
                         return (
                             <ProjectCardDisplay key={project.id} project={project} />
                         );
                     }
-
                     return null
                 })
                 }
