@@ -1011,7 +1011,7 @@ class ProjectAvatarViewSet(RadiamViewSet):
     """
     API endpoint that allows project avatars to be viewed or edited.
     """
-    queryset = ProjectAvatar.objects.all()
+    queryset = ProjectAvatar.objects.all().order_by('?')
     serializer_class = ProjectAvatarSerializer
 
     permission_classes = (IsAuthenticated, DRYPermissions,)
