@@ -115,10 +115,10 @@ class RadiamAPI(object):
         elif resp.status_code == 429:
             # untested until ADM-562 is resolved
             response_json = json.loads(resp.text)
-            time.sleep(int(response_json['retry-after']) + 1)
+            time.sleep(int(response_json.get("retry-after", "3")) + 1)
             self.api_get(url, retries=1)
         else:
-            self.log("Radiam API error: {}\n".format(resp.status_code, resp.text))
+            self.log("Radiam API error while getting from: {} with code {} and error {} \n".format(url, resp.status_code, resp.text))
             return None
 
     def api_post(self, url, body, retries=1):
@@ -142,7 +142,7 @@ class RadiamAPI(object):
         elif resp.status_code == 429:
             # untested until ADM-562 is resolved
             response_json = json.loads(resp.text)
-            time.sleep(int(response_json['retry-after']) + 1)
+            time.sleep(int(response_json.get("retry-after", "3")) + 1)
             self.api_post(url, body, retries=1)
         else:
             self.log("Radiam API error {}:\n{}\n".format(resp.status_code, resp.text))
@@ -259,8 +259,19 @@ class RadiamAPI(object):
         if path is None:
             self.log("Path argument is missing for endpoint search")
             return None
-        index_url = index_url+"search?path="+path
-        return self.api_get(index_url)
+        index_url = index_url + "search/"
+        body = {
+                "query" : {
+                    "bool" : {
+                        "filter" : {
+                            "term" : {
+                                "path.keyword" : path
+                            }
+                        }
+                    }
+                }
+            }
+        return self.api_post(index_url, json.dumps(body))
 
     def search_endpoint_by_fieldname(self, index_url, target, fieldname):
         if target is None:
