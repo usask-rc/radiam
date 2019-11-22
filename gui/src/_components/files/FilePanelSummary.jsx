@@ -36,7 +36,7 @@ const FilePanelSummary = ({ classes, file, caller }) => (
       </Typography>
     </Grid>
     <Grid item className={classes.item} xs={2} md={2}>
-      {file.filesize > 0 ? formatBytes(file.filesize, 2) : ''}
+      {formatBytes(file.filesize, 2)}
     </Grid>
     <Grid item className={classes.item} xs={2} md={3}>
       {caller !== 'browser' && (

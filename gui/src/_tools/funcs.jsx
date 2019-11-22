@@ -171,7 +171,6 @@ export function getRootPaths(projectID) {
               
               if (rootList[file.location].length > file.path_parent.length) {
                 rootList[file.location] = file.path_parent;
-
               }
             }
           }
