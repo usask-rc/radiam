@@ -148,7 +148,7 @@ def main():
                     sys.exit(1)
             for process in processes:
                 process.join()
-            time.sleep(120)
+            time.sleep(3600)
 
     except psycopg2.Error as e:
         print('Database Error %s' %e.pgerror)
