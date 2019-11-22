@@ -33,8 +33,8 @@ import PropTypes from 'prop-types';
 import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-
+import GroupTitle from "./GroupTitle.jsx";
+import { FormDataConsumer } from "ra-core";
 
 const styles = {
   actions: {
@@ -52,8 +52,6 @@ const filterStyles = {
     backgroundColor: "inherit"
   }
 };
-
-
 
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
@@ -126,10 +124,10 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
 
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
     return(
-  <Show title={<GroupTitle />} {...props}>
+  <Show {...props}>
     <SimpleShowLayout>
+      <GroupTitle prefix={"Viewing"} />
       <RelatedUsers {...props} />
-
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -173,10 +171,6 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   </Show>
 )}));
 
-const GroupTitle = ({ record }) => {
-  return <span>{record ? `"${record.name}"` : ""}</span>;
-};
-
 const validateName = required('en.validate.group.group_name');
 const validateDescription = required('en.validate.group.description');
 const validateParentGroup = (value, allValues) => {
@@ -217,6 +211,11 @@ const GroupForm = props =>
       onChange={handleChange}
       save={handleSubmit}
     >
+      <FormDataConsumer>
+        {({formData, ...rest}) => {
+          return <GroupTitle prefix={"Creating Group"} />
+        }}
+      </FormDataConsumer>
       <TextInput
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -270,12 +269,17 @@ class BaseGroupEdit extends Component {
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 
-    return <Edit basePath={basePath} title={<GroupTitle />} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
+    return <Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
       <SimpleForm
         basePath={basePath}
         toolbar={<EditToolbar />}
         redirect={Constants.resource_operations.LIST}
       >
+        <FormDataConsumer>
+          {({formData, ...rest}) => {
+            return <GroupTitle record={formData} prefix={"Updating"} />
+          }}
+        </FormDataConsumer>
         <TextInput
           label={"en.models.groups.name"}
           source={Constants.model_fields.NAME}

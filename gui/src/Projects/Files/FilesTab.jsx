@@ -83,7 +83,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       _isMounted = false;
     }
     
-  }, [search, page, sort, order]);
+  }, [search, page, perPage, sort, order]);
 
   //TODO: this is a mess - is there a way to slim this down?  I hate it.
   return (
@@ -135,7 +135,10 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             total={data.nbFiles}
           />
         </React.Fragment>
-      ) : null}
+      ) : !status.loading && search && data && data.files.length === 0 ? 
+      <Typography className={classes.loading}>
+        {`No Files were found matching Search String: ${search}`}
+      </Typography>: null}
     </div>
   );
 }

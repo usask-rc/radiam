@@ -25,6 +25,7 @@ import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
+import UserTitle from "./UserTitle";
 
 
 const listStyles = {
@@ -140,14 +141,12 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 }
 );
 
-export const UserTitle = ({ record }) => {
-  return <span>User {record ? `"${record.username}"` : ""}</span>;
-};
 export const UserShow = props => {
 
-  return (<Show title={<UserTitle />}  {...props}>
-            <UserDetails {...props} />
-          </Show>
+  return (
+    <Show {...props}>
+      <UserDetails {...props} />
+    </Show>
   )
 };
 
@@ -198,7 +197,7 @@ export const UserCreate = props => {
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
-    <Edit title={<UserTitle />} {...props}>
+    <Edit {...props}>
       <UserForm toolbar={<EditToolbar />} {...other} />
     </Edit>
   )
@@ -210,7 +209,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== String(JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id)) { //dont allow superusers to delete themselves
     return (
-      <Edit title={<UserTitle />} {...props}>
+      <Edit {...props}>
         <UserEditForm {...other} />
       </Edit>
     )

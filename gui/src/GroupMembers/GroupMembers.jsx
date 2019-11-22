@@ -25,6 +25,8 @@ import TranslationSelect from "../_components/_fields/TranslationSelect";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { withStyles } from "@material-ui/core/styles";
 import { Prompt } from 'react-router';
+import GroupMemberTitle from "./GroupMemberTitle";
+import { FormDataConsumer } from "ra-core";
 
 
 const listStyles = {
@@ -145,8 +147,9 @@ export const GroupMemberList = withStyles(listStyles)(
 );
 
 export const GroupMemberShow = props => (
-  <Show title={<GroupMemberTitle />} {...props}>
+  <Show {...props}>
     <SimpleShowLayout>
+    <GroupMemberTitle prefix="Viewing" />
       <ReferenceField
         linkType={false}
         label={"en.models.groupmembers.user"}
@@ -208,10 +211,6 @@ export const GroupMemberShow = props => (
   </Show>
 );
 
-export const GroupMemberTitle = ({ record }) => {
-  return <span>GroupMember {record ? `"${record.date_created}"` : ""}</span>;
-};
-
 const validateUser = required('en.validate.groupmembers.user');
 const validateGroup = required('en.validate.groupmembers.group');
 const validateRole = required('en.validate.groupmembers.role');
@@ -260,37 +259,42 @@ const GroupMemberForm = props => {
     onChange={handleChange}
     save={handleSubmit}
   >
-  <ReferenceInput
-    label={"en.models.groupmembers.user"}
-    source={Constants.model_fk_fields.USER}
-    reference={Constants.models.USERS}
-    validate={validateUser}
-  >
-    <SelectInput optionText={userSelect} />
-  </ReferenceInput>
-  <ReferenceInput
-    label={"en.models.groupmembers.group"}
-    source={Constants.model_fk_fields.GROUP}
-    reference={Constants.models.GROUPS}
-    validate={validateGroup}
-  >
-    <SelectInput optionText={Constants.model_fields.NAME} />
-  </ReferenceInput>
-  <ReferenceInput
-    label={"en.models.groupmembers.role"}
-    source={Constants.model_fk_fields.GROUP_ROLE}
-    reference={Constants.models.ROLES}
-    validate={validateRole}
-  >
-    <TranslationSelect optionText={Constants.model_fields.LABEL} />
-  </ReferenceInput>
-  <DateInput
-    label={"en.models.generic.date_expires"}
-    source={Constants.model_fields.DATE_EXPIRES}
-    allowEmpty
-  />
-  <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-</SimpleForm>
+    <FormDataConsumer>
+      {({formData, ...rest}) => {
+        return <GroupMemberTitle />
+      }}
+    </FormDataConsumer>
+    <ReferenceInput
+      label={"en.models.groupmembers.user"}
+      source={Constants.model_fk_fields.USER}
+      reference={Constants.models.USERS}
+      validate={validateUser}
+    >
+      <SelectInput optionText={userSelect} />
+    </ReferenceInput>
+    <ReferenceInput
+      label={"en.models.groupmembers.group"}
+      source={Constants.model_fk_fields.GROUP}
+      reference={Constants.models.GROUPS}
+      validate={validateGroup}
+    >
+      <SelectInput optionText={Constants.model_fields.NAME} />
+    </ReferenceInput>
+    <ReferenceInput
+      label={"en.models.groupmembers.role"}
+      source={Constants.model_fk_fields.GROUP_ROLE}
+      reference={Constants.models.ROLES}
+      validate={validateRole}
+    >
+      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+    </ReferenceInput>
+    <DateInput
+      label={"en.models.generic.date_expires"}
+      source={Constants.model_fields.DATE_EXPIRES}
+      allowEmpty
+    />
+    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+  </SimpleForm>
   )
 }
 
@@ -304,7 +308,7 @@ export const GroupMemberCreate = props => {
 
 export const GroupMemberEdit = props => {
   return (
-    <Edit title={<GroupMemberTitle />} {...props}>
+    <Edit {...props}>
       <GroupMemberForm/>
     </Edit>
   );

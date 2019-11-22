@@ -9,6 +9,7 @@ import { translateDates, toastErrors } from '../_tools/funcs';
 import { required, email, minLength, maxLength } from 'ra-core';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt, Redirect } from 'react-router';
+import UserTitle from './UserTitle';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
@@ -147,6 +148,7 @@ class UserFormWithAssoc extends Component {
                 toolbar={null}
                 asyncValidate={asyncValidate}
                 asyncBlurFields={[Constants.model_fields.USERNAME]}>
+                <UserTitle prefix={"Creating User"} />
 
                 <TextInput
                     label={"en.models.users.username"}

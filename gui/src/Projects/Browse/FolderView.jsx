@@ -29,9 +29,16 @@ const styles = theme => ({
     marginTop: '2em',
     textAlign: 'right',
   },
+  baseFolder: {
+    backgroundColor: "beige",
+  },
   baseFolderText: {
     fontWeight: 'bold',
     display: 'flex',
+  },
+  noDataFoundText: {
+    fontWeight: 'bold',
+    padding: "1em",
   },
   title: {
     fontSize: 16,
@@ -159,7 +166,9 @@ function FolderView({ projectID, item, classes }) {
 
     let folderPath = parents[parents.length - 1]
     _isMounted = true
-    getFolderFiles(folderPath, projectID, 25, 1, "directory").then((data) => {
+
+    //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+    getFolderFiles(folderPath, projectID, 1000, 1, "directory").then((data) => {
       if (_isMounted){
         setFolders(data.files)
       }
@@ -171,7 +180,7 @@ function FolderView({ projectID, item, classes }) {
     })
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-    getFolderFiles(folderPath, projectID, 25, 1, "file").then((data) => {
+    getFolderFiles(folderPath, projectID, 1000, 1, "file").then((data) => {
       if (_isMounted){
         setFiles(data.files)
       }
@@ -191,15 +200,14 @@ function FolderView({ projectID, item, classes }) {
     }
   }, [parents]);
 
-  console.log("folders, files: ", folders, files)
+  console.log("folders, files, item: ", folders, files, item)
 
 
-  if (!loading) {
+  
 
 
     return (
       <ReducedExpansionPanel
-        key={parents[parents.length - 1]}
         expanded={"true"}
         className={classes.parentPanel}
         TransitionProps={{ unmountOnExit: true }}
@@ -213,12 +221,13 @@ function FolderView({ projectID, item, classes }) {
             linkType={Constants.resource_operations.SHOW}
             basePath={`/${Constants.models.PROJECTS}`}
             resource={Constants.models.PROJECTS}
-            record={files[0]}
+            record={item}
           >
             <LocationShow />
           </ReferenceField>
         </div>
         <ExpansionPanelSummary
+          className={classes.baseFolder}
           onClick={() => {
               if (parents.length > 1){
                 removeParent()
@@ -232,7 +241,7 @@ function FolderView({ projectID, item, classes }) {
           >{`${parents[parents.length - 1]}`}</Typography>
         </ExpansionPanelSummary>
 
-        {folders && folders.length > 0 && folders.map(folder => {
+        {!loading && folders && folders.length > 0 && folders.map(folder => {
           return (
               <ReducedExpansionPanelDetails key={`nested_file:${folder.key}`}>
                     <ExpansionPanelSummary
@@ -247,7 +256,7 @@ function FolderView({ projectID, item, classes }) {
             );
         })}
 
-        {files &&
+        {!loading && files &&
           files.length > 0 &&
           files.map(file => {
             return (
@@ -261,14 +270,14 @@ function FolderView({ projectID, item, classes }) {
               </ReducedExpansionPanelDetails>
             );
           })}
+
+          {!loading && files.length === 0 && folders.length === 0 && 
+            <Typography className={classes.noDataFoundText}>{`No data was found in this directory.`}</Typography>
+          }
+
+          { _isMounted && loading && <Typography>{`Loading...`}</Typography>}
       </ReducedExpansionPanel>
     );
-  } else if (_isMounted && loading) {
-    return <Typography>{`Loading...`}</Typography>
-  }
-  else{
-    return null
-  }
 }
 
 const enhance = compose(
