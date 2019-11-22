@@ -75,7 +75,7 @@ export function getFolderFiles(
     //folderPath may or may not contain an item itself.
     filter: { path_parent: params.folderPath, type:type },
     pagination: { page: params.page, perPage: params.numFiles },
-    sort: { field: 'last_modified', order: 'ASC' },
+    sort: { field: params.sortBy, order: params.order },
   };
 
   const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -148,7 +148,7 @@ export function getRelatedDatasets(record) {
 export function getRootPaths(projectID) {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
-    sort: { field: 'last_modified', order: 'ASC' },
+    sort: { field: 'last_modified', order: '' },
     filter: { type: 'directory' },
   };
 
@@ -168,8 +168,10 @@ export function getRootPaths(projectID) {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             } else {
-              if (rootList[file.location].length > file.path_parent) {
+              
+              if (rootList[file.location].length > file.path_parent.length) {
                 rootList[file.location] = file.path_parent;
+
               }
             }
           }
@@ -188,6 +190,7 @@ export function getRootPaths(projectID) {
             location: key,
           });
         }
+        console.log("root paths being returned are: ", rootPaths)
         resolve(rootPaths);
       })
       .catch(error => {

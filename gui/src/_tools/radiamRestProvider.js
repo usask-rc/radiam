@@ -85,28 +85,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
         }
 
-        console.log("query before being stringified is: ", query)
+        //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
 
-        console.log("options body being sent is: ", options.body)
-
-        if (params && params.sort)
-        {
-          let sign = '';
-          if (params.sort.order && params.sort.order === 'DESC') {
-            sign = '-';
-          }
-          sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
-        }
-
-        // url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
+        //TODO/NOTE: this is necessary - pagination controls have not yet been moved to the search query body from the url.
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-
-        //TODO: parameters should now be handled in the body rather than the url.
-        /*
-        if (params && params.q) {
-          url = url + `&q=${params.q}`;
-        }*/
 
         break;
       }
