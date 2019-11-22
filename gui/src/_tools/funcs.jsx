@@ -11,11 +11,9 @@ var cloneDeep = require('lodash.clonedeep');
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
 
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -69,17 +67,14 @@ export function getFirstCoordinate(layer) {
 }
 
 export function getFolderFiles(
-  folderPath,
-  projectID,
-  numFiles = 50,
-  page = 1,
+  params,
   type,
 ) {
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
-  const params = {
+  const queryParams = {
     //folderPath may or may not contain an item itself.
-    filter: { path_parent: folderPath, type:type },
-    pagination: { page: page, perPage: numFiles },
+    filter: { path_parent: params.folderPath, type:type },
+    pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: 'last_modified', order: 'ASC' },
   };
 
@@ -87,8 +82,8 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + projectID,
-      params
+      Constants.models.PROJECTS + '/' + params.projectID,
+      queryParams
     )
       .then(response => {
         let fileList = [];

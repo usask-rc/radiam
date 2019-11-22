@@ -164,11 +164,20 @@ function FolderView({ projectID, item, classes }) {
 
   useEffect(() => {
 
+    
+
     let folderPath = parents[parents.length - 1]
     _isMounted = true
 
-    //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-    getFolderFiles(folderPath, projectID, 1000, 1, "directory").then((data) => {
+    let params = {
+      folderPath: folderPath,
+      projectID: projectID,
+      numFiles: 1000,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      page: 1, //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+    }
+
+    //TODO: requires an order by component as well
+    getFolderFiles(params, "directory").then((data) => {
       if (_isMounted){
         setFolders(data.files)
       }
@@ -180,7 +189,7 @@ function FolderView({ projectID, item, classes }) {
     })
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-    getFolderFiles(folderPath, projectID, 1000, 1, "file").then((data) => {
+    getFolderFiles(params, "file").then((data) => {
       if (_isMounted){
         setFiles(data.files)
       }
