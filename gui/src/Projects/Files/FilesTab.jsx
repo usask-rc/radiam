@@ -83,7 +83,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       _isMounted = false;
     }
     
-  }, [search, page, sort, order]);
+  }, [search, page, perPage, sort, order]);
 
   //TODO: this is a mess - is there a way to slim this down?  I hate it.
   return (
