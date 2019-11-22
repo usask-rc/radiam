@@ -43,7 +43,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         let matches = {}
 
         //create kvp for any filters.
-
         if (params.filter){
 
           Object.keys(params.filter).map(key => {
@@ -58,8 +57,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           )
         }
 
-
-        if (matches && matches.length > 0){
+        if (matches && Object.keys(matches).length > 0){
           query.query = {
             "bool" : {
               "filter" : [
@@ -88,7 +86,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         }
 
         console.log("query before being stringified is: ", query)
-          options.body = JSON.stringify(query);
+        options.body = JSON.stringify(query);
 
         console.log("options body being sent is: ", options.body)
 
