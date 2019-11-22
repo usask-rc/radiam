@@ -29,9 +29,16 @@ const styles = theme => ({
     marginTop: '2em',
     textAlign: 'right',
   },
+  baseFolder: {
+    backgroundColor: "beige",
+  },
   baseFolderText: {
     fontWeight: 'bold',
     display: 'flex',
+  },
+  noDataFoundText: {
+    fontWeight: 'bold',
+    padding: "1em",
   },
   title: {
     fontSize: 16,
@@ -191,15 +198,14 @@ function FolderView({ projectID, item, classes }) {
     }
   }, [parents]);
 
-  console.log("folders, files: ", folders, files)
+  console.log("folders, files, item: ", folders, files, item)
 
 
-  if (!loading) {
+  
 
 
     return (
       <ReducedExpansionPanel
-        key={parents[parents.length - 1]}
         expanded={"true"}
         className={classes.parentPanel}
         TransitionProps={{ unmountOnExit: true }}
@@ -213,12 +219,13 @@ function FolderView({ projectID, item, classes }) {
             linkType={Constants.resource_operations.SHOW}
             basePath={`/${Constants.models.PROJECTS}`}
             resource={Constants.models.PROJECTS}
-            record={files[0]}
+            record={item}
           >
             <LocationShow />
           </ReferenceField>
         </div>
         <ExpansionPanelSummary
+          className={classes.baseFolder}
           onClick={() => {
               if (parents.length > 1){
                 removeParent()
@@ -232,7 +239,7 @@ function FolderView({ projectID, item, classes }) {
           >{`${parents[parents.length - 1]}`}</Typography>
         </ExpansionPanelSummary>
 
-        {folders && folders.length > 0 && folders.map(folder => {
+        {!loading && folders && folders.length > 0 && folders.map(folder => {
           return (
               <ReducedExpansionPanelDetails key={`nested_file:${folder.key}`}>
                     <ExpansionPanelSummary
@@ -247,7 +254,7 @@ function FolderView({ projectID, item, classes }) {
             );
         })}
 
-        {files &&
+        {!loading && files &&
           files.length > 0 &&
           files.map(file => {
             return (
@@ -261,14 +268,14 @@ function FolderView({ projectID, item, classes }) {
               </ReducedExpansionPanelDetails>
             );
           })}
+
+          {!loading && files.length === 0 && folders.length === 0 && 
+            <Typography className={classes.noDataFoundText}>{`No data was found in this directory.`}</Typography>
+          }
+
+          { _isMounted && loading && <Typography>{`Loading...`}</Typography>}
       </ReducedExpansionPanel>
     );
-  } else if (_isMounted && loading) {
-    return <Typography>{`Loading...`}</Typography>
-  }
-  else{
-    return null
-  }
 }
 
 const enhance = compose(

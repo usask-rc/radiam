@@ -69,7 +69,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
           //TODO: there must be a way to do this in-line above.
           Object.keys(matches).map(match => {
-
             query.query.bool.filter.push({"term": {[match]:matches[match]}})
             return match
           })

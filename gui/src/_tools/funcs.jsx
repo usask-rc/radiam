@@ -185,10 +185,11 @@ export function getRootPaths(projectID) {
         //create dummy root folder items for display
         for (var key in rootList) {
           rootPaths.push({
-            id: `${key}${rootList[key]}`,
+            id: key,
             key: `${key}${rootList[key]}`,
             path_parent: rootList[key],
             path: rootList[key],
+            location: key,
           });
         }
         resolve(rootPaths);
