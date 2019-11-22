@@ -38,7 +38,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
          * create a valid Elasticsearch request body to POST to /search.
          */
 
-        let query = {query:{}}
+        let query = {}
 
         let matches = {}
 
@@ -59,7 +59,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         }
 
 
-        if (matches){
+        if (matches && matches.length > 0){
           query.query = {
             "bool" : {
               "filter" : [
@@ -75,6 +75,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         }
 
         if (params.q){
+
+          if (!query.query){
+            query.query = {}
+          }
           
           query.query["multi_match"] = {
             "query": params.q,
