@@ -27,6 +27,8 @@ const styles = {
   },
 }
 
+//TODO: get count of both folders and files and display both counts.
+
 const FilePanelSummary = ({ classes, file, caller }) => (
   <Grid container direction="row" alignItems="center">
     <Grid item className={classes.item} xs={5} md={4}>

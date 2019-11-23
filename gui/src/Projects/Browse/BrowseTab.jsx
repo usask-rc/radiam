@@ -28,7 +28,6 @@ function BrowseTab({ projectID, classes }) {
     _isMounted = true
     
     getRootPaths(projectID).then(data => {
-      console.log("data returned from getrootpaths is: ", data)
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
         const params = {
@@ -47,8 +46,7 @@ function BrowseTab({ projectID, classes }) {
             location: data.files[0].location
            }
 
-          console.log("folderItem returned from getprojectdata is: ", getProjectData)
-          setListOfRootPaths([folderItem])
+           setListOfRootPaths([folderItem])
           setStatus({loading: false, error: false})
           }
           else{

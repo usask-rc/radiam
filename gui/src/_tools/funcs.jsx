@@ -95,27 +95,6 @@ export function getFolderFiles(
           return file;
         });
 
-        console.log('response to getfolderfiles is: ', response);
-
-        fileList.sort(function(a, b) {
-          if (a.items) {
-            if (b.items) {
-              if (a.name < b.name) {
-                return -1;
-              }
-              return 1;
-            }
-            return -1;
-          } else {
-            if (b.items) {
-              return 1;
-            }
-            if (a.name < b.name) {
-              return -1;
-            }
-            return 1;
-          }
-        });
         resolve({
           files: fileList,
           total: response.total,
