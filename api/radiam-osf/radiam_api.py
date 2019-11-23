@@ -9,7 +9,7 @@ class RadiamAPI(object):
     def __init__(self, **kwargs):
         self.logger = None
         self.tokenfile = None
-        self.baseurl = "http://nginx"
+        self.baseurl = "http://radiamapi:8000"
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json"

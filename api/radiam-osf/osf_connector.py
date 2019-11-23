@@ -13,9 +13,11 @@ import requests
 import multiprocessing
 import logging
 
+
+logger = None
+
 def _setup_osf(osf_token):
     return api.OSF(token=osf_token)
-
 
 def list_(osf_token, project_name, agent_id, location_id):
     osf = _setup_osf(osf_token)
@@ -56,6 +58,9 @@ def list_difference(list1,list2):
     return list(set(list1)-set(list2)), list(set(list2)-set(list1))
 
 def update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id):
+    global logger
+
+    logger.info("Crawling project %s" %project_name)
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
     config_project_endpoint = host + "/api/projects/" + radiam_project_id + "/"
@@ -70,39 +75,23 @@ def update_info(osf_token, project_name, host, API, agent_id, location_id, radia
         for id in id_list:
             API.delete_document(config_project_endpoint, id)
 
-
-def get_radiam_token_for_osf(agent_id):
-    token_endpoint = 'http://nginx/api/useragents/' + agent_id + '/tokens/get'
-    head = {"Content-Type": "application/json", "Accept": "application/json"}
-    r = requests.get(token_endpoint, headers=head)
-    if r.status_code == 200:
-        tokens = json.loads(r.content)
-        tokens["access"] = tokens["access_token"]
-        tokens["refresh"] = tokens["refresh_token"]
-        tokens.pop("access_token")
-        tokens.pop("refresh_token")
-        return tokens
-    else:
-        return None
-
-
 def main():
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the Radiam agent")
 
-    host = 'http://nginx'
     processes = []
-
+    radiam_tokens = {}
+    global logger
     logger = logging.getLogger(__name__)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
         '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     try:
-        logger.debug("In start")
+        host = 'http://radiamapi:8000'
         db_config = ConfigObj(r"/code/config/db/db_env")
         db_name = db_config['POSTGRES_DB']
         db_user = db_config['POSTGRES_USER']
@@ -120,32 +109,25 @@ def main():
         cursor = conn.cursor(cursor_factory=None)
 
         while True:
-            logger.debug("In loop")
             cursor.execute(
-                "select agents.id as user_agent_id, agents.remote_api_token, loc.id as loc_id, loc.osf_project, agent_config.project_id from rdm_locations loc join rdm_location_types loc_type on loc.location_type_id = loc_type.id join rdm_user_agents agents on agents.location_id = loc.id join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id where loc_type.label = %(str)s;",
+                "select agents.id as user_agent_id, agents.remote_api_token, loc.id as loc_id, loc.osf_project, agent_config.project_id, agents.local_access_token, agents.local_refresh_token from rdm_locations loc join rdm_location_types loc_type on loc.location_type_id = loc_type.id join rdm_user_agents agents on agents.location_id = loc.id join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id where loc_type.label = %(str)s;",
                 {'str': 'location.type.osf'})
             for item in cursor:
-                try:
-                    logger.debug("Found configuration")
-                    agent_id = item[0]
-                    osf_token = item[1]
-                    location_id = item[2]
-                    project_name = item[3]
-                    radiam_project_id = item[4]
-                    radiam_tokens = get_radiam_token_for_osf(agent_id)
-                    if (radiam_tokens == None):
-                        logger.error("Not able to retrieve radiam tokens for agent %s, continuing." %agent_id)
-                    else:
-                        agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
-                        API = RadiamAPI(**agent_config)
-                        API.setLogger(logger)
-
-                        p = multiprocessing.Process(target=update_info, args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
-                        processes.append(p)
-                        p.start()
-                except Exception as e:
-                    logger.error('Error with OSF Project %s' %e)
-                    sys.exit(1)
+                agent_id = item[0]
+                osf_token = item[1]
+                location_id = item[2]
+                project_name = item[3]
+                radiam_project_id = item[4]
+                radiam_tokens["access"] = item[5]
+                radiam_tokens["refresh"] = item[6]
+                agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
+                API = RadiamAPI(**agent_config)
+                API.setLogger(logger)
+                p = multiprocessing.Process(
+                    target=update_info,
+                    args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
+                processes.append(p)
+                p.start()
             for process in processes:
                 process.join()
             time.sleep(3600)
