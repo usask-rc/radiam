@@ -17,15 +17,30 @@ const FolderDisplay = ({ classes, file }) => (
             <Typography className={classes.folderContentsName}>{`${file.name}`}</Typography>
         </Grid>
 
-        <Grid
-            item
-            xs={"auto"}
-            >
-            <Description />
-        </Grid>
-        <Grid item xs={"auto"}>
-            {`${file.items}`}
-        </Grid>
+        {file && file.file_num_in_dir > 0 &&
+            <React.Fragment>
+                <Grid
+                    item
+                    xs={"auto"}
+                    >
+                    <Description />
+                </Grid>
+                <Grid item xs={"auto"}>
+                    {`${file.file_num_in_dir}`}
+                </Grid>
+            </React.Fragment>
+        }
+        {file && file.items - file.file_num_in_dir > 0 && 
+            <React.Fragment>
+                <Grid item xs={"auto"}
+                >
+                    <Folder className={classes.folderIcon} />
+                </Grid>
+                <Grid item xs={"auto"}>
+                    {`${file.items - file.file_num_in_dir}`}
+                </Grid>
+            </React.Fragment>
+        }
     </Grid>
 )
 export default FolderDisplay

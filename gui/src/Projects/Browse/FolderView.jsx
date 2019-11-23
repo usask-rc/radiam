@@ -128,13 +128,6 @@ const ReducedExpansionPanel = withStyles(() => ({
   },
 }))(ExpansionPanel);
 
-function isFile(file) {
-  if (file.type !== 'directory') {
-    return true;
-  }
-  return false;
-}
-
 function FolderView({ projectID, item, classes }) {
 
   let _isMounted = false
@@ -143,6 +136,10 @@ function FolderView({ projectID, item, classes }) {
   const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [numFiles, setNumFiles] = useState(10)
+  const [sortBy, setSortBy] = useState("name")
+  const [order, setOrder] = useState("")
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -167,10 +164,21 @@ function FolderView({ projectID, item, classes }) {
     let folderPath = parents[parents.length - 1]
     _isMounted = true
 
-    //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-    getFolderFiles(folderPath, projectID, 1000, 1, "directory").then((data) => {
+    let params = {
+      folderPath: folderPath,
+      projectID: projectID,
+      numFiles: numFiles,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      page: page,
+      sortBy: sortBy,
+      order: order,
+         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
+    }
+
+    //TODO: requires an order by component as well
+    getFolderFiles(params, "directory").then((data) => {
       if (_isMounted){
-        setFolders(data.files)
+        setFolders(...folders, data.files)
       }
       return data
     }).then(() => {
@@ -180,9 +188,9 @@ function FolderView({ projectID, item, classes }) {
     })
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-    getFolderFiles(folderPath, projectID, 1000, 1, "file").then((data) => {
+    getFolderFiles(params, "file").then((data) => {
       if (_isMounted){
-        setFiles(data.files)
+        setFiles(...files, data.files)
       }
     }).then(() => 
     {
@@ -193,18 +201,13 @@ function FolderView({ projectID, item, classes }) {
     }
     ).catch((err => {console.error("error in getFiles is: ", err)}))
 
-    console.log("parent list is: ", parents)
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
   }, [parents]);
 
-  console.log("folders, files, item: ", folders, files, item)
-
-
-  
-
+  console.log("FolderView with PID: ", projectID)
 
     return (
       <ReducedExpansionPanel

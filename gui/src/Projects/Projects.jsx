@@ -128,6 +128,9 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
+
+    //TODO: lock this away behind the right perm set
+    if (permissions){
     return (
       <Show {...props}>
         <TabbedShowLayout>
@@ -179,6 +182,10 @@ export const ProjectShow = withTranslate(withStyles(styles)(
         </TabbedShowLayout>
       </Show>
     );
+    }
+    else{
+      return <Typography>Waiting to load Permissions...</Typography>
+    }
 }));
 
 

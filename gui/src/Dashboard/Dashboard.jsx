@@ -17,7 +17,6 @@ class Dashboard extends PureComponent {
     this.state = { loading: true, hasFiles: false, managedGroups:{} };
   }
 
-
   //TODO: handle potential setstate on unmounted component
   /*
   getRecentUsers = () => {
@@ -36,8 +35,6 @@ class Dashboard extends PureComponent {
         this.setState({ nbNewUsers: newUsers.reduce(nb => ++nb, 0) });
       });
   };*/
-
-  
 
   //TODO: handle potential setstate on unmounted component
   getRecentGroups = () => {
@@ -62,12 +59,10 @@ class Dashboard extends PureComponent {
   //this gets all projects that the user has worked on.
   //we want to get all (recent) files in a project and display them in an expandable listview.
   //TODO: handle potential setstate on unmounted component
-  getRecentProjects = (dateLimit = 30) => {
-    console.log("getrecentprojects run on dashboard")
+  getRecentProjects = (dateLimit = Constants.RECENTFILESLIMIT) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     let projectCtr = 0
     let projectList = []
-
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
       order: { field: Constants.model_fields.NAME },
@@ -110,30 +105,23 @@ class Dashboard extends PureComponent {
             });
 
             projectCtr += 1
-            console.log("project being pushed to list is: ", newProject)
             projectList.push(newProject)
 
             if (!this.state.hasFiles && newProject.files.length > 0){
               this.setState({ hasFiles: true });
             }
 
-
             if (projectCtr === projects.length)
             {
-              console.log("projectcounter equals projects length.  setting state")
               this.setState({ projects: projectList, loading:false });
             }
 
           }).catch(error => {
-            console.log('error in getrecentproj is: ', error);
             projectCtr += 1
-
             if (projectCtr === projects.length)
             {
-              console.log("projectcounter equals projects length.  setting state")
               this.setState({ projects: projectList, loading:false });
             }
-
           });
           return project;
         });

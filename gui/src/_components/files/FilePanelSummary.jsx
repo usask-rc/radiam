@@ -27,13 +27,18 @@ const styles = {
   },
 }
 
+//TODO: get count of both folders and files and display both counts.
+
 const FilePanelSummary = ({ classes, file, caller }) => (
   <Grid container direction="row" alignItems="center">
     <Grid item className={classes.item} xs={5} md={4}>
-      {file.filesize ? <Typography className={classes.fileDisplay}><Description className={classes.folderIcon}/>{`${file.name}`}</Typography> : <Typography className={classes.fileDisplay}><Folder className={classes.folderIcon} />{`${file.name}`}</Typography>}
+      <Typography className={classes.fileDisplay}>
+        <Description className={classes.folderIcon}/>
+        {`${file.name}`}
+      </Typography>
     </Grid>
     <Grid item className={classes.item} xs={2} md={2}>
-      {file.filesize > 0 ? formatBytes(file.filesize, 2) : ''}
+      {formatBytes(file.filesize, 2)}
     </Grid>
     <Grid item className={classes.item} xs={2} md={3}>
       {caller !== 'browser' && (
