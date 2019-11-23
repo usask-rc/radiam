@@ -23,8 +23,8 @@ function BrowseTab({ projectID, classes }) {
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
   let _isMounted = false
-  useEffect(() => {
 
+  useEffect(() => {
     _isMounted = true
     
     getRootPaths(projectID).then(data => {
@@ -72,6 +72,7 @@ function BrowseTab({ projectID, classes }) {
     }
   }, [projectID]);
 
+  console.log("browsetab rendering")
   return (
     <div className={classes.main}>
     {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :

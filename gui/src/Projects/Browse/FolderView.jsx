@@ -128,13 +128,6 @@ const ReducedExpansionPanel = withStyles(() => ({
   },
 }))(ExpansionPanel);
 
-function isFile(file) {
-  if (file.type !== 'directory') {
-    return true;
-  }
-  return false;
-}
-
 function FolderView({ projectID, item, classes }) {
 
   let _isMounted = false
@@ -208,14 +201,13 @@ function FolderView({ projectID, item, classes }) {
     }
     ).catch((err => {console.error("error in getFiles is: ", err)}))
 
-    console.log("parent list is: ", parents)
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
   }, [parents]);
 
-  console.log("folders, files, item: ", folders, files, item)
+  console.log("FolderView with PID: ", projectID)
 
     return (
       <ReducedExpansionPanel
