@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { Pagination, translate } from 'react-admin';
 import Constants from '../../_constants/index';
 import FileList from '../../_components/files/FileList';
-import { Search } from '@material-ui/icons';
+import { Search, ArrowUpward, ArrowDownward } from '@material-ui/icons';
 
 import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
 import { getProjectData } from '../../_tools/funcs';
@@ -23,6 +23,16 @@ const styles = theme => ({
   sortSelect: {
     textAlign: 'right',
   },
+
+  sortDisplay: {
+    display: 'flex',
+    flexDirection: "row",
+  },
+  orderIcon: {
+    height: '1.25em',
+    width: '1.25em',
+    verticalAlign: "middle",
+  },
   flex: {
     display: 'flex',
     alignItems: 'flex-end',
@@ -37,7 +47,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
-  const [order, setOrder] = useState('DESC'); //in case we ever want to be able to toggle asc/desc sorted values
+  const [order, setOrder] = useState('-'); //in case we ever want to be able to toggle asc/desc sorted values
   const [search, setSearch] = useState(
     (props &&
       props.location &&
@@ -114,18 +124,9 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
           </Select>
 
-          
-          <Select
-            //TODO: change this to an icon instead of a select?
-            id={'sort-order'}
-            label={`Order`}
-            className={classes.sortSelect}
-            value={order}
-            onChange={e => setOrder(e.target.value)}
-            >
-              <MenuItem value={Constants.sort_fields.ASCENDING}>ASC</MenuItem>
-              <MenuItem value={Constants.sort_fields.DESCENDING}>DESC</MenuItem>
-            </Select>
+          <div className={classes.sortDisplay}>
+            {order === "-" ? <ArrowUpward className={classes.orderIcon} onClick={() => setOrder("")}/> : <ArrowDownward className={classes.orderIcon} onClick={() => setOrder("-")}/>}
+          </div>
         </form>
       )}
       <Divider />

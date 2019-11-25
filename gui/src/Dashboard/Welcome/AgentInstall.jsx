@@ -16,17 +16,21 @@ const styles = {
     paddingRight: "24px",
     paddingTop: "16px",
     paddingBottom: "16px",
+    verticalAlign: "middle",
   },
   titleIcon: {
     marginRight: "8px",
-    marginBottom: "-5px",
     height: "28px",
     width: "28px",
+    verticalAlign: "middle",
+
   },
   container: {
     margin: "1em 0em 0em 0em",
     textAlign: "flex-start",
     minHeight: "12em",
+    verticalAlign: "middle",
+    
   },
 };
 const AgentInstall = ({ classes, translate }) => (

@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import {
   AddLocation,
   FolderOpen,
+  Search,
+  Sort,
+  ArrowUpward,
+  ArrowDownward,
 } from '@material-ui/icons';
 import { compose } from 'recompose';
 import Constants from '../../_constants/index';
@@ -11,6 +15,8 @@ import {
   ExpansionPanelDetails,
   ExpansionPanelSummary,
   Typography,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 import FileSummary from '../../_components/files/FileSummary';
 import FolderDisplay from './FolderDisplay';
@@ -22,13 +28,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles } from '../../_tools/funcs';
 
 const styles = theme => ({
-  main: {
-    flex: '1',
-    marginRight: '2em',
-    marginLeft: '5em',
-    marginTop: '2em',
-    textAlign: 'right',
-  },
   baseFolder: {
     backgroundColor: "beige",
   },
@@ -36,55 +35,24 @@ const styles = theme => ({
     fontWeight: 'bold',
     display: 'flex',
   },
-  noDataFoundText: {
-    fontWeight: 'bold',
-    padding: "1em",
-  },
-  title: {
-    fontSize: 16,
-    fontDecoration: 'bold',
-  },
-  value: {
-    padding: '0 16px',
-    minHeight: 48,
+  buttonContainer: {
     textAlign: 'right',
-  },
-  listItemText: {
-    paddingRight: 0,
   },
   details: {
     flexDirection: 'column',
     textAlign: 'left',
   },
-  buttonContainer: {
-    textAlign: 'right',
+  fileInfoDisplay: {
+    display: 'flex',
+    flexDirection: "row",
   },
-  sortSelect: {
-    textAlign: 'right',
+  sortDisplay: {
+    display: 'flex',
+    flexDirection: "row",
   },
   fileSummary: {
     paddingRight: '2em',
     marginRight: '20em',
-  },
-  folderIcon: {
-    marginRight: '0.25em',
-  },
-  nestedFolderPanel: {
-    backgroundColor: '#BEBEBE',
-    width: 'inherit',
-    marginRight: '1em',
-    borderRadius: 3,
-  },
-  parentPanel: {
-    textAlign: 'left',
-  },
-  locationDisplay: {
-    margin: '0.25em',
-    marginLeft: '0.75em',
-  },
-  smallDisplay: {
-    textAlign: 'right',
-    verticalAlign: 'middle',
   },
   folderContents: {
     display: 'flex',
@@ -100,9 +68,68 @@ const styles = theme => ({
   folderContentsGrid: {
     display: 'inline-block',
   },
+  folderIcon: {
+    marginRight: '0.25em',
+  },
   folderLineItem: {
     display: "flex",
     flexDirection: "row",
+  },
+  listItemText: {
+    paddingRight: 0,
+  },
+  locationDisplay: {
+    margin: '0.25em',
+    marginLeft: '0.75em',
+  },
+  locationIcon: {
+    verticalAlign: "middle",
+  },
+  main: {
+    flex: '1',
+    marginRight: '2em',
+    marginLeft: '5em',
+    marginTop: '2em',
+    textAlign: 'right',
+  },
+  nestedFolderPanel: {
+    backgroundColor: '#BEBEBE',
+    width: 'inherit',
+    marginRight: '1em',
+    borderRadius: 3,
+  },
+  noDataFoundText: {
+    fontWeight: 'bold',
+    padding: "1em",
+  },
+  parentPanel: {
+    textAlign: 'left',
+  },
+  sortIcon: {
+    height: '1em',
+    width: '1em',
+    verticalAlign: "middle",
+  },
+  orderIcon: {
+    height: '1.25em',
+    width: '1.25em',
+    verticalAlign: "middle",
+  },
+  smallDisplay: {
+    textAlign: 'right',
+    verticalAlign: 'middle',
+  },
+  sortSelect: {
+    textAlign: 'right',
+  },
+  title: {
+    fontSize: 16,
+    fontDecoration: 'bold',
+  },
+  value: {
+    padding: '0 16px',
+    minHeight: 48,
+    textAlign: 'right',
   },
   smallIcon: {},
 });
@@ -137,9 +164,9 @@ function FolderView({ projectID, item, classes }) {
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
-  const [numFiles, setNumFiles] = useState(10)
-  const [sortBy, setSortBy] = useState("name")
-  const [order, setOrder] = useState("")
+  const [numFiles, setNumFiles] = useState(100)
+  const [sortBy, setSortBy] = useState("last_modified")
+  const [order, setOrder] = useState("-")
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -178,7 +205,8 @@ function FolderView({ projectID, item, classes }) {
     //TODO: requires an order by component as well
     getFolderFiles(params, "directory").then((data) => {
       if (_isMounted){
-        setFolders(...folders, data.files)
+        //TODO:will have to change when pagination comes
+        setFolders(data.files)
       }
       return data
     }).then(() => {
@@ -190,7 +218,8 @@ function FolderView({ projectID, item, classes }) {
 
     getFolderFiles(params, "file").then((data) => {
       if (_isMounted){
-        setFiles(...files, data.files)
+        //TODO:will have to change when pagination comes
+        setFiles(data.files)
       }
     }).then(() => 
     {
@@ -205,7 +234,7 @@ function FolderView({ projectID, item, classes }) {
     return function cleanup() {
       _isMounted = false;
     }
-  }, [parents]);
+  }, [parents, sortBy, order]);
 
   console.log("FolderView with PID: ", projectID)
 
@@ -215,19 +244,44 @@ function FolderView({ projectID, item, classes }) {
         className={classes.parentPanel}
         TransitionProps={{ unmountOnExit: true }}
       >
-        <div className={classes.locationDisplay}>
-          <AddLocation className={classes.folderIcon} />
-          <ReferenceField
-            label={'en.models.agents.location'}
-            source={Constants.model_fk_fields.LOCATION}
-            reference={Constants.models.LOCATIONS}
-            linkType={Constants.resource_operations.SHOW}
-            basePath={`/${Constants.models.PROJECTS}`}
-            resource={Constants.models.PROJECTS}
-            record={item}
-          >
-            <LocationShow />
-          </ReferenceField>
+        <div className={classes.fileInfoDisplay}>
+          <div className={classes.locationDisplay}>
+            <AddLocation className={classes.locationIcon} />
+            <ReferenceField
+              label={'en.models.agents.location'}
+              source={Constants.model_fk_fields.LOCATION}
+              reference={Constants.models.LOCATIONS}
+              linkType={Constants.resource_operations.SHOW}
+              basePath={`/${Constants.models.PROJECTS}`}
+              resource={Constants.models.PROJECTS}
+              record={item}
+            >
+            
+              <LocationShow />
+            </ReferenceField>
+          </div>
+
+          <div className={classes.sortDisplay}>
+            <Sort className={classes.sortIcon} />
+            <Select
+              id={'sort-select'}
+              label={`Sort By`}
+              className={classes.sortSelect}
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+            >
+              {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
+              <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
+              <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
+              <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
+              <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
+              <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
+            </Select>
+          </div>
+
+          <div className={classes.sortDisplay}>
+            {order === "-" ? <ArrowUpward className={classes.orderIcon} onClick={() => setOrder("")}/> : <ArrowDownward className={classes.orderIcon} onClick={() => setOrder("-")}/>}
+          </div>
         </div>
         <ExpansionPanelSummary
           className={classes.baseFolder}

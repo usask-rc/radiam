@@ -37,6 +37,8 @@ const styles = theme => ({
     paddingTop: '16px',
     paddingBottom: '16px',
     flexDirection: 'row',
+    verticalAlign: "middle",
+
   },
   image: {
     height: `${Constants.AVATAR_HEIGHT}`,
@@ -62,7 +64,7 @@ const styles = theme => ({
   },
   titleIcon: {
     marginRight: '8px',
-    marginBottom: '-5px',
+    verticalAlign: "middle",
     height: "28px",
     width: "28px",
   },

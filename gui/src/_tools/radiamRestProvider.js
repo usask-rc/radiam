@@ -90,7 +90,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         if (params.sort){
           //TODO: should this be ASC or DESC?
-          sort = `ordering=${params.sort.order === "DESC" ? "-" : ""}${params.sort.field}`
+          sort = `ordering=${params.sort.order}${params.sort.field}`
         }
 
         //TODO/NOTE: this is necessary - pagination controls have not yet been moved to the search query body from the url.
