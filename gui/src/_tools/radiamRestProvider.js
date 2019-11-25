@@ -88,6 +88,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
 
+        if (params.sort){
+          //TODO: should this be ASC or DESC?
+          sort = `ordering=${params.sort.order === "DESC" ? "-" : ""}${params.sort.field}`
+        }
+
         //TODO/NOTE: this is necessary - pagination controls have not yet been moved to the search query body from the url.
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
 
