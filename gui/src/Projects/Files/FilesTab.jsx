@@ -113,6 +113,19 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
             <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
           </Select>
+
+          
+          <Select
+            //TODO: change this to an icon instead of a select?
+            id={'sort-order'}
+            label={`Order`}
+            className={classes.sortSelect}
+            value={order}
+            onChange={e => setOrder(e.target.value)}
+            >
+              <MenuItem value={Constants.sort_fields.ASCENDING}>ASC</MenuItem>
+              <MenuItem value={Constants.sort_fields.DESCENDING}>DESC</MenuItem>
+            </Select>
         </form>
       )}
       <Divider />

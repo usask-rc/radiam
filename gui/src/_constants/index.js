@@ -147,6 +147,10 @@ module.exports = Object.freeze({
     TITLE: "title",
     USERNAME: "username",
   },
+  sort_fields: {
+    ASCENDING: "ASC",
+    DESCENDING: "DESC",
+  },
   //the place to put these is probably in en.js - however, I'm not too keen on having to import translate into more places.
   //these are error / warning messages for form or api failures.
   warnings: {
