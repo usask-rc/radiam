@@ -28,6 +28,7 @@ import StepLabel from '@material-ui/core/StepLabel';
 import { submitObjectWithGeo, getGroupData, getUsersInGroup } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
+import ProjectTitle from '../Projects/ProjectTitle';
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
@@ -374,7 +375,10 @@ export class ProjectStepper extends React.Component {
     const { activeStep } = this.state;
 
     return (
+      <React.Fragment>
+        <ProjectTitle prefix={`Creating Project`} />
       <Stepper activeStep={activeStep} orientation="vertical">
+
         {steps.map((label, index) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
@@ -390,6 +394,7 @@ export class ProjectStepper extends React.Component {
           </Step>
         ))}
       </Stepper>
+      </React.Fragment>
     );
   }
 }

@@ -41,6 +41,7 @@ import { getGroupData, getUsersInGroup } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
+import ProjectTitle from "./ProjectTitle";
 
 const styles = {
   actions: {
@@ -401,10 +402,6 @@ export const ProjectCreate = withTranslate(
   ))
 );
 
-export const ProjectTitle = ({ record }) => (
-  <span>Project {record ? `"${record.name}"` : ''}</span>
-);
-
 class BaseProjectEdit extends Component {
   constructor(props) {
     super(props);
@@ -416,8 +413,9 @@ class BaseProjectEdit extends Component {
   render() {
     const { classes, permissions, record, ...others } = this.props;
 
-    return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
+    return <Edit actions={<MetadataEditActions />} {...others}>
       <SimpleForm redirect={Constants.resource_operations.LIST} submitOnEnter={false}>
+        <ProjectTitle prefix={`Updating`} />
         <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
     </Edit>;

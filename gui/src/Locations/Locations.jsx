@@ -21,6 +21,7 @@ import MapView from '../_components/_fragments/MapView';
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
+import LocationTitle from './LocationTitle';
 
 
 const listStyles = {
@@ -165,9 +166,9 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 export const LocationShow = props => 
   {
   return(
-  <Show title={<LocationTitle />} {...props}>
+  <Show {...props}>
     <SimpleShowLayout>
-      {console.log("props in simpleshowlayout is: ", props)}
+    <LocationTitle prefix={"Viewing"} />
       <TextField
         label={'en.models.locations.display_name'}
         source={Constants.model_fields.DISPLAY_NAME}
@@ -208,14 +209,10 @@ export const LocationCreate = props => {
   );
 };
 
-export const LocationTitle = ({ record }) => {
-  return <span>Location {record ? `"${record.name}"` : ''}</span>;
-};
-
 export const LocationEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<LocationTitle />} submitOnEnter={false} {...props} >
+    <Edit submitOnEnter={false} {...props} >
       <LocationForm {...other} mode={Constants.resource_operations.EDIT} />
     </Edit>
   );
