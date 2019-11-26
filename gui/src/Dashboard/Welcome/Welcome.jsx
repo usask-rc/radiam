@@ -18,10 +18,12 @@ const styles = {
     paddingRight: "24px",
     paddingTop: "16px",
     paddingBottom: "16px",
+    verticalAlign: "middle",
+
   },
   titleIcon: {
     marginRight: "8px",
-    marginBottom: "-5px",
+    verticalAlign: "middle",
     height: "28px",
     width: "28px",
   },

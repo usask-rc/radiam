@@ -156,19 +156,17 @@ const CustomLabel = ({classes, translate, labelText} ) => {
 
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record.geo ? props.record.geo : {})
-  const [dirty, setDirty] = useState(false)
   const [data, setData] = useState({})
-
+/*
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
       submitObjectWithGeo(data, geo, props)
     }
   }, [data])
-
+*/
   function geoDataCallback(geo){
     if (props.record.geo !== geo){
       setGeo(geo)
-      setDirty(true)
     }
   } 
 
@@ -182,21 +180,18 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-    setDirty(false)
     setData(newData) //will prompt the call in useEffect.
-  };
 
-  function handleChange(data) {
-    setDirty(true)
-  }
+    submitObjectWithGeo(newData, geo, props)
+  };
 
   console.log("props in datasetform are: ", props)
   console.log("props classes in datasetform are: ", classes)
-
+  //label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={handleChange} redirect={Constants.resource_operations.LIST}>
-    <TextInput
-      label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
+  <SimpleForm {...props} save={handleSubmit} redirect={Constants.resource_operations.LIST}>
+    <TextInput      
+      label="Title"
       source={Constants.model_fields.TITLE}
       validate={validateTitle}
       
@@ -274,9 +269,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     { props.record && 
       <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
     }
-    <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
   </SimpleForm>)
 };
+//<Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+
 
 export const DatasetCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;

@@ -46,7 +46,7 @@ class Dashboard extends PureComponent {
       filter: {
         is_active: true,
       },
-      sort: { field: Constants.model_fields.NAME, order: 'DESC' },
+      sort: { field: Constants.model_fields.NAME, order: '-' },
       pagination: { page: 1, perPage: 10 },
     })
       .then(response => response.data)
@@ -81,7 +81,7 @@ class Dashboard extends PureComponent {
             {
               sort: {
                 field: Constants.model_fields.INDEXED_DATE,
-                order: 'DESC',
+                order: '-',
               },
               pagination: {
                 page: 1,

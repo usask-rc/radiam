@@ -5,7 +5,7 @@ export default {
   ...englishMessages,
   en: {
     metadata: {
-      configure: "Config",
+      configure: "Metadata",
       config: {
         title: "Configure Additional Metadata",
       },
