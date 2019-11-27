@@ -11,11 +11,9 @@ var cloneDeep = require('lodash.clonedeep');
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
 
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -34,7 +32,7 @@ export function toastErrors(data) {
   } else if (isArray(data)) {
     data.map(item => {
       toast.error('Error: ', item);
-      return item;
+      return item; 
     });
   } else {
     toast.error(data);

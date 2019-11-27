@@ -152,11 +152,10 @@ const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
-
-
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
+  const [isDirty, setIsDirty] = useState(false)
 /*
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
@@ -167,12 +166,15 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   function geoDataCallback(geo){
     if (props.record.geo !== geo){
       setGeo(geo)
+      setIsDirty(true)
     }
   } 
 
   function handleSubmit(data) {
     //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
+
+    setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
@@ -185,11 +187,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     submitObjectWithGeo(newData, geo, props)
   };
 
-  console.log("props in datasetform are: ", props)
-  console.log("props classes in datasetform are: ", classes)
   //label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
   return(
-  <SimpleForm {...props} save={handleSubmit} redirect={Constants.resource_operations.LIST}>
+  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
     <TextInput      
       label="Title"
       source={Constants.model_fields.TITLE}
@@ -271,7 +271,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     }
   </SimpleForm>)
 };
-//<Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
 
 
 export const DatasetCreate = props => {

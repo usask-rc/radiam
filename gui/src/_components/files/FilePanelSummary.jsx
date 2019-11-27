@@ -56,7 +56,7 @@ const FilePanelSummary = ({ classes, file, caller }) => (
       )}
     </Grid>
     <Grid item className={classes.item} xs={2} md={3}>
-      {`${moment().diff(
+      {`Indexed ${moment().diff(
         moment(file.indexed_date).toISOString(),
         'days'
       )} days ago`}
