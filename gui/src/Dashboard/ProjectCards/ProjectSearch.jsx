@@ -19,7 +19,6 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                         className={classes.textField}
                         onChange={handleChange}
                         placeholder={`Search Files`}
-                        autoFocus
                     />
                 )}
                 <Search

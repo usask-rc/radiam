@@ -158,10 +158,6 @@ const WelcomeCards = () => {
                 <SecondSteps userType={userType}/>
             </Grid>
         }
-        
-        <Grid item xs={4}>
-            <Welcome />
-        </Grid>
         <Grid item xs={4}>
             <AgentInstall />
         </Grid>
@@ -169,3 +165,10 @@ const WelcomeCards = () => {
 )}
 
 export default WelcomeCards
+
+/*
+this isn't needed anymore.
+<Grid item xs={4}>
+    <Welcome />
+</Grid>
+*/
