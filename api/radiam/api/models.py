@@ -861,6 +861,11 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
         """
         self.delete_data_collection_methods()
         self.delete_sensitivities()
+        try:
+            entity = Entity.objects.get(dataset=self.id)
+            entity.delete()
+        except ObjectDoesNotExist:
+            pass
         super().delete(*args, **kwargs)
 
     class Meta:
