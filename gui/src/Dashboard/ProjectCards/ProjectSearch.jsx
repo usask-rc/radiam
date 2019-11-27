@@ -4,7 +4,7 @@ import { Search } from '@material-ui/icons';
 import * as Constants from "../../_constants/index"
 
 const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
-    const [searchHidden, setSearchHidden] = useState(true);
+    const [searchHidden, setSearchHidden] = useState(false);
 
     function handleChange(e) {
         setSearch(e.target.value);
@@ -24,7 +24,7 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                 )}
                 <Search
                     className={classes.searchIcon}
-                    onClick={() => setSearchHidden(!searchHidden)}
+                    //onClick={() => setSearchHidden(!searchHidden)}
                 />
                 <Typography variant="body1" component="p" onClick={() => setSearchHidden(!searchHidden)} className={classes.fileCount}>
                     {`${project.nbFiles} ${Constants.model_fields.FILES}`}
