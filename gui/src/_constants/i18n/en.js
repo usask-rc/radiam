@@ -355,8 +355,8 @@ export default {
         title: 'Radiam',
         subtitle: 'Welcome',
         content: 'Browse existing project data in the Projects sidebar, or see the most recently updated files below.',
-        content2: 'View the ',
-        usermanual: 'User Manual',
+        content2: 'Need Help?  Check out the ',
+        usermanual: 'User Manual Here.',
       },
     },
     models: {

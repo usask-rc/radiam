@@ -56,7 +56,8 @@ const AgentInstall = ({ classes, translate }) => (
           {translate("en.dashboard.agent.link_text")}
         </a>
       </Typography>
-      <Typography variant={"body2"} component="p">
+
+      <Typography className={classes.body} variant={"body2"} component="p">
         {translate("en.dashboard.welcome.content2")}
         <a href={Constants.USERMANUALPATH}>{translate("en.dashboard.welcome.usermanual")}</a>
       </Typography> 
