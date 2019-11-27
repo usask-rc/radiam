@@ -25,7 +25,9 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                     className={classes.searchIcon}
                     //onClick={() => setSearchHidden(!searchHidden)}
                 />
-                <Typography variant="body1" component="p" onClick={() => setSearchHidden(!searchHidden)} className={classes.fileCount}>
+                <Typography variant="body1" component="p" className={classes.fileCount}
+                //onClick={() => setSearchHidden(!searchHidden)}
+                >
                     {`${project.nbFiles} ${Constants.model_fields.FILES}`}
                 </Typography>
             </div>
