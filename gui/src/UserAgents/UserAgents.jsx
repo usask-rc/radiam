@@ -215,7 +215,7 @@ export const UserAgentCreate = props => {
         </ReferenceInput>
         </Grid>
         <Grid xs={12}>
-        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
+        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST} required>
           <SimpleFormIterator>
             <ReferenceInput
             label={"en.models.agents.projects"}
