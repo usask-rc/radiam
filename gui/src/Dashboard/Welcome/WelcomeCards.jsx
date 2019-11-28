@@ -159,6 +159,9 @@ const WelcomeCards = () => {
             </Grid>
         }
         <Grid item xs={4}>
+            <Welcome />
+        </Grid>
+        <Grid item xs={4}>
             <AgentInstall />
         </Grid>
     </Grid>

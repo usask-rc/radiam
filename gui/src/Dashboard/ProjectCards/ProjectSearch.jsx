@@ -18,18 +18,14 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                         type={Constants.paths.SEARCH}
                         className={classes.textField}
                         onChange={handleChange}
-                        placeholder={`Search`}
+                        placeholder= {`${project.nbFiles} ${Constants.model_fields.FILES}`}
+                        autoFocus
                     />
                 )}
                 <Search
                     className={classes.searchIcon}
                     //onClick={() => setSearchHidden(!searchHidden)}
                 />
-                <Typography variant="body1" component="p" className={classes.fileCount}
-                //onClick={() => setSearchHidden(!searchHidden)}
-                >
-                    {`${project.nbFiles} ${Constants.model_fields.FILES}`}
-                </Typography>
             </div>
         </form>
     )

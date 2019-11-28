@@ -21,6 +21,10 @@ const styles = {
     verticalAlign: "middle",
 
   },
+  cardContent: {
+    height: "inherit",
+    width: "inherit"
+  },
   titleIcon: {
     marginRight: "8px",
     verticalAlign: "middle",
@@ -28,14 +32,14 @@ const styles = {
     width: "28px",
   },
   container: {
-    margin: "1em",
     textAlign: "flex-start",
     minHeight: "12em",
+    marginLeft: "12px",
   },
 };
 const Welcome = ({ classes, translate }) => (
   <Card className={classes.container}>
-    <CardContent>
+    <CardContent className={classes.cardContent}>
       <Typography className={classes.headlineTop} variant="h5" component="h5">
         <HomeIcon className={classes.titleIcon} />
         {translate("en.dashboard.welcome.subtitle")}
