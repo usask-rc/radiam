@@ -2,13 +2,14 @@
 import React, { Component, PureComponent } from 'react';
 import { GET_LIST } from 'react-admin';
 import { httpClient, radiamRestProvider } from '../_tools';
-import { getAPIEndpoint, getUsersInGroup, getGroupData } from '../_tools/funcs';
+import { getAPIEndpoint } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
 import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
 import moment from 'moment';
 import WelcomeCards from './Welcome/WelcomeCards';
 import RecentFiles from './RecentFiles/RecentFiles';
+import ProjectList from './ProjectList/ProjectList';
 
 class Dashboard extends PureComponent {
   constructor(props) {

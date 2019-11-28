@@ -18,7 +18,7 @@ const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
                         type={Constants.paths.SEARCH}
                         className={classes.textField}
                         onChange={handleChange}
-                        placeholder={`Search Files`}
+                        placeholder={`Search`}
                     />
                 )}
                 <Search
