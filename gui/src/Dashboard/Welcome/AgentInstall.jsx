@@ -30,7 +30,8 @@ const styles = {
     textAlign: "flex-start",
     minHeight: "12em",
     verticalAlign: "middle",
-    marginLeft: "1em",
+    marginLeft: "2em",
+
   },
 };
 const AgentInstall = ({ classes, translate }) => (

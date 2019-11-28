@@ -2,70 +2,71 @@ import React, { Component, useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import {PropTypes} from "prop-types";
 import * as Constants from "../../_constants/index"
-import { Card, CardContent, Typography, CardHeader, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel } from '@material-ui/core';
+import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel, Link } from '@material-ui/core';
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
 import { Redirect } from 'react-router';
-import ProjectCardHeader from '../ProjectCards/ProjectCardHeader';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
 
 const styles = {
     headlineTop: {
-      backgroundColor: '#688db2',
-      color: 'white',
-      marginTop: '-16px !important;',
+        backgroundColor: '#688db2',
+        color: 'white',
+        marginTop: '-16px !important;',
     },
     headerDiv: {
-      float: 'left',
+    float:   'left',
     },
     iconCell: {
-        padding:"15px",
+        verticalAlign: "middle",
+        width: `${Constants.AVATAR_HEIGHT}`,
+
     },
     image: {
-      height: `${Constants.AVATAR_HEIGHT}`,
-      margin: '-6px 6px 0px 0px',
+        height: `${Constants.AVATAR_HEIGHT}`,
+        width: `${Constants.AVATAR_HEIGHT}`,
     },
     nameCell: {
         fontSize: "1em",
     },
     searchIcon: {
-      height: '1em',
-      width: '1em',
-      marginTop: '1em',
+        height: '1em',
+        width: '1em',
+        marginTop: '1em',
     },
     searchArea: {
-      display: 'flex',
-      alignItems: 'flex-end',
+        display: 'flex',
+        alignItems: 'flex-end',
     },
     table: {
-
+        width: "60em",
     },
     textTop: {
-      color: 'white',
+        color: 'white',
     },
     container: {
-      margin: '1em',
-      textAlign: 'center',
-      minWidth: "20em",
+        margin: '1em',
+        textAlign: 'center',
+        minWidth: "20em",
     },
     fileCount: {
-      textAlign: "right",
-      color: "DarkGray"
+        textAlign: "right",
+        color: "DarkGray"
     },
     chipItem: {
-      margin: "0.25em"
+        margin: "0.25em"
     },
     chipContainer: {
-      display: 'flex',
-      width: 'inherit',
-      alignItems: 'flex-end'
+        display: 'flex',
+        width: 'inherit',
+        alignItems: 'flex-end'
     },
     chipLabel: {
-      color: "DarkGray",
-      textAlign: "left",
-      width: "inherit",
-      alignItems: "flex-start"
+        color: "DarkGray",
+        textAlign: "left",
+        width: "inherit",
+        alignItems: "flex-start"
     },
     visuallyHidden: {
         border: 0,
@@ -81,18 +82,27 @@ const styles = {
     };
 
     const headCells = [
-        {id: 'icon', numeric: false, disablePadding: false, label: "Icon"},
-        {id: "name", numeric: false, disablePadding: false, label: "Project Name"},
-        {id: "keywords", numeric: false, disablePadding: false, label: "Keywords" },
-        {id: "search", numeric: false, disablePadding: false, label: "Search"},
+        {id: 'icon', numeric: false, disablePadding: false, canOrder: false, label: "Icon"},
+        {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
+        {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
+        {id: "search", numeric: false, disablePadding: false, canOrder: false, label: "Search Project"},
     ]
 
     function desc(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+        console.log("in desc, comparison is: ", a[orderBy], b[orderBy])
+        let p1 = a[orderBy]
+        let p2 = b[orderBy]
+        if (orderBy === "name" || orderBy === "keywords"){
+            p1 = p1.toLowerCase()
+            p2 = p2.toLowerCase()
         }
-        if (b[orderBy] > a[orderBy]) {
-        return 1;
+
+        if (p2 < p1) {
+            return -1;
+        }
+        if (p2 > p1) {
+            return 1;
         }
         return 0;
     }
@@ -112,6 +122,7 @@ function EnhancedTableHead(props) {
                 padding={headCell.disablePadding ? 'none' : 'default'}
                 sortDirection={orderBy === headCell.id ? order : false}
             >
+                {headCell.canOrder ? 
                 <TableSortLabel
                     active={orderBy === headCell.id}
                     direction={order}
@@ -125,6 +136,9 @@ function EnhancedTableHead(props) {
                     </span>
                 ) : null}
                 </TableSortLabel>
+                :
+                headCell.label
+                }
             </TableCell>
             ))}
         </TableRow>
@@ -133,12 +147,12 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-classes: PropTypes.object.isRequired,
-numSelected: PropTypes.number.isRequired,
-onRequestSort: PropTypes.func.isRequired,
-order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-orderBy: PropTypes.string.isRequired,
-rowCount: PropTypes.number.isRequired,
+    classes: PropTypes.object.isRequired,
+    numSelected: PropTypes.number.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    orderBy: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
 };
 
 
@@ -159,6 +173,7 @@ const ProjectList = ({classes, loading, projects}) => {
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
+            console.log("in stablesort, comparing a, b: ", a, b)
             const order = cmp(a[0], b[0]);
             if (order !== 0) return order;
             return a[1] - b[1];
@@ -211,8 +226,6 @@ const ProjectList = ({classes, loading, projects}) => {
     };
 
     const isSelected = name => selected.indexOf(name) !== -1;
-
-    const emptyRows = tableRows - Math.min(tableRows, projects.length - tablePage * tableRows);
   
     return(
     <Card className={classes.container}>
@@ -257,7 +270,11 @@ const ProjectList = ({classes, loading, projects}) => {
 
                             </ReferenceField>
                         </TableCell>
-                        <TableCell className={classes.nameCell}>{project.name}</TableCell>
+                        <TableCell className={classes.nameCell}>
+                        <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
+                            {project.name}
+                        </Link>
+                        </TableCell>
                         <TableCell className={classes.keywordCell}>
                             <ProjectKeywords classes={classes} project={project} />
                         </TableCell>
