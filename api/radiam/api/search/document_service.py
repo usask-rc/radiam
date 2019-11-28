@@ -46,7 +46,12 @@ class _DocumentService:
         :param updated_doc: The updated document
         :return:
         """
-        ESDataset.init(index=index_name)
+        from elasticsearch import Elasticsearch
+
+        # es = Elasticsearch()
+        # es.indices.close(index=index_name)
+        #ESDataset.init(index=index_name)
+        #es.indices.open(index=index_name)
         doc = ESDataset.get(index=index_name, id=pk)
         doc.update(index=index_name, refresh=True, **updated_doc)
         return doc

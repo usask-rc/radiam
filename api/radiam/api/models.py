@@ -18,6 +18,7 @@ from .exceptions import ElasticSearchRequestError
 from .signals import (radiam_user_created, radiam_project_created,
     radiam_project_deleted)
 from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
+from .search.documents import ESDataset
 
 from django_rest_passwordreset.signals import reset_password_token_created
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -53,13 +54,19 @@ class ElasticSearchModel():
     """
     Add necessary operations for saving and deleting a model from elastic search
     """
-    def save(self, *args, **kwargs):
+    def save(self, analyzer=None, document=None, *args, **kwargs):
         """
         Create the model and create an index in ES
         """
         rs = RadiamService(self.id)
         if not rs.index_exists(self.id):
             try:
+                if analyzer:
+                    print("Adding an analyzer " + str(analyzer) + " to this index " + str(self.id))
+                    rs.index_service.index.analyzer(analyzer)
+                if document:
+                    print("Adding a document " + str(document) + " to this index " + str(self.id))
+                    rs.index_service.index.document(document)
                 rs.create_index(self.id)
             except es_exceptions.RequestError as error:
                 raise ElasticSearchRequestError(error.info)
@@ -710,8 +717,13 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         return geo_data
 
     def save(self, *args, **kwargs):
-        ElasticSearchModel.save(self, *args, **kwargs)
+        from elasticsearch_dsl import analyzer, tokenizer
+        linux_analyzer = analyzer('linux_path_analyzer',
+            tokenizer=tokenizer('linux_path_tokenizer', type='path_hierarchy')
+        )
+        ElasticSearchModel.save(self, analyzer=linux_analyzer, document=ESDataset, *args, **kwargs)
         models.Model.save(self, *args, **kwargs)
+        ESDataset.init(index=self.id)
 
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
