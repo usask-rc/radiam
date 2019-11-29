@@ -24,11 +24,6 @@ const styles = theme => ({
     flexWrap: 'wrap',
     backgroundColor: "beige",
   },
-  relatedDSContainer: {
-      marginLeft: '1em',
-      flexDirection: "row",
-      flex: 1,
-  }
 });
 
 const RelatedUsers = ({classes, record}) => {
@@ -54,7 +49,7 @@ const RelatedUsers = ({classes, record}) => {
     }, [])
 
     return(
-      <div className={classes.relatedDSContainer}>
+      <React.Fragment>
         {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
 
         <div className={classes.chipContainer}>
@@ -81,7 +76,7 @@ const RelatedUsers = ({classes, record}) => {
             <Chip label={`+ New User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable/>
           </Link> 
           </div>
-      </div>
+      </React.Fragment>
     )
   }
 
