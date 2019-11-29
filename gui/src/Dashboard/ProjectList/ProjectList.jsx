@@ -91,7 +91,7 @@ const styles = {
         {id: 'icon', numeric: false, disablePadding: false, canOrder: false, label: "Icon"},
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
-        {id: "search", numeric: false, disablePadding: false, canOrder: false, label: "Search Project"},
+        {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
         {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed File"}
     ]
 
@@ -106,10 +106,10 @@ const styles = {
             p2 = p2.toLowerCase()
         }
 
-        if (!p1 || p2 < p1) {
+        if (p1 === undefined || p2 < p1) {
             return -1;
         }
-        if (!p2 || p2 > p1) {
+        if (p2 === undefined || p2 > p1) {
             return 1;
         }
         return 0;
@@ -281,7 +281,11 @@ const ProjectList = ({classes, loading, projects}) => {
                             <ProjectKeywords classes={classes} project={project} />
                         </TableCell>
                         <TableCell className={classes.searchCell}>
-                            <ProjectSearch project={project} classes={classes} />
+                            {project.nbFiles > 0 ? 
+                                <ProjectSearch project={project} classes={classes} />
+                                :
+                                <Typography className={classes.noFiles}>{`No Files to Search`}</Typography>
+                            }
                         </TableCell>
                         <TableCell className={classes.lastFileCell}>
                         {console.log("recentFile is: ", project.recentFile)}
