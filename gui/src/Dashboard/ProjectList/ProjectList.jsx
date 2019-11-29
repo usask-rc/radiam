@@ -2,12 +2,12 @@ import React, { Component, useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import {PropTypes} from "prop-types";
 import * as Constants from "../../_constants/index"
-import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel, Link } from '@material-ui/core';
+import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel, Link, Typography } from '@material-ui/core';
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
-import { Redirect } from 'react-router';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
+import { FileCopy, Description, FolderOpen } from '@material-ui/icons';
 
 const styles = {
     headlineTop: {
@@ -40,7 +40,7 @@ const styles = {
         alignItems: 'flex-end',
     },
     table: {
-        width: "60em",
+        width: "80em",
     },
     textTop: {
         color: 'white',
@@ -53,6 +53,9 @@ const styles = {
     fileCount: {
         textAlign: "right",
         color: "DarkGray"
+    },
+    noFiles: {
+        color: "LightGray",
     },
     chipItem: {
         margin: "0.25em"
@@ -67,6 +70,9 @@ const styles = {
         textAlign: "left",
         width: "inherit",
         alignItems: "flex-start"
+    },
+    lastFileCellText: {
+        verticalAlign: "center",
     },
     visuallyHidden: {
         border: 0,
@@ -86,11 +92,13 @@ const styles = {
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "search", numeric: false, disablePadding: false, canOrder: false, label: "Search Project"},
+        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed File"}
     ]
 
     function desc(a, b, orderBy) {
 
-        console.log("in desc, comparison is: ", a[orderBy], b[orderBy])
+        console.log("in desc, comparison is: ", a[orderBy], b[orderBy], "a, b: ", a, b)
+
         let p1 = a[orderBy]
         let p2 = b[orderBy]
         if (orderBy === "name" || orderBy === "keywords"){
@@ -98,10 +106,10 @@ const styles = {
             p2 = p2.toLowerCase()
         }
 
-        if (p2 < p1) {
+        if (!p1 || p2 < p1) {
             return -1;
         }
-        if (p2 > p1) {
+        if (!p2 || p2 > p1) {
             return 1;
         }
         return 0;
@@ -159,17 +167,11 @@ EnhancedTableHead.propTypes = {
 
 const ProjectList = ({classes, loading, projects}) => {
 
-    const [redirect, setRedirect] = useState(false);
-    const [search, setSearch] = useState(null);
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
     const [order, setOrder] = useState("asc")
     const [orderBy, setOrderBy] = useState('name')
     const [selected, setSelected] = useState([]);
-
-    function handleSearch(e) {
-        setRedirect(true);
-    }
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
@@ -279,16 +281,12 @@ const ProjectList = ({classes, loading, projects}) => {
                             <ProjectKeywords classes={classes} project={project} />
                         </TableCell>
                         <TableCell className={classes.searchCell}>
-                            <ProjectSearch setSearch={setSearch} handleSearch={handleSearch} project={project} classes={classes} />
+                            <ProjectSearch project={project} classes={classes} />
                         </TableCell>
-                        {redirect && (
-                            <Redirect
-                            to={{
-                                pathname: `/projects/${project.id}/show/files`,
-                                state: { search: search },
-                            }}
-                            />
-                        )}
+                        <TableCell className={classes.lastFileCell}>
+                        {console.log("recentFile is: ", project.recentFile)}
+                            {project.recentFile ? <Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}</Typography> :<Typography className={classes.noFiles}>{`No Crawled Files`}</Typography>}
+                        </TableCell>
                     </TableRow>)
             })
 

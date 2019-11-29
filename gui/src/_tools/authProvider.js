@@ -159,10 +159,10 @@ function getGroupMemberships(user) {
           if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
             groupMembership.group_role = user.groupRoles[rolesIndex];
             if (user.groupRoles[rolesIndex].id === Constants.ROLE_DATA_MANAGER) {
-              user.is_data_manager = true;
+              user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
             } else if (user.groupRoles[rolesIndex].id === Constants.ROLE_GROUP_ADMIN) {
 
-              user.is_group_admin = true;
+              user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
             }
             break;
           }

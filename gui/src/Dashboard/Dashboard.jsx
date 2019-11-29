@@ -62,6 +62,8 @@ class Dashboard extends PureComponent {
   //TODO: handle potential setstate on unmounted component
   getRecentProjects = (dateLimit = Constants.RECENTFILESLIMIT) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const now = moment();
+
     let projectCtr = 0
     let projectList = []
 
@@ -76,6 +78,7 @@ class Dashboard extends PureComponent {
         //TODO: once we can search we can search files on age range and avoid this entire filtering process
         projects.map(project => {
 
+          //get the most recent file to display it
           dataProvider(
             "GET_FILES",
             Constants.models.PROJECTS + '/' + project.id,
@@ -86,31 +89,22 @@ class Dashboard extends PureComponent {
               },
               pagination: {
                 page: 1,
-                perPage: 25,
+                perPage: 1,
               },
             }
           //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
           ).then(response => {
             const newProject = project
             newProject.nbFiles = response.total;
-
-            const now = moment();
-
-            newProject.files = response.data.filter(file => {
-              const date_indexed = moment(file.indexed_date).toISOString();
-              const timeDiff = now.diff(date_indexed, 'days');
-              if (timeDiff <= dateLimit) {
-                return file
-              }
-              return null
-            });
-
+            newProject.recentFile = response.data[0]
+            if (newProject.recentFile){
+              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), 'days')
+              newProject.daysOld = timeDiff
+              newProject.recentFile.timeAgo = `${timeDiff} days ago`
+            }
+            
             projectCtr += 1
             projectList.push(newProject)
-
-            if (!this.state.hasFiles && newProject.files.length > 0){
-              this.setState({ hasFiles: true });
-            }
 
             if (projectCtr === projects.length)
             {
@@ -146,7 +140,6 @@ class Dashboard extends PureComponent {
             {!this.state.loading &&
               <React.Fragment>
                 <ProjectCards loading={this.state.loading} projects={this.state.projects} />
-                <RecentFiles projects={this.state.projects} hasFiles={this.state.hasFiles} />
               </React.Fragment>
             }
           </React.Fragment>

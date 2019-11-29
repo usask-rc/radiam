@@ -1,32 +1,45 @@
 import React, { useState } from 'react';
 import { TextField, Typography } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
+import { Redirect } from 'react-router';
 import * as Constants from "../../_constants/index"
 
-const ProjectSearch = ({ classes, setSearch, project, handleSearch }) => {
-    const [searchHidden, setSearchHidden] = useState(false);
+const ProjectSearch = ({ classes, project }) => {
+    const [search, setSearch] = useState("")
+    const [redirect, setRedirect] = useState(false)
 
     function handleChange(e) {
         setSearch(e.target.value);
     }
+    function handleSearch(e) {
+        setRedirect(true)
+    }
+
     return (
         <form onSubmit={handleSearch}>
             <div className={classes.searchArea}>
-                {!searchHidden && (
-                    <TextField
-                        id={Constants.paths.SEARCH}
-                        type={Constants.paths.SEARCH}
-                        className={classes.textField}
-                        onChange={handleChange}
-                        placeholder= {`${project.nbFiles} ${Constants.model_fields.FILES}`}
-                        autoFocus
-                    />
-                )}
+               
+                <TextField
+                    id={Constants.paths.SEARCH}
+                    type={Constants.paths.SEARCH}
+                    className={classes.textField}
+                    onChange={handleChange}
+                    placeholder= {`${project.nbFiles} ${Constants.model_fields.FILES}`}
+                    autoFocus
+                />
                 <Search
                     className={classes.searchIcon}
                     //onClick={() => setSearchHidden(!searchHidden)}
                 />
             </div>
+            {redirect && (
+                <Redirect
+                to={{
+                    pathname: `/projects/${project.id}/show/files`,
+                    state: { search: search },
+                }}
+                />
+            )}
         </form>
     )
 }
