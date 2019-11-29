@@ -8,6 +8,7 @@ import ProjectSearch from '../ProjectCards/ProjectSearch';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
 import { FileCopy, Description, FolderOpen } from '@material-ui/icons';
+import { LocationShow } from '../../_components/_fields/LocationShow';
 
 const styles = {
     headlineTop: {
@@ -93,6 +94,7 @@ const styles = {
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
         {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed File"}
+        //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
     ]
 
     function desc(a, b, orderBy) {
@@ -289,11 +291,16 @@ const ProjectList = ({classes, loading, projects}) => {
                         </TableCell>
                         <TableCell className={classes.lastFileCell}>
                         {console.log("recentFile is: ", project.recentFile)}
-                            {project.recentFile ? <Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}</Typography> :<Typography className={classes.noFiles}>{`No Crawled Files`}</Typography>}
+                            {project.recentFile ? 
+                                <Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} 
+                                    {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}
+                                </Typography> 
+                                :
+                                <Typography className={classes.noFiles}>{`None`}</Typography>
+                            }
                         </TableCell>
                     </TableRow>)
             })
-
         }
     </TableBody>
     
@@ -312,3 +319,24 @@ const ProjectList = ({classes, loading, projects}) => {
 }
 
 export default withStyles(styles)(ProjectList)
+
+
+/*
+  <TableCell className={classes.lastFileLocation}>
+                            {project.recentFile ? 
+                                <ReferenceField
+                                label={'en.models.agents.location'}
+                                source={Constants.model_fk_fields.LOCATION}
+                                reference={Constants.models.LOCATIONS}
+                                linkType={Constants.resource_operations.SHOW}
+                                basePath={`/${Constants.models.PROJECTS}`}
+                                resource={Constants.models.PROJECTS}
+                                record={project.recentFile}
+                                >
+                                    <LocationShow />
+                                </ReferenceField>
+                                :
+                                <Typography className={classes.noFiles}>{`None`}</Typography>
+                            }
+                        </TableCell>
+                        */

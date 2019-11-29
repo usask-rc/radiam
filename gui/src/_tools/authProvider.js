@@ -153,6 +153,9 @@ function getGroupMemberships(user) {
     })
     .then(result => {
       var groupMemberships = [];
+      var groupAdminships = [];
+      var groupDataManagerships = [];
+      var groupUserships = [];
       for (var i = 0; i < result.count; i++) {
         var groupMembership = result.results[i];
         for (var rolesIndex = 0; rolesIndex < user.groupRoles.length; rolesIndex++) {
@@ -160,9 +163,14 @@ function getGroupMemberships(user) {
             groupMembership.group_role = user.groupRoles[rolesIndex];
             if (user.groupRoles[rolesIndex].id === Constants.ROLE_DATA_MANAGER) {
               user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
+              groupDataManagerships.push(groupMembership.group)
             } else if (user.groupRoles[rolesIndex].id === Constants.ROLE_GROUP_ADMIN) {
 
               user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
+              groupAdminships.push(groupMembership.group)
+            }
+            else{
+              groupUserships.push(groupMembership.group)
             }
             break;
           }
