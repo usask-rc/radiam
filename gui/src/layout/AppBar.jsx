@@ -72,7 +72,12 @@ const CustomAppBar = ({ classes, ...props }) => {
           {
               if (_isMounted)
               {
-                  this.setState({redirect: true})
+                  //this.setState({redirect: true})
+                  window.location.hash = "#/login"
+
+              }
+              else{
+                window.location.hash = "#/login"
               }
           }
       )

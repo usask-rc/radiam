@@ -52,9 +52,10 @@ function refreshAccessToken(curTok) {
 
   return validateToken(curTok.refresh).then(fetch(request)
     .then(response => {
-      if (response.status < 200 || response.status >= 300) {
+      if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
         localStorage.removeItem(Constants.WEBTOKEN)
-        throw new Error(response.statusText);
+        window.location.hash = "#/login"
+        console.error(response.statusText);
       }
       return response.json();
     })
