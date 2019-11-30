@@ -251,6 +251,7 @@ const GroupMemberForm = props => {
     setIsFormDirty(true)
   }
 
+  console.log("groupmemberform props: ", props)
   return(
   <SimpleForm {...props}
     redirect={Constants.resource_operations.LIST}
@@ -276,6 +277,7 @@ const GroupMemberForm = props => {
       label={"en.models.groupmembers.group"}
       source={Constants.model_fk_fields.GROUP}
       reference={Constants.models.GROUPS}
+      defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
       validate={validateGroup}
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
@@ -299,9 +301,13 @@ const GroupMemberForm = props => {
 }
 
 export const GroupMemberCreate = props => {
+  let group = undefined
+  if (props.location.group){
+    group = props.location.group
+  }
   return (
-    <Create {...props}>
-      <GroupMemberForm/>
+    <Create   {...props} >
+      <GroupMemberForm group={group}/>
     </Create>
   );
 }

@@ -10,12 +10,52 @@ var cloneDeep = require('lodash.clonedeep');
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-*/
   return `/${Constants.API_ENDPOINT}`;
+}
+
+export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
+  //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  if (user){
+    if (group !== null){
+      if (user.groupAdminships && group in user.groupAdminships){
+        return "group_admin"
+      }
+      else if (user.dataManagerships && group in user.dataManagerships){
+        return "data_manager"
+      }
+    }
+    return "user"
+  }
+  else{
+    //punt to front page - no user cookie available
+    console.error("No User Cookie Detected - Returning to front page")
+    window.location.hash = "#/login"
+  }
+}
+
+export function getMaxUserRole(){
+
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  if (user){
+    if (user.is_admin){
+      return "admin"
+    }
+    else if (user.is_group_admin){
+      return "group_admin"
+    }
+    else if (user.is_data_manager){
+      return "data_manager" 
+    }
+    return "user"
+  }else{
+    //punt to front page - no user cookie available
+    console.error("No User Cookie Detected - Returning to front page")
+    window.location.hash = "#/login"
+  }
 }
 
 export function toastErrors(data) {
@@ -249,7 +289,7 @@ export function getUsersInGroup(record) {
       sort: { field: Constants.model_fields.USER, order: 'DESC' },
     })
       .then(response => {
-        console.log('getUsersInGroup queried with record: ', response);
+        
         if (response && response.total === 0) {
           resolve([]);
         }

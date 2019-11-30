@@ -322,6 +322,10 @@ export default {
         search: 'Search',
         folders: 'Folders',
       },
+      fewUsers: {
+        content: "",
+        subtitle: "Groups With Few Users",
+      },
       file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
