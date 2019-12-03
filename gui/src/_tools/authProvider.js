@@ -223,7 +223,7 @@ function getGroups(user) {
     });
 }
 
-export default (type, params) => {
+export default (type, params, ...rest) => {
   if (type === AUTH_LOGIN) {
     const { username, password } = params;
     localStorage.setItem(Constants.login_details.USERNAME, username);
@@ -303,8 +303,11 @@ export default (type, params) => {
       );
   }
   if (type === AUTH_GET_PERMISSIONS) {
+    console.log("getpermissions checked with params: " ,params, rest);
+
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     return user ? Promise.resolve(user) : Promise.resolve({ role: Constants.ROLE_ANONYMOUS, is_admin: false });
+
   }
   return Promise.reject("Unknown method");
 };

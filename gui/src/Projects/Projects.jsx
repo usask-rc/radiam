@@ -430,31 +430,18 @@ const enhance = compose(
 export const ProjectEdit = enhance(BaseProjectEdit);
 
 const canEditProject = ({ permissions, record }) => {
-  if (!permissions) {
-    return false;
-  } else if (!record) {
-    return false;
-  } else if (permissions.is_admin) {
-    return true;
-  } else if (
-    permissions.groupMemberships &&
-    permissions.groupMemberships.length > 0
-  ) {
-    for (var i = 0; i < permissions.groupMemberships.length; i++) {
-      var groupMembership = permissions.groupMemberships[i];
-      //'if there is a group in this membership, and its ID matches the group we are inspecting, proceed'.
-      if (groupMembership.group && groupMembership.group.id === record.group) {
-        if (
-          groupMembership.group_role.id === Constants.ROLE_DATA_MANAGER ||
-          groupMembership.group_role.id === Constants.ROLE_GROUP_ADMIN
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-  } else {
-    return false;
+
+  console.log("in canedit project, permissions and record are: ", permissions, record)
+
+  if (permissions.is_admin){
+    return true
   }
+  else if (permissions.is_group_admin || permissions.is_data_manager ){
+    //are they GA/DM of this group?
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+    if (record.id in user.groupAdminships || record.id in user.dataManagerships){
+      return true
+    }
+  }
+  return false
 };

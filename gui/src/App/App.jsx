@@ -116,8 +116,9 @@ const App = props => {
         appLayout={Layout}
         i18nProvider={i18nProvider}
       >
-        {permissions => [
-          <Resource
+        {(permissions, record, ...rest) => { 
+          return [
+            <Resource
             name={Constants.models.USERS}
             icon={Person}
             options={{ label: 'en.sidebar.users' }}
@@ -131,8 +132,6 @@ const App = props => {
             edit={
               permissions.is_admin
                 ? UserEditWithDeletion
-                : permissions.is_group_admin
-                ? UserEdit
                 : null
             }
           />,
@@ -313,7 +312,7 @@ const App = props => {
           <Resource name={Constants.models.PROJECTDATACOLLECTIONMETHOD} />,
           <Resource name={Constants.models.PROJECTSENSITIVITY} />,
           <Resource name={Constants.models.PROJECTSTATISTICS} />,
-        ]}
+        ]}}
       </Admin>
       <ToastContainer />
     </React.Fragment>

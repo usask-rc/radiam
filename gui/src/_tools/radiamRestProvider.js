@@ -176,6 +176,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       //it will have no parameters and so as a result we cannot send the ?is_active=false flag onclick.
       case GET_ONE:
 
+        console.log("in get_one, data is: ", type, resource, params)
+
         if (params.is_active === false) {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=false`;
         } else {

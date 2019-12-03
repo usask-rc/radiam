@@ -90,9 +90,8 @@ class UserEditForm extends Component {
         const {groupMembers} = this.state
         return (<React.Fragment>
             <SimpleForm
-                onSubmit={this.handleSubmit}
+                save={this.handleSubmit}
                 resource={Constants.models.USERS}
-                toolbar={null}
                 asyncValidate={asyncValidate}
                 asyncBlurFields={[Constants.model_fields.USERNAME]} >
                 
@@ -146,11 +145,7 @@ class UserEditForm extends Component {
                 {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
 
             </SimpleForm>
-            <Toolbar>
-                <SaveButton
-                    onClick={this.handleSubmit}
-                />
-            </Toolbar>
+            
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
             {this.state.redirect && <Redirect to="/login"/>}
         </React.Fragment>

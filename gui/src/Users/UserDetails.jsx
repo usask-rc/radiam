@@ -6,7 +6,6 @@ import { getUserGroups } from '../_tools/funcs';
 import UserGroupsDisplay from './UserGroupsDisplay';
 import UserTitle from './UserTitle';
 
-
 class UserDetails extends Component {
 
     constructor(props) {
@@ -21,6 +20,7 @@ class UserDetails extends Component {
     render() {
         const {groupMembers} = this.state
 
+        console.log("UserDetails prop:" , this.props)
         return (
                 <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
                     <UserTitle prefix={"Viewing"}/>

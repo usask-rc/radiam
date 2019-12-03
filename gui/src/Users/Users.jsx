@@ -26,7 +26,9 @@ import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
 import UserTitle from "./UserTitle";
-
+import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
+import { EditButton, DeleteButton } from 'react-admin';
 
 const listStyles = {
   actions: {
@@ -141,10 +143,41 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 }
 );
 
+/*
+function manages_user(data)  {
+  console.log("data in manages_user: ", data)
+  //given my user id, is this user in a group I manage?
+  return true
+}*/
+
+const actionsStyles = theme => ({
+  root: {
+    float: "right",
+    marginTop: "-10px",
+  }
+})
+
+const UserDetailsActions = ({permissions, basePath, data, resource, classes}) => {
+
+  console.log("permissions, basepath, etc: ", permissions, basePath, data, resource)
+  //can only modify the user if I'm a superuser or I'm modifying my own data.
+  if (permissions && data && (permissions.is_admin || (permissions.id === data.id))){
+    return(<Toolbar className={classes.root}>
+          <EditButton basePath={basePath} record={data} />
+          {permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
+      </Toolbar>)
+  }
+  else{
+      return null
+  }
+}
+const EnhancedUserDetailsActions = withStyles(actionsStyles)(UserDetailsActions)
+
 export const UserShow = props => {
+  console.log("usershow props: ", props)
 
   return (
-    <Show {...props}>
+    <Show actions={<EnhancedUserDetailsActions permissions={props.permissions} {...props} />} {...props}>
       <UserDetails {...props} />
     </Show>
   )
@@ -196,9 +229,10 @@ export const UserCreate = props => {
 
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
+  console.log("UserEdit props: ", props)
   return (
-    <Edit {...props}>
-      <UserForm toolbar={<EditToolbar />} {...other} />
+    <Edit toolbar={<EditToolbar />} {...props}>
+      <UserForm  {...other} />
     </Edit>
   )
 };
@@ -209,7 +243,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== String(JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id)) { //dont allow superusers to delete themselves
     return (
-      <Edit {...props}>
+      <Edit toolbar={<EditToolbar />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )
