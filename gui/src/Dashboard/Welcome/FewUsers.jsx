@@ -105,7 +105,7 @@ Therefore the warnings should only be `the group you are in has no users / no da
 */
 const FewUsers = ({ classes, userManagedGroups, translate }) => {
   
-  const groupList = userManagedGroups.filter(group => group.users.length < 3)
+  const groupList = userManagedGroups.filter(group => group.users.length <= 3)
 
   if (groupList.length > 0){
     return(

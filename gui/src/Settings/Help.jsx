@@ -9,7 +9,7 @@ import { changeTheme } from "./actions";
 import { Typography, Card, CardContent } from '@material-ui/core';
 import { HelpOutline } from '@material-ui/icons';
 import * as Constants from "../_constants/index"
-
+import { Link } from "react-router-dom"
 
 
 const styles = {
@@ -93,9 +93,11 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.subheader} variant="p" component="p">
                     {translate('en.help.usermanual.title')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={`..${Constants.USERMANUALPATH}`}>
-                    {Constants.USERMANUALFILENAME}
-                </Typography>
+
+
+                <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank">
+                    {`${Constants.USERMANUALFILENAME}`}
+                </a>
             </div>
 
             <Typography className={classes.subheader} variant="p" component="p">

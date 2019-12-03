@@ -49,7 +49,11 @@ const Welcome = ({ classes, translate }) => (
       </Typography><br/>
       <Typography variant={"body2"} component="p">
         {translate("en.dashboard.welcome.content2")}
-        <a href={Constants.USERMANUALPATH}>{translate("en.dashboard.welcome.usermanual")}</a>
+        <a href={Constants.USERMANUALPATH}></a>
+
+        <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank">
+          {translate("en.dashboard.welcome.usermanual")}
+        </a>
       </Typography> 
     </CardContent>
   </Card>

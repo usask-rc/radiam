@@ -486,7 +486,7 @@ export default {
     group: {
       role: {
         admin: {
-          label: 'Admin',
+          label: 'Group Admin',
           description:
             'Group Administrators can add users to groups and create projects.',
         },
