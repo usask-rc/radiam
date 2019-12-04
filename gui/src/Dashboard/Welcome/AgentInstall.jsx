@@ -50,7 +50,7 @@ const AgentInstall = ({ classes, translate }) => (
 
       <Typography className={classes.body} variant="body2" component="p">
         {translate("en.dashboard.agent.available_at")}
-        <a href="https://github.com/usask-rc/radiam-agent-releases" className={classes.link} target="_blank">
+        <a href="https://github.com/usask-rc/radiam-agent-releases" className={classes.link} target="_blank" rel="noopener noreferrer" >
           {translate("en.dashboard.agent.link_text")}
         </a>
       </Typography>

@@ -93,9 +93,7 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.subheader} variant="p" component="p">
                     {translate('en.help.usermanual.title')}
                 </Typography>
-
-
-                <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank">
+                <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
                     {`${Constants.USERMANUALFILENAME}`}
                 </a>
             </div>

@@ -51,7 +51,7 @@ const Welcome = ({ classes, translate }) => (
         {translate("en.dashboard.welcome.content2")}
         <a href={Constants.USERMANUALPATH}></a>
 
-        <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank">
+        <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
           {translate("en.dashboard.welcome.usermanual")}
         </a>
       </Typography> 

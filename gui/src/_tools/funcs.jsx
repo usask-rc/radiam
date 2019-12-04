@@ -7,6 +7,9 @@ import { httpClient } from '.';
 import { GET_LIST, GET_ONE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
+const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
+
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
@@ -58,7 +61,6 @@ export function validateAccess(splits){
   
   console.log("validating access for model, id, method: ", model, id, method)
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
   switch(model){
     case Constants.models.AGENTS:
       if (user.is_group_admin){ 
@@ -301,7 +303,6 @@ export function getFolderFiles(
     sort: { field: params.sortBy, order: params.order },
   };
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
@@ -332,7 +333,6 @@ export function getFolderFiles(
 
 export function getRelatedDatasets(record) {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.DATASETS, {
       filter: { project: record.id, is_active: true },
       pagination: { page: 1, perPage: 1000 },
@@ -354,7 +354,6 @@ export function getRootPaths(projectID) {
     filter: { type: 'directory' },
   };
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
@@ -404,7 +403,6 @@ export function getProjectData(params, folders = false) {
   //get only folders if true, otherwise get only files
   
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(
       'GET_FILES',
       Constants.models.PROJECTS + '/' + params.id,
@@ -419,9 +417,33 @@ export function getProjectData(params, folders = false) {
   });
 }
 
+//given some group, return all of its parent groups.
+export function getParentGroupList(group_id){
+  return new Promise((resolve, reject) => {
+
+    //resolve upon having all parent groups
+    dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
+    .then(response => {
+      if (!response.data.parent_group === null){
+        resolve(null)
+      }else{
+        getParentGroupList(response.data.parent_group).then(data => {
+          console.log("recursive getparentgrouplist: ", data)
+          resolve(data)
+        })
+      }
+      return response.data
+    })
+    .catch(err => {
+      console.log("getparentgrouplist err: ", err)
+      reject(err)
+    })
+  })
+
+}
+
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
     //get this group's details, then ascend if it has a parent.
     dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
@@ -436,7 +458,6 @@ export function getGroupData(group_id) {
 
 export function getUserDetails() {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider('CURRENT_USER', Constants.models.USERS)
       .then(response => {
         const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
@@ -463,7 +484,6 @@ export function getUsersInGroup(record) {
   console.log('record called to getusersin group: ', record);
   return new Promise((resolve, reject) => {
     let groupUsers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const { id, is_active } = record;
 
     dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
@@ -491,7 +511,6 @@ export function getUsersInGroup(record) {
               groupUsers = [...groupUsers, user];
 
               if (groupUsers.length === groupMembers.length) {
-                console.log('data resolved is: ', groupUsers);
                 resolve(groupUsers);
               }
             })
@@ -507,11 +526,9 @@ export function getUsersInGroup(record) {
 export function getGroupUsers(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
@@ -562,11 +579,9 @@ export function getUserGroups(record) {
   console.log('getusergroups called with rec: ', record);
   return new Promise((resolve, reject) => {
     let userGroupMembers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
