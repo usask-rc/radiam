@@ -6,7 +6,7 @@ import {
   AUTH_CHECK,
   AUTH_GET_PERMISSIONS
 } from "react-admin";
-import { getAPIEndpoint } from "./funcs";
+import { getAPIEndpoint, validateAccess } from "./funcs";
 import * as Constants from "../_constants/index"
 import { toast } from "react-toastify";
 
@@ -294,8 +294,21 @@ export default (type, params, ...rest) => {
   if (type === AUTH_CHECK) {
     const getToken = localStorage.getItem(Constants.WEBTOKEN);
 
+    //I'm confident that the same thing can be achieved with withRouter from react-router
+    //get the model and ID from the URL and check for user authorization on this page.
+    console.log("href is: ", window.location.href, "window location: ", window.location)
+
+    const splits = window.location.hash.split("/")
+    console.log("splits is: ", splits)
     return validateToken(JSON.parse(getToken).access)
-      .then(Promise.resolve())
+      .then(() => {
+        if (splits.length > 2){
+          validateAccess(splits)
+        }
+        Promise.resolve()
+
+      }
+      )
       .catch(
         refreshAccessToken(JSON.parse(getToken))
           .then(Promise.resolve())

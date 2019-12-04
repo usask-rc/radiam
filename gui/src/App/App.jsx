@@ -24,14 +24,20 @@ import { getAPIEndpoint } from '../_tools/funcs';
 import {
   DataCollectionMethodList,
   DataCollectionMethodShow,
+  DataCollectionMethodCreate,
+  DataCollectionMethodEdit,
 } from '../DataCollectionMethod/DataCollectionMethod';
 import {
   DataCollectionStatusList,
   DataCollectionStatusShow,
+  DataCollectionStatusCreate,
+  DataCollectionStatusEdit,
 } from '../DataCollectionStatus/DataCollectionStatus';
 import {
   DistributionRestrictionList,
   DistributionRestrictionShow,
+  DistributionRestrictionCreate,
+  DistributionRestrictionEdit,
 } from '../DistributionRestriction/DistributionRestriction';
 import { GroupList, GroupCreate, GroupEdit, GroupShow } from '../Groups/Groups';
 import {
@@ -44,6 +50,7 @@ import {
   GroupRoleList,
   GroupRoleShow,
   GroupRoleEdit,
+  GroupRoleCreate,
 } from '../GroupRoles/GroupRoles';
 import {
   GroupViewGrantList,
@@ -54,6 +61,8 @@ import {
 import {
   LocationTypeList,
   LocationTypeShow,
+  LocationTypeCreate,
+  LocationTypeEdit,
 } from '../LocationTypes/LocationTypes';
 import {
   ProjectList,
@@ -64,6 +73,8 @@ import {
 import {
   SensitivityLevelList,
   SensitivityLevelShow,
+  SensitivityLevelCreate,
+  SensitivityLevelEdit,
 } from '../SensitivityLevel/SensitivityLevel';
 import {
   UserList,
@@ -91,6 +102,9 @@ import locations from "../Locations"
 import projectavatars from "../ProjectAvatars"
 import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
+import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
+import { LocationList, LocationCreate, LocationEdit } from '../Locations/Locations';
+import { LocationShow } from '../_components/_fields/LocationShow';
 
 const i18nProvider = locale => {
   return englishMessages;
@@ -102,6 +116,21 @@ const styles = {
   },
 };
 
+function canDoThing(permissions, record, rest){
+  console.log("permissions: ", permissions, record, rest)
+  if (permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager)
+  {
+    return true
+  }
+  return false
+}
+
+//TODO: NOTE:
+//Front-end Permissions will operate as follows as of 12/3/2019
+//If a certain level of user can in any case have access to a page, we check to see if the user fulfills that level across any portion of the app, and if so, allow them access
+//if they shouldn't ultimately have access to a specific instance, we can control this by limiting access to the page (Likely the Edit page) from the previous page (likely the Show page).
+//ultimately, if a user shouldn't have access to something, it's the server's job to not provide access to said thing.  This will result in some errors if the user accesses values
+//via the URL instead of navigating by page buttons, but that's OK.  Users know what they're getting into when they do that.
 const App = props => {
   return (
     <React.Fragment>
@@ -116,7 +145,7 @@ const App = props => {
         appLayout={Layout}
         i18nProvider={i18nProvider}
       >
-        {(permissions, record, ...rest) => { 
+        {permissions => { 
           return [
             <Resource
             name={Constants.models.USERS}
@@ -161,8 +190,8 @@ const App = props => {
             options={{ label: 'en.sidebar.roles' }}
             list={permissions.is_admin ? GroupRoleList : null}
             show={permissions.is_admin ? GroupRoleShow : null}
-            create={null}
-            edit={null}
+            create={permissions.is_admin ? GroupRoleCreate : null}
+            edit={permissions.is_admin ? GroupRoleEdit : null}
           />,
 
           <Resource
@@ -183,24 +212,26 @@ const App = props => {
             }
           />,
 
-          // Restrict view of location types to admin only
           <Resource
             name={Constants.models.LOCATIONTYPES}
             icon={LocationCity}
             options={{ label: 'en.sidebar.locationtypes' }}
             list={permissions.is_admin ? LocationTypeList : null}
             show={permissions.is_admin ? LocationTypeShow : null}
-            create={null}
-            edit={null}
+            create={permissions.is_admin ? LocationTypeCreate : null}
+            edit={permissions.is_admin? LocationTypeEdit: null}
           />,
 
           <Resource
             name={Constants.models.LOCATIONS}
             icon={AddLocation}
             options={{ label: 'en.sidebar.locations' }}
-            {...locations}
+            list={LocationList}
+            show={LocationShow}
+            create={LocationCreate}
+            edit={permissions.is_admin ? LocationEdit : null}
           />,
-
+          
           <Resource
             name={Constants.models.PROJECTS}
             icon={Layers}
@@ -208,17 +239,18 @@ const App = props => {
             list={ProjectList}
             show={ProjectShow}
             create={
-              permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager
+              permissions.is_admin || permissions.is_group_admin
                 ? ProjectCreate
                 : null
             }
             edit={
-              permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager
+              permissions.is_admin || permissions.is_group_admin
                 ? ProjectEdit
                 : null
             }
           />,
 
+          //TODO: what are the access permissions for datasets?
           <Resource
             name={'datasets'}
             icon={InsertChart}
@@ -230,17 +262,10 @@ const App = props => {
             name={Constants.models.PROJECTAVATARS}
             icon={FlipToFront}
             options={{ label: 'en.sidebar.projectavatars' }}
-            {...projectavatars}
-          />,
-
-          <Resource
-            name={Constants.models.DATA_COLLECTION_STATUS}
-            icon={AvTimer}
-            options={{ label: 'en.sidebar.data_collection_status' }}
-            list={permissions.is_admin ? DataCollectionStatusList : null}
-            show={permissions.is_admin ? DataCollectionStatusShow : null}
-            create={null}
-            edit={null}
+            list={permissions.is_admin ? ProjectAvatarsList : null}
+            show={permissions.is_admin ? ProjectAvatarsShow : null}
+            create={permissions.is_admin ? ProjectAvatarsCreate : null}
+            edit={permissions.is_admin ? ProjectAvatarsEdit : null}
           />,
 
           <Resource
@@ -249,8 +274,18 @@ const App = props => {
             options={{ label: 'en.sidebar.data_collection_method' }}
             list={permissions.is_admin ? DataCollectionMethodList : null}
             show={permissions.is_admin ? DataCollectionMethodShow : null}
-            create={null}
-            edit={null}
+            create={permissions.is_admin ? DataCollectionMethodCreate : null}
+            edit={permissions.is_admin ? DataCollectionMethodEdit : null}
+          />,
+
+          <Resource
+            name={Constants.models.DATA_COLLECTION_STATUS}
+            icon={AvTimer}
+            options={{ label: 'en.sidebar.data_collection_status' }}
+            list={permissions.is_admin ? DataCollectionStatusList : null}
+            show={permissions.is_admin ? DataCollectionStatusShow : null}
+            create={permissions.is_admin ? DataCollectionStatusCreate : null}
+            edit={permissions.is_admin ? DataCollectionStatusEdit : null}
           />,
 
           <Resource
@@ -259,8 +294,8 @@ const App = props => {
             options={{ label: 'en.sidebar.distribution_restriction' }}
             list={permissions.is_admin ? DistributionRestrictionList : null}
             show={permissions.is_admin ? DistributionRestrictionShow : null}
-            create={null}
-            edit={null}
+            create={permissions.is_admin ? DistributionRestrictionCreate : null}
+            edit={permissions.is_admin ? DistributionRestrictionEdit : null}
           />,
 
           <Resource
@@ -269,10 +304,10 @@ const App = props => {
             options={{ label: 'en.sidebar.sensitivity_level' }}
             list={permissions.is_admin ? SensitivityLevelList : null}
             show={permissions.is_admin ? SensitivityLevelShow : null}
-            create={null}
-            edit={null}
+            create={permissions.is_admin ? SensitivityLevelCreate : null}
+            edit={permissions.is_admin ? SensitivityLevelEdit : null}
           />,
-
+          
           <Resource
             name={Constants.models.GRANTS}
             icon={Visibility}
@@ -305,8 +340,8 @@ const App = props => {
             options={{ label: 'en.sidebar.agents' }}
             list={UserAgentList}
             show={UserAgentShow}
-            create={permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? UserAgentCreate : null}
-            edit={permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? UserAgentEdit : null} //users can only edit if they can also delete.
+            create={UserAgentCreate}
+            edit={permissions.is_admin || permissions.is_group_admin ? UserAgentEdit : null} //users can only edit if they can also delete.
           />,
 
           <Resource name={Constants.models.PROJECTDATACOLLECTIONMETHOD} />,

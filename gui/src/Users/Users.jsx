@@ -98,6 +98,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 
   return (
     <List
+      hasCreate={false}
       {...props}
       classes={{
         root: classes.root,
