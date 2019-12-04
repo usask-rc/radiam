@@ -58,6 +58,10 @@ router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
                 views.UserAgentTokenViewSet,
                 basename='useragenttokens')
 
+router.register(r'useragents/(?P<useragent_id>[-\w]+)/osfquery',
+                views.OSFQueryViewSet,
+                basename='osfquery')
+
 router.register(r'projects/(?P<project_id>[-\w]+)/docs',
                 views.ProjectSearchViewSet,
                 basename='radiamprojectdocs')

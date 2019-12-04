@@ -122,6 +122,7 @@ from django_rest_passwordreset.views import ResetPasswordRequestToken
 from datetime import timedelta
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.db import connection
 from rest_framework import exceptions
 from rest_framework.response import Response
 
@@ -525,6 +526,8 @@ class UserAgentViewSet(RadiamViewSet):
             return super().filter_queryset(queryset).filter(agent_id_qs)
         else:
             return super().filter_queryset(queryset)
+
+    
 
 class ResearchGroupOrderingFilter(RadiamOrderingFilter):
     def get_replacements(self):
@@ -1045,6 +1048,47 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
         }
 
         return Response(data)
+
+
+class OSFQueryViewSet(viewsets.GenericViewSet):
+
+    def get_queryset(self):
+        pass
+
+    def list(self, request, useragent_id):
+        resp = self.osf_agent_token_query()
+
+        data = {
+            "user_agent_id": resp[0],
+            "remote_api_token": resp[1],
+            "loc_id": resp[2],
+            "osf_project": resp[3],
+            "project_id": resp[4],
+            "local_access_token": resp[5]
+        }
+
+        return Response(data)
+
+
+    def osf_agent_token_query(self):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "select agents.id as user_agent_id, "
+                        "agents.remote_api_token, "
+                        "loc.id as loc_id, "
+                        "loc.osf_project, "
+                        "agent_config.project_id, "
+                        "agents.local_access_token, "
+                        "agents.local_refresh_token "
+                "from rdm_locations loc "
+                "join rdm_location_types loc_type on loc.location_type_id = loc_type.id "
+                "join rdm_user_agents agents on agents.location_id = loc.id "
+                "join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id "
+                "where loc_type.label = 'location.type.osf'")
+
+            row = cursor.fetchone()
+
+        return row
 
 
 # class SearchViewSet(viewsets.GenericViewSet):
