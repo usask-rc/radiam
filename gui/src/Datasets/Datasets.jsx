@@ -68,94 +68,6 @@ const actionStyles = theme => ({
   }
 })
 
-/**
- * 
- * 
-const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
-{
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin)
-
-  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
-  useEffect(() => {
-    if (data && !showEdit){
-
-      //TODO: per todd - an Agent should only be modifiable by Superuser or the user that created the Agent.
-      const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-      const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
-
-      if (data.user === user.id){
-
-      }
-      
-      //should we show the edit view?
-      const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
-      const params = { ids:project_id_list }
-      const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-
-      dataProvider(GET_LIST, Constants.models.PROJECTS, params).then(response => {
-        const project_group_ids = []
-
-        response.data.map(project => {
-          project_group_ids.push(project.group)
-          return project
-        })
-
-        let found = false
-        for (var j = 0; j < project_group_ids.length; j++){
-          for (var i = 0; i < user.groupAdminships.length; i++){
-            if (user.groupAdminships[i] === project_group_ids[j]){ //for some reason "response.data.group in user.groupAdminships" didn't work.  Object comparison issue?
-              setShowEdit(true)
-              found = true
-              break
-            }
-          }
-
-          if (found){
-            break
-          }
-        }
-      })
-    }
-  }, [data])
-
- * 
- * 
-I shouldn't be able to access the Edit page of a Dastset that is associated with a Project owned by a group that I do not have adminship over.
-
-Queries:
-1. Get Project details from Dataset.project
-2. Get Parent Groups from Project.group
-3. Parent Groups compare to .GroupAdminships
-
-const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
-{
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin)
-
-  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
-  useEffect(() => {
-    if (data && !showEdit){
-      isAdminOfAParentGroup(data.group).then(data => {
-        setShowEdit(data)
-      })
-    }
-  }, [data])
-
-  if (showEdit){
-    return(
-    <Toolbar className={classes.toolbar}>
-      <EditButton basePath={basePath} record={data} />
-    </Toolbar>
-    )
-  }
-  else{
-    return null
-  }
-})
-
- */
-
  export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => {
 
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
@@ -164,19 +76,13 @@ const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, class
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
-      //we have data.project - the associated project
-      //get the group associated with this project
+      
       const params = { id: data.project }
-
       const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
       dataProvider(GET_ONE, Constants.models.PROJECTS, params).then(response => {
-
         isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
         //now have a group - check for adminship
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
-
-      
-
     }
   })
   if (showEdit){
