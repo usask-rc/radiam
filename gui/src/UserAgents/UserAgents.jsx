@@ -109,7 +109,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-const toolbarStyles = theme => ({
+const actionsStyles = theme => ({
   toolbar:{
     float: "right",
     marginTop: "-20px",
@@ -174,7 +174,7 @@ const UserAgentShowActions = ({ basePath, data, resource, classes}) =>
   }
 }
 
-const EnhancedUserAgentShowActions = withStyles(toolbarStyles)(UserAgentShowActions)
+const EnhancedUserAgentShowActions = withStyles(actionsStyles)(UserAgentShowActions)
 
 export const UserAgentShow = props => {
 //only show edit path if we are a group admin of the group that owns the project that this is connected to.

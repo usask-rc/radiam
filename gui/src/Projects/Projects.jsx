@@ -38,10 +38,13 @@ import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
 import { getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import { InputLabel, Select, MenuItem, Typography, Toolbar } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
+import { EditToolbar } from "../_components";
+import { ShowView } from "ra-ui-materialui/lib/detail";
+import { EditButton } from "ra-ui-materialui/lib/button";
 
 const styles = {
   actions: {
@@ -127,13 +130,87 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
   </List>
 ));
 
+
+const canEditProject = (record) => {
+  //promise here, return when we determine if we can edit
+  
+  return new Promise((resolve, reject) => {
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+
+    if (user && user.is_admin){
+      resolve(true)
+    }
+
+
+    getParentGroupList(record.group).then(data => {
+      console.log("data returned from getparentgrouplist is: ", data)
+
+      data.map(group => {
+        for (var i = 0; i < user.groupAdminships.length; i++){
+          if (group.id === user.groupAdminships[i]){
+            resolve(true)
+          }
+        }
+      })
+
+      resolve(false)
+
+    }).catch(err => {
+      resolve(false)
+    })
+
+  })
+};
+
+/*
+<ShowController translate={translate} {...props}>
+        { controllerProps => (
+*/
+
+
+const actionsStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+const ProjectShowActions = ({ basePath, data, classes}) => 
+{
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin || false)
+
+  useEffect(() => {
+    console.log("data in useeffect projectshowactions: ", data)
+    if (data && !showEdit){
+      canEditProject(data).then(data => {
+        console.log("canEditProject ? data: ", data)
+        setShowEdit(data)
+      }
+      
+      )
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+}
+const EnhancedProjectShowActions = withStyles(actionsStyles)(ProjectShowActions)
+
+
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
 
-    //TODO: lock this away behind the right perm set
     if (permissions){
-    return (
-      <Show {...props}>
+      return (<Show actions={<EnhancedProjectShowActions/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
             <ProjectName label={'en.models.projects.name'} />
@@ -301,7 +378,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   }
 
-  if (canEditProject({ permissions, record, groupList })) {
+  if (canEditProject(record)) {
     if (record.group && projectGroup === null){
       setProjectGroup(record.group)
     }
@@ -428,90 +505,3 @@ const enhance = compose(
 );
 
 export const ProjectEdit = enhance(BaseProjectEdit);
-
-const canEditProject = ({ permissions, record, groupList }) => {
-  //promise here, return when we determine if we can edit
-
-  console.log("before running getallparents")
-
-  getParentGroupList(record.group).then(data => {
-    console.log("data returned from getparentgrouplist is: ", data)
-  }).catch(err => {
-    console.log("err in calling recursive getparentgrouplist:", err)
-  })
-
-  /*
-
-  const [groupList, setGroupList] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  const getAllParentGroups = group_id =>  {
-    if (group_id !== null) {
-
-    getGroupData(group_id).then(data => {
-      let tempGroupList = groupList    
-      tempGroupList.push(data)
-      setGroupList(tempGroupList)
-
-      getAllParentGroups(data.parent_group)
-      return data
-    }).catch(err => {
-      console.error("error returned in getallparentgroups: ", err)
-    })
-
-  }
-
-    else{
-      //now have the entire group list
-      setLoading(false)
-      console.log("groupList in caneditproject is: ", groupList)
-    }
-  }
-
-  useEffect(() => {
-    this.getAllParentGroups(record.group)
-  }, [])
-  */
-  /**
-   * 
-  //TODO: handle potential setstate on unmounted component
-  const getAllParentGroups = group_id => {
-    if (group_id !== null){
-      getGroupData(group_id).then(
-        data => {
-
-          let tempGroupList = groupList
-          tempGroupList.push(data)
-
-          setGroupList(tempGroupList)
-          getAllParentGroups(data.parent_group)
-
-          return data
-        }
-      ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)
-      })
-    }
-    else{
-      //now get a list of users in each group
-      setGroupContactList([])
-      getPrimaryContactCandidates()
-    }
-  };
-   */
-
-  if (permissions.is_admin){
-    return true
-  }
-  else if (permissions.is_group_admin){
-    //are they a Group Admin of this group?
-    //are they a Group Admin of some parent group?
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-    for (var i = 0; i < user.groupAdminships.length; i++){
-      if (record.group === user.groupAdminships[i]){
-        return true
-      }
-    }
-  }
-  return false
-};

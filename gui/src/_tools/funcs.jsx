@@ -418,18 +418,17 @@ export function getProjectData(params, folders = false) {
 }
 
 //given some group, return all of its parent groups.
-export function getParentGroupList(group_id){
+export function getParentGroupList(group_id, groupList = []){
   return new Promise((resolve, reject) => {
-
     //resolve upon having all parent groups
     dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
     .then(response => {
-      if (!response.data.parent_group === null){
-        resolve(null)
+      groupList.push(response.data)
+      if (response.data.parent_group === null){
+        resolve(groupList)
       }else{
-        getParentGroupList(response.data.parent_group).then(data => {
-          console.log("recursive getparentgrouplist: ", data)
-          resolve(data)
+        getParentGroupList(response.data.parent_group, groupList).then(data => {
+          resolve(groupList)
         })
       }
       return response.data
@@ -439,7 +438,6 @@ export function getParentGroupList(group_id){
       reject(err)
     })
   })
-
 }
 
 export function getGroupData(group_id) {
