@@ -103,7 +103,7 @@ import projectavatars from "../ProjectAvatars"
 import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
-import { LocationList, LocationCreate, LocationEdit } from '../Locations/Locations';
+import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
 import { LocationShow } from '../_components/_fields/LocationShow';
 
 const i18nProvider = locale => {
@@ -219,7 +219,7 @@ const App = props => {
             list={permissions.is_admin ? LocationTypeList : null}
             show={permissions.is_admin ? LocationTypeShow : null}
             create={permissions.is_admin ? LocationTypeCreate : null}
-            edit={permissions.is_admin? LocationTypeEdit: null}
+            edit={permissions.is_admin ? LocationTypeEdit: null}
           />,
 
           <Resource
@@ -227,7 +227,7 @@ const App = props => {
             icon={AddLocation}
             options={{ label: 'en.sidebar.locations' }}
             list={LocationList}
-            show={LocationShow}
+            show={LocationDisplay}
             create={LocationCreate}
             edit={permissions.is_admin ? LocationEdit : null}
           />,

@@ -163,7 +163,7 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 );
 
 
-export const LocationShow = props => 
+export const LocationDisplay = props => 
   {
   return(
   <Show {...props}>

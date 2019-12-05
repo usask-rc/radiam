@@ -37,7 +37,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
+import { canEditProject, getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -130,44 +130,6 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
   </List>
 ));
 
-
-const canEditProject = (record) => {
-  //promise here, return when we determine if we can edit
-  
-  return new Promise((resolve, reject) => {
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-
-    if (user && user.is_admin){
-      resolve(true)
-    }
-
-
-    getParentGroupList(record.group).then(data => {
-      console.log("data returned from getparentgrouplist is: ", data)
-
-      data.map(group => {
-        for (var i = 0; i < user.groupAdminships.length; i++){
-          if (group.id === user.groupAdminships[i]){
-            resolve(true)
-          }
-        }
-      })
-
-      resolve(false)
-
-    }).catch(err => {
-      resolve(false)
-    })
-
-  })
-};
-
-/*
-<ShowController translate={translate} {...props}>
-        { controllerProps => (
-*/
-
-
 const actionsStyles = theme => ({
   toolbar:{
     float: "right",
@@ -183,8 +145,7 @@ const ProjectShowActions = ({ basePath, data, classes}) =>
   useEffect(() => {
     console.log("data in useeffect projectshowactions: ", data)
     if (data && !showEdit){
-      canEditProject(data).then(data => {
-        console.log("canEditProject ? data: ", data)
+      canEditProject(data.group).then(data => {
         setShowEdit(data)
       }
       
@@ -378,8 +339,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   }
 
-  if (canEditProject(record)) {
-    if (record.group && projectGroup === null){
+  if (record && canEditProject(record.group)) {
+    if (projectGroup === null){
       setProjectGroup(record.group)
     }
 

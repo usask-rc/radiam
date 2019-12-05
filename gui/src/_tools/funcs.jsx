@@ -201,6 +201,32 @@ export function validateAccess(splits){
   return true
 }
 
+
+//given a group id and our cookies, can we edit this value?
+export function canEditProject(group_id){
+  return new Promise((resolve, reject) => {
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+
+    if (user && user.is_admin){
+      resolve(true)
+    }
+
+    getParentGroupList(group_id).then(data => {
+      data.map(group => {
+        for (var i = 0; i < user.groupAdminships.length; i++){
+          if (group.id === user.groupAdminships[i]){
+            resolve(true)
+          }
+        }
+      })
+      resolve(false)
+
+    }).catch(err => {
+      resolve(false)
+    })
+  })
+};
+
 export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
   //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
@@ -416,6 +442,7 @@ export function getProjectData(params, folders = false) {
       });
   });
 }
+
 
 //given some group, return all of its parent groups.
 export function getParentGroupList(group_id, groupList = []){
