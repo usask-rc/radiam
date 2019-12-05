@@ -37,7 +37,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { canEditProject, getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -130,14 +130,14 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
   </List>
 ));
 
-const actionsStyles = theme => ({
+const actionStyles = theme => ({
   toolbar:{
     float: "right",
     marginTop: "-20px",
   }
 })
 
-const ProjectShowActions = ({ basePath, data, classes}) => 
+const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin || false)
@@ -145,7 +145,7 @@ const ProjectShowActions = ({ basePath, data, classes}) =>
   useEffect(() => {
     console.log("data in useeffect projectshowactions: ", data)
     if (data && !showEdit){
-      canEditProject(data.group).then(data => {
+      isAdminOfAParentGroup(data.group).then(data => {
         setShowEdit(data)
       }
       
@@ -163,15 +163,14 @@ const ProjectShowActions = ({ basePath, data, classes}) =>
   else{
     return null
   }
-}
-const EnhancedProjectShowActions = withStyles(actionsStyles)(ProjectShowActions)
+})
 
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
 
     if (permissions){
-      return (<Show actions={<EnhancedProjectShowActions/>}  {...props} >
+      return (<Show actions={<ProjectShowActions/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
             <ProjectName label={'en.models.projects.name'} />
@@ -339,7 +338,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   }
 
-  if (record && canEditProject(record.group)) {
+  if (record && isAdminOfAParentGroup(record.group)) {
     if (projectGroup === null){
       setProjectGroup(record.group)
     }

@@ -35,6 +35,9 @@ import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
 import { FormDataConsumer } from "ra-core";
+import { isAdminOfAParentGroup } from "../_tools/funcs.jsx";
+import { Toolbar } from "@material-ui/core";
+import { EditButton } from "ra-ui-materialui/lib/button";
 
 const styles = {
   actions: {
@@ -119,12 +122,44 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     </Datagrid>
   </List>
 )
-
 });
+
+
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+//check if this user should have permission to access the edit page.
+const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin || false)
+
+  useEffect(() => {
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.id).then(data => {
+        setShowEdit(data)
+      })
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
 
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
     return(
-  <Show {...props}>
+  <Show actions={<GroupShowActions />} {...props}>
     <SimpleShowLayout>
       <GroupTitle prefix={"Viewing"} />
       <RelatedUsers {...props} />

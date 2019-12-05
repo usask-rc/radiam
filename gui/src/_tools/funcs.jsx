@@ -203,7 +203,7 @@ export function validateAccess(splits){
 
 
 //given a group id and our cookies, can we edit this value?
-export function canEditProject(group_id){
+export function isAdminOfAParentGroup(group_id){
   return new Promise((resolve, reject) => {
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
 

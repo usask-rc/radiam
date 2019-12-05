@@ -109,14 +109,14 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-const actionsStyles = theme => ({
+const actionStyles = theme => ({
   toolbar:{
     float: "right",
     marginTop: "-20px",
   }
 })
 
-const UserAgentShowActions = ({ basePath, data, resource, classes}) => 
+const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
@@ -172,9 +172,7 @@ const UserAgentShowActions = ({ basePath, data, resource, classes}) =>
   else{
     return null
   }
-}
-
-const EnhancedUserAgentShowActions = withStyles(actionsStyles)(UserAgentShowActions)
+})
 
 export const UserAgentShow = props => {
 //only show edit path if we are a group admin of the group that owns the project that this is connected to.
@@ -187,7 +185,7 @@ return(
       console.log("in controllerprops, props: ", props)
 
     return(
-  <Show actions={<EnhancedUserAgentShowActions />} {...props} {...controllerProps}>
+  <Show actions={<UserAgentShowActions />} {...props} {...controllerProps}>
     <SimpleShowLayout toolbar={null}>
       <UserAgentTitle prefix={"Viewing Agent"} />
     

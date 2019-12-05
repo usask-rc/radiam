@@ -172,6 +172,7 @@ const UserDetailsActions = ({permissions, basePath, data, resource, classes}) =>
       return null
   }
 }
+
 const EnhancedUserDetailsActions = withStyles(actionsStyles)(UserDetailsActions)
 
 export const UserShow = props => {
