@@ -1,5 +1,5 @@
+//radiamrestprovider.jsx
 import * as Constants from '../_constants/index';
-
 import { stringify } from 'query-string';
 import {
   fetchUtils,
@@ -26,25 +26,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
-
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
 
-
-        console.log("type res params: ", type, resource, params)
-        /*
-         * If there was a query parameter passed from the component,
-         * create a valid Elasticsearch request body to POST to /search.
-         */
-
         let query = {}
-
         let matches = {}
 
         //create kvp for any filters.
         if (params.filter){
-
           Object.keys(params.filter).map(key => {
               //for any value where there are slashes, we need exact matches
               if (key === "path_parent"){
@@ -88,12 +78,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
 
+        //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort){
-          //TODO: should this be ASC or DESC?
           sort = `ordering=${params.sort.order}${params.sort.field}`
         }
-
-        //TODO/NOTE: this is necessary - pagination controls have not yet been moved to the search query body from the url.
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
 
         break;

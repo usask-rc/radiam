@@ -27,6 +27,9 @@ import { withStyles } from "@material-ui/core/styles";
 import { Prompt } from 'react-router';
 import GroupMemberTitle from "./GroupMemberTitle";
 import { FormDataConsumer } from "ra-core";
+import { isAdminOfAParentGroup } from "../_tools/funcs";
+import { Toolbar } from "@material-ui/core";
+import { EditButton } from "ra-ui-materialui/lib/button";
 
 
 const listStyles = {
@@ -146,8 +149,42 @@ export const GroupMemberList = withStyles(listStyles)(
   }
 );
 
+//I shouldnt be able to access Edit page of members a group that I'm not a group Admin in.
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
+{
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
+  useEffect(() => {
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.group).then(data => {
+        setShowEdit(data)
+      })
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+
 export const GroupMemberShow = props => (
-  <Show {...props}>
+  <Show actions={<GroupMemberShowActions/>} {...props}>
     <SimpleShowLayout>
     <GroupMemberTitle prefix="Viewing" />
       <ReferenceField

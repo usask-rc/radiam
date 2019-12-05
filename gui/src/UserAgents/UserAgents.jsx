@@ -116,34 +116,6 @@ const actionStyles = theme => ({
   }
 })
 
-/**
- * 
-//check if this user should have permission to access the edit page.
-const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin)
-
-  useEffect(() => {
-    if (data && !showEdit){
-      isAdminOfAParentGroup(data.id).then(data => {
-        setShowEdit(data)
-      })
-    }
-  }, [data])
-
-  if (showEdit){
-    return(
-    <Toolbar className={classes.toolbar}>
-      <EditButton basePath={basePath} record={data} />
-    </Toolbar>
-    )
-  }
-  else{
-    return null
-  }
-})
- */
-
 const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
@@ -154,8 +126,6 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
-
-      const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
       if (data.user === user.id){
         setShowEdit(true)
       }
