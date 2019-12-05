@@ -40,6 +40,11 @@ const listStyles = {
   //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
   const DatasetFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     <Filter classes={classes} {...props}>
+      <TextInput
+        label={"en.models.filters.search"}
+        source="search"
+        alwaysOn
+      />
       <ReferenceInput
         label={'en.models.datasets.project'}
         source={Constants.model_fk_fields.PROJECT}

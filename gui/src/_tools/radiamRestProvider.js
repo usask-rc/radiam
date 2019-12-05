@@ -103,13 +103,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             const { sortField, sortOrder } = params.sort;
 
             let query = {
-              ...fetchUtils.flattenObject(params.filter),
+              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
               _sort: sortField ? sortField : null,
               _order: sortOrder ? sortOrder : null,
               _start: (page - 1) * perPage,
               _end: page * perPage,
+              page: page,
+              perPage: perPage,
             };
-            url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
+            url = url + `?${stringify(query)}`;
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
@@ -132,6 +134,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         console.log("url receiving get_list query is: ", url)
         break;
       }
+    
 
       case 'CURRENT_USER': {
         url = `${apiUrl}/${Constants.models.USERS}/current/`;

@@ -44,6 +44,11 @@ const filterStyles = {
 const GroupViewGrantFilter = withStyles(filterStyles)(
   ({ classes, ...props }) => (
     <Filter classes={classes} {...props}>
+      <TextInput
+        label={"en.models.filters.search"}
+        source="search"
+        alwaysOn
+      />
       <ReferenceInput
         label={"en.models.grants.dataset"}
         source={Constants.model_fk_fields.DATASET}

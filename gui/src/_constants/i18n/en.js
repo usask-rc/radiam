@@ -408,6 +408,9 @@ export default {
       distribution_restriction: {
         label: 'Distribution Restriction',
       },
+      filters: {
+        search: "Search",
+      },
       groups: {
         name: 'Group Name',
         active: 'Active',
