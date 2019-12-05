@@ -135,7 +135,7 @@ const actionStyles = theme => ({
 //check if this user should have permission to access the edit page.
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin || false)
+  const [showEdit, setShowEdit] = useState(user.is_admin)
 
   useEffect(() => {
     if (data && !showEdit){

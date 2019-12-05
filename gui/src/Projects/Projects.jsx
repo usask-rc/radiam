@@ -140,7 +140,7 @@ const actionStyles = theme => ({
 const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin || false)
+  const [showEdit, setShowEdit] = useState(user.is_admin)
 
   useEffect(() => {
     console.log("data in useeffect projectshowactions: ", data)

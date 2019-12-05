@@ -116,49 +116,49 @@ const actionStyles = theme => ({
   }
 })
 
+/**
+ * 
+//check if this user should have permission to access the edit page.
+const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  useEffect(() => {
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.id).then(data => {
+        setShowEdit(data)
+      })
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+ */
+
 const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
+  console.log("useragentshowactions data: ", data)
+
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
-    if (data && !user.is_admin){
-      //get all project config list project ids
-      const project_id_list = []
-      data.project_config_list.map(item => {
-        project_id_list.push(item.project);
-        return item;
-      })
-      
-      //should we show the edit view?
-      const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
-      const params = { ids:project_id_list }
+    if (data && !showEdit){
+
       const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-
-      dataProvider(GET_LIST, Constants.models.PROJECTS, params).then(response => {
-        const project_group_ids = []
-
-        response.data.map(project => {
-          project_group_ids.push(project.group)
-          return project
-        })
-
-        let found = false
-        for (var j = 0; j < project_group_ids.length; j++){
-          for (var i = 0; i < user.groupAdminships.length; i++){
-            if (user.groupAdminships[i] === project_group_ids[j]){ //for some reason "response.data.group in user.groupAdminships" didn't work.  Object comparison issue?
-              setShowEdit(true)
-              found = true
-              break
-            }
-          }
-
-          if (found){
-            break
-          }
-        }
-      })
+      if (data.user === user.id){
+        setShowEdit(true)
+      }
     }
   }, [data])
 
