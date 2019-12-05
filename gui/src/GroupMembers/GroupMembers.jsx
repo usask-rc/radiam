@@ -30,6 +30,7 @@ import { FormDataConsumer } from "ra-core";
 import { isAdminOfAParentGroup } from "../_tools/funcs";
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
+import { TextInput } from "ra-ui-materialui/lib/input";
 
 
 const listStyles = {
