@@ -114,6 +114,7 @@ from rest_framework import pagination
 
 from rest_framework.exceptions import APIException
 from rest_framework import status
+from rest_framework import filters
 
 
 # Imports for django_rest_passwordreset override until open issue is resolved
@@ -423,10 +424,12 @@ class UserViewSet(RadiamViewSet):
     queryset = User.objects.all().order_by('last_name', 'first_name', 'username')
 
     filter_backends = (
+       filters.SearchFilter,
        DjangoFilterBackend,
        RadiamAuthUserFilter,
        OrderingFilter,
     )
+    search_fields = ['username']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
     ordering_fields = ('username','first_name','last_name', 'email', 'date_created', 'date_updated', 'notes')
     ordering = ('last_name', 'first_name', 'username', )
