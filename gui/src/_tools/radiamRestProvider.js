@@ -166,7 +166,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         console.log("in get_one, data is: ", type, resource, params)
 
-        if (params.is_active === false) {
+        if (params && params.is_active === false) {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=false`;
         } else {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=true`;

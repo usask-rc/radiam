@@ -121,9 +121,6 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
-  console.log("useragentshowactions data: ", data)
-
-  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
       if (data.user === user.id){
