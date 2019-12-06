@@ -37,6 +37,7 @@ import { GET_ONE } from 'ra-core';
 import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
+import DatasetTitle from './DatasetTitle.jsx';
 
 const styles = {
   actions: {
@@ -76,7 +77,7 @@ const actionStyles = theme => ({
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
-      
+
       const params = { id: data.project }
       const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
       dataProvider(GET_ONE, Constants.models.PROJECTS, params).then(response => {
@@ -100,8 +101,9 @@ const actionStyles = theme => ({
 
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
-  <Show actions={<DatasetShowActions/>} title={<DatasetTitle />} {...props}>
+  <Show actions={<DatasetShowActions/>} {...props}>
     <SimpleShowLayout>
+        <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
           source={Constants.model_fields.TITLE}
@@ -230,8 +232,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   };
 
   //label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
+  console.log("datasetform props.record: ", props.record)
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
+    <DatasetTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"
       source={Constants.model_fields.TITLE}
@@ -324,14 +328,10 @@ export const DatasetCreate = props => {
   );
 };
 
-export const DatasetTitle = ({ record }) => {
-  return <span>Dataset {record ? `"${record.name}"` : ''}</span>;
-};
-
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<DatasetTitle />} actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
+    <Edit actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
       <DatasetForm mode={Constants.resource_operations.EDIT} {...other} />
     </Edit>
   );
