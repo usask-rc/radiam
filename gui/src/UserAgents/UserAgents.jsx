@@ -1,3 +1,4 @@
+//UserAgents.jsx
 import React, { useState, useEffect } from "react";
 import CustomPagination from "../_components/CustomPagination";
 import {
@@ -25,12 +26,11 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { regex, FormDataConsumer, ShowController, GET_LIST } from "ra-core";
+import { regex, FormDataConsumer, ShowController } from "ra-core";
 import { Grid, Toolbar } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import UserAgentTitle from "./UserAgentTitle";
 
 const filterStyles = {

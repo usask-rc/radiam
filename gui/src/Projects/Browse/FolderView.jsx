@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import {
   AddLocation,
   FolderOpen,
-  Search,
   Sort,
   ArrowUpward,
   ArrowDownward,

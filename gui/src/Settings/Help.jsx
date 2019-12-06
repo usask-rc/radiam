@@ -6,13 +6,9 @@ import { connect } from "react-redux";
 import { changeLocale } from "react-admin";
 import compose from "recompose/compose";
 import { changeTheme } from "./actions";
-import { Typography, Card, CardContent, Grid } from '@material-ui/core';
+import { Typography, Card, CardContent } from '@material-ui/core';
 import { HelpOutline } from '@material-ui/icons';
 import * as Constants from "../_constants/index"
-import { Link } from "react-router-dom"
-import Welcome from '../Dashboard/Welcome/Welcome';
-import AgentInstall from '../Dashboard/Welcome/AgentInstall';
-
 
 const styles = {
     label: { width: "10em", display: "inline-block" },
@@ -25,7 +21,7 @@ const styles = {
         marginBottom: '-5px',
         height: "28px",
         width: "28px",
-      },
+    },
     inlineText: {
         display: "flex",
         flexDirection: "row",
@@ -34,28 +30,27 @@ const styles = {
     container: {
         textAlign: 'left',
         minWidth: "20em",
-      },
-      subheader: {
-          fontWeight: "bold"
-      },
-      content: {
+    },
+    subheader: {
+        fontWeight: "bold"
+    },
+    content: {
 
-      },
-      headlineTop: {
-          display: "flex",
-        backgroundColor: '#688db2',
-        color: 'white',
-        marginLeft: '-24px',
-        marginRight: '-24px',
-        marginTop: '-16px !important;',
-        marginBottom: '16px',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        paddingTop: '16px',
-        paddingBottom: '16px',
-      },
-  };
-  
+    },
+    headlineTop: {
+    display: "flex",
+    backgroundColor: '#688db2',
+    color: 'white',
+    marginLeft: '-24px',
+    marginRight: '-24px',
+    marginTop: '-16px !important;',
+    marginBottom: '16px',
+    paddingLeft: '24px',
+    paddingRight: '24px',
+    paddingTop: '16px',
+    paddingBottom: '16px',
+    },
+};
 
 const Help = ({ classes, translate }) => (
     <React.Fragment>
@@ -121,19 +116,18 @@ const Help = ({ classes, translate }) => (
 const mapStateToProps = state => ({
     theme: state.theme,
     locale: state.i18n.locale
-  });
-  
-  const enhance = compose(
-    connect(
-      mapStateToProps,
-      {
-        changeLocale,
-        changeTheme
-      }
-    ),
-    translate,
-    withStyles(styles)
-  );
-  
-  export default enhance(Help);
-  
+});
+
+const enhance = compose(
+connect(
+    mapStateToProps,
+    {
+    changeLocale,
+    changeTheme
+    }
+),
+translate,
+withStyles(styles)
+);
+
+export default enhance(Help);

@@ -79,7 +79,6 @@ import {
 import {
   UserList,
   UserCreate,
-  UserEdit,
   UserShow,
   UserEditWithDeletion,
 } from '../Users/Users';
@@ -98,13 +97,10 @@ import Login from '../layout/Login';
 import 'moment-timezone';
 import { ToastContainer } from 'react-toastify';
 import datasets from "../Datasets"
-import locations from "../Locations"
-import projectavatars from "../ProjectAvatars"
 import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
 import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
-import { LocationShow } from '../_components/_fields/LocationShow';
 
 const i18nProvider = locale => {
   return englishMessages;

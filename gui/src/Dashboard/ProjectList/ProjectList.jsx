@@ -1,4 +1,5 @@
-import React, { Component, useState } from 'react'
+//ProjectList.jsx
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import {PropTypes} from "prop-types";
 import * as Constants from "../../_constants/index"
@@ -7,8 +8,6 @@ import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
-import { FileCopy, Description, FolderOpen } from '@material-ui/icons';
-import { LocationShow } from '../../_components/_fields/LocationShow';
 
 const styles = {
     headlineTop: {
@@ -125,7 +124,7 @@ const styles = {
         return 0;
     }
 function EnhancedTableHead(props) {
-    const { classes, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+    const { classes, order, orderBy, onRequestSort } = props;
     const createSortHandler = property => event => {
         onRequestSort(event, property);
     };

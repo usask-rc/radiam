@@ -22,7 +22,6 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
-import GroupViewGrantsTitle from "./GroupViewGrantTitle";
 import GroupViewGrantTitle from "./GroupViewGrantTitle";
 
 const styles = {
@@ -87,6 +86,9 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
       perPage={10}
       bulkActionButtons={false}
+      title={
+        "Group View Grants"
+      }
       pagination={<CustomPagination />}
     >
       <Datagrid rowClick={Constants.resource_operations.SHOW}>
