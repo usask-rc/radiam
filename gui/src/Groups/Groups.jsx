@@ -251,11 +251,7 @@ const GroupForm = props =>
       onChange={handleChange}
       save={handleSubmit}
     >
-      <FormDataConsumer>
-        {({formData, ...rest}) => {
-          return <GroupTitle prefix={"Creating Group"} />
-        }}
-      </FormDataConsumer>
+      <GroupTitle prefix={"Creating Group"} />
       <TextInput
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -315,11 +311,7 @@ class BaseGroupEdit extends Component {
         toolbar={<EditToolbar />}
         redirect={Constants.resource_operations.LIST}
       >
-        <FormDataConsumer>
-          {({formData, ...rest}) => {
-            return <GroupTitle record={formData} prefix={"Updating"} />
-          }}
-        </FormDataConsumer>
+      <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
           source={Constants.model_fields.NAME}

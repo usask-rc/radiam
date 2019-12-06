@@ -9,7 +9,7 @@ const styles = {
 }
 
 const GroupTitle = ({ prefix="", record, classes }) => {
-    return <Typography className={classes.titleText}>{`${prefix} ${record ? record.name : ""}`}</Typography>;
+    return <Typography className={classes.titleText}>{`${prefix} ${record && record.name ? record.name : ""}`}</Typography>;
 };
 
 export default withStyles(styles)(GroupTitle)

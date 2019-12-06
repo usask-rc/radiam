@@ -8,7 +8,7 @@ const styles = {
     }
 }
 
-const GroupMemberTitle = ({ prefix="", record, classes }) => {
+const GroupMemberTitle = ({ prefix="", classes }) => {
     return (<Typography className={classes.titleText}>{`${prefix} User-Group Relation`}</Typography>)
 };
 
