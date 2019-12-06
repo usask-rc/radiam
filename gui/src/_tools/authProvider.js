@@ -6,7 +6,7 @@ import {
   AUTH_CHECK,
   AUTH_GET_PERMISSIONS
 } from "react-admin";
-import { getAPIEndpoint, validateAccess } from "./funcs";
+import { getAPIEndpoint } from "./funcs";
 import * as Constants from "../_constants/index"
 import { toast } from "react-toastify";
 
@@ -302,12 +302,8 @@ export default (type, params, ...rest) => {
     console.log("splits is: ", splits)
     return validateToken(JSON.parse(getToken).access)
       .then(() => {
-        if (splits.length > 2){
-          validateAccess(splits)
+          Promise.resolve()
         }
-        Promise.resolve()
-
-      }
       )
       .catch(
         refreshAccessToken(JSON.parse(getToken))
