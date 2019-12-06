@@ -298,8 +298,6 @@ export default (type, params, ...rest) => {
     //get the model and ID from the URL and check for user authorization on this page.
     console.log("href is: ", window.location.href, "window location: ", window.location)
 
-    const splits = window.location.hash.split("/")
-    console.log("splits is: ", splits)
     return validateToken(JSON.parse(getToken).access)
       .then(() => {
           Promise.resolve()

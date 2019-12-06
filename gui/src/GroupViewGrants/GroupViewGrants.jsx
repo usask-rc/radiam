@@ -1,3 +1,4 @@
+//GroupViewGrants.jsx
 import React, { useEffect, useState } from "react";
 import {
   Create,
@@ -21,6 +22,8 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
+import GroupViewGrantsTitle from "./GroupViewGrantTitle";
+import GroupViewGrantTitle from "./GroupViewGrantTitle";
 
 const styles = {
   actions: {
@@ -120,8 +123,9 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
 );
 
 export const GroupViewGrantShow = props => (
-  <Show title={<GroupViewGrantTitle />} {...props}>
+  <Show {...props}>
     <SimpleShowLayout>
+      <GroupViewGrantTitle prefix="Showing View Grant" />
       <ReferenceField
         linkType={false}
         label={"en.models.grants.group"}
@@ -175,11 +179,14 @@ const GroupViewGrantForm = props => {
   function handleChange(data){
     setIsFormDirty(true)
   }
+  console.log("props in groupviewgrantform: ", props)
   return(
   <SimpleForm {...props} 
     redirect={Constants.resource_operations.LIST}
     onChange={handleChange}
     save={handleSubmit}>
+    <GroupViewGrantTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating View Grant" : "Creating View Grant"} />
+
     <ReferenceInput
       label={"en.models.grants.group"}
       source={Constants.model_fk_fields.GROUP}
@@ -212,10 +219,6 @@ const GroupViewGrantForm = props => {
   </SimpleForm>
 )};
 
-export const GroupViewGrantTitle = ({ record }) => {
-  return <span>GroupViewGrant {record ? `"${record.fields}"` : ""}</span>;
-};
-
 export const GroupViewGrantCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
@@ -228,7 +231,7 @@ export const GroupViewGrantCreate = props => {
 export const GroupViewGrantEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
-    <Edit title={<GroupViewGrantTitle />} {...props}>
+    <Edit {...props}>
       <GroupViewGrantForm {...other} />
     </Edit>
   );
