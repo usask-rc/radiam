@@ -6,10 +6,12 @@ import { connect } from "react-redux";
 import { changeLocale } from "react-admin";
 import compose from "recompose/compose";
 import { changeTheme } from "./actions";
-import { Typography, Card, CardContent } from '@material-ui/core';
+import { Typography, Card, CardContent, Grid } from '@material-ui/core';
 import { HelpOutline } from '@material-ui/icons';
 import * as Constants from "../_constants/index"
 import { Link } from "react-router-dom"
+import Welcome from '../Dashboard/Welcome/Welcome';
+import AgentInstall from '../Dashboard/Welcome/AgentInstall';
 
 
 const styles = {
@@ -56,9 +58,9 @@ const styles = {
   
 
 const Help = ({ classes, translate }) => (
+    <React.Fragment>
     <Card className={classes.container}>
         <CardContent>
-
             <Typography className={classes.headlineTop} variant="h5" component="h5">
                 <HelpOutline className={classes.titleIcon} />
                 {translate('en.help.title')}
@@ -114,6 +116,7 @@ const Help = ({ classes, translate }) => (
 
         </CardContent>
     </Card>
+    </React.Fragment>
 )
 const mapStateToProps = state => ({
     theme: state.theme,

@@ -61,6 +61,11 @@ const showStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const LocationFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <ReferenceInput
       label={'en.models.locations.type'}
       source={Constants.model_fk_fields.LOCATION_TYPE}

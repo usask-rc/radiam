@@ -111,9 +111,11 @@ const WelcomeCards = () => {
             </Grid>
         }
         <Grid item xs={4}>
+            {/*This should be conditional based on whether a project has files / if there is a group set up with users*/}
             <Welcome />
         </Grid>
         <Grid item xs={4}>
+            {/*This should be conditional based on whether or not a project has files*/}
             <AgentInstall />
         </Grid>
     </Grid>

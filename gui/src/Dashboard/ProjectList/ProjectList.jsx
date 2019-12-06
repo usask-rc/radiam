@@ -19,6 +19,10 @@ const styles = {
     headerDiv: {
     float:   'left',
     },
+    searchCell: {
+        width: "14em",
+
+    },
     iconCell: {
         verticalAlign: "middle",
         width: `${Constants.AVATAR_HEIGHT}`,
@@ -41,13 +45,14 @@ const styles = {
         alignItems: 'flex-end',
     },
     table: {
-        width: "80em",
+        width: "65em",
     },
     textTop: {
         color: 'white',
     },
     container: {
-        margin: '1em',
+        marginTop: '3em',
+        marginLeft: "1em",
         textAlign: 'center',
         minWidth: "20em",
     },
@@ -72,6 +77,9 @@ const styles = {
         width: "inherit",
         alignItems: "flex-start"
     },
+    lastFileCell: {
+        width: "14em",
+    },
     lastFileCellText: {
         verticalAlign: "center",
     },
@@ -93,7 +101,7 @@ const styles = {
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
-        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed File"}
+        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
         //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
     ]
 
@@ -292,9 +300,7 @@ const ProjectList = ({classes, loading, projects}) => {
                         <TableCell className={classes.lastFileCell}>
                         {console.log("recentFile is: ", project.recentFile)}
                             {project.recentFile ? 
-                                <Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} 
-                                    {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}
-                                </Typography> 
+                                <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
                                 :
                                 <Typography className={classes.noFiles}>{`None`}</Typography>
                             }
@@ -304,6 +310,12 @@ const ProjectList = ({classes, loading, projects}) => {
         }
     </TableBody>
     
+    {/*
+{/*<Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} 
+                                    {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}
+                                </Typography> 
+                            */  
+    }
     </Table>
     <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
@@ -319,24 +331,3 @@ const ProjectList = ({classes, loading, projects}) => {
 }
 
 export default withStyles(styles)(ProjectList)
-
-
-/*
-  <TableCell className={classes.lastFileLocation}>
-                            {project.recentFile ? 
-                                <ReferenceField
-                                label={'en.models.agents.location'}
-                                source={Constants.model_fk_fields.LOCATION}
-                                reference={Constants.models.LOCATIONS}
-                                linkType={Constants.resource_operations.SHOW}
-                                basePath={`/${Constants.models.PROJECTS}`}
-                                resource={Constants.models.PROJECTS}
-                                record={project.recentFile}
-                                >
-                                    <LocationShow />
-                                </ReferenceField>
-                                :
-                                <Typography className={classes.noFiles}>{`None`}</Typography>
-                            }
-                        </TableCell>
-                        */

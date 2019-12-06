@@ -14,14 +14,13 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-
-  /* 
+/*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
   return `/${Constants.API_ENDPOINT}`;
 }
+*/
 
 //there are certain things that are easy to check for (e.g - admins have access to everything)
 //there are others that are not so certain, unfortunately.  The Server does a good job of filtering most of these, but we want to avoid displaying buttons that will lead to invaild queries.

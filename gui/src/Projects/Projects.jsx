@@ -74,6 +74,11 @@ const validatePrimaryContactUser = required('en.validate.project.primary_contact
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const ProjectFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <ReferenceInput
       label={'en.models.projects.group'}
       source={Constants.model_fk_fields.GROUP}
