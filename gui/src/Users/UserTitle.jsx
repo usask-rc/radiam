@@ -9,6 +9,7 @@ const styles = {
 }
 
 const UserTitle = ({ prefix="", record, classes }) => {
+    console.log("record in usertitle: ", record)
     return <Typography className={classes.titleText}>{`${prefix} ${record ? `${record.first_name} ${record.last_name} : <${record.username}>` : ""}`}</Typography>;
   };
   

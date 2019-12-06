@@ -3,11 +3,8 @@ import AgentInstall from './AgentInstall';
 import Welcome from './Welcome';
 import { Grid } from '@material-ui/core';
 import * as Constants from "../../_constants/index"
-import { getUserGroups, getUsersInGroup, getAPIEndpoint, getMaxUserRole, getGroupData, getGroupUsers } from '../../_tools/funcs';
-import FirstSteps from './FirstSteps';
+import {  getUsersInGroup, getMaxUserRole, getGroupData } from '../../_tools/funcs';
 import SecondSteps from './SecondSteps';
-import { radiamRestProvider, httpClient } from '../../_tools';
-import { GET_LIST } from 'ra-core';
 import FewUsers from './FewUsers';
 
 

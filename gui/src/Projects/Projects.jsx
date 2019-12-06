@@ -37,13 +37,11 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getAllParentGroups, getParentGroupList } from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
-import { EditToolbar } from "../_components";
-import { ShowView } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 
 const styles = {

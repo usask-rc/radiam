@@ -96,7 +96,7 @@ class UserEditForm extends Component {
                 asyncBlurFields={[Constants.model_fields.USERNAME]} >
                 
                 <FormDataConsumer>
-                    {({formData, ...rest}) => 
+                    {({formData }) => 
                     {
                         return(<UserTitle prefix={"Updating"} record={formData} />)}
                     }

@@ -14,13 +14,12 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-/*
+  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
   return `/${Constants.API_ENDPOINT}`;
 */
-
 }
 
 //given a group id and our cookies, can we edit this value?

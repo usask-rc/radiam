@@ -25,7 +25,6 @@ import * as Constants from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { Prompt } from "react-router"
 import PropTypes from 'prop-types';
 import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
@@ -69,7 +68,7 @@ const actionStyles = theme => ({
   }
 })
 
- export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => {
+ export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => {
 
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
@@ -231,8 +230,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     submitObjectWithGeo(newData, geo, props)
   };
 
-  //label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
-  console.log("datasetform props.record: ", props.record)
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
     <DatasetTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  

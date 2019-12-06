@@ -1,10 +1,9 @@
 //Users.jsx
-import React, { Component } from "react";
+import React from "react";
 import {
   BooleanField,
   BooleanInput,
   Create,
-  crudUpdateMany,
   Datagrid,
   DateInput,
   Edit,
@@ -25,9 +24,7 @@ import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
-import UserTitle from "./UserTitle";
 import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
 import { EditButton, DeleteButton } from 'react-admin';
 
 const listStyles = {

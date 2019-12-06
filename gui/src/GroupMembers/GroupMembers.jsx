@@ -303,11 +303,8 @@ const GroupMemberForm = props => {
     onChange={handleChange}
     save={handleSubmit}
   >
-    <FormDataConsumer>
-      {({formData, ...rest}) => {
-        return <GroupMemberTitle />
-      }}
-    </FormDataConsumer>
+    <GroupMemberTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />
+
     <ReferenceInput
       label={"en.models.groupmembers.user"}
       source={Constants.model_fk_fields.USER}
