@@ -25,7 +25,6 @@ import * as Constants from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { Prompt } from "react-router"
 import PropTypes from 'prop-types';
 import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
