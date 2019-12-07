@@ -26,7 +26,7 @@ const styles = theme => ({
   },
 });
 
-const RelatedUsers = ({classes, record, setShowModal, groupMembers}) => {
+const RelatedUsers = ({classes, setShowModal, groupMembers}) => {
 /*
 
     const [ruGroupMembers, setRUGroupMembers] = useState(groupMembers)
@@ -55,7 +55,6 @@ const RelatedUsers = ({classes, record, setShowModal, groupMembers}) => {
     */
     return(
       <React.Fragment>
-        {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
         <div className={classes.chipContainer}>
           {groupMembers && groupMembers.map(groupMember => {
             let groupRoleTextArr = groupMember.group_role.label.split(".")
@@ -76,7 +75,9 @@ const RelatedUsers = ({classes, record, setShowModal, groupMembers}) => {
       
             )
           })}
+          {setShowModal && 
             <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+          }
           </div>
       </React.Fragment>
     )

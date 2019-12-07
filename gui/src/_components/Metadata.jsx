@@ -1445,13 +1445,15 @@ const enhanceShow = compose(
 );
 
 class BaseMetadataEditActions extends Component {
+  state = {}
   constructor (props) {
     super(props);
     drawerState.register(this, this.setConfig);
   }
 
   componentWillMount(){
-    if (this.props.showRelatedUsers && this.props.record){
+    console.log("componentwillmount props: ", this.props)
+    if (this.props.showRelatedUsers){
 
       if (this.props.id){
         const params={id: this.props.id, is_active: true}
@@ -1472,8 +1474,11 @@ class BaseMetadataEditActions extends Component {
     this.setState({ config: config});
   };
 
+  //TODO: this is the top bar that shows up in the top right corner - showrelatedusers should be true on the Group page.  It can display in the `edit a group` page.
+  
   render() {
     const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
+    console.log("metadatarender props: ", this.props)
     return <CardActions>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1489,11 +1494,12 @@ class BaseMetadataEditActions extends Component {
             filterValues,
             context: 'button',
         }) }
+        { showRelatedUsers && this.state.groupMembers &&
+          <RelatedUsers groupMembers={this.state.groupMembers} />
+        }
+
         { data && <ShowButton basePath={basePath} record={data} /> }
         <RefreshButton />
-        { showRelatedUsers && record && this.state.groupMembers &&
-          <RelatedUsers record={record} groupMembers={this.state.groupMembers} />
-        }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </CardActions>
   }
