@@ -26,33 +26,8 @@ const styles = theme => ({
   },
 });
 
+
 const RelatedUsers = ({classes, setShowModal, groupMembers}) => {
-/*
-
-    const [ruGroupMembers, setRUGroupMembers] = useState(groupMembers)
-    let _isMounted = false
-    useEffect(() => {
-      _isMounted = true;
-
-      if (!ruGroupMembers)
-      {
-        getGroupUsers(record).then((data) =>{
-          if (_isMounted){
-              setRUGroupMembers(data)
-          }
-          return data
-        }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
-      }
-      else{
-        setRUGroupMembers(groupMembers)
-      }
-      //if we unmount, lock out the component from being able to use the state
-      return function cleanup() {
-        _isMounted = false;
-      }
-    }, [])
-    console.log("ruGroupMembers: ", ruGroupMembers)
-    */
     return(
       <React.Fragment>
         <div className={classes.chipContainer}>

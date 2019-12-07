@@ -237,7 +237,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
             {showModal && <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
               <DialogTitle>{`Add User`}</DialogTitle>
               <DialogContent>
-                <GroupMemberForm group={controllerProps.record.id} />
+                <GroupMemberForm group={controllerProps.record.id} setShowModal={setShowModal} {...props} />
               </DialogContent>
             </Dialog>
             }

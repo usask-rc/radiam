@@ -218,6 +218,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case CREATE:
+        console.log("formdata in create: ", formData)
         url = `${apiUrl}/${resource}/`;
         options.method = Constants.methods.POST;
         if (

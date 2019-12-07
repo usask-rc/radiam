@@ -27,7 +27,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { Prompt } from 'react-router';
 import GroupMemberTitle from "./GroupMemberTitle";
 import { FormDataConsumer } from "ra-core";
-import { isAdminOfAParentGroup } from "../_tools/funcs";
+import { isAdminOfAParentGroup, postObjectWithoutSaveProp } from "../_tools/funcs";
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { TextInput } from "ra-ui-materialui/lib/input";
@@ -281,7 +281,20 @@ export const GroupMemberForm = props => {
   
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
-      props.save(data)
+      if (props.save){
+        props.save(data)
+      }
+      //accessing in modal form
+      else{
+        console.log("data is: ", data, "props are: ", props)
+        
+        postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+          console.log("data after posting new groupmember: ", data)
+          if (props.setShowModal){
+            props.setShowModal(false)
+          }
+        })
+      }
     }
   }, [data])
 
@@ -308,7 +321,7 @@ export const GroupMemberForm = props => {
 
     <ReferenceInput
       label={"en.models.groupmembers.user"}
-      source={props.userList}
+      source={Constants.model_fk_fields.USER}
       reference={Constants.models.USERS}
       resource={Constants.models.USERS}
       validate={validateUser}

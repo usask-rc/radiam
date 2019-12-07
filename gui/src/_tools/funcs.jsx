@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -504,6 +504,22 @@ function updateObjectWithGeo(formData, geo, props) {
   props.save(formData, Constants.resource_operations.LIST);
 }
 
+//for the rare cases that we don't have the Save prop and want to POST some model item
+export function postObjectWithoutSaveProp(formData, resource){
+  return new Promise((resolve, reject) => {
+
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+  const params = { data: formData, resource:resource }
+
+  dataProvider(CREATE, resource, params).then(response => {
+      resolve(response)
+  }).catch(err => {
+      reject(err)
+  })
+}
+  )
+}
+
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props) {
   let headers = new Headers({ 'Content-Type': 'application/json' });
@@ -513,7 +529,6 @@ export function createObjectWithGeo(formData, geo, props) {
     const parsedToken = JSON.parse(token);
     headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    console.log('formData sent in creation request is: ', formData);
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
       method: Constants.methods.POST,
       body: JSON.stringify({ ...formData }),

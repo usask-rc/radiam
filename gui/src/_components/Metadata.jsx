@@ -1473,8 +1473,6 @@ class BaseMetadataEditActions extends Component {
   setConfig(config) {
     this.setState({ config: config});
   };
-
-  //TODO: this is the top bar that shows up in the top right corner - showrelatedusers should be true on the Group page.  It can display in the `edit a group` page.
   
   render() {
     const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
@@ -1497,7 +1495,6 @@ class BaseMetadataEditActions extends Component {
         { showRelatedUsers && this.state.groupMembers &&
           <RelatedUsers groupMembers={this.state.groupMembers} />
         }
-
         { data && <ShowButton basePath={basePath} record={data} /> }
         <RefreshButton />
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
