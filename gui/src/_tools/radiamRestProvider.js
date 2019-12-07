@@ -281,8 +281,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
 
-        console.log("get_file return is: ", ret)
-
         ret.data.map(item => (item.key = item.id));
         return ret;
 
@@ -301,8 +299,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case GET_ONE:
         let fields = translateResource(resource, json);
-
-        console.log("GET_ONE fields, json, resource are:" , fields, json, resource)
 
         return {
           data: {
