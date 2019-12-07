@@ -26,32 +26,36 @@ const styles = theme => ({
   },
 });
 
-const RelatedUsers = ({classes, record}) => {
-    let _isMounted = false;
-    
-  
-    const [groupMembers, setGroupMembers] = useState([])
-  
+const RelatedUsers = ({classes, record, setShowModal, groupMembers}) => {
+/*
+
+    const [ruGroupMembers, setRUGroupMembers] = useState(groupMembers)
+    let _isMounted = false
     useEffect(() => {
       _isMounted = true;
-      
-      getGroupUsers(record).then((data) =>{
-        if (_isMounted){
-            setGroupMembers(data)
-        }
-        return data
-      }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
 
+      if (!ruGroupMembers)
+      {
+        getGroupUsers(record).then((data) =>{
+          if (_isMounted){
+              setRUGroupMembers(data)
+          }
+          return data
+        }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
+      }
+      else{
+        setRUGroupMembers(groupMembers)
+      }
       //if we unmount, lock out the component from being able to use the state
       return function cleanup() {
         _isMounted = false;
       }
     }, [])
-
+    console.log("ruGroupMembers: ", ruGroupMembers)
+    */
     return(
       <React.Fragment>
         {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
-
         <div className={classes.chipContainer}>
           {groupMembers && groupMembers.map(groupMember => {
             let groupRoleTextArr = groupMember.group_role.label.split(".")
@@ -72,12 +76,17 @@ const RelatedUsers = ({classes, record}) => {
       
             )
           })}
-          <Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
-            <Chip label={`+ New User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable/>
-          </Link> 
+            <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
           </div>
       </React.Fragment>
     )
   }
 
 export default withStyles(styles)(RelatedUsers)
+
+/*
+//previous version of add user which linked to the create groupmember page
+<Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
+            <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable/>
+          </Link> 
+*/

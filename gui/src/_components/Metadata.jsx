@@ -46,6 +46,7 @@ import * as Constants from "../_constants/index";
 import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
+import { getGroupUsers } from "../_tools/funcs";
 
 const configStyles = {
   root: {
@@ -1449,6 +1450,20 @@ class BaseMetadataEditActions extends Component {
     drawerState.register(this, this.setConfig);
   }
 
+  componentWillMount(){
+    if (this.props.showRelatedUsers && this.props.record){
+
+      if (this.props.id){
+        const params={id: this.props.id, is_active: true}
+        getGroupUsers(params).then((data) => {
+        console.log("getgroupusers returned data: ", data)
+        this.setState({groupMembers: data})
+        return data
+      }).catch(err => console.error("err: ", err))
+      }
+    }
+  }
+
   componentWillUnmount() {
     drawerState.unregister(this, this.setConfig);
   }
@@ -1476,8 +1491,8 @@ class BaseMetadataEditActions extends Component {
         }) }
         { data && <ShowButton basePath={basePath} record={data} /> }
         <RefreshButton />
-        { showRelatedUsers && record &&
-          <RelatedUsers record={record} />
+        { showRelatedUsers && record && this.state.groupMembers &&
+          <RelatedUsers record={record} groupMembers={this.state.groupMembers} />
         }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </CardActions>

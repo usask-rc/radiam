@@ -296,7 +296,6 @@ export default (type, params, ...rest) => {
 
     //I'm confident that the same thing can be achieved with withRouter from react-router
     //get the model and ID from the URL and check for user authorization on this page.
-    console.log("href is: ", window.location.href, "window location: ", window.location)
 
     return validateToken(JSON.parse(getToken).access)
       .then(() => {

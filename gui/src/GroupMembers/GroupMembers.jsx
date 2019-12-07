@@ -275,7 +275,7 @@ const asyncValidate = getAsyncValidateTwoNotExists(
   Constants.models.GROUPMEMBERS
 );
 
-const GroupMemberForm = props => {
+export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
   
@@ -293,8 +293,9 @@ const GroupMemberForm = props => {
   function handleChange(data){
     setIsFormDirty(true)
   }
-
   console.log("groupmemberform props: ", props)
+  //given some chosen group, we only want to be able to add users who are not already members of said group in some form
+  //if the primary way we're going to be accessing this form is via Groups, we already have this data for Create.
   return(
   <SimpleForm {...props}
     redirect={Constants.resource_operations.LIST}
@@ -303,12 +304,13 @@ const GroupMemberForm = props => {
     onChange={handleChange}
     save={handleSubmit}
   >
-    <GroupMemberTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />
+    {props.record && <GroupMemberTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />}
 
     <ReferenceInput
       label={"en.models.groupmembers.user"}
-      source={Constants.model_fk_fields.USER}
+      source={props.userList}
       reference={Constants.models.USERS}
+      resource={Constants.models.USERS}
       validate={validateUser}
     >
       <SelectInput optionText={userSelect} />
@@ -317,6 +319,8 @@ const GroupMemberForm = props => {
       label={"en.models.groupmembers.group"}
       source={Constants.model_fk_fields.GROUP}
       reference={Constants.models.GROUPS}
+      resource={Constants.models.GROUPS}
+
       defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
       validate={validateGroup}
     >
@@ -326,6 +330,8 @@ const GroupMemberForm = props => {
       label={"en.models.groupmembers.role"}
       source={Constants.model_fk_fields.GROUP_ROLE}
       reference={Constants.models.ROLES}
+      resource={Constants.models.ROLES}
+
       validate={validateRole}
     >
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
@@ -341,12 +347,13 @@ const GroupMemberForm = props => {
 }
 
 export const GroupMemberCreate = props => {
-  let group = undefined
+  
+  let group = props.group
   if (props.location.group){
     group = props.location.group
   }
   return (
-    <Create   {...props} >
+    <Create {...props} >
       <GroupMemberForm group={group}/>
     </Create>
   );

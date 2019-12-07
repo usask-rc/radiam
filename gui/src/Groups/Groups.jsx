@@ -35,9 +35,10 @@ import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
 import { FormDataConsumer } from "ra-core";
-import { isAdminOfAParentGroup } from "../_tools/funcs.jsx";
-import { Toolbar } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
+import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
+import { GroupMemberCreate, GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 
 const styles = {
   actions: {
@@ -162,12 +163,37 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) =>
   }
 })
 
+//TODO: ADM-1939 - be able to add users via this group show page
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
-    return(
+
+  const [showModal, setShowModal] = useState(false)
+  const [groupMembers, setGroupMembers] = useState([])
+
+  let _isMounted = false
+  useEffect(() => {
+    _isMounted = true;
+    
+    if (props.id){
+      const params={id: props.id, is_active: true}
+      getGroupUsers(params).then((data) => {
+      console.log("getgroupusers returned data: ", data)
+      if (_isMounted){
+        setGroupMembers(data)
+      }
+      return data
+    }).catch(err => console.error("err: ", err))
+    }
+    return function cleanup() { 
+      _isMounted = false;
+    }
+  }, [showModal])
+
+  return(
   <Show actions={<GroupShowActions />} {...props}>
     <SimpleShowLayout>
+      
       <GroupTitle prefix={"Viewing"} />
-      <RelatedUsers {...props} />
+      {groupMembers && <RelatedUsers setShowModal={setShowModal} groupMembers={groupMembers}  {...props} /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -195,18 +221,31 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
 
       {/** Needs a ShowController to get the record into the ShowMetadata **/}
       <ShowController translate={translate} {...props}>
-        { controllerProps => (
-          <ShowMetadata
-            type={Constants.model_fk_fields.GROUP}
-            translate={translate}
-            record={controllerProps.record}
-            basePath={controllerProps.basePath}
-            resource={controllerProps.resource}
-            id={controllerProps.record.id}
-            props={props}
-          />
-        )}
+        { controllerProps => {
+          console.log("controllerprops in group: ", controllerProps)
+        return(
+          <React.Fragment>
+            <ShowMetadata
+              type={Constants.model_fk_fields.GROUP}
+              translate={translate}
+              record={controllerProps.record}
+              basePath={controllerProps.basePath}
+              resource={controllerProps.resource}
+              id={controllerProps.record.id}
+              props={props}
+            />
+            {showModal && <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
+              <DialogTitle>{`Add User`}</DialogTitle>
+              <DialogContent>
+                <GroupMemberForm group={controllerProps.record.id} />
+              </DialogContent>
+            </Dialog>
+            }
+          </React.Fragment>
+        )}}
       </ShowController>
+
+      
     </SimpleShowLayout>
   </Show>
 )}));

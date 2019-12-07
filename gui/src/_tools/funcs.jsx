@@ -41,6 +41,7 @@ export function isAdminOfAParentGroup(group_id){
       resolve(false)
 
     }).catch(err => {
+      console.error("isadminofaparentgroup error: ",err)
       resolve(false)
     })
   })
