@@ -295,6 +295,15 @@ class RadiamAPI(object):
         endpoint_url += "?" + namefield + "=" + name
         return self.api_get(endpoint_url)
 
+    def get_osf_endpoints(self)
+        """
+        TODO: 
+        Get the OSF endpoint data from the API
+        """
+        
+        return self.api_get(NEW_ENDPOINT_WE_CREATED) 
+
+
     def api_get_statusCode(self, url, retries=1):
         if retries <= 0:
             self.log("Ran out of retries")
@@ -312,3 +321,5 @@ class RadiamAPI(object):
                 self.log("Unauthorized request {}:\n{}\n".format(resp.status_code, resp.text))
         else:
             return resp.status_code
+
+
