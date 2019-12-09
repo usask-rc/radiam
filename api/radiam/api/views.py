@@ -1056,16 +1056,25 @@ class OSFQueryViewSet(viewsets.GenericViewSet):
         pass
 
     def list(self, request, useragent_id):
+        # Restricted to internal Docker network requests
+        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
+            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+        
         resp = self.osf_agent_token_query()
 
-        data = {
-            "user_agent_id": resp[0],
-            "remote_api_token": resp[1],
-            "loc_id": resp[2],
-            "osf_project": resp[3],
-            "project_id": resp[4],
-            "local_access_token": resp[5]
-        }
+        data = []
+        for item in resp:
+            result = {
+                "user_agent_id": item[0],
+                "remote_api_token": item[1],
+                "loc_id": item[2],
+                "osf_project": item[3],
+                "project_id": item[4],
+                "local_access_token": item[5],
+                "local_refresh_token": item[6],
+            }
+            data.append(result)
 
         return Response(data)
 
@@ -1086,9 +1095,9 @@ class OSFQueryViewSet(viewsets.GenericViewSet):
                 "join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id "
                 "where loc_type.label = 'location.type.osf'")
 
-            row = cursor.fetchone()
+            rows = cursor.fetchall()
 
-        return row
+        return rows
 
 
 # class SearchViewSet(viewsets.GenericViewSet):
