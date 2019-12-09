@@ -37,12 +37,13 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getUsersInGroup } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography, Toolbar } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
+import { DatasetForm } from "../Datasets/Datasets";
 
 const styles = {
   actions: {
@@ -172,12 +173,60 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes})
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
 
+    //select all datasets where project = project id
+
+    const [projectDatasets, setProjectDatasets] = useState([])
+    const [showModal, setShowModal] = useState(false)
+
+    let _isMounted = false
+    useEffect(() => {
+      console.log("projectshow record, props:", props)
+      _isMounted = true
+      if (props.id){
+        getRelatedDatasets(props.id).then(data => {
+          console.log("getrelateddatasets returns: ", data)
+          if (_isMounted){
+            setProjectDatasets(data)
+          }
+          return data
+        }).catch(err => console.error(err))
+      }  
+
+      return function cleanup() {
+        _isMounted = false;
+      }
+    }, [showModal])
+
+    /*
+        const [datasets, setDatasets] = useState([])
+    let _isMounted = false
+    useEffect(() => {
+      _isMounted = true
+      if (record){
+        getRelatedDatasets(record)
+        .then(data => {
+          if (_isMounted){
+          setDatasets(data)
+          }
+          return data
+        })
+        .catch(err => console.error(err))
+      }
+
+      //if we unmount, lock out the component from being able to use the state
+      return function cleanup() {
+        _isMounted = false;
+      }
+    }, [record])
+  
+    */
+
     if (permissions){
       return (<Show actions={<ProjectShowActions/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
+            {projectDatasets && <RelatedDatasets setShowModal={setShowModal} projectDatasets={projectDatasets} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
-            <RelatedDatasets projectID={props.id} {...props} />
             <TextField
               label={'en.models.projects.keywords'}
               source={Constants.model_fields.KEYWORDS}
@@ -199,15 +248,26 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
-                <ShowMetadata
-                  type={Constants.model_fk_fields.PROJECT}
-                  translate={translate}
-                  record={controllerProps.record}
-                  basePath={controllerProps.basePath}
-                  resource={controllerProps.resource}
-                  id={controllerProps.record.id}
-                  props={props}
-                />
+                <React.Fragment>
+                  <ShowMetadata
+                    type={Constants.model_fk_fields.PROJECT}
+                    translate={translate}
+                    record={controllerProps.record}
+                    basePath={controllerProps.basePath}
+                    resource={controllerProps.resource}
+                    id={controllerProps.record.id}
+                    props={props}
+                  />
+                  {showModal && 
+                  <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
+                    <DialogTitle>{`Add Dataset`}</DialogTitle>
+                    <DialogContent>
+                      <DatasetForm project={props.id} setShowModal={setShowModal} {...props} />
+                    </DialogContent>
+                  </Dialog>
+                  }
+                </React.Fragment>
+
               )}
             </ShowController>
             <MapView/>

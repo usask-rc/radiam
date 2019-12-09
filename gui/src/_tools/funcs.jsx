@@ -14,11 +14,9 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
   return `/${Constants.API_ENDPOINT}`;
 
 }
@@ -179,10 +177,10 @@ export function getFolderFiles(
   });
 }
 
-export function getRelatedDatasets(record) {
+export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, Constants.models.DATASETS, {
-      filter: { project: record.id, is_active: true },
+      filter: { project: projectID, is_active: true },
       pagination: { page: 1, perPage: 1000 },
       sort: { field: Constants.model_fields.TITLE, order: 'DESC' },
     })
@@ -541,7 +539,7 @@ export function createObjectWithGeo(formData, geo, props) {
         if (response.status >= 200 && response.status < 300) {
           return response.json();
         }
-        throw new Error(response.statusText);
+        throw new Error(response.statusText); //error here when creating dataset nested in project
       })
       .then(data => {
         console.log('data in createobjectwithgeo is: ', data);

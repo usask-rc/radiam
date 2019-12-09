@@ -34,11 +34,10 @@ import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { FormDataConsumer } from "ra-core";
 import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { GroupMemberCreate, GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
+import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 
 const styles = {
   actions: {

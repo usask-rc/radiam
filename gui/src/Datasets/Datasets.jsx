@@ -26,7 +26,7 @@ import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
 import PropTypes from 'prop-types';
-import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
+import { submitObjectWithGeo, isAdminOfAParentGroup, postObjectWithoutSaveProp } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
@@ -196,7 +196,7 @@ const CustomLabel = ({classes, translate, labelText} ) => {
 }
 
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
-  const [geo, setGeo] = useState(props.record.geo ? props.record.geo : {})
+  const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
 /*
@@ -207,7 +207,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   }, [data])
 */
   function geoDataCallback(geo){
-    if (props.record.geo !== geo){
+    if (props.project || (props.record && props.record.geo !== geo)){
       setGeo(geo)
       setIsDirty(true)
     }
@@ -227,12 +227,30 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     newData.sensitivity_level = slList
     setData(newData) //will prompt the call in useEffect.
 
-    submitObjectWithGeo(newData, geo, props)
+    if (props.save){
+      submitObjectWithGeo(newData, geo, props)
+    }else{
+      //if we don't have props.save, we are accessing via a modal
+      //TODO: currently submits without metadata and without GEO
+      console.log("data, geo, props submitted in datasetform: ", newData, geo, props)
+
+      postObjectWithoutSaveProp(newData, Constants.models.DATASETS).then(data => {
+        console.log("data after posting new dataset: ", data)
+        //this should always be true
+        if (props.setShowModal){
+          props.setShowModal(false)
+        }
+        else{
+          console.error("no modal to deactivate");
+        }
+      })
+    }
   };
 
+  console.log("basedatasetform props: ", props)
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
-    <DatasetTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
+    <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"
       source={Constants.model_fields.TITLE}
@@ -256,7 +274,8 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       source={Constants.model_fk_fields.PROJECT}
       reference={Constants.models.PROJECTS}
       validate={validateProject}
-      defaultValue={props.location.project ? props.location.project : null}
+      defaultValue={props.project ? props.project : null}
+      disabled={props.project ? true : false}
     >
       <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
@@ -309,9 +328,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       </React.Fragment>
     )}
 
-    { props.record && 
-      <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
-    }
+    <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
   </SimpleForm>)
 };
 

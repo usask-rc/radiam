@@ -16,6 +16,9 @@ const styles = theme => ({
     justifyContent: "left",
     flexWrap: "wrap",
   },
+  relatedDSContainer: {
+    marginTop: "1em",
+  },
   newDatasetChipDisplay: {
     display: 'flex',
     justifyContent: 'left',
@@ -24,47 +27,31 @@ const styles = theme => ({
   },
 });
 
-const RelatedDatasets = ({classes, record }) => {
-    
-  
-    const [datasets, setDatasets] = useState([])
-    let _isMounted = false
-    useEffect(() => {
-      _isMounted = true
-      if (record){
-        getRelatedDatasets(record)
-        .then(data => {
-          if (_isMounted){
-          setDatasets(data)
-          }
-          return data
-        })
-        .catch(err => console.error(err))
-      }
+const RelatedDatasets = ({classes, setShowModal, projectDatasets}) => {
 
-      //if we unmount, lock out the component from being able to use the state
-      return function cleanup() {
-        _isMounted = false;
-      }
-    }, [record])
-  
     return(
       <div className={classes.relatedDSContainer}>
-        {datasets && datasets.length > 0 && <Typography component="p" variant="body2">{`Related Datasets: `}</Typography> }
         <div className={classes.chipContainer}>
-          {datasets && datasets.map(dataset => {
+          {projectDatasets && projectDatasets.map(dataset => {
             return( //TODO: display number of files in each dataset in the chip
               <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
               label={`${dataset.title}`}
               href={`/#/${Constants.models.DATASETS}/${dataset.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
             )
           })}
-            <Link to={{pathname:`/${Constants.models.DATASETS}/Create`, project: record.id}}>
-              <Chip label={`+ New Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable/>
-            </Link>
+          {setShowModal && 
+              <Chip label={`+ Add Dataset`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+             }
+            
         </div>
       </div>
     )
   }
 
 export default withStyles(styles)(RelatedDatasets)
+
+/*
+<Link to={{pathname:`/${Constants.models.DATASETS}/Create`, project: record.id}}>
+              <Chip label={`+ New Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable/>
+            </Link>
+*/
