@@ -58,9 +58,9 @@ router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
                 views.UserAgentTokenViewSet,
                 basename='useragenttokens')
 
-router.register(r'useragents/(?P<useragent_id>[-\w]+)/osfquery',
-                views.OSFQueryViewSet,
-                basename='osfquery')
+router.register(r'useragents/osf_configs',
+                views.OSFConfigsViewSet,
+                basename='osf_configs')
 
 router.register(r'projects/(?P<project_id>[-\w]+)/docs',
                 views.ProjectSearchViewSet,
