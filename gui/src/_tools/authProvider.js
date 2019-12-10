@@ -309,7 +309,6 @@ export default (type, params, ...rest) => {
       );
   }
   if (type === AUTH_GET_PERMISSIONS) {
-    console.log("getpermissions checked with params: " ,params, rest);
 
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     return user ? Promise.resolve(user) : Promise.resolve({ role: Constants.ROLE_ANONYMOUS, is_admin: false });

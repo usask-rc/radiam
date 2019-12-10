@@ -34,7 +34,7 @@ import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupUsers, getParentGroupList } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm, GroupMemberEdit, GroupMemberShow } from "../GroupMembers/GroupMembers.jsx";
@@ -170,8 +170,25 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   const [editModal, setEditModal] = useState(false)
   const [viewModal, setViewModal] = useState(false)
   const [groupMembers, setGroupMembers] = useState([])
+  const [canEditGroup, setCanEditGroup] = useState(false)
+
+
 
   let _isMounted = false
+
+
+  useEffect(() => {
+    _isMounted = true
+    isAdminOfAParentGroup(props.id).then(data => {
+      if (_isMounted){
+        setCanEditGroup(data)
+      }
+    })
+    return function cleanup() { 
+      _isMounted = false;
+    }
+  }, [])
+
   useEffect(() => {
     _isMounted = true;
     
@@ -198,7 +215,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     <SimpleShowLayout>
       
       <GroupTitle prefix={"Viewing"} />
-      {groupMembers && <RelatedUsers setShowModal={setShowModal} setEditModal={setEditModal} setViewModal={setViewModal} groupMembers={groupMembers}  {...props}  /> }
+      {groupMembers && <RelatedUsers setShowModal={canEditGroup ? setShowModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers}  {...props}  /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}

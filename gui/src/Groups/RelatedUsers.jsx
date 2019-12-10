@@ -87,7 +87,7 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                   }
                   label={`${groupMember.user.username}`}
                   clickable
-                  onDelete={() => setEditModal(groupMember)}
+                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
                   onClick={() => setViewModal(groupMember)}
                   deleteIcon={<Edit />}
 
@@ -108,7 +108,7 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                   }
                   label={`${groupMember.user.username}`}
                   clickable
-                  onDelete={() => setEditModal(groupMember)}
+                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
                   onClick={() => setViewModal(groupMember)}
                   deleteIcon={<Edit />}
                   />
@@ -130,7 +130,7 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                   }
                   label={`${groupMember.user.username}`}
                   clickable
-                  onDelete={() => setEditModal(groupMember)}
+                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
                   onClick={() => setViewModal(groupMember)}
                   deleteIcon={<Edit />}
                   />
@@ -156,7 +156,7 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                   }
                   label={`${groupMember.user.username}`}
                   clickable
-                  onDelete={() => setEditModal(groupMember)}
+                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
                   onClick={() => setViewModal(groupMember)}
                   deleteIcon={<Edit />}
 
