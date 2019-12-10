@@ -25,14 +25,18 @@ import * as Constants from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
-import { Prompt } from "react-router"
 import PropTypes from 'prop-types';
-import { submitObjectWithGeo } from '../_tools/funcs';
+import { submitObjectWithGeo, isAdminOfAParentGroup, postObjectWithoutSaveProp } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
+import { GET_ONE } from 'ra-core';
+import { Toolbar } from '@material-ui/core';
+import { EditButton } from 'ra-ui-materialui/lib/button';
+import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
+import DatasetTitle from './DatasetTitle.jsx';
 
 const styles = {
   actions: {
@@ -57,9 +61,48 @@ const styles = {
   }
 };
 
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+ export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => {
+
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
+  useEffect(() => {
+    if (data && !showEdit){
+
+      const params = { id: data.project }
+      const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
+      dataProvider(GET_ONE, Constants.models.PROJECTS, params).then(response => {
+        isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
+        //now have a group - check for adminship
+      }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
+    }
+  })
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+
+})
+
+
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
-  <Show title={<DatasetTitle />} {...props}>
+  <Show actions={<DatasetShowActions/>} {...props}>
     <SimpleShowLayout>
+        <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
           source={Constants.model_fields.TITLE}
@@ -140,11 +183,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
 ));
 
 
-const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
-const validateDataCollectionMethod = required('en.validate.dataset.data_collection_method');
-const validateDataCollectionStatus = required('en.validate.dataset.data_collection_status');
 const validateProject = required('A project is required for a dataset');
-const validateSensitivityLevel = required('en.validate.dataset.sensitivity_level');
 const validateTitle = required('en.validate.dataset.title');
 
 
@@ -152,29 +191,30 @@ const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
-
-
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
-  const [geo, setGeo] = useState(props.record.geo ? props.record.geo : {})
-  const [dirty, setDirty] = useState(false)
+  const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
-
+  const [isDirty, setIsDirty] = useState(false)
+/*
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
       submitObjectWithGeo(data, geo, props)
     }
   }, [data])
+*/
 
   function geoDataCallback(geo){
-    if (props.record.geo !== geo){
+    if (props.project || (props.record && props.record.geo !== geo)){
       setGeo(geo)
-      setDirty(true)
+      setIsDirty(true)
     }
   } 
 
   function handleSubmit(data) {
     //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
+
+    setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
@@ -182,21 +222,44 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-    setDirty(false)
     setData(newData) //will prompt the call in useEffect.
+    
+    console.log("handlesubmit of datasets form is: ", newData, props, geo)
+
+    //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
+    props.resource = "datasets"
+
+    //if (props.save){
+    submitObjectWithGeo(newData, geo, props, null, props.setShowModal ? true : false)
+
+    if (props.setShowModal){
+      props.setShowModal(false)
+    }
+    //}else{
+      /*
+      //if we don't have props.save, we are accessing via a modal
+      //TODO: currently submits without metadata and without GEO
+      console.log("data, geo, props submitted in datasetform: ", newData, geo, props)
+
+      postObjectWithoutSaveProp(newData, Constants.models.DATASETS).then(data => {
+        console.log("data after posting new dataset: ", data)
+        //this should always be true
+        if (props.setShowModal){
+          props.setShowModal(false)
+        }
+        else{
+          console.error("no modal to deactivate");
+        }
+      })
+      */
+    //}
   };
 
-  function handleChange(data) {
-    setDirty(true)
-  }
-
-  console.log("props in datasetform are: ", props)
-  console.log("props classes in datasetform are: ", classes)
-
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={handleChange} redirect={Constants.resource_operations.LIST}>
-    <TextInput
-      label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
+  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
+    <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
+    <TextInput      
+      label="Title"
       source={Constants.model_fields.TITLE}
       validate={validateTitle}
       
@@ -218,7 +281,8 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       source={Constants.model_fk_fields.PROJECT}
       reference={Constants.models.PROJECTS}
       validate={validateProject}
-      defaultValue={props.location.project ? props.location.project : null}
+      defaultValue={props.project ? props.project : null}
+      disabled={props.project ? true : false}
     >
       <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
@@ -229,7 +293,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_status"}
       source={Constants.model_fields.DATA_COLLECTION_STATUS}
       reference={Constants.models.DATA_COLLECTION_STATUS}
-      validate={validateDataCollectionStatus}>
+      required>
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
     </ReferenceInput>
 
@@ -239,7 +303,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.distribution_restriction"}
       source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
       reference={Constants.models.DISTRIBUTION_RESTRICTION}
-      validate={validateDistributionRestriction}>
+      required>
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
     </ReferenceInput>
 
@@ -250,7 +314,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_method"}
       source={Constants.model_fields.DATA_COLLECTION_METHOD}
       reference={Constants.models.DATA_COLLECTION_METHOD}
-      validate={validateDataCollectionMethod}>
+      required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
@@ -260,7 +324,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.sensitivity_level"}
       source={Constants.model_fields.SENSITIVITY_LEVEL}
       reference={Constants.models.SENSITIVITY_LEVEL}
-      validate={validateSensitivityLevel}>
+      required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
@@ -271,12 +335,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       </React.Fragment>
     )}
 
-    { props.record && 
-      <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
-    }
-    <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
   </SimpleForm>)
 };
+
 
 export const DatasetCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
@@ -287,14 +349,10 @@ export const DatasetCreate = props => {
   );
 };
 
-export const DatasetTitle = ({ record }) => {
-  return <span>Dataset {record ? `"${record.name}"` : ''}</span>;
-};
-
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<DatasetTitle />} actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
+    <Edit actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
       <DatasetForm mode={Constants.resource_operations.EDIT} {...other} />
     </Edit>
   );

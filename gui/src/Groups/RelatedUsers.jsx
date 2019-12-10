@@ -6,66 +6,174 @@ import { Chip, Typography } from '@material-ui/core';
 import {  getGroupUsers } from '../_tools/funcs';
 import UserAvatar from "react-user-avatar";
 import { Link } from  "react-router-dom";
+import { withStyles } from '@material-ui/styles';
+import { Edit } from '@material-ui/icons';
 
-const RelatedUsers = (record) => {
-    let _isMounted = false;
-    const styles = theme => ({
-        chipDisplay: {
-            display: 'flex',
-            justifyContent: 'left',
-            flexWrap: 'wrap',
 
-        },
-        relatedDSContainer: {
-            marginLeft: '1em'
-        }
-    });
-  
-    const [groupMembers, setGroupMembers] = useState([])
-  
-    useEffect(() => {
-      _isMounted = true;
-      
-      getGroupUsers(record).then((data) =>{
-        if (_isMounted){
-            setGroupMembers(data)
-        }
-        return data
-      }).catch((err => {console.error("error in getGroupUsers fetch is: ", err)}))
+const styles = theme => ({
+  chipDisplay: {
+      marginRight: "1em",
+  },
+  container: {
+    justifyContent: "left",
+    flexWrap: "wrap",
+  },
+  roleDisplayContainer: {
+    display: "relative",
+  },
+  groupRoleContainer: {
+    marginBottom: "1em",
+    display: "flex",
+    alignItems: "center",
+  },
+  groupRoleText: {
+    fontSize: "0.9em",
+    marginRight: "1em",
+  },
+  newUserChipDisplay: {
+    backgroundColor: "beige",
+  },
+});
 
-      //if we unmount, lock out the component from being able to use the state
-      return function cleanup() {
-        _isMounted = false;
+
+const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, setViewModal=null}) => {
+
+  const [groupAdmins, setGroupAdmins] = useState([])
+  const [dataManagers, setDataManagers] = useState([])
+  const [members, setMembers] = useState([])
+  const [unknown, setUnknown] = useState([])
+
+  useEffect(() => {
+    let tempGA = []
+    let tempDM = []
+    let tempM = []
+    let tempU = []
+    //sort groupmembers into different categories
+    groupMembers.map(groupMember => {
+      console.log("groupMember: ", groupMember)
+      if (groupMember.group_role.id === Constants.ROLE_GROUP_ADMIN){
+        tempGA.push(groupMember)
       }
-    }, [])
+      else if (groupMember.group_role.id === Constants.ROLE_DATA_MANAGER){
+        tempDM.push(groupMember)
+      }
+      else if (groupMember.group_role.id === Constants.ROLE_MEMBER){
+        tempM.push(groupMember)
+      }
+      else{
+        console.error("unknown role type associated with group.")
+        tempU.push(groupMember)
+      }
+    })
+    setGroupAdmins(tempGA)
+    setDataManagers(tempDM)
+    setMembers(tempM)
+    setUnknown(tempU)
+  }, [groupMembers])
 
+  console.log("dataManagers: ", dataManagers)
+  console.log("groupMembers:", groupMembers)
     return(
-      <div className={styles.relatedDSContainer}>
-      {groupMembers && groupMembers.length > 0 && <Typography component="p" variant="body2">{`Group Users: `}</Typography> }
-      {groupMembers && groupMembers.map(groupMember => {
-        let groupRoleTextArr = groupMember.group_role.label.split(".")
-        let groupRoleValue=""
+      <div className={classes.container}>
 
-        if (groupRoleTextArr.length === 4) {
-            groupRoleValue=groupRoleTextArr[groupRoleTextArr.length - 2]
-        }
+        <div className={classes.roleDisplayContainer}>
+          {groupAdmins && groupAdmins.length > 0 &&
+            <div className={classes.groupRoleContainer}>
+              <Typography className={classes.groupRoleText}>{`Group Admins:`}</Typography>
+              {groupAdmins.map(groupMember => {
+                return(
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable
+                  onDelete={() => setEditModal(groupMember)}
+                  onClick={() => setViewModal(groupMember)}
+                  deleteIcon={<Edit />}
 
-        return(
-          <Chip className={styles.chipDisplay} variant="outlined" key={groupMember.id}
-          avatar={
-            <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  />
+                )
+              })}
+            </div>
           }
-          label={`${groupRoleValue}`}
-          href={`/#/${Constants.models.USERS}/${groupMember.user.id}/${Constants.resource_operations.SHOW}`} component="a" clickable>
-          </Chip>
-  
-        )
-      })}
-        <Link to={{pathname:`/${Constants.models.USERS}/Create`, group: record.id}}>
-          <Chip label={`+ New User`} className={styles.chipDisplay} variant="outlined" key={"newUserChip"} clickable/>
-        </Link> 
+        </div>
+        <div className={classes.roleDisplayContainer}>
+          {dataManagers && dataManagers.length > 0 &&
+            <div className={classes.groupRoleContainer}>
+              <Typography className={classes.groupRoleText}>{`Data Managers:`}</Typography>
+              {dataManagers.map(groupMember => {
+                return(
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable
+                  onDelete={() => setEditModal(groupMember)}
+                  onClick={() => setViewModal(groupMember)}
+                  deleteIcon={<Edit />}
+                  />
+                )
+              })}
+            </div>
+          }
+        </div>
+        <div className={classes.roleDisplayContainer}>
+
+          {members && members.length > 0 &&
+          
+            <div className={classes.groupRoleContainer}>
+              <Typography className={classes.groupRoleText}>{`Members:`}</Typography>
+                {members.map(groupMember => {
+                return(
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable
+                  onDelete={() => setEditModal(groupMember)}
+                  onClick={() => setViewModal(groupMember)}
+                  deleteIcon={<Edit />}
+                  />
+                )
+            })}
+            </div>
+          }
+          {setShowModal && 
+            <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+          }
+          
+        </div>
+
+        <div className={classes.roleDisplayContainer}>
+          {unknown && unknown.length > 0 &&
+            
+            <div className={classes.groupRoleContainer}>
+              <Typography className={classes.groupRoleText}>{`Unknown:`}</Typography>
+                {unknown.map(groupMember => {
+                return(
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable
+                  onDelete={() => setEditModal(groupMember)}
+                  onClick={() => setViewModal(groupMember)}
+                  deleteIcon={<Edit />}
+
+                  />
+                )
+            })}
+            </div>
+          }
+        </div>
       </div>
     )
   }
 
-export default RelatedUsers
+export default withStyles(styles)(RelatedUsers)
+
+/*
+//previous chip line where we provided a link to the user's show page.
+//can restore this in future but would rather put in edit functionality for now
+href={`/#/${Constants.models.USERS}/${groupMember.user.id}/${Constants.resource_operations.SHOW}`} component="a" clickable
+*/

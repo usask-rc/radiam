@@ -37,10 +37,13 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { getGroupData, getUsersInGroup } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
+import ProjectTitle from "./ProjectTitle";
+import { EditButton } from "ra-ui-materialui/lib/button";
+import { DatasetForm } from "../Datasets/Datasets";
 
 const styles = {
   actions: {
@@ -70,6 +73,11 @@ const validatePrimaryContactUser = required('en.validate.project.primary_contact
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const ProjectFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <ReferenceInput
       label={'en.models.projects.group'}
       source={Constants.model_fk_fields.GROUP}
@@ -126,14 +134,77 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
   </List>
 ));
 
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
+{
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  useEffect(() => {
+    console.log("data in useeffect projectshowactions: ", data)
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.group).then(data => {
+        setShowEdit(data)
+      }
+      
+      )
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+
+
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-    return (
-      <Show {...props}>
+
+    //select all datasets where project = project id
+
+    const [projectDatasets, setProjectDatasets] = useState([])
+    const [showModal, setShowModal] = useState(false)
+
+    let _isMounted = false
+    useEffect(() => {
+      console.log("projectshow record, props:", props)
+      _isMounted = true
+      if (props.id){
+        getRelatedDatasets(props.id).then(data => {
+          console.log("getrelateddatasets returns: ", data)
+          if (_isMounted){
+            setProjectDatasets(data)
+          }
+          return data
+        }).catch(err => console.error(err))
+      }  
+
+      return function cleanup() {
+        _isMounted = false;
+      }
+    }, [showModal])
+
+  console.log("projectDatasets: ", projectDatasets)
+
+    if (permissions){
+      return (<Show actions={<ProjectShowActions/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
+            {projectDatasets && <RelatedDatasets setShowModal={setShowModal} projectDatasets={projectDatasets} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
-            <RelatedDatasets projectID={props.id} {...props} />
             <TextField
               label={'en.models.projects.keywords'}
               source={Constants.model_fields.KEYWORDS}
@@ -155,15 +226,26 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
-                <ShowMetadata
-                  type={Constants.model_fk_fields.PROJECT}
-                  translate={translate}
-                  record={controllerProps.record}
-                  basePath={controllerProps.basePath}
-                  resource={controllerProps.resource}
-                  id={controllerProps.record.id}
-                  props={props}
-                />
+                <React.Fragment>
+                  <ShowMetadata
+                    type={Constants.model_fk_fields.PROJECT}
+                    translate={translate}
+                    record={controllerProps.record}
+                    basePath={controllerProps.basePath}
+                    resource={controllerProps.resource}
+                    id={controllerProps.record.id}
+                    props={props}
+                  />
+                  {showModal && 
+                  <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
+                    <DialogTitle>{`Add Dataset`}</DialogTitle>
+                    <DialogContent>
+                      <DatasetForm project={props.id} setShowModal={setShowModal} {...props} />
+                    </DialogContent>
+                  </Dialog>
+                  }
+                </React.Fragment>
+
               )}
             </ShowController>
             <MapView/>
@@ -179,6 +261,10 @@ export const ProjectShow = withTranslate(withStyles(styles)(
         </TabbedShowLayout>
       </Show>
     );
+    }
+    else{
+      return <Typography>Waiting to load Permissions...</Typography>
+    }
 }));
 
 
@@ -293,8 +379,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   }
 
-  if (canEditProject({ permissions, record })) {
-    if (record.group && projectGroup === null){
+  if (record && isAdminOfAParentGroup(record.group)) {
+    if (projectGroup === null){
       setProjectGroup(record.group)
     }
 
@@ -394,10 +480,6 @@ export const ProjectCreate = withTranslate(
   ))
 );
 
-export const ProjectTitle = ({ record }) => (
-  <span>Project {record ? `"${record.name}"` : ''}</span>
-);
-
 class BaseProjectEdit extends Component {
   constructor(props) {
     super(props);
@@ -409,11 +491,12 @@ class BaseProjectEdit extends Component {
   render() {
     const { classes, permissions, record, ...others } = this.props;
 
-    return <Edit title={<ProjectTitle />} actions={<MetadataEditActions />} {...others}>
+    return (<Edit actions={<MetadataEditActions />} {...others}>
       <SimpleForm redirect={Constants.resource_operations.LIST} submitOnEnter={false}>
+        <ProjectTitle prefix={`Updating`} />
         <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
-    </Edit>;
+    </Edit>);
   }
 };
 
@@ -423,33 +506,3 @@ const enhance = compose(
 );
 
 export const ProjectEdit = enhance(BaseProjectEdit);
-
-const canEditProject = ({ permissions, record }) => {
-  if (!permissions) {
-    return false;
-  } else if (!record) {
-    return false;
-  } else if (permissions.is_admin) {
-    return true;
-  } else if (
-    permissions.groupMemberships &&
-    permissions.groupMemberships.length > 0
-  ) {
-    for (var i = 0; i < permissions.groupMemberships.length; i++) {
-      var groupMembership = permissions.groupMemberships[i];
-      //'if there is a group in this membership, and its ID matches the group we are inspecting, proceed'.
-      if (groupMembership.group && groupMembership.group.id === record.group) {
-        if (
-          groupMembership.group_role.id === Constants.ROLE_DATA_MANAGER ||
-          groupMembership.group_role.id === Constants.ROLE_GROUP_ADMIN
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-  } else {
-    return false;
-  }
-};

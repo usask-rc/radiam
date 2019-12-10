@@ -21,6 +21,7 @@ import MapView from '../_components/_fragments/MapView';
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
+import LocationTitle from './LocationTitle';
 
 
 const listStyles = {
@@ -60,6 +61,11 @@ const showStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const LocationFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <ReferenceInput
       label={'en.models.locations.type'}
       source={Constants.model_fk_fields.LOCATION_TYPE}
@@ -162,12 +168,12 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 );
 
 
-export const LocationShow = props => 
+export const LocationDisplay = props => 
   {
   return(
-  <Show title={<LocationTitle />} {...props}>
+  <Show {...props}>
     <SimpleShowLayout>
-      {console.log("props in simpleshowlayout is: ", props)}
+    <LocationTitle prefix={"Viewing"} />
       <TextField
         label={'en.models.locations.display_name'}
         source={Constants.model_fields.DISPLAY_NAME}
@@ -208,14 +214,10 @@ export const LocationCreate = props => {
   );
 };
 
-export const LocationTitle = ({ record }) => {
-  return <span>Location {record ? `"${record.name}"` : ''}</span>;
-};
-
 export const LocationEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit title={<LocationTitle />} submitOnEnter={false} {...props} >
+    <Edit submitOnEnter={false} {...props} >
       <LocationForm {...other} mode={Constants.resource_operations.EDIT} />
     </Edit>
   );

@@ -7,6 +7,8 @@ import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../../_constants/index"
 import GroupAddIcon from "@material-ui/icons/GroupAdd"
+import { PersonAdd } from "@material-ui/icons";
+import { getMaxUserRole } from "../../_tools/funcs";
 
 
 const styles = {
@@ -90,12 +92,15 @@ Therefore the warnings should only be `the group you are in has no users / no da
 
 `next steps` afterwards?
 */
-const FirstSteps = ({ classes, userType, translate }) => {
+const FirstSteps = ({ classes, translate }) => {
+
+  const userType = getMaxUserRole()
+
   return(
     <Card className={classes.container}>
       <CardContent>
         <Typography className={classes.headlineTop} variant="h5" component="h5">
-          <GroupAddIcon className={classes.titleIcon} />
+          <PersonAdd className={classes.titleIcon} />
           {translate(`en.dashboard.first_steps.subtitle`)}
         </Typography>
         <Typography variant="body2" component="p">

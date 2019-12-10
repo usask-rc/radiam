@@ -4,8 +4,7 @@ import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-adm
 import * as Constants from "../_constants/index"
 import { getUserGroups } from '../_tools/funcs';
 import UserGroupsDisplay from './UserGroupsDisplay';
-import { withStyles } from '@material-ui/styles';
-
+import UserTitle from './UserTitle';
 
 class UserDetails extends Component {
 
@@ -14,16 +13,17 @@ class UserDetails extends Component {
         this.state = { groupMembers: [] }
     }
 
-    async componentDidMount() {
-        let groupMembers = await getUserGroups(this.props.record)
-        this.setState({groupMembers: groupMembers})
+    componentDidMount() {
+        getUserGroups(this.props.record).then(data => this.setState({groupMembers: data}))
     }
 
     render() {
         const {groupMembers} = this.state
 
+        console.log("UserDetails prop:" , this.props)
         return (
                 <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
+                    <UserTitle prefix={"Viewing"}/>
                     <TextField
                         label={"en.models.users.username"}
                         source={Constants.model_fields.USERNAME}

@@ -23,12 +23,11 @@ function BrowseTab({ projectID, classes }) {
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
   let _isMounted = false
-  useEffect(() => {
 
+  useEffect(() => {
     _isMounted = true
     
     getRootPaths(projectID).then(data => {
-      console.log("data returned from getrootpaths is: ", data)
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
         const params = {
@@ -39,10 +38,15 @@ function BrowseTab({ projectID, classes }) {
         getProjectData(params).then(data => {
 
           if (data && data.files && data.files.length > 0){ //else there are no project files
-          let folderItem = { id: `${data.files[0].id}`, key: `${data.files[0].key}`, path_parent: data.files[0].path_parent, path: data.files[0].path }
+          let folderItem = { 
+            id: `${data.files[0].id}`, 
+            key: `${data.files[0].key}`, 
+            path_parent: data.files[0].path_parent, 
+            path: data.files[0].path,
+            location: data.files[0].location
+           }
 
-          console.log("folderItem returned from getprojectdata is: ", getProjectData)
-          setListOfRootPaths([folderItem])
+           setListOfRootPaths([folderItem])
           setStatus({loading: false, error: false})
           }
           else{
@@ -68,6 +72,7 @@ function BrowseTab({ projectID, classes }) {
     }
   }, [projectID]);
 
+  console.log("browsetab rendering")
   return (
     <div className={classes.main}>
     {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :

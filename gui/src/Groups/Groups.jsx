@@ -33,8 +33,12 @@ import PropTypes from 'prop-types';
 import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-
+import GroupTitle from "./GroupTitle.jsx";
+import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
+import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
+import { EditButton } from "ra-ui-materialui/lib/button";
+import { GroupMemberForm, GroupMemberEdit, GroupMemberShow } from "../GroupMembers/GroupMembers.jsx";
+import UserDetails from "../Users/UserDetails.jsx";
 
 const styles = {
   actions: {
@@ -53,11 +57,14 @@ const filterStyles = {
   }
 };
 
-
-
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <TextInput
       label={"en.models.groups.name"}
@@ -121,15 +128,77 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     </Datagrid>
   </List>
 )
-
 });
 
-export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
-    return(
-  <Show title={<GroupTitle />} {...props}>
-    <SimpleShowLayout>
-      <RelatedUsers {...props} />
 
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+//check if this user should have permission to access the edit page.
+const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  useEffect(() => {
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.id).then(data => {
+        setShowEdit(data)
+      })
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+
+//TODO: ADM-1939 - be able to add users via this group show page
+export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
+
+  const [showModal, setShowModal] = useState(false)
+  const [editModal, setEditModal] = useState(false)
+  const [viewModal, setViewModal] = useState(false)
+  const [groupMembers, setGroupMembers] = useState([])
+
+  let _isMounted = false
+  useEffect(() => {
+    _isMounted = true;
+    
+    if (props.id){
+      const params={id: props.id, is_active: true}
+      getGroupUsers(params).then((data) => {
+        console.log("getgroupusers returned data: ", data)
+        if (_isMounted){
+          setGroupMembers(data)
+        }
+        return data
+      }).catch(err => console.error("err: ", err))
+    }
+
+    return function cleanup() { 
+      _isMounted = false;
+    }
+  }, [showModal, editModal])
+
+
+
+  return(
+  <Show actions={<GroupShowActions />} {...props}>
+    <SimpleShowLayout>
+      
+      <GroupTitle prefix={"Viewing"} />
+      {groupMembers && <RelatedUsers setShowModal={setShowModal} setEditModal={setEditModal} setViewModal={setViewModal} groupMembers={groupMembers}  {...props}  /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -157,25 +226,45 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
 
       {/** Needs a ShowController to get the record into the ShowMetadata **/}
       <ShowController translate={translate} {...props}>
-        { controllerProps => (
-          <ShowMetadata
-            type={Constants.model_fk_fields.GROUP}
-            translate={translate}
-            record={controllerProps.record}
-            basePath={controllerProps.basePath}
-            resource={controllerProps.resource}
-            id={controllerProps.record.id}
-            props={props}
-          />
-        )}
+        { controllerProps => {
+          console.log("controllerprops in group: ", controllerProps)
+        return(
+          <React.Fragment>
+            <ShowMetadata
+              type={Constants.model_fk_fields.GROUP}
+              translate={translate}
+              record={controllerProps.record}
+              basePath={controllerProps.basePath}
+              resource={controllerProps.resource}
+              id={controllerProps.record.id}
+              props={props}
+            />
+            {showModal && <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
+              <DialogTitle>{`Add User`}</DialogTitle>
+              <DialogContent>
+                <GroupMemberForm group={controllerProps.record.id} setShowModal={setShowModal} {...props} />
+              </DialogContent>
+            </Dialog>
+            }
+            {editModal && <Dialog fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
+              <DialogContent>
+                <GroupMemberForm basePath="/groupmembers" resource="groupmembers" setEditModal={setEditModal} record={{id: editModal.id, user: editModal.user.id, group: editModal.group, group_role: editModal.group_role.id}} />
+              </DialogContent>
+            </Dialog>
+            }
+            {viewModal && <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
+              <DialogContent>
+                <UserDetails basePath="/users" resource="users" setViewModal={setViewModal} record={{...viewModal.user}} />
+              </DialogContent>
+            </Dialog>}
+          </React.Fragment>
+        )}}
       </ShowController>
+
+      
     </SimpleShowLayout>
   </Show>
 )}));
-
-const GroupTitle = ({ record }) => {
-  return <span>{record ? `"${record.name}"` : ""}</span>;
-};
 
 const validateName = required('en.validate.group.group_name');
 const validateDescription = required('en.validate.group.description');
@@ -217,6 +306,7 @@ const GroupForm = props =>
       onChange={handleChange}
       save={handleSubmit}
     >
+      <GroupTitle prefix={"Creating Group"} />
       <TextInput
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -270,12 +360,13 @@ class BaseGroupEdit extends Component {
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
 
-    return <Edit basePath={basePath} title={<GroupTitle />} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
+    return <Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
       <SimpleForm
         basePath={basePath}
         toolbar={<EditToolbar />}
         redirect={Constants.resource_operations.LIST}
       >
+      <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
           source={Constants.model_fields.NAME}

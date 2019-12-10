@@ -24,7 +24,6 @@ const ShowImage: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = ({
   classes,
   record,
   source,
-  ...rest
 }) => {
   return <img alt="" src={get(record, source)} className={classes.image} />;
 };
@@ -36,7 +35,6 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
   basePath,
   translateChoice,
   record = {},
-  ...rest
 }) => {
   return <span>
     <div className={classes.imageContainer}>
@@ -68,13 +66,4 @@ ProjectName.defaultProps = {
   sortBy: Constants.model_fields.NAME,
 };
 
-const EnhancedProjectName = withStyles(styles)(ProjectName);
-
-EnhancedProjectName.defaultProps = {
-  addLabel: true,
-  sortBy: Constants.model_fields.NAME,
-};
-
-EnhancedProjectName.displayName = 'EnhancedProjectName';
-
-export default EnhancedProjectName;
+export default ProjectName;

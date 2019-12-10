@@ -1,10 +1,9 @@
 //Users.jsx
-import React, { Component } from "react";
+import React from "react";
 import {
   BooleanField,
   BooleanInput,
   Create,
-  crudUpdateMany,
   Datagrid,
   DateInput,
   Edit,
@@ -25,7 +24,8 @@ import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
-
+import Toolbar from '@material-ui/core/Toolbar';
+import { EditButton, DeleteButton } from 'react-admin';
 
 const listStyles = {
   actions: {
@@ -51,6 +51,11 @@ const filterStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+          label={"en.models.filters.search"}
+          source="search"
+          alwaysOn
+    />
     <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <TextInput
       label={"en.models.users.username"}
@@ -95,6 +100,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 
   return (
     <List
+      hasCreate={false}
       {...props}
       classes={{
         root: classes.root,
@@ -140,14 +146,44 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 }
 );
 
-export const UserTitle = ({ record }) => {
-  return <span>User {record ? `"${record.username}"` : ""}</span>;
-};
-export const UserShow = props => {
+/*
+function manages_user(data)  {
+  console.log("data in manages_user: ", data)
+  //given my user id, is this user in a group I manage?
+  return true
+}*/
 
-  return (<Show title={<UserTitle />}  {...props}>
-            <UserDetails {...props} />
-          </Show>
+const actionsStyles = theme => ({
+  root: {
+    float: "right",
+    marginTop: "-10px",
+  }
+})
+
+const UserDetailsActions = ({permissions, basePath, data, resource, classes}) => {
+
+  console.log("permissions, basepath, etc: ", permissions, basePath, data, resource)
+  //can only modify the user if I'm a superuser or I'm modifying my own data.
+  if (permissions && data && (permissions.is_admin || (permissions.id === data.id))){
+    return(<Toolbar className={classes.root}>
+          <EditButton basePath={basePath} record={data} />
+          {permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
+      </Toolbar>)
+  }
+  else{
+      return null
+  }
+}
+
+const EnhancedUserDetailsActions = withStyles(actionsStyles)(UserDetailsActions)
+
+export const UserShow = props => {
+  console.log("usershow props: ", props)
+
+  return (
+    <Show actions={<EnhancedUserDetailsActions permissions={props.permissions} {...props} />} {...props}>
+      <UserDetails {...props} />
+    </Show>
   )
 };
 
@@ -197,9 +233,10 @@ export const UserCreate = props => {
 
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
+  console.log("UserEdit props: ", props)
   return (
-    <Edit title={<UserTitle />} {...props}>
-      <UserForm toolbar={<EditToolbar />} {...other} />
+    <Edit toolbar={<EditToolbar />} {...props}>
+      <UserForm  {...other} />
     </Edit>
   )
 };
@@ -210,7 +247,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== String(JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id)) { //dont allow superusers to delete themselves
     return (
-      <Edit title={<UserTitle />} {...props}>
+      <Edit toolbar={<EditToolbar />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )

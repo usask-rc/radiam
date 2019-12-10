@@ -25,6 +25,11 @@ import TranslationSelect from "../_components/_fields/TranslationSelect";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { withStyles } from "@material-ui/core/styles";
 import { Prompt } from 'react-router';
+import GroupMemberTitle from "./GroupMemberTitle";
+import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveProp } from "../_tools/funcs";
+import { Toolbar } from "@material-ui/core";
+import { EditButton } from "ra-ui-materialui/lib/button";
+import { TextInput } from "ra-ui-materialui/lib/input";
 
 
 const listStyles = {
@@ -47,6 +52,11 @@ const filterStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const GroupMemberFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <ReferenceInput
       label={"en.models.groupmembers.user"}
@@ -144,9 +154,44 @@ export const GroupMemberList = withStyles(listStyles)(
   }
 );
 
+//I shouldnt be able to access Edit page of members a group that I'm not a group Admin in.
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
+{
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
+  useEffect(() => {
+    if (data && !showEdit){
+      isAdminOfAParentGroup(data.group).then(data => {
+        setShowEdit(data)
+      })
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+
 export const GroupMemberShow = props => (
-  <Show title={<GroupMemberTitle />} {...props}>
+  <Show actions={<GroupMemberShowActions/>} {...props}>
     <SimpleShowLayout>
+    <GroupMemberTitle prefix="Viewing" />
       <ReferenceField
         linkType={false}
         label={"en.models.groupmembers.user"}
@@ -208,10 +253,6 @@ export const GroupMemberShow = props => (
   </Show>
 );
 
-export const GroupMemberTitle = ({ record }) => {
-  return <span>GroupMember {record ? `"${record.date_created}"` : ""}</span>;
-};
-
 const validateUser = required('en.validate.groupmembers.user');
 const validateGroup = required('en.validate.groupmembers.group');
 const validateRole = required('en.validate.groupmembers.role');
@@ -233,13 +274,39 @@ const asyncValidate = getAsyncValidateTwoNotExists(
   Constants.models.GROUPMEMBERS
 );
 
-const GroupMemberForm = props => {
+export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
   
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
-      props.save(data)
+      if (props.save){
+        props.save(data)
+      }
+      //accessing in modal form
+      else{
+        console.log("data is: ", data, "props are: ", props)
+        
+
+        //if data previously existed, PUT instead
+        if (data.id){
+          putObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+            console.log("data after updating groupmember: ", data)
+            if (props.setEditModal){
+              props.setEditModal(false)
+            }
+          })
+        }
+        else{
+          postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+            console.log("data after posting new groupmember: ", data)
+            if (props.setShowModal){
+              props.setShowModal(false)
+            }
+          })
+        }
+       
+      }
     }
   }, [data])
 
@@ -251,7 +318,9 @@ const GroupMemberForm = props => {
   function handleChange(data){
     setIsFormDirty(true)
   }
-
+  console.log("groupmemberform props: ", props)
+  //given some chosen group, we only want to be able to add users who are not already members of said group in some form
+  //if the primary way we're going to be accessing this form is via Groups, we already have this data for Create.
   return(
   <SimpleForm {...props}
     redirect={Constants.resource_operations.LIST}
@@ -260,51 +329,67 @@ const GroupMemberForm = props => {
     onChange={handleChange}
     save={handleSubmit}
   >
-  <ReferenceInput
-    label={"en.models.groupmembers.user"}
-    source={Constants.model_fk_fields.USER}
-    reference={Constants.models.USERS}
-    validate={validateUser}
-  >
-    <SelectInput optionText={userSelect} />
-  </ReferenceInput>
-  <ReferenceInput
-    label={"en.models.groupmembers.group"}
-    source={Constants.model_fk_fields.GROUP}
-    reference={Constants.models.GROUPS}
-    validate={validateGroup}
-  >
-    <SelectInput optionText={Constants.model_fields.NAME} />
-  </ReferenceInput>
-  <ReferenceInput
-    label={"en.models.groupmembers.role"}
-    source={Constants.model_fk_fields.GROUP_ROLE}
-    reference={Constants.models.ROLES}
-    validate={validateRole}
-  >
-    <TranslationSelect optionText={Constants.model_fields.LABEL} />
-  </ReferenceInput>
-  <DateInput
-    label={"en.models.generic.date_expires"}
-    source={Constants.model_fields.DATE_EXPIRES}
-    allowEmpty
-  />
-  <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-</SimpleForm>
+    {props.record && <GroupMemberTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />}
+
+    <ReferenceInput
+      label={"en.models.groupmembers.user"}
+      source={Constants.model_fk_fields.USER}
+      reference={Constants.models.USERS}
+      resource={Constants.models.USERS}
+      defaultValue={props.user ? props.user : (() => setIsFormDirty(false))}
+      disabled={props.record && props.record.user ? true : false}
+      validate={validateUser}
+    >
+      <SelectInput optionText={userSelect} />
+    </ReferenceInput>
+    <ReferenceInput
+      label={"en.models.groupmembers.group"}
+      source={Constants.model_fk_fields.GROUP}
+      reference={Constants.models.GROUPS}
+      resource={Constants.models.GROUPS}
+      defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
+      disabled={props.record && props.record.group ? true : false}
+      validate={validateGroup}
+    >
+      <SelectInput optionText={Constants.model_fields.NAME} />
+    </ReferenceInput>
+    <ReferenceInput
+      label={"en.models.groupmembers.role"}
+      source={Constants.model_fk_fields.GROUP_ROLE}
+      reference={Constants.models.ROLES}
+      resource={Constants.models.ROLES}
+      defaultValue={props.group_role ? props.group_role : (() => setIsFormDirty(false))}
+      validate={validateRole}
+    >
+      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+    </ReferenceInput>
+    <DateInput
+      label={"en.models.generic.date_expires"}
+      source={Constants.model_fields.DATE_EXPIRES}
+      defaultValue={props.date_expires ? props.date_expires : (() => setIsFormDirty(false))}
+      allowEmpty
+    />
+    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+  </SimpleForm>
   )
 }
 
 export const GroupMemberCreate = props => {
+  
+  let group = props.group
+  if (props.location.group){
+    group = props.location.group
+  }
   return (
-    <Create {...props}>
-      <GroupMemberForm/>
+    <Create {...props} >
+      <GroupMemberForm group={group}/>
     </Create>
   );
 }
 
 export const GroupMemberEdit = props => {
   return (
-    <Edit title={<GroupMemberTitle />} {...props}>
+    <Edit {...props}>
       <GroupMemberForm/>
     </Edit>
   );

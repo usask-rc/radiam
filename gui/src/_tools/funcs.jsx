@@ -4,21 +4,91 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
+
+const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+
 
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-  
+
   /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
-  
+*/
 
   return `/${Constants.API_ENDPOINT}`;
+}
+
+//given a group id and our cookies, can we edit this value?
+export function isAdminOfAParentGroup(group_id){
+  return new Promise((resolve, reject) => {
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+
+    if (user && user.is_admin){
+      resolve(true)
+    }
+
+    getParentGroupList(group_id).then(data => {
+      data.map(group => {
+        for (var i = 0; i < user.groupAdminships.length; i++){
+          if (group.id === user.groupAdminships[i]){
+            resolve(true)
+          }
+        }
+      })
+      resolve(false)
+
+    }).catch(err => {
+      console.error("isadminofaparentgroup error: ",err)
+      resolve(false)
+    })
+  })
+};
+
+export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
+  //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  if (user){
+    if (group !== null){
+      if (user.groupAdminships && group in user.groupAdminships){
+        return "group_admin"
+      }
+      else if (user.dataManagerships && group in user.dataManagerships){
+        return "data_manager"
+      }
+    }
+    return "user"
+  }
+  else{
+    //punt to front page - no user cookie available
+    console.error("No User Cookie Detected - Returning to front page")
+    window.location.hash = "#/login"
+  }
+}
+
+export function getMaxUserRole(){
+
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  if (user){
+    if (user.is_admin){
+      return "admin"
+    }
+    else if (user.is_group_admin){
+      return "group_admin"
+    }
+    else if (user.is_data_manager){
+      return "data_manager" 
+    }
+    return "user"
+  }else{
+    //punt to front page - no user cookie available
+    console.error("No User Cookie Detected - Returning to front page")
+    window.location.hash = "#/login"
+  }
 }
 
 export function toastErrors(data) {
@@ -35,7 +105,7 @@ export function toastErrors(data) {
   } else if (isArray(data)) {
     data.map(item => {
       toast.error('Error: ', item);
-      return item;
+      return item; 
     });
   } else {
     toast.error(data);
@@ -70,26 +140,22 @@ export function getFirstCoordinate(layer) {
 }
 
 export function getFolderFiles(
-  folderPath,
-  projectID,
-  numFiles = 50,
-  page = 1,
+  params,
   type,
 ) {
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
-  const params = {
+  const queryParams = {
     //folderPath may or may not contain an item itself.
-    filter: { path_parent: folderPath, type:type },
-    pagination: { page: page, perPage: numFiles },
-    sort: { field: 'last_modified', order: 'ASC' },
+    filter: { path_parent: params.folderPath, type:type },
+    pagination: { page: params.page, perPage: params.numFiles },
+    sort: { field: params.sortBy, order: params.order },
   };
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + projectID,
-      params
+      Constants.models.PROJECTS + '/' + params.projectID,
+      queryParams
     )
       .then(response => {
         let fileList = [];
@@ -101,27 +167,6 @@ export function getFolderFiles(
           return file;
         });
 
-        console.log('response to getfolderfiles is: ', response);
-
-        fileList.sort(function(a, b) {
-          if (a.items) {
-            if (b.items) {
-              if (a.name < b.name) {
-                return -1;
-              }
-              return 1;
-            }
-            return -1;
-          } else {
-            if (b.items) {
-              return 1;
-            }
-            if (a.name < b.name) {
-              return -1;
-            }
-            return 1;
-          }
-        });
         resolve({
           files: fileList,
           total: response.total,
@@ -134,11 +179,10 @@ export function getFolderFiles(
   });
 }
 
-export function getRelatedDatasets(record) {
+export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.DATASETS, {
-      filter: { project: record.id, is_active: true },
+      filter: { project: projectID, is_active: true },
       pagination: { page: 1, perPage: 1000 },
       sort: { field: Constants.model_fields.TITLE, order: 'DESC' },
     })
@@ -154,11 +198,10 @@ export function getRelatedDatasets(record) {
 export function getRootPaths(projectID) {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
-    sort: { field: 'last_modified', order: 'ASC' },
+    sort: { field: 'last_modified', order: '' },
     filter: { type: 'directory' },
   };
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
@@ -174,7 +217,8 @@ export function getRootPaths(projectID) {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             } else {
-              if (rootList[file.location].length > file.path_parent) {
+              
+              if (rootList[file.location].length > file.path_parent.length) {
                 rootList[file.location] = file.path_parent;
               }
             }
@@ -187,12 +231,14 @@ export function getRootPaths(projectID) {
         //create dummy root folder items for display
         for (var key in rootList) {
           rootPaths.push({
-            id: `${key}${rootList[key]}`,
+            id: key,
             key: `${key}${rootList[key]}`,
             path_parent: rootList[key],
             path: rootList[key],
+            location: key,
           });
         }
+        console.log("root paths being returned are: ", rootPaths)
         resolve(rootPaths);
       })
       .catch(error => {
@@ -205,7 +251,6 @@ export function getProjectData(params, folders = false) {
   //get only folders if true, otherwise get only files
   
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(
       'GET_FILES',
       Constants.models.PROJECTS + '/' + params.id,
@@ -220,9 +265,32 @@ export function getProjectData(params, folders = false) {
   });
 }
 
+
+//given some group, return all of its parent groups.
+export function getParentGroupList(group_id, groupList = []){
+  return new Promise((resolve, reject) => {
+    //resolve upon having all parent groups
+    dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
+    .then(response => {
+      groupList.push(response.data)
+      if (response.data.parent_group === null){
+        resolve(groupList)
+      }else{
+        getParentGroupList(response.data.parent_group, groupList).then(data => {
+          resolve(groupList)
+        })
+      }
+      return response.data
+    })
+    .catch(err => {
+      console.log("getparentgrouplist err: ", err)
+      reject(err)
+    })
+  })
+}
+
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
     //get this group's details, then ascend if it has a parent.
     dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
@@ -237,7 +305,6 @@ export function getGroupData(group_id) {
 
 export function getUserDetails() {
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider('CURRENT_USER', Constants.models.USERS)
       .then(response => {
         const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
@@ -264,7 +331,6 @@ export function getUsersInGroup(record) {
   console.log('record called to getusersin group: ', record);
   return new Promise((resolve, reject) => {
     let groupUsers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const { id, is_active } = record;
 
     dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
@@ -273,7 +339,7 @@ export function getUsersInGroup(record) {
       sort: { field: Constants.model_fields.USER, order: 'DESC' },
     })
       .then(response => {
-        console.log('getUsersInGroup queried with record: ', response);
+        
         if (response && response.total === 0) {
           resolve([]);
         }
@@ -292,7 +358,6 @@ export function getUsersInGroup(record) {
               groupUsers = [...groupUsers, user];
 
               if (groupUsers.length === groupMembers.length) {
-                console.log('data resolved is: ', groupUsers);
                 resolve(groupUsers);
               }
             })
@@ -308,11 +373,9 @@ export function getUsersInGroup(record) {
 export function getGroupUsers(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
@@ -363,11 +426,9 @@ export function getUserGroups(record) {
   console.log('getusergroups called with rec: ', record);
   return new Promise((resolve, reject) => {
     let userGroupMembers = [];
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
-        const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
@@ -414,17 +475,19 @@ export function getUserGroups(record) {
   });
 }
 
+//TODO: convert to promise / callback system
 export function submitObjectWithGeo(
   formData,
   geo,
   props,
-  redirect = Constants.resource_operations.LIST
+  redirect = Constants.resource_operations.LIST,
+  inModal=false
 ) {
   console.log('formData heading into submitobjectwithgeo is: ', formData);
   if (formData.id) {
     updateObjectWithGeo(formData, geo, props, redirect);
   } else {
-    createObjectWithGeo(formData, geo, props);
+    createObjectWithGeo(formData, geo, props, inModal);
   }
 }
 
@@ -442,11 +505,41 @@ function updateObjectWithGeo(formData, geo, props) {
       },
     };
   }
-  props.save(formData, Constants.resource_operations.LIST);
+    props.save(formData, Constants.resource_operations.LIST);
+}
+
+export function putObjectWithoutSaveProp(formData, resource){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = {id: formData.id, data: formData, resource:resource }
+  
+    dataProvider(UPDATE, resource, params).then(response => {
+        resolve(response)
+    }).catch(err => {
+        reject(err)
+    })
+  }
+    )
+}
+
+//for the rare cases that we don't have the Save prop and want to POST some model item
+export function postObjectWithoutSaveProp(formData, resource){
+  return new Promise((resolve, reject) => {
+
+  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+  const params = { data: formData, resource:resource }
+
+  dataProvider(CREATE, resource, params).then(response => {
+      resolve(response)
+  }).catch(err => {
+      reject(err)
+  })
+}
+  )
 }
 
 //TODO: When creating Projects, there is a failure somewhere here.
-export function createObjectWithGeo(formData, geo, props) {
+export function createObjectWithGeo(formData, geo, props, inModal) {
   let headers = new Headers({ 'Content-Type': 'application/json' });
   const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -454,7 +547,7 @@ export function createObjectWithGeo(formData, geo, props) {
     const parsedToken = JSON.parse(token);
     headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    console.log('formData sent in creation request is: ', formData);
+    //POST the new object, then update it immediately afterwards with any geoJSON it carries.
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
       method: Constants.methods.POST,
       body: JSON.stringify({ ...formData }),
@@ -465,7 +558,9 @@ export function createObjectWithGeo(formData, geo, props) {
         if (response.status >= 200 && response.status < 300) {
           return response.json();
         }
-        throw new Error(response.statusText);
+        console.log("failed request: , ", request)
+        console.log("failed respnose: ", response)
+        throw new Error(response.statusText); //error here when creating dataset nested in project
       })
       .then(data => {
         console.log('data in createobjectwithgeo is: ', data);
@@ -488,6 +583,7 @@ export function createObjectWithGeo(formData, geo, props) {
           };
         }
 
+        //the PUT request to update this object with its geoJSON
         const request = new Request(
           getAPIEndpoint() + `/${props.resource}/${data.id}/`,
           {
@@ -505,8 +601,10 @@ export function createObjectWithGeo(formData, geo, props) {
             throw new Error(response.statusText);
           })
           .then(data => {
-            console.log('data after update is: ', data);
-            props.history.push(`/${props.resource}`);
+            console.log("inmodal: ", inModal);
+            if (!inModal){ //stop redirect if in a modal
+              props.history.push(`/${props.resource}`);
+            }
           });
       });
   } else {

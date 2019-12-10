@@ -78,20 +78,20 @@ const MapView = ({ classes, record }) => {
                     let leafletGeoJSON = new L.GeoJSON(feature);
                     let leafletFG = _editableFG.leafletElement
                 
-                leafletGeoJSON.eachLayer(layer => 
-                    {
-                        console.log("loading feature layer: ", layer)
-                        //add layer to the map
-                        output = leafletFG.addLayer(layer)
+                    leafletGeoJSON.eachLayer(layer => 
+                        {
+                            console.log("loading feature layer: ", layer)
+                            //add layer to the map
+                            output = leafletFG.addLayer(layer)
 
-                        layer.on({
-                            click: _onLayerClick.bind(this)
-                        })
-                        return layer
-                    }
-                    );
-                    return feature
-                })
+                            layer.on({
+                                click: _onLayerClick.bind(this)
+                            })
+                            return layer
+                        }
+                        );
+                        return feature
+                    })
                 //initialize our features
                 Object.keys(output._layers).map(key => {
                     let feature = output._layers[key].feature

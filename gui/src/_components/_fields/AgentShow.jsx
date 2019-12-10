@@ -26,7 +26,7 @@ export const AgentShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
                 className={className}
                 {...rest}
             >
-                {display_location}
+                {record.id}
             </Typography>
         );
     } else {

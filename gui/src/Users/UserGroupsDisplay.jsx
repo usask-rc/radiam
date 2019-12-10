@@ -12,6 +12,8 @@ const styles = theme => ({
     },
 });
 
+
+//TODO: refactor these chips to display `group admin` instead of `admin` and potentially change the labeling of `member`.
 const UserGroupsDisplay = ({ classes, groupMembers }) => {
     return (
         <div className={classes.chipDisplay}>            

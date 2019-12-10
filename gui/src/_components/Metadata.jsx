@@ -46,6 +46,7 @@ import * as Constants from "../_constants/index";
 import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
+import { getGroupUsers } from "../_tools/funcs";
 
 const configStyles = {
   root: {
@@ -1444,9 +1445,25 @@ const enhanceShow = compose(
 );
 
 class BaseMetadataEditActions extends Component {
+  state = {}
   constructor (props) {
     super(props);
     drawerState.register(this, this.setConfig);
+  }
+
+  componentWillMount(){
+    console.log("componentwillmount props: ", this.props)
+    if (this.props.showRelatedUsers){
+
+      if (this.props.id){
+        const params={id: this.props.id, is_active: true}
+        getGroupUsers(params).then((data) => {
+        console.log("getgroupusers returned data: ", data)
+        this.setState({groupMembers: data})
+        return data
+      }).catch(err => console.error("err: ", err))
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -1456,9 +1473,10 @@ class BaseMetadataEditActions extends Component {
   setConfig(config) {
     this.setState({ config: config});
   };
-
+  
   render() {
     const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
+    console.log("metadatarender props: ", this.props)
     return <CardActions>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1474,11 +1492,11 @@ class BaseMetadataEditActions extends Component {
             filterValues,
             context: 'button',
         }) }
+        { showRelatedUsers && this.state.groupMembers &&
+          <RelatedUsers groupMembers={this.state.groupMembers} />
+        }
         { data && <ShowButton basePath={basePath} record={data} /> }
         <RefreshButton />
-        { showRelatedUsers && record &&
-          <RelatedUsers record={record} />
-        }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </CardActions>
   }

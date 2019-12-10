@@ -3,6 +3,7 @@ module.exports = Object.freeze({
   API_PORT: "8100",
   AVATAR_HEIGHT: "36px",
   I18N_TLE: "en", //TODO: modularize this or remove it.
+  RECENTFILESLIMIT: 30, //This is the amount of days within which we should display uploaded files.
   ROLE_ANONYMOUS: "anonymous",
   ROLE_DATA_MANAGER: "c4e21cc8-a446-4b38-9879-f2af71c227c3",
   ROLE_GROUP_ADMIN: "a59be619-fd9b-462b-8643-486e68f38613",
@@ -145,6 +146,10 @@ module.exports = Object.freeze({
     STUDY_SITE: "study_site",
     TITLE: "title",
     USERNAME: "username",
+  },
+  sort_fields: {
+    ASCENDING: "ASC",
+    DESCENDING: "DESC",
   },
   //the place to put these is probably in en.js - however, I'm not too keen on having to import translate into more places.
   //these are error / warning messages for form or api failures.

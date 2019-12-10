@@ -84,8 +84,6 @@ class FileSummary extends React.Component {
 
   render() {
     const { classes, item, caller } = this.props;
-
-    //TODO: ADD ICONS HERE TO DIFF B/W FILES AND FOLDERS
     return (
       <ReducedExpansionPanel className={classes.card}>
         <ReducedExpansionPanelSummary className={classes.content}>

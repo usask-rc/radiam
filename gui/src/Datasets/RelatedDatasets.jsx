@@ -5,57 +5,52 @@ import '../_components/components.css';
 import { Chip, Typography } from '@material-ui/core';
 import { getRelatedDatasets } from '../_tools/funcs';
 import { Link } from  "react-router-dom";
+import { withStyles } from '@material-ui/styles';
 
+const styles = theme => ({
+  chipDisplay: {
+      marginRight: "1em",
+  },
+  chipContainer: {
+    display: "flex",
+    justifyContent: "left",
+    flexWrap: "wrap",
+  },
+  relatedDSContainer: {
+    marginTop: "1em",
+  },
+  newDatasetChipDisplay: {
+    display: 'flex',
+    justifyContent: 'left',
+    flexWrap: 'wrap',
+    backgroundColor: "beige",
+  },
+});
 
-const RelatedDatasets = ({ record }) => {
-    const styles = theme => ({
-        chipDisplay: {
-            display: 'flex',
-            justifyContent: 'left',
-            flexWrap: 'wrap',
+const RelatedDatasets = ({classes, setShowModal, projectDatasets}) => {
 
-        },
-        relatedDSContainer: {
-            marginLeft: '1em'
-        }
-    });
-  
-    const [datasets, setDatasets] = useState([])
-    let _isMounted = false
-    useEffect(() => {
-      _isMounted = true
-      if (record){
-        getRelatedDatasets(record)
-        .then(data => {
-          if (_isMounted){
-          setDatasets(data)
-          }
-          return data
-        })
-        .catch(err => console.error(err))
-      }
-
-      //if we unmount, lock out the component from being able to use the state
-      return function cleanup() {
-        _isMounted = false;
-      }
-    }, [record])
-  
     return(
-      <div className={styles.relatedDSContainer}>
-      {datasets && datasets.length > 0 && <Typography component="p" variant="p">{`Related Datasets: `}</Typography> }
-      {datasets && datasets.map(dataset => {
-        return( //TODO: display number of files in each dataset in the chip
-          <Chip className={styles.chipDisplay} variant="outlined" key={dataset.id}
-          label={`${dataset.title}`}
-          href={`/#/${Constants.models.DATASETS}/${dataset.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
-        )
-      })}
-        <Link to={{pathname:`/${Constants.models.DATASETS}/Create`, project: record.id}}>
-          <Chip label={`+ New Dataset`} className={styles.chipDisplay} variant="outlined" key={"newDatasetChip"} clickable/>
-        </Link>
+      <div className={classes.relatedDSContainer}>
+        <div className={classes.chipContainer}>
+          {projectDatasets && projectDatasets.map(dataset => {
+            return( //TODO: display number of files in each dataset in the chip
+              <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
+              label={`${dataset.title}`}
+              href={`/#/${Constants.models.DATASETS}/${dataset.id}/${Constants.resource_operations.SHOW}`} component="a" clickable />
+            )
+          })}
+          {setShowModal && 
+            <Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+          }
+        </div>
       </div>
     )
   }
 
-export default RelatedDatasets
+export default withStyles(styles)(RelatedDatasets)
+
+/*
+<Link to={{pathname:`/${Constants.models.DATASETS}/Create`, project: record.id}}>
+              <Chip label={`+ New Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable/>
+            </Link>
+*/

@@ -18,6 +18,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
+import LocationTitle from './LocationTitle';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -182,6 +183,8 @@ class LocationForm extends Component {
       {
         return(
           <Grid container>
+            {formData && formData.display_name ? <LocationTitle record={formData} prefix={"Updating"} /> : <LocationTitle prefix={"Creating Location"} />}
+
             <Grid item xs={12}>
               <TextInput
                 label={'en.models.locations.display_name'}

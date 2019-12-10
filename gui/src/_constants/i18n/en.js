@@ -5,7 +5,7 @@ export default {
   ...englishMessages,
   en: {
     metadata: {
-      configure: "Config",
+      configure: "Metadata",
       config: {
         title: "Configure Additional Metadata",
       },
@@ -322,6 +322,10 @@ export default {
         search: 'Search',
         folders: 'Folders',
       },
+      fewUsers: {
+        content: "",
+        subtitle: "Groups With Few Users",
+      },
       file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
@@ -345,7 +349,7 @@ export default {
       new_users: 'Recent Users',
       new_groups: 'Your Recent Groups',
       new_projects: 'Recently Updated Projects',
-      recentfiles: 'Files Added in the last 30 Days',
+      recentfiles: 'Recently Added Files:',
       roles: 'User Roles',
       show_all: 'Show All',
       files: 'Files',
@@ -355,8 +359,8 @@ export default {
         title: 'Radiam',
         subtitle: 'Welcome',
         content: 'Browse existing project data in the Projects sidebar, or see the most recently updated files below.',
-        content2: 'View the ',
-        usermanual: 'User Manual',
+        content2: 'Need Help?  Check out the ',
+        usermanual: 'User Manual Here.',
       },
     },
     models: {
@@ -403,6 +407,9 @@ export default {
       },
       distribution_restriction: {
         label: 'Distribution Restriction',
+      },
+      filters: {
+        search: "Search",
       },
       groups: {
         name: 'Group Name',
@@ -482,7 +489,7 @@ export default {
     group: {
       role: {
         admin: {
-          label: 'Admin',
+          label: 'Group Admin',
           description:
             'Group Administrators can add users to groups and create projects.',
         },

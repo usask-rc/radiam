@@ -18,22 +18,28 @@ const styles = {
     paddingRight: "24px",
     paddingTop: "16px",
     paddingBottom: "16px",
+    verticalAlign: "middle",
+
+  },
+  cardContent: {
+    height: "inherit",
+    width: "inherit"
   },
   titleIcon: {
     marginRight: "8px",
-    marginBottom: "-5px",
+    verticalAlign: "middle",
     height: "28px",
     width: "28px",
   },
   container: {
-    margin: "1em",
     textAlign: "flex-start",
     minHeight: "12em",
+    marginLeft: "1em",
   },
 };
 const Welcome = ({ classes, translate }) => (
   <Card className={classes.container}>
-    <CardContent>
+    <CardContent className={classes.cardContent}>
       <Typography className={classes.headlineTop} variant="h5" component="h5">
         <HomeIcon className={classes.titleIcon} />
         {translate("en.dashboard.welcome.subtitle")}
@@ -43,7 +49,11 @@ const Welcome = ({ classes, translate }) => (
       </Typography><br/>
       <Typography variant={"body2"} component="p">
         {translate("en.dashboard.welcome.content2")}
-        <a href={Constants.USERMANUALPATH}>{translate("en.dashboard.welcome.usermanual")}</a>
+        <a href={Constants.USERMANUALPATH}></a>
+
+        <a href={`..${Constants.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
+          {translate("en.dashboard.welcome.usermanual")}
+        </a>
       </Typography> 
     </CardContent>
   </Card>

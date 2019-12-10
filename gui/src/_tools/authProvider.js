@@ -52,9 +52,10 @@ function refreshAccessToken(curTok) {
 
   return validateToken(curTok.refresh).then(fetch(request)
     .then(response => {
-      if (response.status < 200 || response.status >= 300) {
+      if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
         localStorage.removeItem(Constants.WEBTOKEN)
-        throw new Error(response.statusText);
+        window.location.hash = "#/login"
+        console.error(response.statusText);
       }
       return response.json();
     })
@@ -153,23 +154,36 @@ function getGroupMemberships(user) {
     })
     .then(result => {
       var groupMemberships = [];
+      var groupAdminships = [];
+      var dataManagerships = [];
+      var groupUserships = [];
       for (var i = 0; i < result.count; i++) {
         var groupMembership = result.results[i];
         for (var rolesIndex = 0; rolesIndex < user.groupRoles.length; rolesIndex++) {
           if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
             groupMembership.group_role = user.groupRoles[rolesIndex];
             if (user.groupRoles[rolesIndex].id === Constants.ROLE_DATA_MANAGER) {
-              user.is_data_manager = true;
+              user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
+              dataManagerships.push(groupMembership.group)
             } else if (user.groupRoles[rolesIndex].id === Constants.ROLE_GROUP_ADMIN) {
 
-              user.is_group_admin = true;
+              user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
+              groupAdminships.push(groupMembership.group)
             }
+            else{
+              groupUserships.push(groupMembership.group)
+            }
+            groupMemberships.push(groupMembership.group)
             break;
           }
         }
         groupMemberships.push(groupMembership);
       }
       user.groupMemberships = groupMemberships;
+      user.groupAdminships = groupAdminships
+      user.dataManagerships = dataManagerships
+      user.groupUserships = groupUserships
+
       localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {
@@ -209,7 +223,7 @@ function getGroups(user) {
     });
 }
 
-export default (type, params) => {
+export default (type, params, ...rest) => {
   if (type === AUTH_LOGIN) {
     const { username, password } = params;
     localStorage.setItem(Constants.login_details.USERNAME, username);
@@ -280,8 +294,14 @@ export default (type, params) => {
   if (type === AUTH_CHECK) {
     const getToken = localStorage.getItem(Constants.WEBTOKEN);
 
+    //I'm confident that the same thing can be achieved with withRouter from react-router
+    //get the model and ID from the URL and check for user authorization on this page.
+
     return validateToken(JSON.parse(getToken).access)
-      .then(Promise.resolve())
+      .then(() => {
+          Promise.resolve()
+        }
+      )
       .catch(
         refreshAccessToken(JSON.parse(getToken))
           .then(Promise.resolve())
@@ -289,8 +309,11 @@ export default (type, params) => {
       );
   }
   if (type === AUTH_GET_PERMISSIONS) {
+    console.log("getpermissions checked with params: " ,params, rest);
+
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     return user ? Promise.resolve(user) : Promise.resolve({ role: Constants.ROLE_ANONYMOUS, is_admin: false });
+
   }
   return Promise.reject("Unknown method");
 };

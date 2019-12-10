@@ -1,4 +1,5 @@
-import React from "react";
+//UserAgents.jsx
+import React, { useState, useEffect } from "react";
 import CustomPagination from "../_components/CustomPagination";
 import {
   ArrayField,
@@ -10,12 +11,10 @@ import {
   Edit,
   Filter,
   List,
-  NumberInput,
   ReferenceField,
   ReferenceInput,
   required,
   SelectInput,
-  ShowView,
   SimpleForm,
   SimpleFormIterator,
   SimpleShowLayout,
@@ -27,9 +26,12 @@ import * as Constants from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
-import { regex, number, minValue, FormDataConsumer, ShowController } from "ra-core";
-import { Grid } from "@material-ui/core";
+import { regex, FormDataConsumer, ShowController } from "ra-core";
+import { Grid, Toolbar } from "@material-ui/core";
 import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
+import { Show } from "ra-ui-materialui/lib/detail";
+import { EditButton } from "ra-ui-materialui/lib/button";
+import UserAgentTitle from "./UserAgentTitle";
 
 const filterStyles = {
   form: {
@@ -51,6 +53,11 @@ const listStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const UserAgentFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
+    <TextInput
+      label={"en.models.filters.search"}
+      source="search"
+      alwaysOn
+    />
     <ReferenceInput
       label={"en.models.agents.user"}
       source={Constants.model_fk_fields.USER}
@@ -107,18 +114,53 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
+const actionStyles = theme => ({
+  toolbar:{
+    float: "right",
+    marginTop: "-20px",
+  }
+})
+
+const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
+{
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user.is_admin)
+
+  useEffect(() => {
+    if (data && !showEdit){
+      if (data.user === user.id){
+        setShowEdit(true)
+      }
+    }
+  }, [data])
+
+  if (showEdit){
+    return(
+    <Toolbar className={classes.toolbar}>
+      <EditButton basePath={basePath} record={data} />
+    </Toolbar>
+    )
+  }
+  else{
+    return null
+  }
+})
+
 export const UserAgentShow = props => {
-console.log("props in useragentshow are; ", props);
+//only show edit path if we are a group admin of the group that owns the project that this is connected to.
 return(
-  <ShowController {...props}>
+  <ShowController toolbar={null} {...props}>
     {controllerProps => 
     {
 
       console.log("controllerProps is: ", controllerProps)
+      console.log("in controllerprops, props: ", props)
 
     return(
-  <ShowView title={<UserAgentTitle />} {...props} {...controllerProps}>
-    <SimpleShowLayout>
+  <Show actions={<UserAgentShowActions />} {...props} {...controllerProps}>
+    <SimpleShowLayout toolbar={null}>
+      <UserAgentTitle prefix={"Viewing Agent"} />
+    
       <ReferenceField
         linkType={false}
         label={"en.models.agents.user"}
@@ -168,7 +210,7 @@ return(
         source={Constants.model_fields.ACTIVE}
       />
     </SimpleShowLayout>
-  </ShowView>)}
+  </Show>)}
 }
   </ShowController>
 )};
@@ -177,18 +219,16 @@ const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version'
 const validateLocation=required('en.validate.useragents.location')
 const validateUser = required('en.validate.useragents.user');
 
-export const UserAgentTitle = ({ record }) => {
-  return <span>UserAgent {record ? `"${record.id}"` : ""}</span>;
-};
-
 //TODO: some values must be moved to the Strings file.
 export const UserAgentCreate = props => {
-  console.log("props in useragentcreate are: ", props)
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...other}>
       <SimpleForm {...other} redirect={Constants.resource_operations.LIST}>
+      <UserAgentTitle prefix={"Creating Agent"} />
+
       <FormDataConsumer>
+
       {({formData, ...rest}) => 
       {
         return(
@@ -215,7 +255,7 @@ export const UserAgentCreate = props => {
         </ReferenceInput>
         </Grid>
         <Grid xs={12}>
-        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
+        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST} required>
           <SimpleFormIterator>
             <ReferenceInput
             label={"en.models.agents.projects"}
@@ -251,64 +291,63 @@ export const UserAgentCreate = props => {
 //TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  console.log("props in useragentedit are: ", props)
-  console.log("props in useragentedit other is: ", other)
   return (
     <Edit {...props}>
       <SimpleForm>
-      <ReferenceField
-        linkType={false}
-        label={"en.models.agents.location"}
-        source={Constants.model_fk_fields.LOCATION}
-        reference={Constants.models.LOCATIONS}
-      >
-        <LocationShow/>
-      </ReferenceField>
-      <ReferenceField
-        linkType={false}
-        label={"en.models.agents.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
-        allowEmpty={false}
-      >
-        <UserShow />
-      </ReferenceField>
-      <FormDataConsumer>
-      {({formData, ...rest}) => 
-      {
-      if (formData && formData.remote_api_token && formData.remote_api_username){
-        formData.project_config_list.map(project => {
-          const newProj = project
-          delete newProj.config
-          return newProj
-        })
-      }
+        <UserAgentTitle prefix={"Editing Agent"} />
+        <ReferenceField
+          linkType={false}
+          label={"en.models.agents.location"}
+          source={Constants.model_fk_fields.LOCATION}
+          reference={Constants.models.LOCATIONS}
+        >
+          <LocationShow/>
+        </ReferenceField>
+        <ReferenceField
+          linkType={false}
+          label={"en.models.agents.user"}
+          source={Constants.model_fk_fields.USER}
+          reference={Constants.models.USERS}
+          allowEmpty={false}
+        >
+          <UserShow />
+        </ReferenceField>
+        <FormDataConsumer>
+        {({formData, ...rest}) => 
+        {
+          if (formData && formData.remote_api_token && formData.remote_api_username){
+            formData.project_config_list.map(project => {
+              const newProj = project
+              delete newProj.config
+              return newProj
+            })
+          }
 
-        return(
-          <React.Fragment>
-          <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
-          <SimpleFormIterator disableRemove disableAdd>
-            <ReferenceInput
-            label={"en.models.agents.projects"}
-            source={Constants.model_fk_fields.PROJECT}
-            reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={Constants.model_fields.NAME} disabled/>
-            </ReferenceInput>
-            {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
-          </SimpleFormIterator>
-        </ArrayInput>
-          <Grid container direction="row">
-          <Grid xs={12}>
-            <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+          return(
+            <React.Fragment>
+            <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
+            <SimpleFormIterator disableRemove disableAdd>
+              <ReferenceInput
+              label={"en.models.agents.projects"}
+              source={Constants.model_fk_fields.PROJECT}
+              reference={Constants.models.PROJECTS}>
+                <SelectInput optionText={Constants.model_fields.NAME} disabled/>
+              </ReferenceInput>
+              {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+            </SimpleFormIterator>
+          </ArrayInput>
+            <Grid container direction="row">
+            <Grid xs={12}>
+              <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+            </Grid>
+            <Grid xs={12}>
+              <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+            </Grid>
           </Grid>
-          <Grid xs={12}>
-            <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-          </Grid>
-        </Grid>
-        </React.Fragment>)
-      }
-      }
-      </FormDataConsumer>
+          </React.Fragment>)
+        }
+        }
+        </FormDataConsumer>
       </SimpleForm>
     </Edit>
 

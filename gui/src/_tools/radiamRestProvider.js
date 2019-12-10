@@ -1,5 +1,5 @@
+//radiamrestprovider.jsx
 import * as Constants from '../_constants/index';
-
 import { stringify } from 'query-string';
 import {
   fetchUtils,
@@ -26,26 +26,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
-
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
 
-
-        console.log("type res params: ", type, resource, params)
-        /*
-         * If there was a query parameter passed from the component,
-         * create a valid Elasticsearch request body to POST to /search.
-         */
-
-        let query = {query:{}}
-
+        let query = {}
         let matches = {}
 
         //create kvp for any filters.
-
         if (params.filter){
-
           Object.keys(params.filter).map(key => {
               //for any value where there are slashes, we need exact matches
               if (key === "path_parent"){
@@ -58,8 +47,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           )
         }
 
-
-        if (matches){
+        if (matches && Object.keys(matches).length > 0){
           query.query = {
             "bool" : {
               "filter" : [
@@ -69,13 +57,16 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
           //TODO: there must be a way to do this in-line above.
           Object.keys(matches).map(match => {
-
             query.query.bool.filter.push({"term": {[match]:matches[match]}})
             return match
           })
         }
 
         if (params.q){
+
+          if (!query.query){
+            query.query = {}
+          }
           
           query.query["multi_match"] = {
             "query": params.q,
@@ -84,28 +75,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
         }
 
-        console.log("query before being stringified is: ", query)
-          options.body = JSON.stringify(query);
+        //TODO: ordering and pagination do not yet exist satisfactorily
+        options.body = JSON.stringify(query);
 
-        console.log("options body being sent is: ", options.body)
-
-        if (params && params.sort)
-        {
-          let sign = '';
-          if (params.sort.order && params.sort.order === 'DESC') {
-            sign = '-';
-          }
-          sort = `ordering=${sign}${params.sort.field}`; //this line should be the sole dominion of the /search elasticsearch endpoint.
+        //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
+        if (params.sort){
+          sort = `ordering=${params.sort.order}${params.sort.field}`
         }
-
-        // url = url + `?${stringify(query)}&page=${page}&page_size=${perPage}&${sort}`;
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-
-        //TODO: parameters should now be handled in the body rather than the url.
-        /*
-        if (params && params.q) {
-          url = url + `&q=${params.q}`;
-        }*/
 
         break;
       }
@@ -126,13 +103,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             const { sortField, sortOrder } = params.sort;
 
             let query = {
-              ...fetchUtils.flattenObject(params.filter),
+              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
               _sort: sortField ? sortField : null,
               _order: sortOrder ? sortOrder : null,
               _start: (page - 1) * perPage,
               _end: page * perPage,
+              page: page,
+              perPage: perPage,
             };
-            url = url + `?${stringify(query)}&page=${page}&perPage=${perPage}`;
+            url = url + `?${stringify(query)}`;
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
@@ -155,6 +134,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         console.log("url receiving get_list query is: ", url)
         break;
       }
+    
 
       case 'CURRENT_USER': {
         url = `${apiUrl}/${Constants.models.USERS}/current/`;
@@ -187,7 +167,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       //it will have no parameters and so as a result we cannot send the ?is_active=false flag onclick.
       case GET_ONE:
 
-        if (params.is_active === false) {
+        console.log("in get_one, data is: ", type, resource, params)
+
+        if (params && params.is_active === false) {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=false`;
         } else {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=true`;
@@ -216,9 +198,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case UPDATE:
         url = `${apiUrl}/${resource}/${params.id}/`;
 
-
         console.log("params and options in update are: ", params, options)
-
 
         options.method = 'PUT';
         if (
@@ -236,6 +216,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case CREATE:
+        console.log("formdata in create: ", formData)
         url = `${apiUrl}/${resource}/`;
         options.method = Constants.methods.POST;
         if (
@@ -298,8 +279,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
 
-        console.log("get_file return is: ", ret)
-
         ret.data.map(item => (item.key = item.id));
         return ret;
 
@@ -318,8 +297,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case GET_ONE:
         let fields = translateResource(resource, json);
-
-        console.log("GET_ONE fields, json, resource are:" , fields, json, resource)
 
         return {
           data: {

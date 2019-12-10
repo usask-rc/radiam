@@ -4,10 +4,11 @@ import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-
 import * as Constants from "../_constants/index"
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { email, maxLength, minLength, required } from 'ra-core';
+import { email, maxLength, minLength, required, FormDataConsumer } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt, Redirect } from 'react-router';
 import UserGroupsDisplay from './UserGroupsDisplay';
+import UserTitle from './UserTitle';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
@@ -89,11 +90,19 @@ class UserEditForm extends Component {
         const {groupMembers} = this.state
         return (<React.Fragment>
             <SimpleForm
-                onSubmit={this.handleSubmit}
+                save={this.handleSubmit}
                 resource={Constants.models.USERS}
-                toolbar={null}
                 asyncValidate={asyncValidate}
                 asyncBlurFields={[Constants.model_fields.USERNAME]} >
+                
+                <FormDataConsumer>
+                    {({formData }) => 
+                    {
+                        return(<UserTitle prefix={"Updating"} record={formData} />)}
+                    }
+                </FormDataConsumer>
+
+
                 <TextInput
                     label={"en.models.users.username"}
                     source={Constants.model_fields.USERNAME}
@@ -136,11 +145,7 @@ class UserEditForm extends Component {
                 {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
 
             </SimpleForm>
-            <Toolbar>
-                <SaveButton
-                    onClick={this.handleSubmit}
-                />
-            </Toolbar>
+            
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
             {this.state.redirect && <Redirect to="/login"/>}
         </React.Fragment>

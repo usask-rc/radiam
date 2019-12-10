@@ -1,18 +1,17 @@
-//SecondSteps.jsx
+//FirstSteps.jsx
 import React from "react";
-import { CardContent, Card, Typography, Button } from "@material-ui/core";
-import HomeIcon from "@material-ui/icons/Home";
+import { CardContent, Card, Typography, Button, Chip, Grid } from "@material-ui/core";
+import { Link } from  "react-router-dom";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../../_constants/index"
 import GroupAddIcon from "@material-ui/icons/GroupAdd"
-import { PersonAdd } from "@material-ui/icons";
 
 
 const styles = {
     headlineTop: {
-      backgroundColor: "#688db2",
+      backgroundColor: "#c4bb76",
       color: "white",
       marginLeft: "-24px",
       marginRight: "-24px",
@@ -30,16 +29,27 @@ const styles = {
       width: "28px",
     },
     container: {
-      width: "36em",
-      margin: "1em",
       textAlign: "flex-start",
-      minHeight: "12em",
+      minHeight: "11em",
+      marginLeft: "1em",
+    },
+    groupDetails: {
+      textAlign: "right",
+      margniTop: "8px",
     },
     button: {
       margin: '1em',
+    },
+    addUserChipDisplay: {
+      marginLeft: "1em",
+      backgroundColor: "beige",
+    },
+    groupDisplay: {
+      textAlign: "right",
+
+      alignItems: "flex-end",
     }
   };
-
 /*
 `on the home dashboard, if the user is not a member of any groups:
 Regular users / Mid Level - `you are not a member of any groups.  ask your group admin to add you to a group`
@@ -92,30 +102,52 @@ Therefore the warnings should only be `the group you are in has no users / no da
 
 
 `next steps` afterwards?
-
-//For 
 */
-const SecondSteps = ({ classes, userType, translate }) => {
+const FewUsers = ({ classes, userManagedGroups, translate }) => {
+  
+  const groupList = userManagedGroups.filter(group => group.users.length <= 3)
 
+  if (groupList.length > 0){
     return(
-      <Card className={classes.container}>
-        <CardContent>
-          <Typography className={classes.headlineTop} variant="h5" component="h5">
-            <PersonAdd className={classes.titleIcon} />
-            {translate(`en.dashboard.first_steps.subtitle`)}
-          </Typography>
-          <Typography variant="body2" component="p">
-            {translate(`en.dashboard.first_steps.${userType}.content`)}
-          </Typography>
-          <Button variant="contained" color="primary" href="/#/researchgroups/create" className={classes.button}>{`Create a Research Group`}</Button>
-        </CardContent>
-      </Card>
-    )};
-    
-    const enhance = compose(
-      withStyles(styles),
-      translate
-    );
-    
-    export default enhance(SecondSteps);
-    
+      <Grid item xs={2}>
+        <Card className={classes.container}>
+          <CardContent>
+
+            <Typography className={classes.headlineTop} variant="h5" component="h5">
+              <GroupAddIcon className={classes.titleIcon} />
+              {translate(`en.dashboard.fewUsers.subtitle`)}
+            </Typography>
+            <Typography className={classes.groupDetails} variant="body2" component="p">
+              {translate(`en.dashboard.fewUsers.content`)}
+            </Typography>
+
+            {groupList && groupList.map(group => {
+              return(
+                <div className={classes.groupDisplay}>
+                  <Typography key={group.id} className={classes.groupDetails} variant="body2" component="p">
+                    {`${group.name} : ${group.users.length} users`}
+
+                    <Link to={{pathname: `/${Constants.models.GROUPMEMBERS}/Create`, group: group.id}}>
+                      <Chip label={`+ Add User`} className={classes.addUserChipDisplay} variant="outlined" key={`${group.id}_adduser`} clickable />
+                    </Link>
+                  </Typography>
+                </div>
+              )
+            })}
+          </CardContent>
+        </Card>
+      </Grid>
+    )
+  }
+  else{
+    return null;
+  }
+};  
+
+const enhance = compose(
+  withStyles(styles),
+  translate
+);
+
+export default enhance(FewUsers);
+  
