@@ -11,9 +11,11 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 from elasticsearch import exceptions as es_exceptions
+from elasticsearch_dsl import analyzer, Index, tokenizer
 
 # from . import services
 from .search import RadiamService
+from .search.exceptions import IndexNotCreatedException
 from .exceptions import ElasticSearchRequestError
 from .signals import (radiam_user_created, radiam_project_created,
     radiam_project_deleted)
@@ -58,16 +60,16 @@ class ElasticSearchModel():
         """
         Create the model and create an index in ES
         """
-        rs = RadiamService(self.id)
-        if not rs.index_exists(self.id):
+        index = Index(self.id)
+        if not index.exists():
             try:
                 if analyzer:
-                    print("Adding an analyzer " + str(analyzer) + " to this index " + str(self.id))
-                    rs.index_service.index.analyzer(analyzer)
+                    index.analyzer(analyzer)
                 if document:
-                    print("Adding a document " + str(document) + " to this index " + str(self.id))
-                    rs.index_service.index.document(document)
-                rs.create_index(self.id)
+                    index.document(document)
+                index.create()
+                if not index.exists():
+                    raise IndexNotCreatedException
             except es_exceptions.RequestError as error:
                 raise ElasticSearchRequestError(error.info)
             else:
@@ -717,7 +719,6 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         return geo_data
 
     def save(self, *args, **kwargs):
-        from elasticsearch_dsl import analyzer, tokenizer
         linux_analyzer = analyzer('linux_path_analyzer',
             tokenizer=tokenizer('linux_path_tokenizer', type='path_hierarchy')
         )

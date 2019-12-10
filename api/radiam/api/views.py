@@ -189,7 +189,7 @@ class RadiamViewSet(viewsets.ModelViewSet):
         return response
 
 class MetadataViewset():
-    def create(self, request, add_doc_mapping=False, analyzers=None, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -202,12 +202,6 @@ class MetadataViewset():
             else:
                 fields['metadata'] = {}
             doc.update(**fields)
-            #if analyzers:
-            #    radiam_service = RadiamService(instance.id)
-            #    print("Adding analyzers " + str(analyzers))
-            #    for analyzer in analyzers:
-            #        print("Adding analyzer " + str(analyzer) + " to " + str(instance.id))
-            #        radiam_service.index_service.index.analyzer(analyzer)
         except ElasticSearchRequestError as error:
             raise ItemNotCreatedException(detail=error.info['error']['root_cause'][0]['reason'])
         except Exception as error:
@@ -223,7 +217,7 @@ class MetadataViewset():
         else:
             #success
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers), instance
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def sanitize_empty_values(self, metadata):
         """
@@ -934,17 +928,7 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        from elasticsearch_dsl import analyzer, tokenizer
-        linux_analyzer = analyzer('linux_path_analyzer',
-            tokenizer=tokenizer('linux_path_tokenizer', type='path_hierarchy')
-        )
-        response, instance = MetadataViewset.create(self, request, add_doc_mapping=True, analyzers=[linux_analyzer], *args, **kwargs)
-        # radiam_service = RadiamService(instance.id)
-        # radiam_service.index_service.index.analyzer(linux_analyzer)
-        #index = radiam_service.index_service.index
-        #index.document(ESDataset)
-        #index.create()
-        return response
+        return MetadataViewset.create(self, request, *args, **kwargs)
 
     def update(self, request, pk):
         response = MetadataViewset.update(self, request, pk)
@@ -1289,7 +1273,6 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         updated_doc = self.request.data
         result = radiam_service.update_doc(project_id, pk, updated_doc)
         result = serializer.to_representation(result)
-        print("Update result was: " + str(result))
         return Response(result)
 
     def update(self, request, project_id, pk):
@@ -1322,7 +1305,6 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         # API calls right to ES would... is this a problem?
         doc = ESDataset.get(index=project_id, id=pk)
         key = self.get_cache_key(project_id, doc.location, doc.agent, doc.path)
-        print("Got key: '" + key + "'")
         self.cache.delete(key)
         radiam_service = RadiamService(project_id)
         result = radiam_service.delete_doc(project_id, pk)
