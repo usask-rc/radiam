@@ -421,7 +421,6 @@ export function getGroupUsers(record) {
 }
 
 export function getUserGroups(record) {
-  console.log('getusergroups called with rec: ', record);
   return new Promise((resolve, reject) => {
     let userGroupMembers = [];
     dataProvider(GET_LIST, Constants.models.ROLES)

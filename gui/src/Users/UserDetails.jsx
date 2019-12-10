@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-admin";
 import * as Constants from "../_constants/index"
 import { getUserGroups } from '../_tools/funcs';
-import UserGroupsDisplay from './UserGroupsDisplay';
+import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
 
 class UserDetails extends Component {
@@ -48,7 +48,7 @@ class UserDetails extends Component {
                         label={"en.models.generic.active"}
                         source={Constants.model_fields.ACTIVE}
                     />
-                    {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
+                    {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} inModal={this.props.setViewModal !== null ? true : false}/>}
                 </SimpleShowLayout>
         )
     }

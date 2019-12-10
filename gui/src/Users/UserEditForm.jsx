@@ -7,7 +7,7 @@ import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { email, maxLength, minLength, required, FormDataConsumer } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt, Redirect } from 'react-router';
-import UserGroupsDisplay from './UserGroupsDisplay';
+import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
@@ -19,9 +19,12 @@ class UserEditForm extends Component {
         this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false }
     }
 
-    async componentDidMount() {
-        let abc = await getUserGroups(this.props.record)
-        this.setState({groupMembers: abc})
+    componentDidMount() {
+        getUserGroups(this.props.record).then(data => {
+            console.log("user groups are: ", data)
+            this.setState({groupMembers: data})
+            return data
+        })
     }
 
     handleSubmit = () => {
@@ -142,7 +145,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
-                {groupMembers && groupMembers.length > 0 && <UserGroupsDisplay groupMembers={groupMembers}/>}
+                {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers}/>}
 
             </SimpleForm>
             

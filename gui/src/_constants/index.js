@@ -151,6 +151,12 @@ module.exports = Object.freeze({
     ASCENDING: "ASC",
     DESCENDING: "DESC",
   },
+  role_labels: {
+    ADMIN: "Group Admin",
+    DATA_MANAGER: "Data Manager",
+    MEMBER: "Member",
+    UNKNOWN: "Unknown"
+  },
   //the place to put these is probably in en.js - however, I'm not too keen on having to import translate into more places.
   //these are error / warning messages for form or api failures.
   warnings: {
