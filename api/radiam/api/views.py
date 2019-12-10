@@ -1050,7 +1050,7 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
         return Response(data)
 
 
-class OSFQueryViewSet(viewsets.GenericViewSet):
+class OSFConfigsViewSet(viewsets.GenericViewSet):
 
     def get_queryset(self):
         pass

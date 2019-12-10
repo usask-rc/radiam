@@ -75,6 +75,14 @@ def update_info(osf_token, project_name, host, API, agent_id, location_id, radia
         for id in id_list:
             API.delete_document(config_project_endpoint, id)
 
+
+def get_osf_endpoints():
+    """
+    TODO:
+    Get the OSF endpoint data from the API
+    """
+    return requests.get("http://radiamapi:8000/useragents/osf_configs")
+
 def main():
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the Radiam agent")
