@@ -37,7 +37,8 @@ import GroupTitle from "./GroupTitle.jsx";
 import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
+import { GroupMemberForm, GroupMemberEdit, GroupMemberShow } from "../GroupMembers/GroupMembers.jsx";
+import UserDetails from "../Users/UserDetails.jsx";
 
 const styles = {
   actions: {
@@ -166,6 +167,8 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) =>
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
 
   const [showModal, setShowModal] = useState(false)
+  const [editModal, setEditModal] = useState(false)
+  const [viewModal, setViewModal] = useState(false)
   const [groupMembers, setGroupMembers] = useState([])
 
   let _isMounted = false
@@ -175,24 +178,27 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupUsers(params).then((data) => {
-      console.log("getgroupusers returned data: ", data)
-      if (_isMounted){
-        setGroupMembers(data)
-      }
-      return data
-    }).catch(err => console.error("err: ", err))
+        console.log("getgroupusers returned data: ", data)
+        if (_isMounted){
+          setGroupMembers(data)
+        }
+        return data
+      }).catch(err => console.error("err: ", err))
     }
+
     return function cleanup() { 
       _isMounted = false;
     }
-  }, [showModal])
+  }, [showModal, editModal])
+
+
 
   return(
   <Show actions={<GroupShowActions />} {...props}>
     <SimpleShowLayout>
       
       <GroupTitle prefix={"Viewing"} />
-      {groupMembers && <RelatedUsers setShowModal={setShowModal} groupMembers={groupMembers}  {...props} /> }
+      {groupMembers && <RelatedUsers setShowModal={setShowModal} setEditModal={setEditModal} setViewModal={setViewModal} groupMembers={groupMembers}  {...props}  /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -240,6 +246,17 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
               </DialogContent>
             </Dialog>
             }
+            {editModal && <Dialog fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
+              <DialogContent>
+                <GroupMemberForm basePath="/groupmembers" resource="groupmembers" setEditModal={setEditModal} record={{id: editModal.id, user: editModal.user.id, group: editModal.group, group_role: editModal.group_role.id}} />
+              </DialogContent>
+            </Dialog>
+            }
+            {viewModal && <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
+              <DialogContent>
+                <UserDetails basePath="/users" resource="users" setViewModal={setViewModal} record={{...viewModal.user}} />
+              </DialogContent>
+            </Dialog>}
           </React.Fragment>
         )}}
       </ShowController>

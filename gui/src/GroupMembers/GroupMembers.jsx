@@ -26,8 +26,7 @@ import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { withStyles } from "@material-ui/core/styles";
 import { Prompt } from 'react-router';
 import GroupMemberTitle from "./GroupMemberTitle";
-import { FormDataConsumer } from "ra-core";
-import { isAdminOfAParentGroup, postObjectWithoutSaveProp } from "../_tools/funcs";
+import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveProp } from "../_tools/funcs";
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { TextInput } from "ra-ui-materialui/lib/input";
@@ -288,12 +287,25 @@ export const GroupMemberForm = props => {
       else{
         console.log("data is: ", data, "props are: ", props)
         
-        postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
-          console.log("data after posting new groupmember: ", data)
-          if (props.setShowModal){
-            props.setShowModal(false)
-          }
-        })
+
+        //if data previously existed, PUT instead
+        if (data.id){
+          putObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+            console.log("data after updating groupmember: ", data)
+            if (props.setEditModal){
+              props.setEditModal(false)
+            }
+          })
+        }
+        else{
+          postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+            console.log("data after posting new groupmember: ", data)
+            if (props.setShowModal){
+              props.setShowModal(false)
+            }
+          })
+        }
+       
       }
     }
   }, [data])
@@ -324,6 +336,8 @@ export const GroupMemberForm = props => {
       source={Constants.model_fk_fields.USER}
       reference={Constants.models.USERS}
       resource={Constants.models.USERS}
+      defaultValue={props.user ? props.user : (() => setIsFormDirty(false))}
+      disabled={props.record && props.record.user ? true : false}
       validate={validateUser}
     >
       <SelectInput optionText={userSelect} />
@@ -333,8 +347,8 @@ export const GroupMemberForm = props => {
       source={Constants.model_fk_fields.GROUP}
       reference={Constants.models.GROUPS}
       resource={Constants.models.GROUPS}
-
       defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
+      disabled={props.record && props.record.group ? true : false}
       validate={validateGroup}
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
@@ -344,7 +358,7 @@ export const GroupMemberForm = props => {
       source={Constants.model_fk_fields.GROUP_ROLE}
       reference={Constants.models.ROLES}
       resource={Constants.models.ROLES}
-
+      defaultValue={props.group_role ? props.group_role : (() => setIsFormDirty(false))}
       validate={validateRole}
     >
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
@@ -352,6 +366,7 @@ export const GroupMemberForm = props => {
     <DateInput
       label={"en.models.generic.date_expires"}
       source={Constants.model_fields.DATE_EXPIRES}
+      defaultValue={props.date_expires ? props.date_expires : (() => setIsFormDirty(false))}
       allowEmpty
     />
     <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>

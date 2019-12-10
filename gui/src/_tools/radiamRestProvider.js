@@ -198,9 +198,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case UPDATE:
         url = `${apiUrl}/${resource}/${params.id}/`;
 
-
         console.log("params and options in update are: ", params, options)
-
 
         options.method = 'PUT';
         if (

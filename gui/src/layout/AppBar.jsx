@@ -32,7 +32,6 @@ const styles = {
     color: "black",
     paddingLeft: "1em",
   }
-  
 };
 
 // "Menu" is the drop-down that you get when you click the Profile button.
@@ -69,17 +68,9 @@ const CustomAppBar = ({ classes, ...props }) => {
         }
       })
       .catch(err => 
-          {
-              if (_isMounted)
-              {
-                  //this.setState({redirect: true})
-                  window.location.hash = "#/login"
-
-              }
-              else{
-                window.location.hash = "#/login"
-              }
-          }
+        {
+          window.location.hash = "#/login"
+        }
       )
 
     //if we unmount, lock out the component from being able to use the state
@@ -89,7 +80,7 @@ const CustomAppBar = ({ classes, ...props }) => {
   }, [])
 
   return(
-  <AppBar {...props} userMenu={<CustomUserMenu user={user} />}>
+  <AppBar {...props} refresh={false} userMenu={<CustomUserMenu user={user} />}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />

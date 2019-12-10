@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
 var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -504,6 +504,20 @@ function updateObjectWithGeo(formData, geo, props) {
     };
   }
     props.save(formData, Constants.resource_operations.LIST);
+}
+
+export function putObjectWithoutSaveProp(formData, resource){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = {id: formData.id, data: formData, resource:resource }
+  
+    dataProvider(UPDATE, resource, params).then(response => {
+        resolve(response)
+    }).catch(err => {
+        reject(err)
+    })
+  }
+    )
 }
 
 //for the rare cases that we don't have the Save prop and want to POST some model item
