@@ -473,17 +473,19 @@ export function getUserGroups(record) {
   });
 }
 
+//TODO: convert to promise / callback system
 export function submitObjectWithGeo(
   formData,
   geo,
   props,
-  redirect = Constants.resource_operations.LIST
+  redirect = Constants.resource_operations.LIST,
+  inModal=false
 ) {
   console.log('formData heading into submitobjectwithgeo is: ', formData);
   if (formData.id) {
     updateObjectWithGeo(formData, geo, props, redirect);
   } else {
-    createObjectWithGeo(formData, geo, props);
+    createObjectWithGeo(formData, geo, props, inModal);
   }
 }
 
@@ -501,7 +503,7 @@ function updateObjectWithGeo(formData, geo, props) {
       },
     };
   }
-  props.save(formData, Constants.resource_operations.LIST);
+    props.save(formData, Constants.resource_operations.LIST);
 }
 
 //for the rare cases that we don't have the Save prop and want to POST some model item
@@ -521,7 +523,7 @@ export function postObjectWithoutSaveProp(formData, resource){
 }
 
 //TODO: When creating Projects, there is a failure somewhere here.
-export function createObjectWithGeo(formData, geo, props) {
+export function createObjectWithGeo(formData, geo, props, inModal) {
   let headers = new Headers({ 'Content-Type': 'application/json' });
   const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -529,6 +531,7 @@ export function createObjectWithGeo(formData, geo, props) {
     const parsedToken = JSON.parse(token);
     headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
+    //POST the new object, then update it immediately afterwards with any geoJSON it carries.
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
       method: Constants.methods.POST,
       body: JSON.stringify({ ...formData }),
@@ -539,6 +542,8 @@ export function createObjectWithGeo(formData, geo, props) {
         if (response.status >= 200 && response.status < 300) {
           return response.json();
         }
+        console.log("failed request: , ", request)
+        console.log("failed respnose: ", response)
         throw new Error(response.statusText); //error here when creating dataset nested in project
       })
       .then(data => {
@@ -562,6 +567,7 @@ export function createObjectWithGeo(formData, geo, props) {
           };
         }
 
+        //the PUT request to update this object with its geoJSON
         const request = new Request(
           getAPIEndpoint() + `/${props.resource}/${data.id}/`,
           {
@@ -579,8 +585,10 @@ export function createObjectWithGeo(formData, geo, props) {
             throw new Error(response.statusText);
           })
           .then(data => {
-            console.log('data after update is: ', data);
-            props.history.push(`/${props.resource}`);
+            console.log("inmodal: ", inModal);
+            if (!inModal){ //stop redirect if in a modal
+              props.history.push(`/${props.resource}`);
+            }
           });
       });
   } else {

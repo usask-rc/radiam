@@ -183,11 +183,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
 ));
 
 
-const validateDistributionRestriction = required('en.validate.dataset.distribution_restriction');
-const validateDataCollectionMethod = required('en.validate.dataset.data_collection_method');
-const validateDataCollectionStatus = required('en.validate.dataset.data_collection_status');
 const validateProject = required('A project is required for a dataset');
-const validateSensitivityLevel = required('en.validate.dataset.sensitivity_level');
 const validateTitle = required('en.validate.dataset.title');
 
 
@@ -206,6 +202,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     }
   }, [data])
 */
+
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
       setGeo(geo)
@@ -226,10 +223,20 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
     setData(newData) //will prompt the call in useEffect.
+    
+    console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
-    if (props.save){
-      submitObjectWithGeo(newData, geo, props)
-    }else{
+    //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
+    props.resource = "datasets"
+
+    //if (props.save){
+    submitObjectWithGeo(newData, geo, props, null, props.setShowModal ? true : false)
+
+    if (props.setShowModal){
+      props.setShowModal(false)
+    }
+    //}else{
+      /*
       //if we don't have props.save, we are accessing via a modal
       //TODO: currently submits without metadata and without GEO
       console.log("data, geo, props submitted in datasetform: ", newData, geo, props)
@@ -244,10 +251,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
           console.error("no modal to deactivate");
         }
       })
-    }
+      */
+    //}
   };
 
-  console.log("basedatasetform props: ", props)
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
     <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
@@ -286,7 +293,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_status"}
       source={Constants.model_fields.DATA_COLLECTION_STATUS}
       reference={Constants.models.DATA_COLLECTION_STATUS}
-      validate={validateDataCollectionStatus}>
+      required>
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
     </ReferenceInput>
 
@@ -296,7 +303,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.distribution_restriction"}
       source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
       reference={Constants.models.DISTRIBUTION_RESTRICTION}
-      validate={validateDistributionRestriction}>
+      required>
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
     </ReferenceInput>
 
@@ -307,7 +314,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_method"}
       source={Constants.model_fields.DATA_COLLECTION_METHOD}
       reference={Constants.models.DATA_COLLECTION_METHOD}
-      validate={validateDataCollectionMethod}>
+      required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
@@ -317,7 +324,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.sensitivity_level"}
       source={Constants.model_fields.SENSITIVITY_LEVEL}
       reference={Constants.models.SENSITIVITY_LEVEL}
-      validate={validateSensitivityLevel}>
+      required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
