@@ -40,7 +40,7 @@ const RelatedDatasets = ({classes, setShowModal, projectDatasets}) => {
             )
           })}
           {setShowModal && 
-              <Chip label={`+ Add Dataset`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+              <Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
              }
             
         </div>
