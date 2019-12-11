@@ -208,14 +208,14 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     }
   }, [showModal, editModal])
 
+  console.log("groupshow props: ", props)
 
 
   return(
-  <Show actions={<GroupShowActions />} {...props}>
+  <Show actions={!props.inModal && <GroupShowActions />} {...props}>
     <SimpleShowLayout>
-      
       <GroupTitle prefix={"Viewing"} />
-      {groupMembers && <RelatedUsers setShowModal={canEditGroup ? setShowModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers}  {...props}  /> }
+      {groupMembers && <RelatedUsers setShowModal={canEditGroup ? setShowModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers} inModal={props.inModal}  {...props}  /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}

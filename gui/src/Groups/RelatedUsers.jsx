@@ -36,7 +36,7 @@ const styles = theme => ({
 });
 
 
-const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, setViewModal=null}) => {
+const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, setViewModal=null, inModal=false, ...props}) => {
 
   const [groupAdmins, setGroupAdmins] = useState([])
   const [dataManagers, setDataManagers] = useState([])
@@ -71,9 +71,9 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
     setUnknown(tempU)
   }, [groupMembers])
 
-  console.log("dataManagers: ", dataManagers)
-  console.log("groupMembers:", groupMembers)
-    return(
+  console.log("RelatedUsers props: ", props, "inmodal: ", inModal)
+
+  return(
       <div className={classes.container}>
 
         <div className={classes.roleDisplayContainer}>
@@ -86,9 +86,11 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                       <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
                   }
                   label={`${groupMember.user.username}`}
-                  clickable
-                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => setViewModal(groupMember)}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal) {
+                    setViewModal(groupMember)
+                  }}}
                   deleteIcon={<Edit />}
 
                   />
@@ -107,9 +109,11 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                       <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
                   }
                   label={`${groupMember.user.username}`}
-                  clickable
-                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => setViewModal(groupMember)}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal) {
+                    setViewModal(groupMember)
+                  }}}
                   deleteIcon={<Edit />}
                   />
                 )
@@ -129,16 +133,18 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                       <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
                   }
                   label={`${groupMember.user.username}`}
-                  clickable
-                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => setViewModal(groupMember)}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal) {
+                    setViewModal(groupMember)
+                  }}}
                   deleteIcon={<Edit />}
                   />
                 )
             })}
             </div>
           }
-          {setShowModal && 
+          {setShowModal && !inModal && 
             <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
           }
           
@@ -155,9 +161,11 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
                       <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
                   }
                   label={`${groupMember.user.username}`}
-                  clickable
-                  onDelete={setEditModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => setViewModal(groupMember)}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal) {
+                    setViewModal(groupMember)
+                  }}}
                   deleteIcon={<Edit />}
 
                   />
