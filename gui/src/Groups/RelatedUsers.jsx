@@ -20,7 +20,7 @@ const styles = theme => ({
   },
   roleDisplayContainer: {
     marginRight: "1em",
-    float: "left",
+    display: "flex",
   },
   groupRoleContainer: {
     marginBottom: "1em",
