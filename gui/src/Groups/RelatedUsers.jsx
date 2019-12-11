@@ -51,7 +51,6 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
     let tempU = []
     //sort groupmembers into different categories
     groupMembers.map(groupMember => {
-      console.log("groupMember: ", groupMember)
       if (groupMember.group_role.id === Constants.ROLE_GROUP_ADMIN){
         tempGA.push(groupMember)
       }
@@ -62,7 +61,6 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
         tempM.push(groupMember)
       }
       else{
-        console.error("unknown role type associated with group.")
         tempU.push(groupMember)
       }
     })
@@ -71,8 +69,6 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
     setMembers(tempM)
     setUnknown(tempU)
   }, [groupMembers])
-
-  console.log("RelatedUsers props: ", props, "inmodal: ", inModal)
 
   return(
       <div className={classes.container}>
@@ -156,7 +152,6 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
                     setViewModal(groupMember)
                   }}}
                   deleteIcon={<Edit />}
-
                   />
                 </Tooltip>
               )
