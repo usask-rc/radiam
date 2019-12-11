@@ -166,17 +166,13 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) =>
 //TODO: ADM-1939 - be able to add users via this group show page
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
 
-  const [showModal, setShowModal] = useState(false)
+  const [createModal, setCreateModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
   const [viewModal, setViewModal] = useState(false)
   const [groupMembers, setGroupMembers] = useState([])
   const [canEditGroup, setCanEditGroup] = useState(false)
 
-
-
   let _isMounted = false
-
-
   useEffect(() => {
     _isMounted = true
     isAdminOfAParentGroup(props.id).then(data => {
@@ -206,16 +202,13 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     return function cleanup() { 
       _isMounted = false;
     }
-  }, [showModal, editModal])
-
-  console.log("groupshow props: ", props)
-
+  }, [createModal, editModal, viewModal])
 
   return(
   <Show actions={!props.inModal && <GroupShowActions />} {...props}>
     <SimpleShowLayout>
       <GroupTitle prefix={"Viewing"} />
-      {groupMembers && <RelatedUsers setShowModal={canEditGroup ? setShowModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers} inModal={props.inModal}  {...props}  /> }
+      {groupMembers && <RelatedUsers setCreateModal={canEditGroup ? setCreateModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers} inModal={props.inModal}  {...props}  /> }
       <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
@@ -256,10 +249,10 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
               id={controllerProps.record.id}
               props={props}
             />
-            {showModal && <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
+            {createModal && <Dialog fullWidth open={createModal} onClose={() => {console.log("dialog close"); setCreateModal(false)}} aria-label="Add User">
               <DialogTitle>{`Add User`}</DialogTitle>
               <DialogContent>
-                <GroupMemberForm group={controllerProps.record.id} setShowModal={setShowModal} {...props} />
+                <GroupMemberForm group={controllerProps.record.id} setCreateModal={setCreateModal} {...props} />
               </DialogContent>
             </Dialog>
             }

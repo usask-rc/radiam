@@ -43,7 +43,7 @@ import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { DatasetForm } from "../Datasets/Datasets";
+import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
 
 const styles = {
   actions: {
@@ -58,6 +58,9 @@ const styles = {
   root: {
     backgroundColor: 'inherit',
   },
+  modalContainer: {
+    paddingRight: "1em",
+  }
 };
 
 const filterStyles = {
@@ -176,7 +179,9 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     //select all datasets where project = project id
 
     const [projectDatasets, setProjectDatasets] = useState([])
-    const [showModal, setShowModal] = useState(false)
+    const [createModal, setCreateModal] = useState(false)
+    const [viewModal, setViewModal] = useState(false)
+    const [editModal, setEditModal] = useState(false)
 
     let _isMounted = false
     useEffect(() => {
@@ -191,19 +196,16 @@ export const ProjectShow = withTranslate(withStyles(styles)(
           return data
         }).catch(err => console.error(err))
       }  
-
       return function cleanup() {
         _isMounted = false;
       }
-    }, [showModal])
-
-  console.log("projectDatasets: ", projectDatasets)
+    }, [createModal, viewModal])
 
     if (permissions){
       return (<Show actions={<ProjectShowActions/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
-            {projectDatasets && <RelatedDatasets setShowModal={setShowModal} projectDatasets={projectDatasets} {...props} /> }
+            {projectDatasets && <RelatedDatasets setCreateModal={setCreateModal} setEditModal={setEditModal} setViewModal={setViewModal} projectDatasets={projectDatasets} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
             <TextField
               label={'en.models.projects.keywords'}
@@ -236,14 +238,30 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                     id={controllerProps.record.id}
                     props={props}
                   />
-                  {showModal && 
-                  <Dialog fullWidth open={showModal} onClose={() => {console.log("dialog close"); setShowModal(false)}} aria-label="Add User">
-                    <DialogTitle>{`Add Dataset`}</DialogTitle>
+                  {createModal && 
+                    <Dialog className={classes.modalContainer}fullWidth open={createModal} onClose={() => {console.log("dialog close"); setCreateModal(false)}} aria-label="Add User">
+                      <DialogTitle>{`Add Dataset`}</DialogTitle>
+                      <DialogContent>
+                        <DatasetForm project={props.id} setCreateModal={setCreateModal} {...props} />
+                      </DialogContent>
+                    </Dialog>
+                  }
+                  {console.log("editModal: ", editModal)}
+                  {editModal && 
+                  <Dialog className={classes.modalContainer}fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
+                    <DialogTitle>{`Update Dataset`}</DialogTitle>
                     <DialogContent>
-                      <DatasetForm project={props.id} setShowModal={setShowModal} {...props} />
+                      <DatasetForm basePath="/datasets" resource="datasets" project={props.id} setEditModal={setEditModal} record={{...editModal}} />
                     </DialogContent>
                   </Dialog>
                   }
+
+                  {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
+                    <DialogContent>
+                      <DatasetShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
+                    </DialogContent>
+                  </Dialog>}
+                  
                 </React.Fragment>
 
               )}

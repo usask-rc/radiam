@@ -36,7 +36,7 @@ const styles = theme => ({
 });
 
 
-const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, setViewModal=null, inModal=false, ...props}) => {
+const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null, setViewModal=null, inModal=false, ...props}) => {
 
   const [groupAdmins, setGroupAdmins] = useState([])
   const [dataManagers, setDataManagers] = useState([])
@@ -144,8 +144,8 @@ const RelatedUsers = ({classes, setShowModal, groupMembers, setEditModal=null, s
             })}
             </div>
           }
-          {setShowModal && !inModal && 
-            <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setShowModal(true)}/>
+          {setCreateModal && !inModal && 
+            <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setCreateModal(true)}/>
           }
           
         </div>

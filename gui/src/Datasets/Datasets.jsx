@@ -195,13 +195,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
-/*
-  useEffect(() => {
-    if (data && Object.keys(data).length > 0) {
-      submitObjectWithGeo(data, geo, props)
-    }
-  }, [data])
-*/
+
 
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
@@ -230,30 +224,17 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     props.resource = "datasets"
 
     //if (props.save){
-    submitObjectWithGeo(newData, geo, props, null, props.setShowModal ? true : false)
+    submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false)
 
-    if (props.setShowModal){
-      props.setShowModal(false)
+    if (props.setCreateModal){
+      props.setCreateModal(false)
     }
-    //}else{
-      /*
-      //if we don't have props.save, we are accessing via a modal
-      //TODO: currently submits without metadata and without GEO
-      console.log("data, geo, props submitted in datasetform: ", newData, geo, props)
-
-      postObjectWithoutSaveProp(newData, Constants.models.DATASETS).then(data => {
-        console.log("data after posting new dataset: ", data)
-        //this should always be true
-        if (props.setShowModal){
-          props.setShowModal(false)
-        }
-        else{
-          console.error("no modal to deactivate");
-        }
-      })
-      */
-    //}
+    else if (props.setEditModal){
+      props.setEditModal(false)
+    }
   };
+
+  console.log("props record after editmodal transofmration: ", props.record)
 
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>

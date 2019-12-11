@@ -167,7 +167,6 @@ const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, class
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
-  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
       isAdminOfAParentGroup(data.group).then(data => {
@@ -300,8 +299,8 @@ export const GroupMemberForm = props => {
         else{
           postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
             console.log("data after posting new groupmember: ", data)
-            if (props.setShowModal){
-              props.setShowModal(false)
+            if (props.setCreateModal){
+              props.setCreateModal(false)
             }
           })
         }
