@@ -322,6 +322,10 @@ export default {
         search: 'Search',
         folders: 'Folders',
       },
+      fewUsers: {
+        content: "",
+        subtitle: "Groups With Few Users",
+      },
       file_path: 'File Path',
       file_name: 'File Name',
       file_size: 'File Size',
@@ -404,6 +408,9 @@ export default {
       distribution_restriction: {
         label: 'Distribution Restriction',
       },
+      filters: {
+        search: "Search",
+      },
       groups: {
         name: 'Group Name',
         active: 'Active',
@@ -482,9 +489,9 @@ export default {
     group: {
       role: {
         admin: {
-          label: 'Admin',
+          label: 'Group Admin',
           description:
-            'Group Administrators can add users to groups and create projects.',
+            'Group Administrators may Create Users, Groups, Locations, Projects, Datasets, View Grants and Agents, and add users to Group they are a Group Admin of.  They have Update permissions on all Groups they administrate, and all Projects that are associated with said group, or a group that is a child of one they administrate, and similarly any Datasets associated with any Projects they administrate.  They may not update Users after creation.',
         },
         datamanager: {
           label: 'Data Manager',

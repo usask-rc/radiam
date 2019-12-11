@@ -163,8 +163,8 @@ const actionsStyles = theme => ({
 const UserDetailsActions = ({permissions, basePath, data, resource, classes}) => {
 
   console.log("permissions, basepath, etc: ", permissions, basePath, data, resource)
-  //can only modify the user if I'm a superuser or I'm modifying my own data.
-  if (permissions && data && (permissions.is_admin || (permissions.id === data.id))){
+  //only superuser can modify user data - users must go via the User Edit page.
+  if (permissions && permissions.is_admin){
     return(<Toolbar className={classes.root}>
           <EditButton basePath={basePath} record={data} />
           {permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}

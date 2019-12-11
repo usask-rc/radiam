@@ -9,6 +9,8 @@ import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt, Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
+import { Dialog, DialogContent } from '@material-ui/core';
+import { GroupShow } from '../Groups/Groups';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
 const validateEmail = [required('en.validate.user.email'), email()];
@@ -148,6 +150,13 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
+                {viewModal &&
+                    <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); this.setState({viewModal:false})}} aria-label="Add User">
+                        <DialogContent>
+                            <GroupShow id={viewModal.group.id} basePath="/researchgroups" resource="researchgroups" setViewModal={(data) => {this.setState({viewModal: data})}} inModal={true} record={{...viewModal.group}} />
+                        </DialogContent>
+                    </Dialog>
+                }
             </SimpleForm>
             
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>

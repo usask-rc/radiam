@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import * as Constants from '../_constants/index';
 import '../_components/components.css';
-import { Chip, Typography } from '@material-ui/core';
+import { Chip, Typography, Tooltip } from '@material-ui/core';
 import {  getGroupUsers } from '../_tools/funcs';
 import UserAvatar from "react-user-avatar";
 import { Link } from  "react-router-dom";
@@ -16,10 +16,11 @@ const styles = theme => ({
   },
   container: {
     justifyContent: "left",
-    flexWrap: "wrap",
+    display: "flex",
   },
   roleDisplayContainer: {
-    display: "relative",
+    marginRight: "1em",
+    float: "left",
   },
   groupRoleContainer: {
     marginBottom: "1em",
@@ -75,105 +76,96 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
 
   return(
       <div className={classes.container}>
-
-        <div className={classes.roleDisplayContainer}>
           {groupAdmins && groupAdmins.length > 0 &&
-            <div className={classes.groupRoleContainer}>
-              <Typography className={classes.groupRoleText}>{`Group Admins:`}</Typography>
-              {groupAdmins.map(groupMember => {
-                return(
-                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
-                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
-                  }
-                  label={`${groupMember.user.username}`}
-                  clickable={inModal ? false : true}
-                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => {if (!inModal) {
-                    setViewModal(groupMember)
-                  }}}
-                  deleteIcon={<Edit />}
 
-                  />
-                )
-              })}
-            </div>
-          }
-        </div>
         <div className={classes.roleDisplayContainer}>
-          {dataManagers && dataManagers.length > 0 &&
-            <div className={classes.groupRoleContainer}>
-              <Typography className={classes.groupRoleText}>{`Data Managers:`}</Typography>
-              {dataManagers.map(groupMember => {
-                return(
+          {groupAdmins.map(groupMember => {
+            return(
+              <Tooltip title="Group Admin">
+              <Chip className={classes.chipDisplay} aria-label={"admin"} variant="outlined" key={groupMember.id} avatar={
+                    <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                }
+                label={`${groupMember.user.username}`}
+                clickable={inModal ? false : true}
+                onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                onClick={() => {if (!inModal && setViewModal !== null) {
+                  setViewModal(groupMember)
+                }}}
+                deleteIcon={<Edit />}
+              />
+              </Tooltip>
+            )
+          })}
+        </div>
+          }
+        {dataManagers && dataManagers.length > 0 &&
+          <div className={classes.roleDisplayContainer}>
+            {dataManagers.map(groupMember => {
+              return(
+                <Tooltip title="Data Manager">
                   <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
                       <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
-                  }
-                  label={`${groupMember.user.username}`}
-                  clickable={inModal ? false : true}
-                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => {if (!inModal) {
-                    setViewModal(groupMember)
-                  }}}
-                  deleteIcon={<Edit />}
+                    }
+                    label={`${groupMember.user.username}`}
+                    clickable={inModal ? false : true}
+                    onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                    onClick={() => {if (!inModal && setViewModal !== null) {
+                      setViewModal(groupMember)
+                    }}}
+                    deleteIcon={<Edit />}
                   />
-                )
-              })}
-            </div>
-          }
-        </div>
-        <div className={classes.roleDisplayContainer}>
-
-          {members && members.length > 0 &&
-          
-            <div className={classes.groupRoleContainer}>
-              <Typography className={classes.groupRoleText}>{`Members:`}</Typography>
-                {members.map(groupMember => {
-                return(
-                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
-                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
-                  }
-                  label={`${groupMember.user.username}`}
-                  clickable={inModal ? false : true}
-                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => {if (!inModal) {
-                    setViewModal(groupMember)
-                  }}}
-                  deleteIcon={<Edit />}
-                  />
-                )
+                </Tooltip>
+              )
             })}
-            </div>
-          }
-          {setCreateModal && !inModal && 
+          </div>
+        }
+        {members && members.length > 0 &&
+
+          <div className={classes.roleDisplayContainer}>
+            {members.map(groupMember => {
+              return(
+                <Tooltip title="Member">
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal && setViewModal !== null) {
+                    setViewModal(groupMember)
+                  }}}
+                  deleteIcon={<Edit />}
+                  />
+                </Tooltip>
+              )
+            })}
+          </div>
+        }
+        {unknown && unknown.length > 0 &&
+          <div className={classes.roleDisplayContainer}>
+              {unknown.map(groupMember => {
+              return(
+                <Tooltip title="Other Role">
+                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
+                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
+                  }
+                  label={`${groupMember.user.username}`}
+                  clickable={inModal ? false : true}
+                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
+                  onClick={() => {if (!inModal && setViewModal !== null) {
+                    setViewModal(groupMember)
+                  }}}
+                  deleteIcon={<Edit />}
+
+                  />
+                </Tooltip>
+              )
+            })}
+          </div>
+        }
+        {setCreateModal && !inModal && 
             <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setCreateModal(true)}/>
-          }
-          
-        </div>
-
-        <div className={classes.roleDisplayContainer}>
-          {unknown && unknown.length > 0 &&
-            
-            <div className={classes.groupRoleContainer}>
-              <Typography className={classes.groupRoleText}>{`Unknown:`}</Typography>
-                {unknown.map(groupMember => {
-                return(
-                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
-                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
-                  }
-                  label={`${groupMember.user.username}`}
-                  clickable={inModal ? false : true}
-                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => {if (!inModal) {
-                    setViewModal(groupMember)
-                  }}}
-                  deleteIcon={<Edit />}
-
-                  />
-                )
-            })}
-            </div>
-          }
-        </div>
+        }
       </div>
     )
   }

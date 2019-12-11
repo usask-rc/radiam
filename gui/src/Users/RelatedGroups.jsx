@@ -1,6 +1,6 @@
 //RelatedGroups.jsx
 import React, { useState, useEffect } from 'react';
-import { Chip, Typography } from '@material-ui/core';
+import { Chip, Tooltip } from '@material-ui/core';
 import * as Constants from "../_constants/index"
 import { withStyles } from '@material-ui/styles';
 
@@ -8,11 +8,10 @@ const styles = theme => ({
     
     container: {
         justifyContent: "left",
-        flexWrap: "wrap",
+        display: "flex",
     },
     roleContainer: {
-        marginBottom: "1em",
-        display: "flex",
+        float: "left",
         alignItems: "center",
     },
     roleText: {
@@ -69,15 +68,16 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         <div className={classes.container}>   
             {groupAdmins.length > 0 &&
                 <div className={classes.roleContainer}>
-                    <Typography className={classes.roleText}>{`${Constants.role_labels.ADMIN}:`}</Typography>
                     {groupAdmins.map(groupMember => {
-                        return <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
-                        label={`${groupMember.group.name}`}
-                        onClick={() => {
-                        if (inModal === false){
-                            setViewModal(groupMember)
-                        }}}
-                        clickable={inModal? false : true} />
+                        return <Tooltip title="Group Admin">
+                            <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
+                            label={`${groupMember.group.name}`}
+                            onClick={() => {
+                            if (inModal === false){
+                                setViewModal(groupMember)
+                            }}}
+                            clickable={inModal? false : true} />
+                        </Tooltip>
                     })
                     }
                 </div>
@@ -85,15 +85,16 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
             
             {dataManagers.length > 0 && 
                 <div className={classes.roleContainer}>
-                    <Typography className={classes.roleText}>{`${Constants.role_labels.DATA_MANAGER}:`}</Typography>
                     {dataManagers.map(groupMember => {
-                        return <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
-                        label={`${groupMember.group.name}`}
-                        onClick={() => {
-                        if (inModal === false){
-                        setViewModal(groupMember)
-                        }}}
-                        clickable={inModal? false : true} />
+                        return <Tooltip title="Data Manager">
+                            <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
+                            label={`${groupMember.group.name}`}
+                            onClick={() => {
+                            if (inModal === false){
+                            setViewModal(groupMember)
+                            }}}
+                            clickable={inModal? false : true} />
+                        </Tooltip>
                     })
                     }
                 </div>
@@ -101,30 +102,32 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
 
             {members.length > 0 && 
                 <div className={classes.roleContainer}>
-                    <Typography className={classes.roleText}>{`${Constants.role_labels.MEMBER}:`}</Typography>
                     {members.map(groupMember => {
-                        return <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
-                        label={`${groupMember.group.name}`}
-                        onClick={() => {
-                        if (inModal === false){
-                        setViewModal(groupMember)
-                        }}}
-                        clickable={inModal? false : true} />
+                        return <Tooltip title="Member">
+                            <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
+                            label={`${groupMember.group.name}`}
+                            onClick={() => {
+                            if (inModal === false){
+                            setViewModal(groupMember)
+                            }}}
+                            clickable={inModal? false : true} />
+                        </Tooltip>
                     })
                     }
                 </div>
             }
             {unknown.length > 0 && 
                 <div className={classes.roleContainer}>
-                    <Typography className={classes.roleText}>{`${Constants.role_labels.UNKNOWN}:`}</Typography>
                     {unknown.map(groupMember => {
-                        return <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
-                        label={`${groupMember.group.name}`}
-                        onClick={() => {
-                        if (inModal === false){
-                        setViewModal(groupMember)
-                        }}}
-                        clickable={inModal? false : true} />
+                        return <Tooltip title="Other">
+                            <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
+                            label={`${groupMember.group.name}`}
+                            onClick={() => {
+                            if (inModal === false){
+                            setViewModal(groupMember)
+                            }}}
+                            clickable={inModal? false : true} />
+                        </Tooltip>
                     })
                     }
                 </div>
@@ -133,29 +136,3 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
 }
 
 export default withStyles(styles)(RelatedGroups)
-
-/*
-
-href={inModal ? null : `/#/${Constants.models.GROUPS}/${groupMember.group.id}/${Constants.resource_operations.SHOW}`} component="a" clickable/>
-
-{groupMembers.map(groupMember => {
-                if (groupMember && groupMember.group_role && groupMember.group_role.label){
-                    //TODO: below string label translation is hardcoded to our API format and shouldn't be - it should be run through translate.
-                    let groupRoleTextArr = groupMember.group_role.label.split(".")
-                    let groupRoleValue=""
-
-                    if (groupRoleTextArr.length === 4) {
-                        groupRoleValue=groupRoleTextArr[groupRoleTextArr.length - 2] + ": "
-                    }
-                    return (
-                        <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id} 
-                        label={`${groupRoleValue}${groupMember.group.name}`}
-                        href={`/#/${Constants.models.GROUPS}/${groupMember.group.id}/${Constants.resource_operations.SHOW}`} component="a" clickable={inModal ? false : true}/>
-                    )
-                }
-            else{
-                return null
-            }
-            })
-            }
-*/

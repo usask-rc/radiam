@@ -64,8 +64,3 @@ class UserDetails extends Component {
 }
 
 export default UserDetails
-
-
-//
-//<UserDetails basePath="/users" resource="users" setViewModal={setViewModal} record={{...viewModal.user}} />
-//
