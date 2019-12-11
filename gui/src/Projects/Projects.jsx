@@ -144,7 +144,7 @@ const actionStyles = theme => ({
   }
 })
 
-const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
+const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEditModal, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
@@ -154,6 +154,7 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, classes})
     if (data && !showEdit){
       isAdminOfAParentGroup(data.group).then(data => {
         setShowEdit(data)
+        setCanEditModal(data)
       }
       
       )
@@ -182,6 +183,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     const [createModal, setCreateModal] = useState(false)
     const [viewModal, setViewModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
+    const [canEditModal, setCanEditModal] = useState(false) //this is used to pass into RelatedDatasets to decide whether or not to make the dataset editable
 
     let _isMounted = false
     useEffect(() => {
@@ -202,10 +204,10 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     }, [createModal, viewModal])
 
     if (permissions){
-      return (<Show actions={<ProjectShowActions/>}  {...props} >
+      return (<Show actions={<ProjectShowActions setCanEditModal={setCanEditModal}/>}  {...props} >
         <TabbedShowLayout>
           <Tab label={'summary'}>
-            {projectDatasets && <RelatedDatasets setCreateModal={setCreateModal} setEditModal={setEditModal} setViewModal={setViewModal} projectDatasets={projectDatasets} {...props} /> }
+            {projectDatasets && <RelatedDatasets setCreateModal={setCreateModal} setEditModal={setEditModal} setViewModal={setViewModal} projectDatasets={projectDatasets} canEditModal={canEditModal} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
             <TextField
               label={'en.models.projects.keywords'}

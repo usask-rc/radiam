@@ -28,7 +28,7 @@ const styles = theme => ({
   },
 });
 
-const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=false, setEditModal, setViewModal, ...props}) => {
+const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=false, setEditModal, setViewModal, canEditModal, ...props}) => {
 
     return(
       <div className={classes.relatedDSContainer}>
@@ -38,7 +38,7 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
               <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
               label={`${dataset.title}`}
               clickable={inModal ? false : true}
-              onDelete={setEditModal && !inModal ? () => {
+              onDelete={canEditModal && setEditModal && !inModal ? () => {
                 
                 //NOTE: the array selection fields require a specific formatting to display properly.  This translation satisfies that formatting
                 const cpDataset = dataset
@@ -65,7 +65,7 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
               deleteIcon={<Edit />}  />
             )
           })}
-          {setCreateModal && 
+          {canEditModal && setCreateModal && 
             <Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setCreateModal(true)}/>
           }
         </div>
