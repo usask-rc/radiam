@@ -16,7 +16,7 @@ const validateEmail = [required('en.validate.user.email'), email()];
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
-        this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false }
+        this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false, viewModal: false}
     }
 
     componentDidMount() {
@@ -90,7 +90,8 @@ class UserEditForm extends Component {
     };
 
     render() {
-        const {groupMembers} = this.state
+        const {groupMembers, viewModal} = this.state
+        const {setViewModal} = this.props
         return (<React.Fragment>
             <SimpleForm
                 save={this.handleSubmit}
@@ -104,6 +105,8 @@ class UserEditForm extends Component {
                         return(<UserTitle prefix={"Updating"} record={formData} />)}
                     }
                 </FormDataConsumer>
+
+                {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
 
 
                 <TextInput
@@ -145,8 +148,6 @@ class UserEditForm extends Component {
                     defaultValue={this.state.is_active}
                     onChange={this.handleSelectChange}
                 />
-                {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers}/>}
-
             </SimpleForm>
             
             <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>

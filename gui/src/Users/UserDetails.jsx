@@ -22,46 +22,43 @@ class UserDetails extends Component {
     render() {
         const {groupMembers, viewModal} = this.state
         const {setViewModal} = this.props
-        console.log("setViewModal: ", setViewModal)
 
-        console.log("UserDetails prop:" , this.props)
-        console.log("this.state: ", this.state)
         return (
-                <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
-                    <UserTitle prefix={"Viewing"}/>
-                    <TextField
-                        label={"en.models.users.username"}
-                        source={Constants.model_fields.USERNAME}
-                    />
-                    <TextField
-                        label={"en.models.users.fname"}
-                        source={Constants.model_fields.FIRST_NAME}
-                    />
-                    <TextField
-                        label={"en.models.users.lname"}
-                        source={Constants.model_fields.LAST_NAME}
-                    />
-                    <EmailField
-                        label={"en.models.users.email"}
-                        source={Constants.model_fields.EMAIL}
-                    />
-                    <TextField
-                        label={"en.models.users.notes"}
-                        source={Constants.model_fields.NOTES}
-                    />
-                    <BooleanField
-                        label={"en.models.generic.active"}
-                        source={Constants.model_fields.ACTIVE}
-                    />
-                    {viewModal &&
-                    <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); this.setState({viewModal:false})}} aria-label="Add User">
-                        <DialogContent>
-                            <GroupShow id={viewModal.group.id} basePath="/researchgroups" resource="researchgroups" setViewModal={(data) => {this.setState({viewModal: data})}} inModal={true} record={{...viewModal.group}} />
-                        </DialogContent>
-                    </Dialog>
-                    }
-                    {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
-                </SimpleShowLayout>
+            <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
+                <UserTitle prefix={"Viewing"}/>
+                {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
+                <TextField
+                    label={"en.models.users.username"}
+                    source={Constants.model_fields.USERNAME}
+                />
+                <TextField
+                    label={"en.models.users.fname"}
+                    source={Constants.model_fields.FIRST_NAME}
+                />
+                <TextField
+                    label={"en.models.users.lname"}
+                    source={Constants.model_fields.LAST_NAME}
+                />
+                <EmailField
+                    label={"en.models.users.email"}
+                    source={Constants.model_fields.EMAIL}
+                />
+                <TextField
+                    label={"en.models.users.notes"}
+                    source={Constants.model_fields.NOTES}
+                />
+                <BooleanField
+                    label={"en.models.generic.active"}
+                    source={Constants.model_fields.ACTIVE}
+                />
+                {viewModal &&
+                <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); this.setState({viewModal:false})}} aria-label="Add User">
+                    <DialogContent>
+                        <GroupShow id={viewModal.group.id} basePath="/researchgroups" resource="researchgroups" setViewModal={(data) => {this.setState({viewModal: data})}} inModal={true} record={{...viewModal.group}} />
+                    </DialogContent>
+                </Dialog>
+                }
+            </SimpleShowLayout>
         )
     }
 }
