@@ -60,7 +60,7 @@ def list_difference(list1,list2):
 def update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id):
     global logger
 
-    logger.info("Crawling project %s" %project_name)
+    logger.info("Crawling project %s" % project_name)
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
     config_project_endpoint = host + "/api/projects/" + radiam_project_id + "/"
@@ -81,7 +81,7 @@ def get_osf_endpoints():
     TODO:
     Get the OSF endpoint data from the API
     """
-    return requests.get("http://radiamapi:8000/useragents/osf_configs")
+    return requests.get("http://nginx/api/useragents/osf_configs")
 
 def main():
     if sys.version_info[0] < 3:
@@ -103,16 +103,19 @@ def main():
     while True:
     
         # TODO: Get OSF Agent information from Radiam API
-        data = RadiamAPI.get_osf_endpoints()
-        
+        resp = get_osf_endpoints()
+        host = "http://radiamapi:8000"
+    
+        data = json.loads(resp.text)
+
         for item in data:
-            agent_id = item[0]
-            osf_token = item[1]
-            location_id = item[2]
-            project_name = item[3]
-            radiam_project_id = item[4]
-            radiam_tokens["access"] = item[5]
-            radiam_tokens["refresh"] = item[6]
+            agent_id = item['user_agent_id']
+            osf_token = item['remote_api_token']
+            location_id = item['loc_id']
+            project_name = item['osf_project']
+            radiam_project_id = item['project_id']
+            radiam_tokens["access"] = item['local_access_token']
+            radiam_tokens["refresh"] = item['local_refresh_token']
             agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
             API = RadiamAPI(**agent_config)
             API.setLogger(logger)

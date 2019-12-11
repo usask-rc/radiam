@@ -529,8 +529,10 @@ class UserAgentViewSet(RadiamViewSet):
 
     @action(methods=['get'],
             detail=False,
-            url_name='osf_configs')
+            url_name='osf_configs',
+            permission_classes=[AllowAny])
     def osf_configs(self, request):
+
         # Restricted to internal Docker network requests
         # if ('HTTP_X_FORWARDED_FOR' not in request.META) or (request.get_host() is not "osfconnector"):
         if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
@@ -1096,55 +1098,55 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
         return Response(data)
 
 
-class OSFConfigsViewSet(viewsets.GenericViewSet):
+# class OSFConfigsViewSet(viewsets.GenericViewSet):
 
-    def get_queryset(self):
-        pass
+#     def get_queryset(self):
+#         pass
 
-    def list(self, request):
-        # Restricted to internal Docker network requests
-        #if ('HTTP_X_FORWARDED_FOR' not in request.META) or (request.get_host() is not "osfconnector"):
-        # if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
-        #     data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
-        #     return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+#     def list(self, request):
+#         # Restricted to internal Docker network requests
+#         #if ('HTTP_X_FORWARDED_FOR' not in request.META) or (request.get_host() is not "osfconnector"):
+#         # if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
+#         #     data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+#         #     return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         
-        resp = self.osf_agent_token_query()
+#         resp = self.osf_agent_token_query()
 
-        data = []
-        for item in resp:
-            result = {
-                "user_agent_id": item[0],
-                "remote_api_token": item[1],
-                "loc_id": item[2],
-                "osf_project": item[3],
-                "project_id": item[4],
-                "local_access_token": item[5],
-                "local_refresh_token": item[6],
-            }
-            data.append(result)
+#         data = []
+#         for item in resp:
+#             result = {
+#                 "user_agent_id": item[0],
+#                 "remote_api_token": item[1],
+#                 "loc_id": item[2],
+#                 "osf_project": item[3],
+#                 "project_id": item[4],
+#                 "local_access_token": item[5],
+#                 "local_refresh_token": item[6],
+#             }
+#             data.append(result)
 
-        return Response(data)
+#         return Response(data)
 
 
-    def osf_agent_token_query(self):
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "select agents.id as user_agent_id, "
-                        "agents.remote_api_token, "
-                        "loc.id as loc_id, "
-                        "loc.osf_project, "
-                        "agent_config.project_id, "
-                        "agents.local_access_token, "
-                        "agents.local_refresh_token "
-                "from rdm_locations loc "
-                "join rdm_location_types loc_type on loc.location_type_id = loc_type.id "
-                "join rdm_user_agents agents on agents.location_id = loc.id "
-                "join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id "
-                "where loc_type.label = 'location.type.osf'")
+#     def osf_agent_token_query(self):
+#         with connection.cursor() as cursor:
+#             cursor.execute(
+#                 "select agents.id as user_agent_id, "
+#                         "agents.remote_api_token, "
+#                         "loc.id as loc_id, "
+#                         "loc.osf_project, "
+#                         "agent_config.project_id, "
+#                         "agents.local_access_token, "
+#                         "agents.local_refresh_token "
+#                 "from rdm_locations loc "
+#                 "join rdm_location_types loc_type on loc.location_type_id = loc_type.id "
+#                 "join rdm_user_agents agents on agents.location_id = loc.id "
+#                 "join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id "
+#                 "where loc_type.label = 'location.type.osf'")
 
-            rows = cursor.fetchall()
+#             rows = cursor.fetchall()
 
-        return rows
+#         return rows
 
 
 # class SearchViewSet(viewsets.GenericViewSet):
