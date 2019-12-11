@@ -6,12 +6,13 @@ import { getAPIEndpoint } from '../_tools';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { toast } from 'react-toastify';
 import { translateDates, toastErrors } from '../_tools/funcs';
-import { required, email, minLength, maxLength } from 'ra-core';
+import { required, email, minLength, maxLength, regex } from 'ra-core';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt, Redirect } from 'react-router';
 import UserTitle from './UserTitle';
 
-const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
+//const validateVersion = regex(/^\d+\.\d+\.\d+/, 'en.validate.useragents.version')
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
 const validateEmail = [required('en.validate.user.email'), email()];
 const validateGroup = required('en.validate.user.group');
 const validateRole = required('en.validate.user.role');

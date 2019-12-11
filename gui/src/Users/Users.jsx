@@ -26,6 +26,7 @@ import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
 import Toolbar from '@material-ui/core/Toolbar';
 import { EditButton, DeleteButton } from 'react-admin';
+import { minLength, maxLength, regex } from "ra-core";
 
 const listStyles = {
   actions: {
@@ -187,9 +188,9 @@ export const UserShow = props => {
   )
 };
 
-const validateUsername = required('en.validate.user.username');
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
 
-//TODO: want ability to create user-group association from here.
+
 const UserForm = props => (
   <SimpleForm {...props} >
     <TextInput

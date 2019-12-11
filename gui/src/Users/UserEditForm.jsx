@@ -4,7 +4,7 @@ import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-
 import * as Constants from "../_constants/index"
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { email, maxLength, minLength, required, FormDataConsumer } from 'ra-core';
+import { email, maxLength, minLength, required, FormDataConsumer, regex } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Prompt, Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
@@ -12,7 +12,7 @@ import UserTitle from './UserTitle';
 import { Dialog, DialogContent } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
 
-const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12)];
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
 const validateEmail = [required('en.validate.user.email'), email()];
 
 class UserEditForm extends Component {
