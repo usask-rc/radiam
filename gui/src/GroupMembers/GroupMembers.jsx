@@ -130,22 +130,10 @@ export const GroupMemberList = withStyles(listStyles)(
           </ReferenceField>
           <DateField
             label={"en.models.generic.date_updated"}
-            options={{
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            }}
             source={Constants.model_fields.DATE_UPDATED}
           />
           <DateField
             label={"en.models.generic.date_expires"}
-            options={{
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            }}
             source={Constants.model_fields.DATE_EXPIRES}
           />
         </Datagrid>

@@ -491,7 +491,7 @@ export default {
         admin: {
           label: 'Group Admin',
           description:
-            'Group Administrators may Create Users, Groups, Locations, Projects, Datasets, View Grants and Agents, and add users to Group they are a Group Admin of.  They have Update permissions on all Groups they administrate, and all Projects that are associated with said group, or a group that is a child of one they administrate, and similarly any Datasets associated with any Projects they administrate.  They may not update Users after creation.',
+            'Group Administrators may Create Users, Groups, Locations, Projects, Datasets, View Grants and Agents, and add users to Group they are a Group Admin of.  They have full CRUD ability on any Project or Dataset that resides in a Group they administrate, and may create Group Grants and User Agents.',
         },
         datamanager: {
           label: 'Data Manager',

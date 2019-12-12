@@ -13,6 +13,8 @@ import { Dialog, DialogContent } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
+const validateFirstName = [required('en.validate.user.first_name')]
+const validateLastName = [required('en.validate.user.lastname')]
 const validateEmail = [required('en.validate.user.email'), email()];
 
 class UserEditForm extends Component {
@@ -122,12 +124,14 @@ class UserEditForm extends Component {
                     label={"en.models.users.fname"}
                     source={Constants.model_fields.FIRST_NAME}
                     onChange={this.handleChange}
+                    validate={validateFirstName}
                     defaultValue={this.state.first_name}
                 />
                 <TextInput
                     label={"en.models.users.lname"}
                     source={Constants.model_fields.LAST_NAME}
                     onChange={this.handleChange}
+                    validate={validateLastName}
                     defaultValue={this.state.last_name}
                 />
                 <TextInput

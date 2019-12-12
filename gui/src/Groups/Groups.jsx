@@ -65,7 +65,6 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       source="search"
       alwaysOn
     />
-    <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <TextInput
       label={"en.models.groups.name"}
       source={Constants.model_fields.NAME}
@@ -327,11 +326,6 @@ const GroupForm = props =>
         label={"en.models.groups.description"}
         source={Constants.model_fields.DESCRIPTION}
         validate={validateDescription}
-      />
-      <BooleanInput
-        label={"en.models.generic.active"}
-        defaultValue={true}
-        source={Constants.model_fields.ACTIVE}
       />
       <ReferenceInput
         label={"en.models.groups.parent_group"}

@@ -57,14 +57,9 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
           source="search"
           alwaysOn
     />
-    <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <TextInput
       label={"en.models.users.username"}
       source={Constants.model_fields.USERNAME}
-    />
-    <TextInput
-      label={"en.models.users.notes"}
-      source={Constants.model_fields.NOTES}
     />
     <TextInput
       label={"en.models.users.email"}
@@ -82,7 +77,6 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       label={"en.models.users.active"}
       defaultValue={true}
       source={Constants.model_fields.ACTIVE} />
-
   </Filter>
 ));
 
@@ -189,7 +183,9 @@ export const UserShow = props => {
 };
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
-
+const validateFirstName = [required('en.validate.user.first_name')]
+const validateLastName = [required('en.validate.user.lastname')]
+const validateEmail = [required('en.validate.user.email')]
 
 const UserForm = props => (
   <SimpleForm {...props} >
@@ -201,14 +197,17 @@ const UserForm = props => (
     <TextInput
       label={"en.models.users.fname"}
       source={Constants.model_fields.FIRST_NAME}
+      validate={validateFirstName}
     />
     <TextInput
       label={"en.models.users.lname"}
       source={Constants.model_fields.LAST_NAME}
+      validate={validateLastName}
     />
     <TextInput
       label={"en.models.users.email"}
       source={Constants.model_fields.EMAIL}
+      validate={validateEmail}
     />
     <TextInput
       label={"en.models.users.notes"}

@@ -56,8 +56,7 @@ class UserFormWithAssoc extends Component {
             }
         )
 
-        if (username && email) {
-
+        if (username && email && ((group && group_role) || (!group && !group_role))) {
             return fetch(request).then(response => {
 
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
@@ -65,60 +64,71 @@ class UserFormWithAssoc extends Component {
                 }
                 throw new Error(response.statusText);
             })
-                .then(data => {
-                    if (data.id) {
-                        //create a groupmember with these details
-                        const groupMemberRequest = new Request(getAPIEndpoint() + "/groupmembers/", {
-                            method: Constants.methods.POST,
-                            body: JSON.stringify({ ...this.state, date_expires: date_expires, user: data.id }),
-                            headers: headers
+            .then(data => {
+                if (data.id) {
+                    //create a groupmember with these details
+                    const groupMemberRequest = new Request(getAPIEndpoint() + "/groupmembers/", {
+                        method: Constants.methods.POST,
+                        body: JSON.stringify({ ...this.state, date_expires: date_expires, user: data.id }),
+                        headers: headers
+                    })
+
+                    if (group_role && group) {
+
+                        return fetch(groupMemberRequest).then(response => {
+                            if (response.status >= 200 && response.status < 300) {
+                                return response.json();
+                            }
+                            throw new Error(response.statusText);
                         })
-
-                        if (group_role && group) {
-
-                            return fetch(groupMemberRequest).then(response => {
-                                if (response.status >= 200 && response.status < 300) {
-                                    return response.json();
-                                }
-                                throw new Error(response.statusText);
+                            .then(data => {
+                                this.props.history.push(`/${Constants.models.USERS}`);
                             })
-                                .then(data => {
-                                    this.props.history.push(`/${Constants.models.USERS}`);
-                                })
-                                .catch(err => {
-                                    toastErrors(err)
-                                    console.log("Error in groupmember creation after new user is: ", err)
-                                })
-                        }
-                        else if (group_role || group) {
-                            toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
-                            this.props.history.push(`/${Constants.models.USERS}`);
-                        }
-                        else {
-                            toast.success("User: " + username + " was successfully created.")
-                            this.props.history.push(`/${Constants.models.USERS}`);
-                        }
-
+                            .catch(err => {
+                                toastErrors(err)
+                                console.log("Error in groupmember creation after new user is: ", err)
+                            })
                     }
-                    //case of 400 or 500 errors
-                    else if (data) {
-                        toastErrors(data)
+                    else if (group_role || group) {
+                        toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
+                        this.props.history.push(`/${Constants.models.USERS}`);
                     }
-
-                    //we should never reach this point
                     else {
-                        console.log("Something went wrong with groupmember association")
-                        toastErrors("GroupMember not created.  Please proceed to the GroupMember page to associate this user with a group.");
+                        toast.success("User: " + username + " was successfully created.")
+                        this.props.history.push(`/${Constants.models.USERS}`);
                     }
-                })
-                .catch(err => {
-                    toastErrors(err)
-                    console.error("hit Catch in User Creation request: ", err)
-                })
+
+                }
+                //case of 400 or 500 errors
+                else if (data) {
+                    toastErrors(data)
+                }
+
+                //we should never reach this point
+                else {
+                    console.log("Something went wrong with groupmember association")
+                    toastErrors("GroupMember not created.  Please proceed to the GroupMember page to associate this user with a group.");
+                }
+            })
+            .catch(err => {
+                toastErrors(err)
+                console.error("hit Catch in User Creation request: ", err)
+            })
 
         }
         else {
-            toastErrors("Please enter the new User's Username and Email Address.");            
+            if (!username){
+                toastErrors("Please enter a username");
+            }
+            else if (!email){
+                toastErrors("Please enter an email address");
+            }
+            else if (!group){
+                toastErrors("Please select a group role")
+            }
+            else if (!group_role){
+                toastErrors("Please select a group")
+            }
         }
     })
     };

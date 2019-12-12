@@ -47,6 +47,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
 import { getGroupUsers } from "../_tools/funcs";
+import { Cancel } from "@material-ui/icons";
 
 const configStyles = {
   root: {
@@ -1495,7 +1496,7 @@ class BaseMetadataEditActions extends Component {
         { showRelatedUsers && this.state.groupMembers &&
           <RelatedUsers groupMembers={this.state.groupMembers} />
         }
-        { data && <ShowButton basePath={basePath} record={data} /> }
+        { data && <ShowButton basePath={basePath} label="Cancel" icon={<Cancel />} record={data} /> }
         <RefreshButton />
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </CardActions>
