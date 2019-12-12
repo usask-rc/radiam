@@ -9,7 +9,7 @@ import FewUsers from './FewUsers';
 
 
 const WelcomeCards = () => {
-
+    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     let _isMounted = false
     const [userManagedGroups, setUserManagedGroups] = useState([])
 
@@ -51,7 +51,6 @@ const WelcomeCards = () => {
         //if i'm the superuser, I don't care if a group doesn't have a user.  This is up to a Group Admin or a Data Manager to rectify.
         _isMounted = true
         //TODO: protect against memory leakage
-        const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
         
         if (user){
             let userRole = getMaxUserRole()
@@ -82,9 +81,7 @@ const WelcomeCards = () => {
         container
         spacing={3}
     >
-    {//this is to appear if the user manages (group admin or data manager) one or more groups with few users
-    }
-    {userManagedGroups && userManagedGroups.length > 0 && 
+    {(user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
         <FewUsers userManagedGroups={userManagedGroups} />
     }
     {
