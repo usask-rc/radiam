@@ -3,13 +3,13 @@
   "version": "1.0.4",
   "private": true,
   "dependencies": {
-    "@babel/core": "^7.6.0",
+    "@babel/core": "7.6.0",
     "@material-ui/core": "^4.4.3",
     "@material-ui/icons": "^4.4.3",
-    "babel": "^6.23.0",
-    "babel-loader": "^8.0.6",
-    "babel-plugin-named-asset-import": "^0.3.4",
-    "babel-preset-react-app": "^9.0.2",
+    "babel": "6.23.0",
+    "babel-loader": "8.0.6",
+    "babel-plugin-named-asset-import": "0.3.4",
+    "babel-preset-react-app": "9.0.2",
     "bfj": "^7.0.1",
     "case-sensitive-paths-webpack-plugin": "^2.2.0",
     "compose": "^0.1.2",
@@ -134,5 +134,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "yarn-deduplicate": "^1.1.1"
   }
 }

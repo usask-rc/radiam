@@ -28,7 +28,7 @@ const ProjectCards = ({ loading, projects }) =>
                     return null
                 })
                 */
-                }
+            }
         </Grid>
     )
 }

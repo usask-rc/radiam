@@ -34,7 +34,6 @@ const styles = {
   container: {
     textAlign: "flex-start",
     minHeight: "12em",
-    marginLeft: "1em",
   },
 };
 const Welcome = ({ classes, translate }) => (
