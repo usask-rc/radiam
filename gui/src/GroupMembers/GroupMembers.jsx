@@ -52,11 +52,6 @@ const filterStyles = {
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
 const GroupMemberFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
-    <TextInput
-      label={"en.models.filters.search"}
-      source="search"
-      alwaysOn
-    />
     <DateInput source={Constants.model_fields.DATE_UPDATED} />
     <ReferenceInput
       label={"en.models.groupmembers.user"}
