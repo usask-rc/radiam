@@ -164,8 +164,8 @@ function FolderView({ projectID, item, classes }) {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [numFiles, setNumFiles] = useState(100)
-  const [sortBy, setSortBy] = useState("last_modified")
-  const [order, setOrder] = useState("-")
+  const [sortBy, setSortBy] = useState("name.keyword")
+  const [order, setOrder] = useState("")
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -270,7 +270,7 @@ function FolderView({ projectID, item, classes }) {
               onChange={e => setSortBy(e.target.value)}
             >
               {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-              <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
+              <MenuItem value={"name.keyword"}>File Name</MenuItem>
               <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
               <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
               <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>

@@ -47,7 +47,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
-  const [order, setOrder] = useState('-'); //in case we ever want to be able to toggle asc/desc sorted values
+  const [order, setOrder] = useState(''); //in case we ever want to be able to toggle asc/desc sorted values
   const [search, setSearch] = useState(
     (props &&
       props.location &&
@@ -60,7 +60,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       props.location &&
       props.location.state &&
       props.location.state.sortType) ||
-    'last_modified'
+    'path.agnostic.keyword'
   );
 
   const handleSubmit = e => {
@@ -117,7 +117,8 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             onChange={e => setSort(e.target.value)}
           >
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-            <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
+            <MenuItem value={"name.keyword"}>File Name</MenuItem>
+            <MenuItem value={"path.agnostic.keyword"}>File Path</MenuItem>
             <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
             <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
             <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>

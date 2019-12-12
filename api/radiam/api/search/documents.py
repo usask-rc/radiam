@@ -21,9 +21,9 @@ class ESDataset(Document):
     path = Text(analyzer=linux_analyzer,
             fields={ "keyword" : Keyword(),
                 "agnostic": Text(analyzer=linux_analyzer, fields={ "keyword" : Keyword() }) })
+    path_parent = Text(analyzer=linux_analyzer, fields={"keyword": Keyword()})
     # Type is set to a keyword so that it will be possible to sort on it.
     type = Keyword()
-    path_parent = Text(analyzer=linux_analyzer, fields={"keyword": Keyword()})
 
     class Meta:
         doc_type = "_doc"
