@@ -429,7 +429,7 @@ class UserViewSet(RadiamViewSet):
        RadiamAuthUserFilter,
        OrderingFilter,
     )
-    search_fields = ['username']
+    search_fields = ['username', 'first_name', 'last_name', 'email']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
     ordering_fields = ('username','first_name','last_name', 'email', 'date_created', 'date_updated', 'notes')
     ordering = ('last_name', 'first_name', 'username', )
@@ -549,10 +549,12 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     ordering = ('name',)
 
     permission_classes = (IsAuthenticated, DRYPermissions,)
+    search_fields = ['name', 'description']
     filter_fields = ('id', 'name', 'description', 'parent_group')
     ordering_fields = ('name', 'description', 'date_created', 'date_updated', 'parent_group')
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         ActiveModelFilter,
         RadiamAuthResearchGroupFilter,
@@ -636,10 +638,12 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     search_index = 'dataset_metadata'
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         RadiamAuthDatasetFilter,
         DatasetOrderingFilter,
     )
+    search_fields = ['title', 'study_site']
     filter_fields=('title', 'study_site', 'project', 'id')
     ordering_fields=('title', 'study_site', 'project', 'date_created', 'date_updated')
     ordering = ('title', )
@@ -773,11 +777,13 @@ class GroupViewGrantViewSet(RadiamViewSet):
     serializer_class = GroupViewGrantSerializer
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         RadiamAuthGroupViewGrantFilter,
         GroupViewGrantOrderingFilter,
     )
 
+    search_fields = ['fields']
     filter_fields = ('group', 'dataset', 'fields')
     ordering_fields = ('group', 'dataset', 'fields', 'date_created', 'date_updated', 'date_starts', 'date_expires')
     permission_classes = (IsAuthenticated, DRYPermissions,)
@@ -796,11 +802,13 @@ class LocationViewSet(RadiamViewSet):
     serializer_class = LocationSerializer
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         ActiveModelFilter,
         LocationOrderingFilter,
     )
 
+    search_fields = ['display_name', 'host_name']
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
 
@@ -898,10 +906,12 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     parser_classes = (JSONParser,)
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         RadiamAuthProjectFilter,
         ProjectOrderingFilter,
     )
+    search_fields = ['name', 'keywords']
     filter_fields=('name', 'number', 'keywords', 'group', 'id')
     ordering_fields=('name', 'number', 'keywords', 'group', 'primary_contact_user', 'date_created', 'date_updated')
     ordering = ('name', )
