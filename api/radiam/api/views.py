@@ -534,7 +534,6 @@ class UserAgentViewSet(RadiamViewSet):
     def osf_configs(self, request):
 
         # Restricted to internal Docker network requests
-        # if ('HTTP_X_FORWARDED_FOR' not in request.META) or (request.get_host() is not "osfconnector"):
         if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
             data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)

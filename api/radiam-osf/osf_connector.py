@@ -78,7 +78,6 @@ def update_info(osf_token, project_name, host, API, agent_id, location_id, radia
 
 def get_osf_endpoints():
     """
-    TODO:
     Get the OSF endpoint data from the API
     """
     return requests.get("http://nginx/api/useragents/osf_configs")
@@ -101,8 +100,7 @@ def main():
     # Loop every hour checking OSF endpoints for updates
 
     while True:
-    
-        # TODO: Get OSF Agent information from Radiam API
+        # TODO: Change host,  sleep time, and others to configurable values
         resp = get_osf_endpoints()
         host = "http://radiamapi:8000"
     
