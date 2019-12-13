@@ -242,6 +242,14 @@ class BaseUserSerializer(serializers.ModelSerializer):
         instance.notes = validated_data.get('notes', instance.notes)
 
         instance.save()
+
+        # trigger the user updated signal
+        radiam_user_updated.send(sender=self.__class__,
+                                 email=instance.email,
+                                 username=instance.username,
+                                 first_name=instance.first_name,
+                                 request=self.context.get('request'))
+
         return instance
 
 
