@@ -15,7 +15,7 @@ from elasticsearch import exceptions as es_exceptions
 # from . import services
 from .search import RadiamService
 from .exceptions import ElasticSearchRequestError
-from .signals import (radiam_user_created, radiam_project_created,
+from .signals import (radiam_user_created, radiam_user_updated, radiam_project_created,
     radiam_project_deleted)
 from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
 
@@ -288,6 +288,44 @@ def send_user_welcome_email(sender, user, reset_password_token, *args, **kwargs)
     else:
         print(render_to_string('user_welcome_email.html', context=context))
 
+
+@receiver(radiam_user_updated)
+def send_user_update_email(sender, email, username, first_name, *args, **kwargs):
+    """
+    When a new user is updated, send them a notification email informing
+    the user.
+    """
+
+    request = kwargs['request']
+
+    context = {
+        'username': username,
+        'first_name': first_name,
+        'host': request.get_host(),
+        'scheme': request.scheme,
+    }
+
+    user_update_subj = "Radiam Notification"
+
+    if settings.DEBUG and hasattr(settings, 'DEV_EMAIL_ADDRESSES'):
+        email_addresses = settings.DEV_EMAIL_ADDRESSES
+    else:
+        email_addresses = [email]
+
+    if use_email():
+        try:
+            send_mail(user_update_subj,
+                      render_to_string('notify_user_update_email.txt',
+                                       context=context, ),
+                      'noreply@radiam.ca',
+                      email_addresses,
+                      html_message=render_to_string('notify_user_update_email.html',
+                                                    context=context)
+                      )
+        except:
+            print(render_to_string('notify_user_update_email.html', context=context))
+    else:
+        print(render_to_string('notify_user_update_email.html', context=context))
 
 class GeoData(models.Model):
     """
