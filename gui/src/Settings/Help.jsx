@@ -68,7 +68,7 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.content} variant="p" component="p">
                     {translate('en.help.download.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTURL} >
+                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTURL} target="_blank" rel="noopener noreferrer">
                     {Constants.RADIAMAGENTURL}
                 </Typography>
             </div>
@@ -81,7 +81,7 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.content} variant="p" component="p">
                     {translate('en.help.email.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${Constants.SUPPORTEMAIL}`}>
+                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${Constants.SUPPORTEMAIL}`} target="_blank" rel="noopener noreferrer" >
                     {Constants.SUPPORTEMAIL}
                 </Typography>
             </div>
@@ -104,7 +104,7 @@ const Help = ({ classes, translate }) => (
                     {translate('en.help.developers.text')}
                 </Typography>
 
-                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTREADMEURL}>
+                <Typography  className={classes.link} variant="a" component="a" href={Constants.RADIAMAGENTREADMEURL} target="_blank" rel="noopener noreferrer" >
                     {Constants.RADIAMAGENTREADMEURL}
                 </Typography>
             </div>

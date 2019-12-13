@@ -92,6 +92,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         console.log("params sent to get_list are: ", params)
 
+
         if (params)
         {
           if (
@@ -115,8 +116,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
-            let page = `page=${params.pagination.page}&page_size=${params.pagination.perPage}`;
-
+            console.log("params in else: ", params)
+            const { page, perPage } = params.pagination;
+            
             url = `${apiUrl}/${resource}/?`;
             if (page && sort) {
               url = `${url}${page}&${sort}`;
@@ -124,10 +126,20 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               url = `${url}${page}`;
             } else if (sort) {
               url = `${url}${sort}`;
-            }
-            if (params.query) {
-              url = url + `&${stringify(params.query)}`;
-            }
+            }/*
+            const { page, perPage } = params.pagination;
+            const { sortField, sortOrder } = params.sort;
+
+            let query = {
+              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
+              _sort: sortField ? sortField : null,
+              _order: sortOrder ? sortOrder : null,
+              _start: (page - 1) * perPage,
+              _end: page * perPage,
+              page: page,
+              perPage: perPage,
+            };*/
+            //url = url + `?${stringify(query)}`;
           }
         }
 
