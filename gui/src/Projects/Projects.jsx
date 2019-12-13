@@ -370,6 +370,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
         
           data.map(item => {
             groupContactCandidates[item.id] = item
+            return item;
           })
 
           iteratedGroups.push(group)
@@ -378,6 +379,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
             let groupContactList = []
             Object.keys(groupContactCandidates).map(key => {
               groupContactList.push(groupContactCandidates[key])
+              return key
             })
 
             if (groupContactList.length > 0)
@@ -393,7 +395,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           }
         }).catch(err => 
           setStatus({error: err, loading: false}))
-      })
+          
+        return group
+        })
     }else{
       console.error("no group selected from which to provide candidate contacts")
     }

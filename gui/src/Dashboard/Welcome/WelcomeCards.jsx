@@ -1,3 +1,4 @@
+//WelcomeCards.jsx
 import React, { useState, useEffect } from 'react';
 import AgentInstall from './AgentInstall';
 import Welcome from './Welcome';
@@ -8,7 +9,7 @@ import SecondSteps from './SecondSteps';
 import FewUsers from './FewUsers';
 
 
-const WelcomeCards = () => {
+const WelcomeCards = ({loading, hasFiles}) => {
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     let _isMounted = false
     const [userManagedGroups, setUserManagedGroups] = useState([])
@@ -37,7 +38,10 @@ const WelcomeCards = () => {
                     const newGroup = groupData
                     newGroup.users = users
                     managedGroupsList = [...managedGroupsList, newGroup]
+
+                    if (_isMounted){
                     setUserManagedGroups(managedGroupsList)
+                    }
                 })
             })
         })
@@ -59,7 +63,9 @@ const WelcomeCards = () => {
             }
             else{
                 const managedGroups = [...user.groupAdminships, ...user.dataManagerships] 
-                getAssociatedUsers(managedGroups)
+                if (_isMounted){
+                    getAssociatedUsers(managedGroups)
+                }
             }
         }
         else{
@@ -109,8 +115,8 @@ const WelcomeCards = () => {
             <Welcome />
         </Grid>
         <Grid item xs={4}>
-            {/*This should be conditional based on whether or not a project has files*/}
-            <AgentInstall />
+            {/*This should be conditional based on whether or not the user has access to a project with files*/}
+            {!loading && !hasFiles && (user.is_admin || user.is_group_admin) && <AgentInstall />}
         </Grid>
     </Grid>
 )}

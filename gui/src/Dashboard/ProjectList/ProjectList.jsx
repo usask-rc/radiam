@@ -51,7 +51,6 @@ const styles = {
     },
     container: {
         marginTop: '3em',
-        marginLeft: "1em",
         textAlign: 'center',
         minWidth: "20em",
     },

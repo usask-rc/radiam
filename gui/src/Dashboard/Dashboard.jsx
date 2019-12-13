@@ -8,6 +8,14 @@ import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
 import moment from 'moment';
 import WelcomeCards from './Welcome/WelcomeCards';
+import { withStyles } from '@material-ui/styles';
+
+
+const styles = theme => ({
+  root: {
+
+  }
+})
 
 class Dashboard extends PureComponent {
   constructor(props) {
@@ -60,6 +68,10 @@ class Dashboard extends PureComponent {
               const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), 'days')
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
+
+              if (!this.state.hasFiles){
+                this.setState({hasFiles: true})
+              }
             }
             
             projectCtr += 1
@@ -88,12 +100,14 @@ class Dashboard extends PureComponent {
   }
 
   render() {
+    const {classes} = this.props
 
     return (
+      <div className={classes.root}>
       <Responsive
         medium={
           <React.Fragment>
-            <WelcomeCards />
+            <WelcomeCards loading={this.state.loading} hasFiles={this.state.hasFiles}  />
             {!this.state.loading &&
               <React.Fragment>
                 <ProjectCards loading={this.state.loading} projects={this.state.projects} />
@@ -102,8 +116,9 @@ class Dashboard extends PureComponent {
           </React.Fragment>
         }
       />
+      </div>
     );
   }
 }
 
-export default Dashboard;
+export default withStyles(styles)(Dashboard);
