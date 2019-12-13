@@ -1,3 +1,4 @@
+//WelcomeCards.jsx
 import React, { useState, useEffect } from 'react';
 import AgentInstall from './AgentInstall';
 import Welcome from './Welcome';
@@ -37,7 +38,10 @@ const WelcomeCards = ({loading, hasFiles}) => {
                     const newGroup = groupData
                     newGroup.users = users
                     managedGroupsList = [...managedGroupsList, newGroup]
+
+                    if (_isMounted){
                     setUserManagedGroups(managedGroupsList)
+                    }
                 })
             })
         })
@@ -59,7 +63,9 @@ const WelcomeCards = ({loading, hasFiles}) => {
             }
             else{
                 const managedGroups = [...user.groupAdminships, ...user.dataManagerships] 
-                getAssociatedUsers(managedGroups)
+                if (_isMounted){
+                    getAssociatedUsers(managedGroups)
+                }
             }
         }
         else{

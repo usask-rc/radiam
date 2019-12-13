@@ -112,21 +112,6 @@ const styles = {
   },
 };
 
-function canDoThing(permissions, record, rest){
-  console.log("permissions: ", permissions, record, rest)
-  if (permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager)
-  {
-    return true
-  }
-  return false
-}
-
-//TODO: NOTE:
-//Front-end Permissions will operate as follows as of 12/3/2019
-//If a certain level of user can in any case have access to a page, we check to see if the user fulfills that level across any portion of the app, and if so, allow them access
-//if they shouldn't ultimately have access to a specific instance, we can control this by limiting access to the page (Likely the Edit page) from the previous page (likely the Show page).
-//ultimately, if a user shouldn't have access to something, it's the server's job to not provide access to said thing.  This will result in some errors if the user accesses values
-//via the URL instead of navigating by page buttons, but that's OK.  Users know what they're getting into when they do that.
 const App = props => {
   return (
     <React.Fragment>
