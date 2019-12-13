@@ -150,6 +150,7 @@ const MapView = ({ classes, record }) => {
         console.warn(`ERROR(${err.code}): ${err.message}`);
     }
 
+    //TODO: is this necessary?  Should we just centre in a generic location in canada rather than the user's location?
     navigator.geolocation.getCurrentPosition(success, error, {
         enableHighAccuracy: true,
         timeout: 5000,

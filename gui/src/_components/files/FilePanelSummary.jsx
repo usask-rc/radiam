@@ -5,7 +5,7 @@ import { Grid, Typography } from '@material-ui/core';
 import { LocationShow } from '../_fields/LocationShow';
 import moment from 'moment';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
-import { Folder, Description } from '@material-ui/icons';
+import { Folder, Description, FolderOpen } from '@material-ui/icons';
 import { withStyles } from '@material-ui/styles';
 
 const styles = {
@@ -33,12 +33,13 @@ const FilePanelSummary = ({ classes, file, caller }) => (
   <Grid container direction="row" alignItems="center">
     <Grid item className={classes.item} xs={5} md={4}>
       <Typography className={classes.fileDisplay}>
-        <Description className={classes.folderIcon}/>
+        {file.type === "file" ? <Description className={classes.folderIcon}/>
+        : <FolderOpen className={classes.folderIcon} /> }
         {`${file.name}`}
       </Typography>
     </Grid>
     <Grid item className={classes.item} xs={2} md={2}>
-      {formatBytes(file.filesize, 2)}
+      {file.filesize && formatBytes(file.filesize, 2)}
     </Grid>
     <Grid item className={classes.item} xs={2} md={3}>
       {caller !== 'browser' && (

@@ -24,8 +24,6 @@ const WelcomeCards = ({loading, hasFiles}) => {
     //TODO: protect against leaks using ismounted
     const getAssociatedUsers = (managedGroups) => {
 
-        console.log("getassociatedusers: ", managedGroups)
-
         let managedGroupsList = []
 
         //first, get this group data by making a call to /researchgroups/{id}/
@@ -81,29 +79,29 @@ const WelcomeCards = ({loading, hasFiles}) => {
     }, [])
 
     return(
-    <Grid
-        direction="row"
-        alignItems="flex-start"
-        container
-        spacing={3}
-    >
-    {(user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
-        <FewUsers userManagedGroups={userManagedGroups} />
-    }
-    {
-        
-        //this should show if the user is an admin AND if there are no groups.
-    //there should be another if the user is in no groups
-    /*
-    
-    {userGroups !== null && userGroups.length === 0 &&
-        <Grid item xs={4}>
-            <FirstSteps />
-        </Grid>
+        <Grid
+            direction="row"
+            alignItems="flex-start"
+            container
+            spacing={3}
+        >
+        {user && (user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
+            <FewUsers userManagedGroups={userManagedGroups} />
         }
-        */
+        {
+            
+            //this should show if the user is an admin AND if there are no groups.
+        //there should be another if the user is in no groups
+        /*
+        
+        {userGroups !== null && userGroups.length === 0 &&
+            <Grid item xs={4}>
+                <FirstSteps />
+            </Grid>
+            }
+            */
 
-    }
+        }
         
         { false && //to be replaced once we know what's going here.
             <Grid item xs={4}>

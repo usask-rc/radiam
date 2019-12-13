@@ -95,6 +95,10 @@ class Login extends Component {
       reset_password: ""
     };
   }
+  componentDidMount(){
+    localStorage.clear()
+    sessionStorage.clear()
+  }
 
   handleSubmit(event) {
     this.submitForm();
