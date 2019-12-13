@@ -65,14 +65,6 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       source="search"
       alwaysOn
     />
-    <TextInput
-      label={"en.models.groups.name"}
-      source={Constants.model_fields.NAME}
-    />
-    <TextInput
-      label={"en.models.groups.description"}
-      source={Constants.model_fields.DESCRIPTION}
-    />
     <ReferenceInput
       label={"en.models.groups.parent_group"}
       source={Constants.model_fk_fields.PARENT_GROUP}

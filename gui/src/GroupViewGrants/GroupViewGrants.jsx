@@ -55,20 +55,10 @@ const GroupViewGrantFilter = withStyles(filterStyles)(
         label={"en.models.grants.dataset"}
         source={Constants.model_fk_fields.DATASET}
         reference={Constants.models.DATASETS}
+        alwaysOn
       >
-        <SelectInput optionText={Constants.model_fields.NAME} />
+        <SelectInput optionText={Constants.model_fields.TITLE} />
       </ReferenceInput>
-      <ReferenceInput
-        label={"en.models.grants.group"}
-        source={Constants.model_fk_fields.GROUP}
-        reference={Constants.models.GROUPS}
-      >
-        <SelectInput optionText={Constants.model_fields.NAME} />
-      </ReferenceInput>
-      <TextInput
-        label={"en.models.grants.fields"}
-        source={Constants.model_fields.FIELDS}
-      />
     </Filter>
   )
 );

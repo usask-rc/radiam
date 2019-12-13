@@ -49,17 +49,10 @@ const listStyles = {
         label={'en.models.datasets.project'}
         source={Constants.model_fk_fields.PROJECT}
         reference={Constants.models.PROJECTS}
+        alwaysOn
       >
         <SelectInput optionText={Constants.model_fields.NAME} />
       </ReferenceInput>
-      <TextInput
-        label={'en.models.datasets.title'}
-        source={Constants.model_fields.TITLE}
-      />
-      <TextInput
-        label={'en.models.datasets.study_site'}
-        source={Constants.model_fields.STUDY_SITE}
-      />
     </Filter>
   ));
 

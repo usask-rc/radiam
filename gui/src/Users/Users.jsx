@@ -57,26 +57,10 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
           source="search"
           alwaysOn
     />
-    <TextInput
-      label={"en.models.users.username"}
-      source={Constants.model_fields.USERNAME}
-    />
-    <TextInput
-      label={"en.models.users.email"}
-      source={Constants.model_fields.EMAIL}
-    />
-    <TextInput
-      label={"en.models.users.fname"}
-      source={Constants.model_fields.FIRST_NAME}
-    />
-    <TextInput
-      label={"en.models.users.lname"}
-      source={Constants.model_fields.LAST_NAME}
-    />
     <BooleanInput
       label={"en.models.users.active"}
-      defaultValue={true}
-      source={Constants.model_fields.ACTIVE} />
+      source={Constants.model_fields.ACTIVE}
+      alwaysOn />
   </Filter>
 ));
 
@@ -102,6 +86,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
         header: classes.header,
         actions: classes.actions
       }}
+      filterDefaultValues={{is_active: true}}
       exporter={false}
       filters={<UserFilter />}
       sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Chip, Tooltip } from '@material-ui/core';
 import * as Constants from "../_constants/index"
 import { withStyles } from '@material-ui/styles';
+import { Link } from 'ra-ui-materialui';
+import { Redirect } from "react-router-dom"
 
 const styles = theme => ({
     
@@ -36,6 +38,7 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
     const [dataManagers, setDataManagers] = useState([])
     const [members, setMembers] = useState([])
     const [unknown, setUnknown] = useState([])
+    const [redirect, setRedirect] = useState(false)
   
     useEffect(() => {
         let tempGA = []
@@ -74,7 +77,8 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
                             label={`${groupMember.group.name}`}
                             onClick={() => {
                             if (inModal === false){
-                                setViewModal(groupMember)
+                                return setRedirect(groupMember.group.id)
+
                             }}}
                             clickable={inModal? false : true} />
                         </Tooltip>
@@ -91,7 +95,8 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
                             label={`${groupMember.group.name}`}
                             onClick={() => {
                             if (inModal === false){
-                            setViewModal(groupMember)
+                                return setRedirect(groupMember.group.id)
+
                             }}}
                             clickable={inModal? false : true} />
                         </Tooltip>
@@ -108,7 +113,8 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
                             label={`${groupMember.group.name}`}
                             onClick={() => {
                             if (inModal === false){
-                            setViewModal(groupMember)
+                                return setRedirect(groupMember.group.id)
+
                             }}}
                             clickable={inModal? false : true} />
                         </Tooltip>
@@ -124,14 +130,20 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
                             label={`${groupMember.group.name}`}
                             onClick={() => {
                             if (inModal === false){
-                            setViewModal(groupMember)
+                                return setRedirect(groupMember.group.id)
+
                             }}}
                             clickable={inModal? false : true} />
                         </Tooltip>
                     })
                     }
                 </div>
-            }   
+            }
+            {redirect && <Redirect
+                to={{
+                    pathname: `/researchgroups/${redirect}/show`,
+                }}
+            />}
         </div>)
 }
 

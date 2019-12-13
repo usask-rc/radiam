@@ -57,6 +57,7 @@ const UserAgentFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       label={"en.models.agents.user"}
       source={Constants.model_fk_fields.USER}
       reference={Constants.models.USERS}
+      alwaysOn
     >
       <SelectInput optionText={userSelect} />
     </ReferenceInput>
@@ -64,6 +65,7 @@ const UserAgentFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       label={"en.models.agents.location"}
       source={Constants.model_fk_fields.LOCATION}
       reference={Constants.models.LOCATIONS}
+      alwaysOn
     >
       <SelectInput optionText={locationSelect} />
     </ReferenceInput>

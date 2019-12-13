@@ -85,13 +85,10 @@ const ProjectFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       label={'en.models.projects.group'}
       source={Constants.model_fk_fields.GROUP}
       reference={Constants.models.GROUPS}
+      alwaysOn
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
     </ReferenceInput>
-    <TextInput
-      label={'en.models.projects.name'}
-      source={Constants.model_fields.NAME}
-    />
   </Filter>
 ));
 //will need to be updated to look up only groups that the user is in.

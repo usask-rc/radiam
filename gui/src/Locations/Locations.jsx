@@ -70,13 +70,10 @@ const LocationFilter = withStyles(filterStyles)(({ classes, ...props }) => (
       label={'en.models.locations.type'}
       source={Constants.model_fk_fields.LOCATION_TYPE}
       reference={Constants.models.LOCATIONTYPES}
+      alwaysOn
     >
       <TranslationSelect optionText={Constants.model_fields.LABEL} />
     </ReferenceInput>
-    <TextInput
-      label={'en.models.locations.name'}
-      source={Constants.model_fields.NAME}
-    />
   </Filter>
 ));
 
