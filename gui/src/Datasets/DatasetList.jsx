@@ -14,6 +14,7 @@ import * as Constants from '../_constants/index';
 import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
 import { withStyles } from '@material-ui/core/styles';
+import { Search } from '@material-ui/icons';
 
 const listStyles = {
     actions: {

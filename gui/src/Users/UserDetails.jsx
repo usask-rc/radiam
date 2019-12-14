@@ -47,6 +47,10 @@ class UserDetails extends Component {
                     label={"en.models.users.notes"}
                     source={Constants.model_fields.NOTES}
                 />
+                <TextField
+                    label={"en.models.users.user_orcid_id"}
+                    source={Constants.model_fields.ORCID_ID}
+                    />
                 <BooleanField
                     label={"en.models.generic.active"}
                     source={Constants.model_fields.ACTIVE}

@@ -16,6 +16,9 @@ const validateUsername = [required('en.validate.user.username'), minLength(3), m
 const validateEmail = [required('en.validate.user.email'), email()];
 const validateGroup = required('en.validate.user.group');
 const validateRole = required('en.validate.user.role');
+const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid orcid, pattern is ####-####-####-####")]
+
+
 
 //this exists to combine the User Creation form and the GroupMember Association form into a single page.
 class UserFormWithAssoc extends Component {
@@ -60,11 +63,13 @@ class UserFormWithAssoc extends Component {
             return fetch(request).then(response => {
 
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
+                    console.log("response after user create: ", response)
                     return response.json();
                 }
                 throw new Error(response.statusText);
             })
             .then(data => {
+                console.log("data after user create: ", data)
                 if (data.id) {
                     //create a groupmember with these details
                     const groupMemberRequest = new Request(getAPIEndpoint() + "/groupmembers/", {
@@ -152,6 +157,7 @@ class UserFormWithAssoc extends Component {
 
 
     render() {
+        console.log("this state: ", this.state)
         return (<React.Fragment>
             <SimpleForm
                 onSubmit={this.handleSubmit}
@@ -189,12 +195,19 @@ class UserFormWithAssoc extends Component {
                     source={Constants.model_fields.NOTES}
                     onChange={this.handleChange}
                 />
+                <TextInput
+                    label={"en.models.users.orcid"}
+                    source={Constants.model_fields.ORCID_ID}
+                    onChange={this.handleChange}
+                    validate={validateOrcid}
+                />
                 <ReferenceInput
                     label={"en.models.groupmembers.group"}
                     source={Constants.model_fk_fields.GROUP}
                     reference={Constants.models.GROUPS}
                     onChange={this.handleSelectChange}
                     defaultValue={this.state.group}
+                    required
                 >
                     <SelectInput
                         validate={this.state.group_role ? validateGroup : null}
@@ -207,6 +220,7 @@ class UserFormWithAssoc extends Component {
                     reference={Constants.models.ROLES}
                     resource={Constants.models.ROLES}
                     onChange={this.handleSelectChange}
+                    required
                 >
                     <TranslationSelect
                         validate={this.state.group ? validateRole : null}

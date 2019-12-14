@@ -11,16 +11,22 @@ import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
 import { Dialog, DialogContent } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
+import { toast } from 'react-toastify';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
 const validateFirstName = [required('en.validate.user.first_name')]
 const validateLastName = [required('en.validate.user.lastname')]
 const validateEmail = [required('en.validate.user.email'), email()];
+const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid orcid, pattern is ####-####-####-####")]
+
+
 
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
         this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false, viewModal: false}
+
+        console.log("props in UserEditForm: ", props)
     }
 
     componentDidMount() {
@@ -57,10 +63,12 @@ class UserEditForm extends Component {
             this.setState({isFormDirty: false}, () => {
             return fetch(request).then(response => {
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
-                    this.props.history.push(`/${Constants.models.USERS}`);
                     return response.json();
                 }
                 throw new Error(response.statusText);
+            }).then(data => {
+                console.log("data on return : ", data)
+                toast.success("User Successfully Updated")
             })
 
                 .catch(err => {
@@ -119,6 +127,7 @@ class UserEditForm extends Component {
                     onChange={this.handleChange}
                     validate={validateUsername}
                     defaultValue={this.state.username}
+                    disabled
                 />
                 <TextInput
                     label={"en.models.users.fname"}
@@ -147,6 +156,13 @@ class UserEditForm extends Component {
                     source={Constants.model_fields.NOTES}
                     onChange={this.handleChange}
                     defaultValue={this.state.notes}
+                />
+                <TextInput
+                    label={"en.models.users.orcid"}
+                    source={Constants.model_fields.ORCID_ID}
+                    onChange={this.handleChange}
+                    defaultValue={this.state.user_orcid_id}
+                    validate={validateOrcid}
                 />
                 <BooleanInput
                     label={"en.models.generic.active"}

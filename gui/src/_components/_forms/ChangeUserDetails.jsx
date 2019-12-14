@@ -6,8 +6,10 @@ import { radiamRestProvider, httpClient } from "../../_tools";
 import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
-import { UPDATE } from "ra-core";
+import { UPDATE, regex } from "ra-core";
 import englishMessages from "../../_constants/i18n/en"
+import UserEditForm from "../../Users/UserEditForm";
+import { UserEdit } from "../../Users/Users";
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -54,9 +56,12 @@ const styles = theme => ({
     }
 });
 
+
 //TODO: move api call to the central security provider file if possible once this functionality is completed.
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangeDetails extends Component {
+    
+    
 
     
     handleSubmit = event => {
@@ -101,7 +106,8 @@ class ChangeDetails extends Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.state = { username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null, mounted: false }
+        const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null, mounted: false }
     }
 
     componentDidMount() {
@@ -118,9 +124,21 @@ class ChangeDetails extends Component {
             <Responsive
                 medium={
                     <React.Fragment>
-                        <div style={styles.flex}>
-                            <div style={styles.leftCol}>
-                                <form style={styles.flex} onSubmit={this.handleSubmit}>
+                        <UserEdit basePath="/users" resource="users" id={this.state.user.id}  />
+                        <ToastContainer />
+                        {this.state.redirect && <Redirect to="/login"/>}
+                    </React.Fragment>
+                }
+            />
+        );
+    }
+}
+
+export default ChangeDetails;
+
+
+/*
+<form style={styles.flex} onSubmit={this.handleSubmit}>
                                     <Typography component={"h4"} variant={"h4"}
                                         className={styles.title}
                                     >{`User Details:`}</Typography>
@@ -166,6 +184,8 @@ class ChangeDetails extends Component {
                                             id={Constants.model_fields.ORCID_ID}
                                             label={englishMessages.en.models.users.user_orcid_id}
                                             value={this.state.user_orcid_id}
+                                            inputProps={{pattern: "([0-9]{4}-){3}[0-9]{4}"}}
+                                            error={"bluh"}
                                             onChange={this.handleChange(Constants.model_fields.ORCID_ID)}
                                         />
                                     </div>
@@ -188,15 +208,4 @@ class ChangeDetails extends Component {
                                         </Button>
                                     </CardActions>
                                 </form>
-                            </div>
-                        </div>
-                        <ToastContainer />
-                        {this.state.redirect && <Redirect to="/login"/>}
-                    </React.Fragment>
-                }
-            />
-        );
-    }
-}
-
-export default ChangeDetails;
+*/

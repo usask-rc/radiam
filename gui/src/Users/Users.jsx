@@ -171,6 +171,8 @@ const validateUsername = [required('en.validate.user.username'), minLength(3), m
 const validateFirstName = [required('en.validate.user.first_name')]
 const validateLastName = [required('en.validate.user.lastname')]
 const validateEmail = [required('en.validate.user.email')]
+const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid orcid, pattern is ####-####-####-####")]
+
 
 const UserForm = props => (
   <SimpleForm {...props} >
@@ -198,6 +200,12 @@ const UserForm = props => (
       label={"en.models.users.notes"}
       source={Constants.model_fields.NOTES}
     />
+
+    <TextInput
+        label={"en.models.users.orcid"}
+        source={Constants.model_fields.ORCID_ID}
+        validate={validateOrcid}
+    />
     <BooleanInput
       label={"en.models.generic.active"}
       source={Constants.model_fields.ACTIVE}
@@ -216,21 +224,35 @@ export const UserCreate = props => {
   )
 };
 
+//TODO: refactor all these goddamn user edit forms into one
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
   console.log("UserEdit props: ", props)
+
+  //this is the form with deletion
+  if (props.id !== user.id && user.is_admin){
+    return(
+      <Edit toolbar={<EditToolbar />} {...props}>
+        <UserForm {...other}/>
+      </Edit>
+    )
+  }
+  else{
   return (
     <Edit toolbar={<EditToolbar />} {...props}>
-      <UserForm  {...other} />
+      <UserEditForm  {...other} />
     </Edit>
   )
+  }
 };
 
 //TODO: add "are you sure?" prompt.
 //a form for superusers, this is gated in App.jsx.
 export const UserEditWithDeletion = props => {
+  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  if (props.id !== String(JSON.parse(localStorage.getItem(Constants.ROLE_USER)).id)) { //dont allow superusers to delete themselves
+  if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
       <Edit toolbar={<EditToolbar />} {...props}>
         <UserEditForm {...other} />

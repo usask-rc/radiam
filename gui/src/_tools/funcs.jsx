@@ -671,7 +671,7 @@ export function formatBytes(bytes, decimals) {
 
 export function translateResource(resource, untranslatedData, direction = 0) {
   let data = cloneDeep(untranslatedData);
-
+  
   if (resource) {
     resource = resource.toUpperCase();
   }

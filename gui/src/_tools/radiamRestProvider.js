@@ -308,6 +308,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return ret;
 
       case GET_ONE:
+          console.log("fields in get_one: ", resource, json)
+
         let fields = translateResource(resource, json);
 
         return {

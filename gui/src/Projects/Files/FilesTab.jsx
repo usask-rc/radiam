@@ -108,7 +108,6 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             defaultValue={search || ''}
             placeholder={`Search Files`}
           />
-          <Search className={classes.searchIcon} />
           <Select
             id={'sort-select'}
             label={`Sort By`}
