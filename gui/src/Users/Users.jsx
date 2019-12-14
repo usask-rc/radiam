@@ -5,28 +5,24 @@ import {
   BooleanInput,
   Create,
   Datagrid,
-  DateInput,
   Edit,
   EmailField,
   Filter,
   List,
-  required,
   Show,
-  SimpleForm,
   TextField,
   TextInput,
 } from "react-admin";
 import * as Constants from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { EditToolbar } from "../_components";
-import UserFormWithAssoc from "./UserForm";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
 import Toolbar from '@material-ui/core/Toolbar';
 import { EditButton, DeleteButton } from 'react-admin';
-import { minLength, maxLength, regex } from "ra-core";
+import UserForm from "./UserForm";
 
 const listStyles = {
   actions: {
@@ -167,59 +163,12 @@ export const UserShow = props => {
   )
 };
 
-const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
-const validateFirstName = [required('en.validate.user.first_name')]
-const validateLastName = [required('en.validate.user.lastname')]
-const validateEmail = [required('en.validate.user.email')]
-const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid orcid, pattern is ####-####-####-####")]
-
-
-const UserForm = props => (
-  <SimpleForm {...props} >
-    <TextInput
-      label={"en.models.users.username"}
-      source={Constants.model_fields.USERNAME}
-      validate={validateUsername}
-    />
-    <TextInput
-      label={"en.models.users.fname"}
-      source={Constants.model_fields.FIRST_NAME}
-      validate={validateFirstName}
-    />
-    <TextInput
-      label={"en.models.users.lname"}
-      source={Constants.model_fields.LAST_NAME}
-      validate={validateLastName}
-    />
-    <TextInput
-      label={"en.models.users.email"}
-      source={Constants.model_fields.EMAIL}
-      validate={validateEmail}
-    />
-    <TextInput
-      label={"en.models.users.notes"}
-      source={Constants.model_fields.NOTES}
-    />
-
-    <TextInput
-        label={"en.models.users.orcid"}
-        source={Constants.model_fields.ORCID_ID}
-        validate={validateOrcid}
-    />
-    <BooleanInput
-      label={"en.models.generic.active"}
-      source={Constants.model_fields.ACTIVE}
-      defaultValue={true}
-    />
-  </SimpleForm>
-);
-
 export const UserCreate = props => {
   //filter out unneeded hasCreate, hasEdit, etc.  These throw an error if passed to our custom userForm.
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <UserFormWithAssoc {...other} redirect={'/show'} />
+      <UserForm {...other} redirect={'/show'} />
     </Create>
   )
 };
@@ -229,22 +178,11 @@ export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
   console.log("UserEdit props: ", props)
-
-  //this is the form with deletion
-  if (props.id !== user.id && user.is_admin){
     return(
-      <Edit toolbar={<EditToolbar />} {...props}>
-        <UserForm {...other}/>
-      </Edit>
-    )
-  }
-  else{
-  return (
     <Edit toolbar={<EditToolbar />} {...props}>
-      <UserEditForm  {...other} />
-    </Edit>
-  )
-  }
+      <UserEditForm {...other}/>
+    </Edit>)
+    
 };
 
 //TODO: add "are you sure?" prompt.

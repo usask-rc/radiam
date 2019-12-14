@@ -69,6 +69,12 @@ class UserEditForm extends Component {
             }).then(data => {
                 console.log("data on return : ", data)
                 toast.success("User Successfully Updated")
+                if (this.props.history){
+                    this.props.history.push(`/${Constants.models.USERS}`)
+                }
+                else{
+                    //accessing from a modal, we don't care about redirection.
+                }
             })
 
                 .catch(err => {
@@ -119,8 +125,6 @@ class UserEditForm extends Component {
                 </FormDataConsumer>
 
                 {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
-
-
                 <TextInput
                     label={"en.models.users.username"}
                     source={Constants.model_fields.USERNAME}
@@ -158,7 +162,7 @@ class UserEditForm extends Component {
                     defaultValue={this.state.notes}
                 />
                 <TextInput
-                    label={"en.models.users.orcid"}
+                    label={"en.models.users.user_orcid_id"}
                     source={Constants.model_fields.ORCID_ID}
                     onChange={this.handleChange}
                     defaultValue={this.state.user_orcid_id}

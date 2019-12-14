@@ -9,7 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { UPDATE, regex } from "ra-core";
 import englishMessages from "../../_constants/i18n/en"
 import UserEditForm from "../../Users/UserEditForm";
-import { UserEdit } from "../../Users/Users";
+import { UserEdit, UserEditWithDeletion } from "../../Users/Users";
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -124,7 +124,7 @@ class ChangeDetails extends Component {
             <Responsive
                 medium={
                     <React.Fragment>
-                        <UserEdit basePath="/users" resource="users" id={this.state.user.id}  />
+                        <UserEditWithDeletion basePath="/users" resource="users" id={this.state.user.id}  />
                         <ToastContainer />
                         {this.state.redirect && <Redirect to="/login"/>}
                     </React.Fragment>

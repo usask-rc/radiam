@@ -21,11 +21,11 @@ const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid or
 
 
 //this exists to combine the User Creation form and the GroupMember Association form into a single page.
-class UserFormWithAssoc extends Component {
+class UserForm extends Component {
     constructor(props) {
+        console.log("UserForm props: ", props)
         super(props);
-        console.log("userformwithassoc prop: ", props)
-        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location.group || "", group_role: "", date_expires: null, redirect: false }
+        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location ? props.location.group : "", group_role: "", date_expires: null, redirect: false }
     }
 
     handleSubmit = event => {
@@ -196,7 +196,7 @@ class UserFormWithAssoc extends Component {
                     onChange={this.handleChange}
                 />
                 <TextInput
-                    label={"en.models.users.orcid"}
+                    label={"en.models.users.user_orcid_id"}
                     source={Constants.model_fields.ORCID_ID}
                     onChange={this.handleChange}
                     validate={validateOrcid}
@@ -257,4 +257,4 @@ class UserFormWithAssoc extends Component {
  */
 const asyncValidate = getAsyncValidateNotExists({ id: Constants.model_fields.ID,  name: Constants.model_fields.USERNAME, reject: "There is already a user with this username. Please pick another username." }, Constants.models.USERS);
 
-export default UserFormWithAssoc;
+export default UserForm;
