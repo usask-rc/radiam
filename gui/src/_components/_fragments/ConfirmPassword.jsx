@@ -8,6 +8,10 @@ import * as Constants from "../../_constants/index"
 const styles = {
     label: { width: '10em', display: 'inline-block' },
     button: { margin: '1em' },
+    input: {width: "20em",},
+    textField: {
+        width: "20em",
+    }
 };
 const ConfirmPassword = ({ classes, handleChange }) => (
     <React.Fragment>
@@ -17,15 +21,16 @@ const ConfirmPassword = ({ classes, handleChange }) => (
                 name={Constants.password_change.PASSWORD_NEW}
                 label={"New Password"}
                 onChange={handleChange}
+                className={classes.textField}
                 type={Constants.fields.PASSWORD} />
         </div>
-
         <div className={classes.input}>
             <TextField
                 id={Constants.password_change.PASSWORD_CONFIRM}
                 name={Constants.password_change.PASSWORD_CONFIRM}
-                label={"Confirm New Password"}
+                label={"Confirm Password"}
                 onChange={handleChange}
+                className={classes.textField}
                 type={Constants.fields.PASSWORD} />
         </div>
     </React.Fragment>)

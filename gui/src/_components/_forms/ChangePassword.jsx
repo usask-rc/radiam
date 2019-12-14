@@ -7,16 +7,15 @@ import RequestPassword from "../_fragments/RequestPassword";
 import {Redirect} from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast } from "react-toastify";
+import { withStyles } from "@material-ui/styles";
 
 const styles = theme => ({
-  flex: { display: "flex" },
   flexColumn: { display: "flex", flexDirection: "column" },
   leftCol: { marginTop: "1em", flex: 1, marginRight: "1em" },
   rightCol: { flex: 1, marginLeft: "1em" },
   singleCol: { marginBottom: "2em" },
 
   main: {
-    display: "flex",
     flexDirection: "column",
     minHeight: "100vh",
     alignItems: "center",
@@ -38,11 +37,11 @@ const styles = theme => ({
   input: {
     marginTop: "1em"
   },
-  actions: {
-    padding: "0 1em 1em 1em"
-  },
   title: {
-    padding: "16px 16px"
+    fontSize: "2em",
+    },
+  submitButton: {
+    marginTop: "1em",
   },
   button: {
     marginTop: "6em",
@@ -148,30 +147,33 @@ class ChangePassword extends Component {
   };
   
   render() {
+    const {classes} = this.props
     console.log("state in changepassword is: ", this.state)
     return (
       <React.Fragment>
       <Responsive
         medium={
           <React.Fragment>
-            <div style={styles.flex}>
-              <div style={styles.leftCol}>
-                <form style={styles.flex} onSubmit={this.handleSubmit}>
+            <div className={classes.main}>
+              <div className={classes.leftCol}>
+                <form className={classes.flex} onSubmit={this.handleSubmit}>
+                  <div>
                   <Typography component={"h4"} variant={"h4"}
-                    className={styles.title}
-                  >{"Please enter and confirm a new password:"}</Typography>
+                    className={classes.title}
+                  >{"Please enter and confirm a new password:"}
+                  </Typography>
                   <RequestPassword handleChange={this.handleChange} />
                   <ConfirmPassword handleChange={this.handleChange} />
 
-                  <CardActions className={styles.actions}>
                     <Button
                       variant="outlined"
                       type={Constants.fields.SUBMIT}
                       color="primary"
+                      className={classes.submitButton}
                     >
                       {"Update Password"}
                     </Button>
-                  </CardActions>
+                </div>
                 </form>
               </div>
             </div>
@@ -184,4 +186,4 @@ class ChangePassword extends Component {
   }
 }
 
-export default ChangePassword;
+export default withStyles(styles) (ChangePassword);
