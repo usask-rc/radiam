@@ -101,12 +101,19 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             Object.keys(params.filter).length > 0
           ) {
             const { page, perPage } = params.pagination;
-            const { sortField, sortOrder } = params.sort;
+
+            console.log("params sort: ", params.sort)
+            let { field, order } = params.sort;
+            if (order === "DESC"){
+              order = "-"
+            }else{
+              order = ""
+            }
 
             let query = {
               ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
-              _sort: sortField ? sortField : null,
-              _order: sortOrder ? sortOrder : null,
+              ordering: `${order}${field}`,
+
               _start: (page - 1) * perPage,
               _end: page * perPage,
               page: page,
