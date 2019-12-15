@@ -34,8 +34,9 @@ class DSForm extends Component {
     }
 
     geoDataCallback(geo){
+      const {record} = this.props
       console.log("in datasetform, geodatacallback triggered with geo: ", geo)
-      if (this.props.record.geo !== geo){
+      if (record.geo !== geo){
         this.setState({geo: geo, isDirty: true})
       }
     } 
@@ -69,7 +70,7 @@ class DSForm extends Component {
     render() { 
 
       const {geo, data} = this.state
-      const { staticContext, basePath, ...rest } = this.props
+      const { staticContext, basePath, location, id, mode, record, ...rest } = this.props
 
       console.log("state, props: ", this.state, this.props)
 
@@ -98,7 +99,7 @@ class DSForm extends Component {
                 source={Constants.model_fk_fields.PROJECT}
                 reference={Constants.models.PROJECTS}
                 validate={validateProject}
-                defaultValue={this.props.location.project ? this.props.location.project : null}
+                defaultValue={location.project ? location.project : null}
                 >
                 <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
                 </ReferenceInput>
@@ -144,15 +145,15 @@ class DSForm extends Component {
                 <TranslationSelectArray optionText="label" />
                 </ReferenceArrayInput>
             
-                { this.props.mode === Constants.resource_operations.EDIT && this.props.id && (
+                { mode === Constants.resource_operations.EDIT && id && (
                 <React.Fragment>
-                    <EditMetadata id={this.props.id} type="dataset"/>
-                    <ConfigMetadata id={this.props.id} type="dataset" />
+                    <EditMetadata id={id} type="dataset"/>
+                    <ConfigMetadata id={id} type="dataset" />
                 </React.Fragment>
                 )}
             
-                { this.props.record && 
-                 <MapForm content_type={'dataset'} recordGeo={this.props.record.geo} id={this.props.record.id} geoDataCallback={this.geoDataCallback}/>
+                { record && 
+                 <MapForm content_type={'dataset'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
                 }
             </SimpleForm>
         );

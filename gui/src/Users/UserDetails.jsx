@@ -16,7 +16,8 @@ class UserDetails extends Component {
     }
 
     componentDidMount() {
-        getUserGroups(this.props.record).then(data => this.setState({groupMembers: data}))
+        const { record } = this.props
+        getUserGroups(record).then(data => this.setState({groupMembers: data}))
     }
 
     render() {

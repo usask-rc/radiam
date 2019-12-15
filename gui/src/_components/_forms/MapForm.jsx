@@ -207,6 +207,7 @@ class MapForm extends Component {
   };
 
   updateGeo = () => {
+    const {id, content_type, geoDataCallback} = this.props
     //there are values in Geo that we don't care for in the API.
 
     let featuresList = [];
@@ -228,8 +229,8 @@ class MapForm extends Component {
     let localGeo = {};
     if (featuresList.length > 0) {
       localGeo = {
-        object_id: this.props.id,
-        content_type: this.props.content_type,
+        object_id: id,
+        content_type: content_type,
         geojson: {
           type: 'FeatureCollection',
           features: featuresList,
@@ -237,7 +238,7 @@ class MapForm extends Component {
       };
     }
     this.setState({ geo: localGeo });
-    this.props.geoDataCallback(localGeo);
+    geoDataCallback(localGeo);
   };
 
   _onCreated = e => {
@@ -390,6 +391,9 @@ class MapForm extends Component {
   };
 
   render() {
+
+    const {classes} = this.props
+
     navigator.geolocation.getCurrentPosition(this.success, this.error, {
       enableHighAccuracy: true,
       timeout: 5000,
@@ -400,7 +404,7 @@ class MapForm extends Component {
       <React.Fragment>
         {this.state.location && this.state.location.length > 0 && (
           <React.Fragment>
-            <Typography className={this.props.classes.mapTitle} component={'p'}>
+            <Typography className={classes.mapTitle} component={'p'}>
               {`Geolocation Map Input`}
             </Typography>
             <Map
@@ -410,7 +414,7 @@ class MapForm extends Component {
                 }
               }}
               center={this.state.location}
-              className={this.props.classes.mapDisplay}
+              className={classes.mapDisplay}
               zoom={
                 this.state.mapRef && this.state.mapRef.leafletElement
                   ? this.state.mapRef.leafletElement.getZoom()
@@ -450,7 +454,7 @@ class MapForm extends Component {
 
               {this.state.popup.active && (
                 <Popup
-                  className={this.props.classes.mapPopup}
+                  className={classes.mapPopup}
                   position={this.state.location}
                   onClose={this._onPopupClose}
                 >

@@ -355,7 +355,7 @@ class BaseGroupEdit extends Component {
 
   render() {
 
-    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, ...others } = this.props;
+    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, id, ...others } = this.props;
 
     return <Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
       <SimpleForm
@@ -391,10 +391,10 @@ class BaseGroupEdit extends Component {
             optionText={Constants.model_fields.NAME}
           />
         </ReferenceInput>
-        { this.props.id && (
+        { id && (
           <React.Fragment>
-            <EditMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
-            <ConfigMetadata id={this.props.id} type={Constants.model_fk_fields.GROUP}/>
+            <EditMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
+            <ConfigMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
           </React.Fragment>
           )}
       </SimpleForm>

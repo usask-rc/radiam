@@ -84,8 +84,9 @@ class ResetPassword extends Component {
   }
 
   componentDidMount() {
-    if (this.props && this.props.match && this.props.match.params && this.props.match.params.token) {
-      this.setState({ token: this.props.match.params.token });
+    const {match} = this.props
+    if (this.props && match && match.params && match.params.token) {
+      this.setState({ token: match.params.token });
     }
     //TODO: if not token, we have to reject and leave this page.
     else {

@@ -1453,11 +1453,12 @@ class BaseMetadataEditActions extends Component {
   }
 
   componentWillMount(){
+    const {id, showRelatedUsers} = this.props
     console.log("componentwillmount props: ", this.props)
-    if (this.props.showRelatedUsers){
+    if (showRelatedUsers){
 
-      if (this.props.id){
-        const params={id: this.props.id, is_active: true}
+      if (id){
+        const params={id: id, is_active: true}
         getGroupUsers(params).then((data) => {
         console.log("getgroupusers returned data: ", data)
         this.setState({groupMembers: data})
@@ -1590,6 +1591,7 @@ class BaseShowMetadata extends MetadataComponent {
   };
 
   renderField = (classes, translate, field, depth, parentPath) => {
+    const { record } = this.props
     if (field.selected) {
       var type = get(field, "metadata_ui_type.key", null);
       if (type === "boolean" ||
@@ -1601,7 +1603,7 @@ class BaseShowMetadata extends MetadataComponent {
           type ==="integer" ||
           type ==="text" ||
           type ==="url") {
-        var current = get(this.props.record, parentPath + "." + field.id);
+        var current = get(record, parentPath + "." + field.id);
         if (!current || (Array.isArray(current) && current.length === 0)) {
           return null;
         }
@@ -1626,7 +1628,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequired : null }
                           />
@@ -1643,7 +1645,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequired : null }
                           />
@@ -1656,7 +1658,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                           />
                         </div>
@@ -1668,7 +1670,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequiredEmail : validateEmail }
                           />
@@ -1681,7 +1683,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequired : null }
                           />
@@ -1694,7 +1696,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequired : null }
                           />
@@ -1707,7 +1709,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                           />
                         </div>
@@ -1718,7 +1720,7 @@ class BaseShowMetadata extends MetadataComponent {
                             className={fieldClass}
                             key={"text-input-" + field.id}
                             label={translate(field.label + ".label")}
-                            record={this.props.record}
+                            record={record}
                             source={parentPath + "." + field.id + "[" + index + "].value"}
                             validate={ field.required ? validateRequiredURL : validateURL }
                           />
@@ -1746,7 +1748,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="date" ?
@@ -1754,7 +1756,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="dateYear" ?
@@ -1762,14 +1764,14 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
                 : type === Constants.model_fields.EMAIL ?
                     <EmailField
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="float" ?
@@ -1777,7 +1779,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="integer" ?
@@ -1785,7 +1787,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="text" ?
@@ -1793,7 +1795,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
                 : type ==="url" ?
@@ -1801,7 +1803,7 @@ class BaseShowMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={this.getSource(field, parentPath)}
-                      record={this.props.record}
+                      record={record}
                     />
 
 

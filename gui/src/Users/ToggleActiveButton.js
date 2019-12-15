@@ -5,11 +5,11 @@ import { connect } from "react-redux"
 
 class ToggleActiveButton extends Component{
     handleClick = () => {
-      const {basePath, crudUpdateMany, resource, selectedIds} = this.props;
+      const {basePath, crudUpdateMany, resource, filterValues, selectedIds} = this.props;
 
       console.log("props in toggleactivebutton are: ", this.props)
       
-      if (this.props.filterValues && this.props.filterValues.is_active)
+      if (filterValues && filterValues.is_active)
       {
         crudUpdateMany(resource, selectedIds, {is_active: false }, basePath)    
       }

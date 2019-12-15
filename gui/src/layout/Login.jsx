@@ -133,11 +133,12 @@ class Login extends Component {
     this.setState({forgotpassword: !this.state.forgotpassword });
   };
 
-  login = auth =>
-    this.props.userLogin(
+  login = auth =>{
+    const {userLogin, location} = this.props
+    return userLogin(
       auth,
-      this.props.location.state ? this.props.location.state.nextPathname : "/"
-    );
+      location.state ? location.state.nextPathname : "/"
+    )};
 
   //TODO: these pages can be extracted into their own classes... somehow.  The `submitForm()` is preventing it, and needs to be looked into.
   render() {

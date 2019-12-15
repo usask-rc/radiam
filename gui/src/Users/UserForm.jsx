@@ -29,6 +29,7 @@ class UserForm extends Component {
     }
 
     handleSubmit = event => {
+        const { history } = this.props
         this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
@@ -87,7 +88,7 @@ class UserForm extends Component {
                             throw new Error(response.statusText);
                         })
                             .then(data => {
-                                this.props.history.push(`/${Constants.models.USERS}`);
+                                history.push(`/${Constants.models.USERS}`);
                             })
                             .catch(err => {
                                 toastErrors(err)
@@ -96,11 +97,11 @@ class UserForm extends Component {
                     }
                     else if (group_role || group) {
                         toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
-                        this.props.history.push(`/${Constants.models.USERS}`);
+                        history.push(`/${Constants.models.USERS}`);
                     }
                     else {
                         toast.success("User: " + username + " was successfully created.")
-                        this.props.history.push(`/${Constants.models.USERS}`);
+                        history.push(`/${Constants.models.USERS}`);
                     }
 
                 }

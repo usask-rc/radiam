@@ -155,14 +155,16 @@ return(
 class PageThree extends Component {
   constructor(props){
     super(props)
-    this.state = {geo: this.props.record.geo, isDirty: false }
+    this.state = {geo: props.record.geo, isDirty: false }
   }
 
   geoDataCallback = geo => {
     //send our geodata back up to the stepper, we don't have any reason to handle it here.
     console.log("receiving geodata from map in gDC: ", geo)
 
-    if (this.state.geo !== this.props.record.geo){
+    const {record} = this.props
+
+    if (this.state.geo !== record.geo){
       this.setState({geo: geo})
       this.setState({isFormDirty: true})
     }
@@ -211,13 +213,13 @@ class PageTwo extends Component {
 
   componentDidMount() {
     //I don't know why this can't use dot notation, but apparently group appears in prop and can only be accessed in Dict notation.
-    const { group, primary_contact_user } = this.props.record
+    const { record } = this.props
 
     this.setState({ groupList: [], isMounted: true })
     //Accessing in Edit Mode
-    if (group) {
-      this.setState({ group: group, primary_contact_user: primary_contact_user})
-      this.getAllParentGroups(group)
+    if (record.group) {
+      this.setState({ group: record.group, primary_contact_user: record.primary_contact_user})
+      this.getAllParentGroups(record.group)
     }
     else {
       //Accessing in Creation mode - is there anything extra needed here?
@@ -370,7 +372,7 @@ export class ProjectStepper extends React.Component {
   };
 
   render() {
-    const { classes, translate } = this.props;
+    const { classes, translate, mode, save} = this.props;
     const steps = [translate('en.models.projects.steps.name'), translate('en.models.projects.steps.researchgroup'), translate('en.models.projects.steps.map')];
     const { activeStep } = this.state;
 
@@ -388,7 +390,7 @@ export class ProjectStepper extends React.Component {
                 index === 1 ? 
                 <PageTwo classes={classes} handleNext={this.handleNext} handleBack={this.handleBack} {...this.props} />
                 :
-                <PageThree classes={classes} handleBack={this.handleBack} mode={this.props.mode} save={this.props.save} {...this.props}/>
+                <PageThree classes={classes} handleBack={this.handleBack} mode={mode} save={save} {...this.props}/>
               }
             </StepContent>
           </Step>

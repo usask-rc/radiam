@@ -42,7 +42,7 @@ class LocationForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      geo: this.props.record.geo,
+      geo: props.record.geo,
       geoText: '',
       isFormDirty: false,
       mapFormKey: 0,
@@ -55,6 +55,9 @@ class LocationForm extends Component {
   }
 
   geoDataCallback = geo => {
+
+    const {record} = this.props
+
     if (geo && Object.keys(geo).length > 0) {
       this.setState({ geo: geo }, () => this.setState({geoText: JSON.stringify(geo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: this.state.jsonTextFormKey + 1})));
     } else {
@@ -63,7 +66,7 @@ class LocationForm extends Component {
     }
 
     //mark as dirty if prop value does not equal state value.  If they're equal, leave isDirty as is.
-    if (this.state.geo !== this.props.record.geo) {
+    if (this.state.geo !== record.geo) {
       this.setState({ isFormDirty: true });
     }
   };
@@ -92,6 +95,8 @@ class LocationForm extends Component {
   mapTextToGeo = event => {
     console.log('text to geo button pressed');
     let parseGeoText;
+
+    const { record } = this.props
     try {
 
       //TODO: this isnt parsing geotext, it's parsing features.
@@ -118,11 +123,11 @@ class LocationForm extends Component {
         "content_type": "location",
       }
 
-      if (this.props.record && this.props.record.id){
-        geoObject.object_id = this.props.record.id
+      if (record && record.id){
+        geoObject.object_id = record.id
       }
-      if (this.props.record && this.props.record.geo && this.props.record.geo.id){
-        geoObject.id = this.props.record.geo.id
+      if (record && record.geo && record.geo.id){
+        geoObject.id = record.geo.id
       }
 
       parseGeoText = JSON.parse(JSON.stringify(geoObject));
@@ -168,7 +173,7 @@ class LocationForm extends Component {
 
   render() {
     //const {isformdirty, rest} = {...this.props}
-    const { staticContext, ...rest } = this.props;
+    const { staticContext, id, ...rest } = this.props;
     const { isFormDirty } = this.state;
     return (
       <SimpleForm
@@ -245,7 +250,7 @@ class LocationForm extends Component {
               <MapForm
                 content_type={Constants.model_fk_fields.LOCATION}
                 recordGeo={this.state.geo}
-                id={this.props.id}
+                id={id}
                 geoDataCallback={this.geoDataCallback}
               />
             </Grid>

@@ -30,7 +30,9 @@ class UserEditForm extends Component {
     }
 
     componentDidMount() {
-        getUserGroups(this.props.record).then(data => {
+        const { record } = this.props
+
+        getUserGroups(record).then(data => {
             console.log("user groups are: ", data)
             this.setState({groupMembers: data})
             return data
@@ -38,6 +40,7 @@ class UserEditForm extends Component {
     }
 
     handleSubmit = () => {
+        const { history } = this.props
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -69,8 +72,8 @@ class UserEditForm extends Component {
             }).then(data => {
                 console.log("data on return : ", data)
                 toast.success("User Successfully Updated")
-                if (this.props.history){
-                    this.props.history.push(`/${Constants.models.USERS}`)
+                if (history){
+                    history.push(`/${Constants.models.USERS}`)
                 }
                 else{
                     //accessing from a modal, we don't care about redirection.
