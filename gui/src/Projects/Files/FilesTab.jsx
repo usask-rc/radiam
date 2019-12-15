@@ -116,11 +116,11 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             onChange={e => setSort(e.target.value)}
           >
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-            <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
-            <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
-            <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
+            <MenuItem value={Constants.model_fields.NAME}>{`File Name`}</MenuItem>
+            <MenuItem value={Constants.model_fields.INDEXED_DATE}>{`Indexed On`}</MenuItem>
+            <MenuItem value={Constants.model_fields.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
+            <MenuItem value={Constants.model_fields.FILESIZE}>{`Filesize`}</MenuItem>
+            <MenuItem value={Constants.model_fields.LAST_ACCESS}>{`Last Accessed`}</MenuItem>
           </Select>
 
           <div className={classes.sortDisplay}>
