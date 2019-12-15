@@ -1,13 +1,17 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
+import { withStyles } from '@material-ui/styles';
 
-const FileSummaryButton = ({ nbFiles, handleRedirect, translate }) => (
+const styles = {
+    summaryButton: { float: "right" }
+}
+const FileSummaryButton = ({ classes, nbFiles, handleRedirect, translate }) => (
 
     <Button
         variant="contained"
         onClick={handleRedirect}
         color="primary"
-        styles={{ float: "right" }}
+        className={classes.summaryButton}
     >
         {`${translate(
             'en.dashboard.show_all'
@@ -15,4 +19,4 @@ const FileSummaryButton = ({ nbFiles, handleRedirect, translate }) => (
     </Button>
 
 )
-export default FileSummaryButton
+export default withStyles(styles)(FileSummaryButton)

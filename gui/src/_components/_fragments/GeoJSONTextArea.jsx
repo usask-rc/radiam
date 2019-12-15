@@ -9,14 +9,21 @@ import {
   Grid,
 } from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
+import { withStyles } from '@material-ui/styles';
 
-const GeoJSONTextArea = ({ styles, geoText, handleInput, mapTextToGeo }) => {
+const styles = {
+  geoTextArea: {
+
+  }
+}
+
+const GeoJSONTextArea = ({ classes, geoText, handleInput, mapTextToGeo }) => {
   return (
     <ExpansionPanel fullWidth>
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
         <Typography>{`Geo Text Entry - Experimental`}</Typography>
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={styles.geoTextArea}>
+      <ExpansionPanelDetails className={classes.geoTextArea}>
         <Grid container>
           <Grid item xs={12}>
             <TextField
@@ -42,4 +49,4 @@ const GeoJSONTextArea = ({ styles, geoText, handleInput, mapTextToGeo }) => {
   );
 };
 
-export default GeoJSONTextArea;
+export default withStyles(styles)(GeoJSONTextArea);

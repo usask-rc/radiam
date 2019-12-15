@@ -25,18 +25,6 @@ const styles = {
   }
 };
 
-/*worked on getting this as a replacement for the drop-down select for Users, but I can't get the Styles to work properly.
-<Grid container>
-  <div>
-    <UserAvatar size="24" name={`${choice.first_name} ${choice.last_name}`} />
-  </div>
-
-  <div styles={{backgroundColor: "red"}}>
-  {`${choice.first_name} ${choice.last_name} ${choice.username}`}
-  </div>
-  </Grid>
-  */
-
 export const userSelect = choice => choice.first_name || choice.last_name ?
 
   `${choice.first_name} ${choice.last_name} (${choice.username})` : `${choice.username}`;
