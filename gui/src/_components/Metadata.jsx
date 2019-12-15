@@ -379,13 +379,15 @@ class MetadataComponent extends Component {
   };
 
   fieldEnabled = (field) => {
-    return this.state.fields[field.id].selected
+    const { fields} = this.state
+    return fields[field.id].selected
       && this.fieldSchemaEnabled(field)
       && this.fieldParentsEnabled(field);
   };
 
   fieldSchemaEnabled = (field) => {
-    return field.schema.id && this.state.schemas[field.schema.id].selected;
+    const { schemas } = this.state
+    return field.schema.id && schemas[field.schema.id].selected;
   };
 
   fieldParentsEnabled = (field) => {
@@ -561,17 +563,17 @@ class MetadataComponent extends Component {
 class BaseConfigMetadata extends MetadataComponent {
   constructor(props) {
     super(props);
-    this.state.config = false;
+    this.state = {config: false}
   }
 
   handleSchemaChange = name => event => {
-    var schemas = {...this.state.schemas}
+    const { schemas } = this.state
     schemas[name].selected = event.target.checked;
     this.setState({schemas})
   };
 
   handleFieldChange = name => event => {
-    var fields = {...this.state.fields}
+    const { fields } = this.state
     fields[name].selected = event.target.checked;
     this.setState({fields})
   };
@@ -863,11 +865,13 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   resetSchemas = () => {
-    return this.deleteSchemas(Object.values(this.state.schemas), this.state.entity);
+    const { schemas, entity } = this.state
+    return this.deleteSchemas(Object.values(schemas), entity);
   };
 
   resetFields = () => {
-    return this.deleteFields(Object.values(this.state.fields), this.state.entity);
+    const { fields, entity } = this.state
+    return this.deleteFields(Object.values(fields), entity);
   };
 
   onUpdate = () => {
@@ -898,11 +902,10 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   changeOrder = (id, up) => {
-    var fields = { ...this.state.fields };
+    const { fields, rootFields } = this.state
     var field = fields[id];
     field.changed = true;
     if (!field.parent) {
-      var rootFields = { ...this.state.rootFields };
       var rootFieldsArray = [];
       Object.values(rootFields).map((rootField, index) => {
         rootFieldsArray.push(rootField);
@@ -924,21 +927,21 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   changeDefault = id => event => {
-    var fields = { ...this.state.fields };
+    const { fields } = this.state
     fields[id].default = event.target.value;
     fields[id].changed = true;
     this.setState({fields});
   };
 
   changeRequired = id => event => {
-    var fields = { ...this.state.fields };
+    const { fields } = this.state
     fields[id].required = event.target.checked;
     fields[id].changed = true;
     this.setState({fields});
   };
 
-  changeVisible = id => event => {
-    var fields = { ...this.state.fields };
+  changeVisible = id => event => {    
+    const { fields } = this.state
     fields[id].visible = event.target.checked;
     fields[id].changed = true;
     this.setState({fields});
@@ -1115,7 +1118,7 @@ class BaseConfigMetadata extends MetadataComponent {
   };
 
   renderBody() {
-    const { entity, error, isLoaded, rootFields } = this.state;
+    const { entity, error, isLoaded, rootFields, schemas } = this.state;
     const { classes, id, translate } = this.props;
     if (error) {
       return <div>There was an error loading additional metadata: {error.message} </div>
@@ -1128,7 +1131,7 @@ class BaseConfigMetadata extends MetadataComponent {
         <div>
           {entity.schemas.map((schema) => {
             return <div key={schema.id} >
-              <Switch checked={this.state.schemas[schema.id].selected} color="primary" component="span" onChange={this.handleSchemaChange(schema.id)} value={schema.id} />
+              <Switch checked={schemas[schema.id].selected} color="primary" component="span" onChange={this.handleSchemaChange(schema.id)} value={schema.id} />
               <Typography variant="body1" component="span">{translate(schema.label + ".label")}</Typography>
               <ExpandMoreIcon component="span" />
             </div>
@@ -1149,8 +1152,9 @@ class BaseConfigMetadata extends MetadataComponent {
 
   render() {
     const { classes, close, id, type, translate, ...others } = this.props;
+    const { config } = this.state
 
-    return <Drawer anchor="bottom" open={this.state.config} onClose={() => drawerState.close()} {...others}>
+    return <Drawer anchor="bottom" open={config} onClose={() => drawerState.close()} {...others}>
       <React.Fragment>
         { this.renderBody() }
       </React.Fragment>
@@ -1198,7 +1202,7 @@ class BaseEditMetadata extends MetadataComponent {
   };
 
   changeValue = id => event => {
-    var fields = { ...this.state.fields };
+    const { fields } = this.state
     fields[id].value = event.target.value;
     fields[id].changed = true;
     this.setState({fields});
@@ -1478,7 +1482,7 @@ class BaseMetadataEditActions extends Component {
   
   render() {
     const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
-    console.log("metadatarender props: ", this.props)
+    const { groupMembers } = this.state
     return <CardActions>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1494,8 +1498,8 @@ class BaseMetadataEditActions extends Component {
             filterValues,
             context: 'button',
         }) }
-        { showRelatedUsers && this.state.groupMembers &&
-          <RelatedUsers groupMembers={this.state.groupMembers} />
+        { showRelatedUsers && groupMembers &&
+          <RelatedUsers groupMembers={groupMembers} />
         }
         { data && <ShowButton basePath={basePath} label="Cancel" icon={<Cancel />} record={data} /> }
         <RefreshButton />

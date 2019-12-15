@@ -30,6 +30,7 @@ class Dashboard extends PureComponent {
   getRecentProjects = () => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const now = moment();
+    const { hasFiles } = this.state
 
     let projectCtr = 0
     let projectList = []
@@ -69,7 +70,7 @@ class Dashboard extends PureComponent {
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
 
-              if (!this.state.hasFiles){
+              if (!hasFiles){
                 this.setState({hasFiles: true})
               }
             }
@@ -101,16 +102,16 @@ class Dashboard extends PureComponent {
 
   render() {
     const {classes} = this.props
-
+    const { loading, hasFiles, projects } = this.state
     return (
       <div className={classes.root}>
       <Responsive
         medium={
           <React.Fragment>
-            <WelcomeCards loading={this.state.loading} hasFiles={this.state.hasFiles}  />
-            {!this.state.loading &&
+            <WelcomeCards loading={loading} hasFiles={hasFiles}  />
+            {!loading &&
               <React.Fragment>
-                <ProjectCards loading={this.state.loading} projects={this.state.projects} />
+                <ProjectCards loading={loading} projects={projects} />
               </React.Fragment>
             }
           </React.Fragment>

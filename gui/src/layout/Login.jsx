@@ -89,7 +89,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      forgotpassword: false,
+      forgotPassword: false,
       email: "",
       token: "",
       reset_password: ""
@@ -117,8 +117,9 @@ class Login extends Component {
   //TODO: the below Toasts need to be put in the Constants or the Translation file.
   forgotPassword = (e) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const { email } = this.state
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
-      email: this.state.email
+      email: email
     })
       .then(response =>
         toast.success("Please check your email for a password reset link.")
@@ -129,12 +130,14 @@ class Login extends Component {
   };
 
   toggleForgotPassword = (e) => {
+    const { forgotPassword } = this.state
     e.preventDefault()
-    this.setState({forgotpassword: !this.state.forgotpassword });
+    this.setState({forgotPassword: !forgotPassword });
   };
 
   login = auth =>{
     const {userLogin, location} = this.props
+    const { forgotPassword } = this.state
     return userLogin(
       auth,
       location.state ? location.state.nextPathname : "/"
@@ -143,6 +146,7 @@ class Login extends Component {
   //TODO: these pages can be extracted into their own classes... somehow.  The `submitForm()` is preventing it, and needs to be looked into.
   render() {
     const { classes, handleSubmit, isLoading, translate } = this.props;
+    const { forgotPassword } = this.state
     return (
       <div className={classes.main}>
         <Card className={classes.card}>
@@ -151,7 +155,7 @@ class Login extends Component {
               <LockIcon />
             </Avatar>
           </div>
-          {!this.state.forgotpassword ? (
+          {!forgotPassword ? (
             <React.Fragment>
               <form onSubmit={handleSubmit(this.login)}>
                 <div className={classes.form}>

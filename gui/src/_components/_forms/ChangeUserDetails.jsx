@@ -65,8 +65,9 @@ class ChangeDetails extends Component {
 
     
     handleSubmit = event => {
+        const {id} = this.state
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-        const params = { data: this.state, id: this.state.id }
+        const params = { data: this.state, id: id }
 
         dataProvider(UPDATE, Constants.models.USERS, params).then(response => {
             toast.success("Account information successfully updated.")
@@ -82,9 +83,10 @@ class ChangeDetails extends Component {
     }
 
     getCurrentUserDetails() {
+        const { mounted } = this.state
         getUserDetails().then(data => 
         {
-            if (this.state.mounted){
+            if (mounted){
                 this.setState(data)
             }
             else{
@@ -94,7 +96,7 @@ class ChangeDetails extends Component {
         })
         .catch(err => 
             {
-                if (this.state.mounted)
+                if (mounted)
                 {
                     this.setState({redirect: true})
                 }
@@ -120,13 +122,14 @@ class ChangeDetails extends Component {
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
+        const { user, redirect } = this.state
         return (
             <Responsive
                 medium={
                     <React.Fragment>
-                        <UserEditWithDeletion basePath="/users" resource="users" id={this.state.user.id}  />
+                        <UserEditWithDeletion basePath="/users" resource="users" id={user.id}  />
                         <ToastContainer />
-                        {this.state.redirect && <Redirect to="/login"/>}
+                        {redirect && <Redirect to="/login"/>}
                     </React.Fragment>
                 }
             />
@@ -135,77 +138,3 @@ class ChangeDetails extends Component {
 }
 
 export default ChangeDetails;
-
-
-/*
-<form style={styles.flex} onSubmit={this.handleSubmit}>
-                                    <Typography component={"h4"} variant={"h4"}
-                                        className={styles.title}
-                                    >{`User Details:`}</Typography>
-
-                                    <div className={styles.input}>
-
-                                        <TextField
-                                            id={Constants.model_fields.USERNAME}
-                                            label={englishMessages.en.models.users.username}
-                                            value={this.state.username}
-                                            onChange={this.handleChange(Constants.model_fields.USERNAME)}
-                                        />
-                                    </div>
-                                    <div className={styles.input}>
-
-                                        <TextField
-                                            id={Constants.model_fields.FIRST_NAME}
-                                            label={englishMessages.en.models.users.fname}
-                                            value={this.state.first_name}
-                                            onChange={this.handleChange(Constants.model_fields.FIRST_NAME)}
-                                        />
-                                    </div>
-                                    <div className={styles.input}>
-
-                                        <TextField
-                                            id={Constants.model_fields.LAST_NAME}
-                                            label={englishMessages.en.models.users.lname}
-                                            value={this.state.last_name}
-                                            onChange={this.handleChange(Constants.model_fields.LAST_NAME)}
-                                        />
-                                    </div>
-                                    <div className={styles.input}>
-
-                                        <TextField
-                                            id={Constants.model_fields.EMAIL}
-                                            label={englishMessages.en.models.users.email}
-                                            value={this.state.email}
-                                            onChange={this.handleChange(Constants.model_fields.EMAIL)}
-                                            type={Constants.model_fields.EMAIL} />
-                                    </div>
-                                    <div className={styles.input}>
-                                        <TextField
-                                            id={Constants.model_fields.ORCID_ID}
-                                            label={englishMessages.en.models.users.user_orcid_id}
-                                            value={this.state.user_orcid_id}
-                                            inputProps={{pattern: "([0-9]{4}-){3}[0-9]{4}"}}
-                                            error={"bluh"}
-                                            onChange={this.handleChange(Constants.model_fields.ORCID_ID)}
-                                        />
-                                    </div>
-                                    <div className={styles.input}>
-                                        <TextField
-                                            id={Constants.model_fields.NOTES}
-                                            label={englishMessages.en.models.users.notes}
-                                            value={this.state.notes || ""}
-                                            onChange={this.handleChange(Constants.model_fields.NOTES)}
-                                        />
-                                    </div>
-
-                                    <CardActions className={styles.actions}>
-                                        <Button
-                                            variant="outlined"
-                                            type={Constants.fields.SUBMIT}
-                                            color="primary"
-                                        >
-                                            {"Update Details"}
-                                        </Button>
-                                    </CardActions>
-                                </form>
-*/

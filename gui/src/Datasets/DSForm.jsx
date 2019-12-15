@@ -49,6 +49,7 @@ class DSForm extends Component {
       let dcmList = []
       let slList = []
       let newData = {...data}
+      const { geo } = this.state
       data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
       data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
       newData.data_collection_method = dcmList
@@ -56,8 +57,7 @@ class DSForm extends Component {
       
       this.setState({dirty: false, data: newData},
 
-        () =>
-      submitObjectWithGeo(newData, this.state.geo, this.props)
+        () => submitObjectWithGeo(newData, geo, this.props)
       )
       console.log("handleSubmit complete, newData: ", newData)
   
@@ -161,130 +161,3 @@ class DSForm extends Component {
 }
  
 export default DSForm;
-/*
-                <Prompt when={this.state.isDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-
-*/
-
-/*
-const BaseDatasetForm = ({ basePath, classes, ...props }) => {
-
-/*
-  useEffect(() => {
-    if (data && Object.keys(data).length > 0) {
-      submitObjectWithGeo(data, geo, props)
-    }
-  }, [data])
-*/
-/*
-function geoDataCallback(geo){
-    if (props.record.geo !== geo){
-      setGeo(geo)
-      setIsDirty(true)
-    }
-  } 
-
-  function handleSubmit(data) {
-    //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
-    //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
-
-    setIsDirty(false)
-    let dcmList = []
-    let slList = []
-    let newData = {...data}
-    data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
-    data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
-    newData.data_collection_method = dcmList
-    newData.sensitivity_level = slList
-    setData(newData) //will prompt the call in useEffect.
-
-    submitObjectWithGeo(newData, geo, props)
-  };
-
-  //label={<CustomFormLabel classes={classes} labelText={"en.models.datasets.title"}/>}
-  return(
-  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
-    <TextInput      
-      label="Title"
-      source={Constants.model_fields.TITLE}
-      validate={validateTitle}
-      
-    />
-    <TextInput
-      className="input-large"
-      label={"en.models.datasets.data_abstract"}
-      options={{ multiline: true }}
-      source={Constants.model_fields.ABSTRACT}
-    />
-    <TextInput
-      className="input-small"
-      label={"en.models.datasets.study_site"}
-      source={Constants.model_fields.STUDY_SITE}
-    />
-
-    <ReferenceInput
-      label={'en.models.datasets.project'}
-      source={Constants.model_fk_fields.PROJECT}
-      reference={Constants.models.PROJECTS}
-      validate={validateProject}
-      defaultValue={props.location.project ? props.location.project : null}
-    >
-      <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
-    </ReferenceInput>
-
-    <ReferenceInput
-      resource={Constants.models.DATA_COLLECTION_STATUS}
-      className="input-small"
-      label={"en.models.datasets.data_collection_status"}
-      source={Constants.model_fields.DATA_COLLECTION_STATUS}
-      reference={Constants.models.DATA_COLLECTION_STATUS}
-      validate={validateDataCollectionStatus}>
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
-    </ReferenceInput>
-
-    <ReferenceInput
-      resource={Constants.models.DISTRIBUTION_RESTRICTION}
-      className="input-small"
-      label={"en.models.datasets.distribution_restriction"}
-      source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
-      reference={Constants.models.DISTRIBUTION_RESTRICTION}
-      validate={validateDistributionRestriction}>
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
-    </ReferenceInput>
-
-    <ReferenceArrayInput
-      allowEmpty
-      resource={Constants.models.DATA_COLLECTION_METHOD}
-      className="input-medium"
-      label={"en.models.datasets.data_collection_method"}
-      source={Constants.model_fields.DATA_COLLECTION_METHOD}
-      reference={Constants.models.DATA_COLLECTION_METHOD}
-      validate={validateDataCollectionMethod}>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
-
-    <ReferenceArrayInput
-      resource={Constants.models.SENSITIVITY_LEVEL}
-      className="input-medium"
-      label={"en.models.datasets.sensitivity_level"}
-      source={Constants.model_fields.SENSITIVITY_LEVEL}
-      reference={Constants.models.SENSITIVITY_LEVEL}
-      validate={validateSensitivityLevel}>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
-
-    { props.mode === Constants.resource_operations.EDIT && props.id && (
-      <React.Fragment>
-        <EditMetadata id={props.id} type="dataset"/>
-        <ConfigMetadata id={props.id} type="dataset" />
-      </React.Fragment>
-    )}
-
-    { props.record && 
-      <MapForm content_type={'dataset'} recordGeo={props.record.geo} id={props.record.id} geoDataCallback={geoDataCallback}/>
-    }
-    <Prompt when={isDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-  </SimpleForm>)
-};
-
-*/

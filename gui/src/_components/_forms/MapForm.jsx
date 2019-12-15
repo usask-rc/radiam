@@ -51,12 +51,13 @@ class MapForm extends Component {
 
   //here is where we handle different data management cases for features
   featuresCallback = layer => {
+    const { features } = this.state
     if (typeof layer === 'string') {
-      const featureList = { ...this.state.features };
+      const featureList = { ...features };
       delete featureList[layer];
       this._updateFeatures(featureList);
     } else if (typeof layer === 'object') {
-      const newFeature = { ...this.state.features };
+      const newFeature = { ...features };
       newFeature[layer.id] = layer;
       this._updateFeatures(newFeature);
     } else {
@@ -136,8 +137,9 @@ class MapForm extends Component {
   //this can be resolved using a Promise, but it's not a high priority right now and will be shelved.
   //ADM-1496
   setProperties = featureParams => {
-    const featureList = { ...this.state.features };
-    featureList[this.state.popup.for].properties = featureParams;
+    const { features, popup } = this.state
+    const featureList = { ...features };
+    featureList[popup.for].properties = featureParams;
     this._updateFeatures(featureList);
     this.setState({ prevProperties: {} });
     this.setState({ popup: { active: false, for: '' } });
@@ -145,21 +147,21 @@ class MapForm extends Component {
 
   success = pos => {
     //if there are no features, default our location to the user's location.
-
-    if (this.state.mapLoading) {
+    const {mapLoading, geo } = this.state
+    if (mapLoading) {
       let latLng = [pos.coords.latitude, pos.coords.longitude];
 
       if (
-        this.state.geo &&
-        this.state.geo.geojson &&
-        this.state.geo.geojson.features &&
-        this.state.geo.geojson.features.length > 0
+        geo &&
+        geo.geojson &&
+        geo.geojson.features &&
+        geo.geojson.features.length > 0
       ) {
         console.log(
           'geojson before feature parse is: ',
-          this.state.geo.geojson
+          geo.geojson
         );
-        const firstFeature = this.state.geo.geojson.features[0];
+        const firstFeature = geo.geojson.features[0];
 
         if (firstFeature.geometry.type === 'Point') {
           latLng = [
@@ -201,27 +203,30 @@ class MapForm extends Component {
   };
 
   _updateFeatures = feature => {
-    this.setState({ ...this.state.features, features: feature });
+    const { features, notDisplayedFeatures } = this.state
+    this.setState({ ...features, features: feature });
     console.log('in _updateFeatures, state is now: ', this.state);
     this.updateGeo();
   };
 
   updateGeo = () => {
     const {id, content_type, geoDataCallback} = this.props
+    const { features, notDisplayedFeatures } = this.state
     //there are values in Geo that we don't care for in the API.
 
     let featuresList = [];
-    Object.keys(this.state.features).map(key => {
-      featuresList.push(this.state.features[key]);
+    Object.keys(features).map(key => {
+      featuresList.push(features[key]);
       return key;
     });
 
+    //TODO: case of features that leaflet cannot display (multipolygon, multipoint, multilinestring)
     console.log(
       'in updategeo, notdisplayedfeatures is: ',
-      this.state.notDisplayedFeatures
+      notDisplayedFeatures
     );
-    Object.keys(this.state.notDisplayedFeatures).map(key => {
-      featuresList.push(this.state.notDisplayedFeatures[key]);
+    Object.keys(notDisplayedFeatures).map(key => {
+      featuresList.push(notDisplayedFeatures[key]);
       return key;
     });
 
@@ -275,32 +280,27 @@ class MapForm extends Component {
   //get all edited values and push them up to the update function.
   //this occurs when we hit 'Save' after editing
   _onEdited = e => {
+    const { features } = this.state
     Object.keys(e.layers._layers).map(item => {
       let layer = e.layers._layers[item]; //this specific edited item
       //preform a lookup for the previous properties of this object and throw them into state if they exist
       let newFeature = this._generateFeature(layer);
-      newFeature.properties = this.state.features[item].properties; //carry over old properties
+      newFeature.properties = features[item].properties; //carry over old properties
       this.featuresCallback(newFeature);
-      //do not edit properties on edit - leave that for onClick instead.
-      /*
-            //TODO: at some point, this callback will need to happen for each edited object to update their descriptions
-            this.setState({prevProperties: this.state.features[item].properties ? this.state.features[item].properties : {}})
-            this.setState({popup:{active: true, for:newFeature.id}}, this.featuresCallback(newFeature))
-            return item
-            */
     });
   };
 
   //this is where we would put info display / editing for features.
   _onLayerClick = e => {
+    const { features, blockPopup } = this.state
     var layer = e.target;
-    let prevProperties = this.state.features[layer._leaflet_id].properties
-      ? this.state.features[layer._leaflet_id].properties
+    let prevProperties = features[layer._leaflet_id].properties
+      ? features[layer._leaflet_id].properties
       : {};
 
     console.log('layer clicked with value e: ', e, 'and state: ', this.state);
 
-    if (!this.state.blockPopup) {
+    if (!blockPopup) {
       this.setState({ location: [e.latlng.lat, e.latlng.lng] });
       this.setState({ prevProperties: prevProperties });
       this.setState({ popup: { active: true, for: layer._leaflet_id } });
@@ -309,22 +309,23 @@ class MapForm extends Component {
 
   //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
   _onFeatureGroupReady = ref => {
-    if (ref === null || !this.state.mapLoading) {
+    const { mapLoading, geo } = this.state
+    if (ref === null || !mapLoading) {
       return;
     }
 
     if (
-      this.state.geo &&
-      this.state.geo.geojson &&
-      this.state.geo.geojson.features &&
-      this.state.geo.geojson.features.length > 0
+      geo &&
+      geo.geojson &&
+      geo.geojson.features &&
+      geo.geojson.features.length > 0
     ) {
       //features must be loaded in one at a time, not in bulk.
       let localFeatures = {};
       let output = {};
       let notDisplayedFeatures = [];
 
-      this.state.geo.geojson.features.map(feature => {
+      geo.geojson.features.map(feature => {
         let leafletGeoJSON = new L.GeoJSON(feature);
 
         leafletGeoJSON.eachLayer(layer => {
@@ -393,6 +394,7 @@ class MapForm extends Component {
   render() {
 
     const {classes} = this.props
+    const { location, mapRef, popup, prevProperties } = this.state
 
     navigator.geolocation.getCurrentPosition(this.success, this.error, {
       enableHighAccuracy: true,
@@ -402,22 +404,22 @@ class MapForm extends Component {
 
     return (
       <React.Fragment>
-        {this.state.location && this.state.location.length > 0 && (
+        {location && location.length > 0 && (
           <React.Fragment>
             <Typography className={classes.mapTitle} component={'p'}>
               {`Geolocation Map Input`}
             </Typography>
             <Map
               ref={ref => {
-                if (!this.state.mapRef) {
+                if (!mapRef) {
                   this._setMapRef(ref);
                 }
               }}
-              center={this.state.location}
+              center={location}
               className={classes.mapDisplay}
               zoom={
-                this.state.mapRef && this.state.mapRef.leafletElement
-                  ? this.state.mapRef.leafletElement.getZoom()
+                mapRef && mapRef.leafletElement
+                  ? mapRef.leafletElement.getZoom()
                   : 7
               }
               minZoom={4}
@@ -452,14 +454,14 @@ class MapForm extends Component {
                 />
               </FeatureGroup>
 
-              {this.state.popup.active && (
+              {popup.active && (
                 <Popup
                   className={classes.mapPopup}
-                  position={this.state.location}
+                  position={location}
                   onClose={this._onPopupClose}
                 >
                   <DynamicForm
-                    prevProperties={this.state.prevProperties}
+                    prevProperties={prevProperties}
                     setProperties={this.setProperties}
                   />
                 </Popup>

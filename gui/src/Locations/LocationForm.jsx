@@ -51,32 +51,33 @@ class LocationForm extends Component {
   }
 
   componentDidMount() {
-    this.setState({ geoText: this.state.geo && this.state.geo.geojson ? JSON.stringify(this.state.geo.geojson.features, null, 2) : '[]' });
+    const { geo } = this.state
+    this.setState({ geoText: geo && geo.geojson ? JSON.stringify(geo.geojson.features, null, 2) : '[]' });
   }
 
-  geoDataCallback = geo => {
+  geoDataCallback = callbackGeo => {
 
     const {record} = this.props
+    const { jsonTextFormKey, geo } = this.state //no longer needed unless we re implement
 
-    if (geo && Object.keys(geo).length > 0) {
-      this.setState({ geo: geo }, () => this.setState({geoText: JSON.stringify(geo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: this.state.jsonTextFormKey + 1})));
+    if (callbackGeo && Object.keys(callbackGeo).length > 0) {
+      this.setState({ geo: callbackGeo }, () => this.setState({geoText: JSON.stringify(callbackGeo.geojson.features, null, 2)}, () => this.setState({jsonTextFormKey: jsonTextFormKey + 1})));
     } else {
       //this will likely have to be changed
       this.setState({ geo: {} });
     }
 
     //mark as dirty if prop value does not equal state value.  If they're equal, leave isDirty as is.
-    if (this.state.geo !== record.geo) {
+    if (geo !== record.geo) {
       this.setState({ isFormDirty: true });
     }
   };
 
   //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
   handleSubmit = (data) => {
-    console.log("data in handlesubmit locform is: ", data)
-    
+    const { geo } = this.state    
     this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, this.state.geo, this.props, data.location_type === Constants.LOCATIONTYPE_OSF ? `/${Constants.models.AGENTS}/create` : `/${Constants.models.LOCATIONS}`);
+        submitObjectWithGeo(data, geo, this.props, data.location_type === Constants.LOCATIONTYPE_OSF ? `/${Constants.models.AGENTS}/create` : `/${Constants.models.LOCATIONS}`);
     })
     
   };
@@ -97,28 +98,15 @@ class LocationForm extends Component {
     let parseGeoText;
 
     const { record } = this.props
+
+    const { geoText, mapFormKey} = this.state
     try {
 
-      //TODO: this isnt parsing geotext, it's parsing features.
-
-      /**
-       *{
-  "id": "97313af3-ac52-4b12-afdb-4a0307bb58e2",
-  "geojson": {
-    "type": "FeatureCollection",
-    "features": []
-  },
-  "object_id": "e950313e-faf0-47aa-ac35-5294857c1486",
-  "content_type": "location"
-} 
-       */
-
-
-       //organize features into a geoJSON object to see if it is valid geoJSON.
+      //organize features into a geoJSON object to see if it is valid geoJSON.
       const geoObject = {
         "geojson": {
           "type": "FeatureCollection",
-          "features": JSON.parse(this.state.geoText)
+          "features": JSON.parse(geoText)
         },
         "content_type": "location",
       }
@@ -153,7 +141,7 @@ class LocationForm extends Component {
         })*/
 
         //TODO: non-feature values should not be in the text form.
-        this.setState({ geo: geoObject }, this.setState({mapFormKey: this.state.mapFormKey + 1}));
+        this.setState({ geo: geoObject }, this.setState({mapFormKey: mapFormKey + 1}));
       }
       else{
         console.log("Invalid geoJSON provided to form - If there's a plugin that identifies the mistake in-page, please insert it here.")
@@ -165,16 +153,12 @@ class LocationForm extends Component {
       toastErrors("Invalid JSON given to Text Entry: ", e)
       console.log("e in try catch geoObject failure is: ", e)
     }
-    //check for difference between text and map
-    //check for valid geoJSON
-    //if valid geoJSON, send it to the map to be populated, EXCEPT any values that cannot be shown (multiline, multipoint, multipolygon).App
-    //if not valid, indicate to the user this fact - maybe make the geotext field red?
   };
 
   render() {
     //const {isformdirty, rest} = {...this.props}
     const { staticContext, id, ...rest } = this.props;
-    const { isFormDirty } = this.state;
+    const { isFormDirty, geo, mapFormKey } = this.state;
     return (
       <SimpleForm
         {...rest}
@@ -246,10 +230,10 @@ class LocationForm extends Component {
               <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
             </Grid>
 
-            <Grid item xs={12} key={this.state.mapFormKey}>
+            <Grid item xs={12} key={mapFormKey}>
               <MapForm
                 content_type={Constants.model_fk_fields.LOCATION}
-                recordGeo={this.state.geo}
+                recordGeo={geo}
                 id={id}
                 geoDataCallback={this.geoDataCallback}
               />
@@ -269,25 +253,3 @@ class LocationForm extends Component {
 
 const enhance = compose(withStyles(styles));
 export default enhance(LocationForm);
-
-
-/**
- *  This is the geojson text form - it can be thrown into the form, but currently we're still figuring out the best way to implement this.
-        <Grid xs={12} key={this.state.jsonTextFormKey}>
-          <ExpansionPanel fullWidth>
-            <ExpansionPanelSummary expandIcon={<ExpandMore/>}>
-              <Typography>{`Geo Text Entry - Experimental`}</Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={styles.geoTextArea}>
-            <Grid container>
-            <Grid item xs={12}>
-              <TextField name="geoText" fullWidth label={'en.models.locations.geo'} value={this.state.geoText} placeholder='geoJSON' multiline={true} onChange={this.handleInput} />
-              </Grid>
-              <Grid item xs={12}>
-              <Button name="mapTextToGeo" label={'en.models.locations.text_to_geo'} onClick={this.mapTextToGeo}>{`Convert geoJSON to Map`}</Button>
-              </Grid>
-              </Grid>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
-        </Grid>
- */

@@ -120,12 +120,13 @@ class ChangePassword extends Component {
   }
 
   handleSubmit = event => {
+    const {newPassword, confirmPassword} = this.state
     event.preventDefault();
     //get uuid from storage
     const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
     if (user && user.id) {
       //the endpoint we need is at /users/${user.id}/set_password/
-      if (this.state.newPassword === this.state.confirmPassword) {
+      if (newPassword === confirmPassword) {
         this.changePassword(user.id);
       } else {
         toastErrors(
@@ -148,6 +149,7 @@ class ChangePassword extends Component {
   
   render() {
     const {classes} = this.props
+    const { redirect } = this.state
     console.log("state in changepassword is: ", this.state)
     return (
       <React.Fragment>
@@ -180,7 +182,7 @@ class ChangePassword extends Component {
           </React.Fragment>
         }
       />
-      {this.state.redirect && <Redirect to="/login"/>}
+      {redirect && <Redirect to="/login"/>}
       </React.Fragment>
     );
   }

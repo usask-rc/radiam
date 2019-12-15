@@ -158,14 +158,14 @@ class PageThree extends Component {
     this.state = {geo: props.record.geo, isDirty: false }
   }
 
-  geoDataCallback = geo => {
+  geoDataCallback = callbackGeo => {
     //send our geodata back up to the stepper, we don't have any reason to handle it here.
     console.log("receiving geodata from map in gDC: ", geo)
 
     const {record} = this.props
-
-    if (this.state.geo !== record.geo){
-      this.setState({geo: geo})
+    const { geo } = this.state
+    if (geo !== record.geo){
+      this.setState({geo: callbackGeo})
       this.setState({isFormDirty: true})
     }
   };
@@ -187,6 +187,7 @@ class PageThree extends Component {
 
   render(){
     const { handleBack, record } = this.props
+    const { isFormDirty } = this.state
     return(
       <React.Fragment>
         <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
@@ -194,7 +195,7 @@ class PageThree extends Component {
             <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
           }
         </SimpleForm>
-        <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+        <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
       </React.Fragment>
     )
   }
@@ -230,6 +231,7 @@ class PageTwo extends Component {
     this.setState({isMounted: false})
   }
 
+  //TODO: this smells funny - there's a better way to do this.
   getAllParentGroups = group_id => {
     if (group_id !== null){
       getGroupData(group_id).then(
@@ -254,6 +256,7 @@ class PageTwo extends Component {
     }
   };
 
+  //TODO: this also needs a bit of refactoring
   getPrimaryContactCandidates = () => {
     if (this.state.groupList){
       let iteratedGroups = []
@@ -290,7 +293,7 @@ class PageTwo extends Component {
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
-    const { groupContactCandidates, groupContactList } = this.state
+    const { isFormDirty, groupContactList } = this.state
 
     console.log("groupContactList is: ", groupContactList)
 
@@ -323,7 +326,7 @@ class PageTwo extends Component {
       </div>
       }
     </SimpleForm>
-    <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
     </React.Fragment>
     )
   }

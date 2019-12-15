@@ -158,7 +158,7 @@ class UserForm extends Component {
 
 
     render() {
-        console.log("this state: ", this.state)
+        const { group, group_role, redirect, isFormDirty} = this.state
         return (<React.Fragment>
             <SimpleForm
                 onSubmit={this.handleSubmit}
@@ -207,11 +207,11 @@ class UserForm extends Component {
                     source={Constants.model_fk_fields.GROUP}
                     reference={Constants.models.GROUPS}
                     onChange={this.handleSelectChange}
-                    defaultValue={this.state.group}
+                    defaultValue={group}
                     required
                 >
                     <SelectInput
-                        validate={this.state.group_role ? validateGroup : null}
+                        validate={group_role ? validateGroup : null}
                         optionText={Constants.model_fields.NAME}
                     />
                 </ReferenceInput>
@@ -224,7 +224,7 @@ class UserForm extends Component {
                     required
                 >
                     <TranslationSelect
-                        validate={this.state.group ? validateRole : null}
+                        validate={group ? validateRole : null}
                         optionText={Constants.model_fields.LABEL}
                     />
                 </ReferenceInput>
@@ -246,8 +246,8 @@ class UserForm extends Component {
                     onClick={this.handleSubmit}
                 />
             </Toolbar>
-            <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-            {this.state.redirect && <Redirect to="/login"/>}
+            <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            {redirect && <Redirect to="/login"/>}
         </React.Fragment>
         );
     }

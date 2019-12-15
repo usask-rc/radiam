@@ -55,6 +55,7 @@ class RecentFilesSummary extends React.Component {
   //TODO: the filesummarybutton is too far to the left - i don't know the css that is causing this, but it requires a fix.
   render() {
     const { id, files, classes } = this.props;
+    const { redirect } = this.state
     return (
       <React.Fragment>
         {files && files.length > 0 && (
@@ -76,7 +77,7 @@ class RecentFilesSummary extends React.Component {
             </CardContent>
           </Card>
         )}
-        {this.state.redirect && (
+        {redirect && (
           <Redirect
             to={{
               pathname: `/projects/${id}/show/files`,

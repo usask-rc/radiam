@@ -41,6 +41,7 @@ class UserEditForm extends Component {
 
     handleSubmit = () => {
         const { history } = this.props
+        const { id, username, email } = this.state
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(Constants.WEBTOKEN);
 
@@ -55,14 +56,14 @@ class UserEditForm extends Component {
         }
 
         const request = new Request(
-            getAPIEndpoint() + `/${Constants.models.USERS}/${this.state.id}/`, {
+            getAPIEndpoint() + `/${Constants.models.USERS}/${id}/`, {
                 method: Constants.methods.PUT,
                 body: JSON.stringify({ ...this.state }),
                 headers: headers
             }
         )
 
-        if (this.state.username && this.state.email) {
+        if (username && email) {
             this.setState({isFormDirty: false}, () => {
             return fetch(request).then(response => {
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
@@ -111,7 +112,7 @@ class UserEditForm extends Component {
     };
 
     render() {
-        const {groupMembers, viewModal} = this.state
+        const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
         const {setViewModal} = this.props
         return (<React.Fragment>
             <SimpleForm
@@ -133,7 +134,7 @@ class UserEditForm extends Component {
                     source={Constants.model_fields.USERNAME}
                     onChange={this.handleChange}
                     validate={validateUsername}
-                    defaultValue={this.state.username}
+                    defaultValue={username}
                     disabled
                 />
                 <TextInput
@@ -141,14 +142,14 @@ class UserEditForm extends Component {
                     source={Constants.model_fields.FIRST_NAME}
                     onChange={this.handleChange}
                     validate={validateFirstName}
-                    defaultValue={this.state.first_name}
+                    defaultValue={first_name}
                 />
                 <TextInput
                     label={"en.models.users.lname"}
                     source={Constants.model_fields.LAST_NAME}
                     onChange={this.handleChange}
                     validate={validateLastName}
-                    defaultValue={this.state.last_name}
+                    defaultValue={last_name}
                 />
                 <TextInput
                     type={Constants.model_fields.EMAIL}
@@ -156,25 +157,25 @@ class UserEditForm extends Component {
                     source={Constants.model_fields.EMAIL}
                     onChange={this.handleChange}
                     validate={validateEmail}
-                    defaultValue={this.state.email}
+                    defaultValue={email}
                 />
                 <TextInput
                     label={"en.models.users.notes"}
                     source={Constants.model_fields.NOTES}
                     onChange={this.handleChange}
-                    defaultValue={this.state.notes}
+                    defaultValue={notes}
                 />
                 <TextInput
                     label={"en.models.users.user_orcid_id"}
                     source={Constants.model_fields.ORCID_ID}
                     onChange={this.handleChange}
-                    defaultValue={this.state.user_orcid_id}
+                    defaultValue={user_orcid_id}
                     validate={validateOrcid}
                 />
                 <BooleanInput
                     label={"en.models.generic.active"}
                     source={Constants.model_fields.ACTIVE}
-                    defaultValue={this.state.is_active}
+                    defaultValue={is_active}
                     onChange={this.handleSelectChange}
                 />
                 {viewModal &&
@@ -186,8 +187,8 @@ class UserEditForm extends Component {
                 }
             </SimpleForm>
             
-            <Prompt when={this.state.isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-            {this.state.redirect && <Redirect to="/login"/>}
+            <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            {redirect && <Redirect to="/login"/>}
         </React.Fragment>
         );
     }
