@@ -197,6 +197,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
                   'email',
                   'is_active',
                   'time_zone_id',
+                  'user_orcid_id',
                   'date_created',
                   'date_updated',
                   'notes')
@@ -238,6 +239,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'is_active', instance.is_active)
         instance.time_zone_id = validated_data.get(
             'time_zone_id', instance.time_zone_id)
+        instance.user_orcid_id = validated_data.get(
+            'user_orcid_id', instance.user_orcid_id)
         instance.date_updated = now()
         instance.notes = validated_data.get('notes', instance.notes)
 
@@ -276,7 +279,6 @@ class SuperuserUserSerializer(BaseUserSerializer):
                   'is_active',
                   'is_superuser',
                   'time_zone_id',
-                  'user_orcid_id',
                   'date_created',
                   'date_updated',
                   'notes')
@@ -294,8 +296,6 @@ class SuperuserUserSerializer(BaseUserSerializer):
                                 'is_active', instance.is_active)
         instance.is_superuser = validated_data.get(
                                 'is_superuser', instance.is_superuser)
-        instance.user_orcid_id = validated_data.get(
-                                'user_orcid_id', instance.is_superuser)
         instance.time_zone_id = validated_data.get(
                                 'time_zone_id', instance.time_zone_id)
         instance.date_updated = now()
