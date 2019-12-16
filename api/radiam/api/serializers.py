@@ -206,8 +206,6 @@ class BaseUserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**validated_data)
         user.date_created = now()
 
-        # add the users to the 'All Users' group
-        # all_users_group = ResearchGroup.objects.get(name='All Users')
         HTTP_USER_AGENT_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_HTTP_USER_AGENT_HEADER',
                                          'HTTP_USER_AGENT')
         HTTP_IP_ADDRESS_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_IP_ADDRESS_HEADER', 'REMOTE_ADDR')
@@ -278,6 +276,7 @@ class SuperuserUserSerializer(BaseUserSerializer):
                   'email',
                   'is_active',
                   'is_superuser',
+                  'user_orcid_id',
                   'time_zone_id',
                   'date_created',
                   'date_updated',
@@ -296,6 +295,8 @@ class SuperuserUserSerializer(BaseUserSerializer):
                                 'is_active', instance.is_active)
         instance.is_superuser = validated_data.get(
                                 'is_superuser', instance.is_superuser)
+        instance.user_orcid_id = validated_data.get(
+            'user_orcid_id', instance.user_orcid_id)
         instance.time_zone_id = validated_data.get(
                                 'time_zone_id', instance.time_zone_id)
         instance.date_updated = now()
