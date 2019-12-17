@@ -190,7 +190,7 @@ const styles = theme => ({
 const headCells = [
   {id: "name", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
-  {id : "path_parent", numeric: false, disablePadding: false, canOrder: true, label: "File Path"},
+  {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
   {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
@@ -223,6 +223,7 @@ const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
   return null;
 })
 
+
 function EnhancedTableHead(props) {
   const { classes, order, orderBy, onRequestSort } = props;
   const createSortHandler = property => event => {
@@ -249,7 +250,7 @@ function EnhancedTableHead(props) {
               {headCell.label}
               {orderBy === headCell.id ? (
                   <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === '-' ? 'sorted descending' : 'sorted ascending'}
                   </span>
               ) : null}
               </TableSortLabel>
@@ -274,7 +275,7 @@ function FolderView({ projectID, item, classes }) {
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(5)
+  const [perPage, setPerPage] = useState(100)
   const [sortBy, setSortBy] = useState("last_modified")
   const [order, setOrder] = useState("-")
   const [file, setFile] = useState(null)
@@ -293,6 +294,12 @@ function FolderView({ projectID, item, classes }) {
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
+
+  const handleRequestSort = (event, property) => {
+    const isDesc = order === property && order === '-';
+    setOrder(isDesc ? '' : '-');
+    setSortBy(property);
+};
 
   const removeParent = () => {
     let tempParents = [...parents]
@@ -342,11 +349,15 @@ function getJsonKeys(json) {
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
 
+    console.log("folderParams: ", folderParams)
+
     //TODO: requires an order by component as well
     getFolderFiles(folderParams, "directory").then((data) => {
       if (_isMounted){
         //TODO:will have to change when pagination comes
         setFolderTotal(data.total)
+        //cases for where we want to add more files via `...`
+        //TODO: sort functionality adds duplicates in - the logic has to change here.
         if (folders && folders.length  > 0 ){
           const prevFolders = folders
           setFolders([...prevFolders, ...data.files])
@@ -396,7 +407,8 @@ function getJsonKeys(json) {
   return(
   <div>
     <Table size={"small"} className={classes.table}>
-    <EnhancedTableHead classes={classes}>
+    <EnhancedTableHead classes={classes}
+    onRequestSort={handleRequestSort}>
       <div className={classes.locationDisplay}>
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
