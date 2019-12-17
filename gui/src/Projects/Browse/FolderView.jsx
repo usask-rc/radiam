@@ -40,6 +40,10 @@ import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 
 const styles = theme => ({
+  backCell: {
+    verticalAlign: "middle",
+    display: "flex",
+  },
   baseFolder: {
     backgroundColor: "beige",
   },
@@ -135,6 +139,9 @@ const styles = theme => ({
   parentPanel: {
     textAlign: 'left',
   },
+  parentDisplay: {
+    marginLeft: "1em",
+  },
   sortIcon: {
     height: '1em',
     width: '1em',
@@ -181,7 +188,7 @@ const styles = theme => ({
 });
 
 const headCells = [
-  {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
+  {id: "name", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: true, label: "File Path"},
   {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
@@ -408,7 +415,7 @@ function getJsonKeys(json) {
     <TableBody>
       {!loading && (parents.length > 1) &&
         <TableRow className={classes.folderRow}>
-          <TableCell onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /></TableCell>
+          <TableCell className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /><Typography className={classes.parentDisplay}>{`${parents[parents.length - 2]}`}</Typography></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
@@ -437,7 +444,7 @@ function getJsonKeys(json) {
       }
       {!loading && folders && folders.length < folderTotal &&
         <TableRow className={classes.folderRow} onClick={() => setFolderPage(folderPage + 1)}>
-          <TableCell>{`...`}</TableCell>
+          <TableCell>{`... ${folderTotal - folders.length} more directories`}</TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
@@ -463,7 +470,7 @@ function getJsonKeys(json) {
       }
       {!loading && files && files.length < fileTotal &&
         <TableRow className={classes.fileRow} onClick={() => setFilePage(filePage + 1)}>
-          <TableCell>{`...`}</TableCell>
+          <TableCell>{`... ${fileTotal - files.length} more files`}</TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
