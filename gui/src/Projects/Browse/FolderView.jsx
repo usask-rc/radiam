@@ -7,6 +7,8 @@ import {
   ArrowUpward,
   ArrowDownward,
   ArrowBack,
+  Description,
+  Folder,
 } from '@material-ui/icons';
 import { compose } from 'recompose';
 import Constants from '../../_constants/index';
@@ -52,6 +54,16 @@ const styles = theme => ({
     flexDirection: 'column',
     textAlign: 'left',
   },
+  displayFileIcons: {
+    display: "flex",
+    flexDirection: "row",
+
+  },
+  fileIcons: {
+    display: "flex",
+    verticalAlign: "middle",
+    flexDirection: "row",
+  },
   fileInfoDisplay: {
     display: 'flex',
     flexDirection: "row",
@@ -87,6 +99,11 @@ const styles = theme => ({
   folderLineItem: {
     display: "flex",
     flexDirection: "row",
+  },
+  iconDisplay: {
+    marginTop: "-0.1em",
+    paddingLeft: "0.1em",
+    paddingRight: "0.1em",
   },
   listItemText: {
     paddingRight: 0,
@@ -170,6 +187,34 @@ const headCells = [
   {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
+
+const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
+  const { file_num_in_dir, items } = props.folder
+
+  console.log("Displayfileicons folder :", props, file_num_in_dir, items)
+
+  if (items > 0){
+    return(
+      <div className={classes.displayFileIcons}>
+          {
+            items - file_num_in_dir > 0 &&
+            <div className={classes.fileIcons}>
+            {items - file_num_in_dir}
+            <Folder className={classes.iconDisplay} />
+          </div>
+          }
+          {file_num_in_dir > 0 && 
+          <div className={classes.fileIcons}>
+            {file_num_in_dir}
+            <Description className={classes.iconDisplay} />
+          </div>
+          }
+      </div>
+    )
+  }
+
+  return null;
+})
 
 function EnhancedTableHead(props) {
   const { classes, order, orderBy, onRequestSort } = props;
@@ -376,8 +421,8 @@ function getJsonKeys(json) {
             <TableCell className={classes.nameCell}>
               {folder.name}
             </TableCell>
-            <TableCell className={classes.nameCell}>
-              {folder.filesize}
+            <TableCell className={classes.fileCountCell}>
+              <DisplayFileIcons folder={folder} classes={classes} />
             </TableCell>
             <TableCell className={classes.nameCell}>
               {folder.path_parent}
