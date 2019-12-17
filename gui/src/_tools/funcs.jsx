@@ -157,6 +157,8 @@ export function getFolderFiles(
       queryParams
     )
       .then(response => {
+
+        console.log("getfolderfiles response: ", response)
         let fileList = [];
         response.data.map(file => {
           const newFile = file;
@@ -169,7 +171,7 @@ export function getFolderFiles(
         resolve({
           files: fileList,
           total: response.total,
-          next: response.text,
+          next: response.next,
         });
       })
       .catch(err => {

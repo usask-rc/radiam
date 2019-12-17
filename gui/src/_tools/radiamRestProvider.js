@@ -83,7 +83,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           sort = `ordering=${params.sort.order}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-
+        console.log("url before get_files request: ", url)
         break;
       }
 

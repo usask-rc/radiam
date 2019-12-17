@@ -33,7 +33,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 
 const styles = theme => ({
@@ -220,7 +220,7 @@ function FolderView({ projectID, item, classes }) {
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
-  const [numFiles, setNumFiles] = useState(100)
+  const [perPage, setPerPage] = useState(5)
   const [sortBy, setSortBy] = useState("last_modified")
   const [order, setOrder] = useState("-")
   const [file, setFile] = useState(null)
@@ -229,6 +229,7 @@ function FolderView({ projectID, item, classes }) {
     let tempParents = [...parents, parent]
     setLoading(true)
     setFolders([])
+    setPage(1)
     setFiles([])
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
@@ -238,6 +239,7 @@ function FolderView({ projectID, item, classes }) {
     let tempParents = [...parents]
     tempParents.splice(tempParents.length - 1, 1)
     setLoading(true)
+    setPage(1)
     setFolders([])
     setFiles([])
     setParents(tempParents)
@@ -259,7 +261,7 @@ function getJsonKeys(json) {
     let params = {
       folderPath: folderPath,
       projectID: projectID,
-      numFiles: numFiles,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       page: page,
       sortBy: sortBy,
       order: order,
@@ -271,7 +273,15 @@ function getJsonKeys(json) {
     getFolderFiles(params, "directory").then((data) => {
       if (_isMounted){
         //TODO:will have to change when pagination comes
-        setFolders(data.files)
+
+        if (folders && folders.length  > 0 ){
+          const prevFolders = folders
+          setFolders([...prevFolders, ...data.files])
+          console.log("setting files to: ", [...prevFolders, ...data.files])
+        }
+        else{
+          setFolders(data.files)
+        }
       }
       return data
     }).then(() => {
@@ -282,9 +292,16 @@ function getJsonKeys(json) {
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
     getFolderFiles(params, "file").then((data) => {
+      console.log("folder files data: ", data)
       if (_isMounted){
-        //TODO:will have to change when pagination comes
-        setFiles(data.files)
+        if (files && files.length > 0){
+          const prevFiles = files
+          console.log("setting files to: ", [...prevFiles, ...data.files])
+          setFiles([...prevFiles, ...data.files])
+        }
+        else{
+          setFiles(data.files)
+        }
       }
     }).then(() => 
     {
@@ -299,7 +316,7 @@ function getJsonKeys(json) {
     return function cleanup() {
       _isMounted = false;
     }
-  }, [parents, sortBy, order]);
+  }, [parents, sortBy, order, page, perPage]);
 
   console.log("FolderView with PID: ", projectID)
   return(
@@ -358,7 +375,7 @@ function getJsonKeys(json) {
             {file.name}
           </TableCell>
           <TableCell className={classes.nameCell}>
-            {file.filesize}
+            {formatBytes(file.filesize)}
           </TableCell>
           <TableCell className={classes.nameCell}>
             {file.path_parent}
@@ -368,6 +385,14 @@ function getJsonKeys(json) {
           </TableCell>
         </TableRow>
       })
+      }
+      {!loading && files && 
+        <TableRow className={classes.fileRow} onClick={() => setPage(page + 1)}>
+          <TableCell>{`...`}</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
       }
       
     </TableBody>
