@@ -1,0 +1,6 @@
+Hello {{ first_name }},
+
+The user information of user {{ username }} has been updated.
+
+Thanks,
+Radiam Admin

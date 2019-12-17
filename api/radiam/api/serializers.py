@@ -49,7 +49,7 @@ from .models import (
     UserAgent,
     UserAgentProjectConfig)
 
-from .signals import radiam_user_created, radiam_project_created
+from .signals import radiam_user_created, radiam_user_updated, radiam_project_created
 
 class MetadataSerializer():
     def to_representation(self, instance, ret):
@@ -197,6 +197,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
                   'email',
                   'is_active',
                   'time_zone_id',
+                  'user_orcid_id',
                   'date_created',
                   'date_updated',
                   'notes')
@@ -205,8 +206,6 @@ class BaseUserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**validated_data)
         user.date_created = now()
 
-        # add the users to the 'All Users' group
-        # all_users_group = ResearchGroup.objects.get(name='All Users')
         HTTP_USER_AGENT_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_HTTP_USER_AGENT_HEADER',
                                          'HTTP_USER_AGENT')
         HTTP_IP_ADDRESS_HEADER = getattr(settings, 'DJANGO_REST_PASSWORDRESET_IP_ADDRESS_HEADER', 'REMOTE_ADDR')
@@ -238,10 +237,20 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'is_active', instance.is_active)
         instance.time_zone_id = validated_data.get(
             'time_zone_id', instance.time_zone_id)
+        instance.user_orcid_id = validated_data.get(
+            'user_orcid_id', instance.user_orcid_id)
         instance.date_updated = now()
         instance.notes = validated_data.get('notes', instance.notes)
 
         instance.save()
+
+        # trigger the user updated signal
+        radiam_user_updated.send(sender=self.__class__,
+                                 email=instance.email,
+                                 username=instance.username,
+                                 first_name=instance.first_name,
+                                 request=self.context.get('request'))
+
         return instance
 
 
@@ -267,8 +276,8 @@ class SuperuserUserSerializer(BaseUserSerializer):
                   'email',
                   'is_active',
                   'is_superuser',
-                  'time_zone_id',
                   'user_orcid_id',
+                  'time_zone_id',
                   'date_created',
                   'date_updated',
                   'notes')
@@ -287,13 +296,21 @@ class SuperuserUserSerializer(BaseUserSerializer):
         instance.is_superuser = validated_data.get(
                                 'is_superuser', instance.is_superuser)
         instance.user_orcid_id = validated_data.get(
-                                'user_orcid_id', instance.is_superuser)
+            'user_orcid_id', instance.user_orcid_id)
         instance.time_zone_id = validated_data.get(
                                 'time_zone_id', instance.time_zone_id)
         instance.date_updated = now()
         instance.notes = validated_data.get('notes', instance.notes)
 
         instance.save()
+
+        # trigger the user updated signal
+        radiam_user_updated.send(sender=self.__class__,
+                                 email=instance.email,
+                                 username=instance.username,
+                                 first_name=instance.first_name,
+                                 request=self.context.get('request'))
+
         return instance
 
 
