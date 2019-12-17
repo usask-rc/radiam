@@ -14,6 +14,7 @@ const styles = theme => ({
   card: {
     textAlign: 'left',
     display: 'flex',
+    paddingBottom: "1em",
   },
   title: {
     fontSize: 16,
@@ -33,10 +34,10 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
             key !== 'key' &&
             key !== 'children' ? (
               <React.Fragment>
-                <Grid item xs={12} s={2} md={2}>
+                <Grid item xs={12} s={2} md={6}>
                   <Typography className={classes.title}>{key}</Typography>
                 </Grid>
-                <Grid item xs={12} s={2} md={4}>
+                <Grid item xs={12} s={2} md={6}>
                   <React.Fragment>
                     {key === Constants.model_fk_fields.LOCATION ? (
                       <ReferenceField

@@ -59,6 +59,9 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: "row",
   },
+  fileDialog: {
+    minWidth: "50em",
+  },
   fileSummary: {
     paddingRight: '2em',
     marginRight: '20em',
@@ -132,14 +135,20 @@ const styles = theme => ({
     textAlign: 'right',
   },
   table: {
+    marginBottom: "2em",
+    borderRadius: "16",
 
   },
-  tableRow: {
+  folderRow: {
+    backgroundColor: "beige",
+    borderRadius: "16",
+  },
+  fileRow: {
 
   },
   tableHead: {
     textAlign: "left",
-
+    backgroundColor: "LightGray",
   },
   title: {
     fontSize: 16,
@@ -155,7 +164,7 @@ const styles = theme => ({
 
 const headCells = [
   {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
-  {id : "filesize", numeric: true, disablePadding: true, canOrder: true, label: "File Size"},
+  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: true, label: "File Path"},
   {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
@@ -168,7 +177,7 @@ function EnhancedTableHead(props) {
   };
 
   return (
-      <TableHead>
+      <TableHead className={classes.tableHead}>
       <TableRow>
           {headCells.map(headCell => (
           <TableCell
@@ -296,7 +305,7 @@ function getJsonKeys(json) {
   return(
   <div>
     <Table size={"small"} className={classes.table}>
-    <EnhancedTableHead className={classes.tableHead}>
+    <EnhancedTableHead classes={classes}>
       <div className={classes.locationDisplay}>
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
@@ -313,27 +322,38 @@ function getJsonKeys(json) {
       </div>
     </EnhancedTableHead>
     <TableBody>
-      {!loading && folders && folders.length > 0 && 
-      folders.map( folder => {
-        return <TableRow onClick={() => setFile(folder)}>
-          <TableCell className={classes.nameCell}>
-            {folder.name}
-          </TableCell>
-          <TableCell className={classes.nameCell}>
-            {folder.filesize}
-          </TableCell>
-          <TableCell className={classes.nameCell}>
-            {folder.path_parent}
-          </TableCell>
-          <TableCell className={classes.nameCell}>
-            {folder.indexed_date}
-          </TableCell>
+      {!loading && (parents.length > 1) &&
+        <TableRow className={classes.folderRow} onClick={() => parents.length > 1 ? removeParent() : null}>
+          <TableCell>{`...`}</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
         </TableRow>
-      })
+      }
+      {!loading && folders && folders.length > 0 && 
+      <React.Fragment>
+        {folders.map( folder => {
+          return <TableRow className={classes.folderRow} onClick={() => addParent(folder.path)}>
+            <TableCell className={classes.nameCell}>
+              {folder.name}
+            </TableCell>
+            <TableCell className={classes.nameCell}>
+              {folder.filesize}
+            </TableCell>
+            <TableCell className={classes.nameCell}>
+              {folder.path_parent}
+            </TableCell>
+            <TableCell className={classes.nameCell}>
+              {folder.indexed_date}
+            </TableCell>
+          </TableRow>
+        })
+        }
+      </React.Fragment>
       }
       {!loading && files && files.length > 0 && 
         files.map( file => {
-          return <TableRow onClick={() => setFile(file)}>
+          return <TableRow className={classes.fileRow} onClick={() => setFile(file)}>
           <TableCell className={classes.nameCell}>
             {file.name}
           </TableCell>
@@ -349,14 +369,15 @@ function getJsonKeys(json) {
         </TableRow>
       })
       }
+      
     </TableBody>
     </Table>
     {file &&
-      <Dialog fullWidth open={file} onClose={() => setFile(null)} aria-label="Show File">
+      <Dialog fullWidth className={classes.fileDialog} open={file} onClose={() => setFile(null)} aria-label="Show File">
       <DialogTitle>
       {file.name}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className={classes.fileDialogContent}>
         <FileDetails item={file} getJsonKeys={getJsonKeys} />
       </DialogContent>
     </Dialog>
