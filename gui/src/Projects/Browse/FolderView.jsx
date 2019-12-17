@@ -16,6 +16,15 @@ import {
   Typography,
   Select,
   MenuItem,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableSortLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@material-ui/core';
 import FileSummary from '../../_components/files/FileSummary';
 import FolderDisplay from './FolderDisplay';
@@ -25,6 +34,7 @@ import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles } from '../../_tools/funcs';
+import FileDetails from '../../_components/files/FileDetails';
 
 const styles = theme => ({
   baseFolder: {
@@ -121,6 +131,16 @@ const styles = theme => ({
   sortSelect: {
     textAlign: 'right',
   },
+  table: {
+
+  },
+  tableRow: {
+
+  },
+  tableHead: {
+    textAlign: "left",
+
+  },
   title: {
     fontSize: 16,
     fontDecoration: 'bold',
@@ -133,26 +153,54 @@ const styles = theme => ({
   smallIcon: {},
 });
 
-const ReducedExpansionPanelDetails = withStyles(() => ({
-  root: {
-    width: '100%',
-    margin: '0.4em',
-    padding: '0.4em',
-  },
-}))(ExpansionPanelDetails);
+const headCells = [
+  {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
+  {id : "filesize", numeric: true, disablePadding: true, canOrder: true, label: "File Size"},
+  {id : "path_parent", numeric: false, disablePadding: false, canOrder: true, label: "File Path"},
+  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
+  //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
+]
 
-const ReducedExpansionPanel = withStyles(() => ({
-  root: {
-    fontWeight: 'bold',
-    width: '100%',
-    marginLeft: '2em',
-    border: '2px solid #87CEFA',
-    borderRadius: 5,
-  },
-  expanded: {
-    height: '80%',
-  },
-}))(ExpansionPanel);
+function EnhancedTableHead(props) {
+  const { classes, order, orderBy, onRequestSort } = props;
+  const createSortHandler = property => event => {
+      onRequestSort(event, property);
+  };
+
+  return (
+      <TableHead>
+      <TableRow>
+          {headCells.map(headCell => (
+          <TableCell
+              key={headCell.id}
+              align={headCell.numeric ? 'right' : 'left'}
+              padding={headCell.disablePadding ? 'none' : 'default'}
+              sortDirection={orderBy === headCell.id ? order : false}
+          >
+              {headCell.canOrder ? 
+              <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={order}
+                  onClick={createSortHandler(headCell.id)}
+                  
+              >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                  <span className={classes.visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  </span>
+              ) : null}
+              </TableSortLabel>
+              :
+              headCell.label
+              }
+          </TableCell>
+          ))}
+      </TableRow>
+      </TableHead>
+  );
+}
+
 
 function FolderView({ projectID, item, classes }) {
 
@@ -166,6 +214,7 @@ function FolderView({ projectID, item, classes }) {
   const [numFiles, setNumFiles] = useState(100)
   const [sortBy, setSortBy] = useState("last_modified")
   const [order, setOrder] = useState("-")
+  const [file, setFile] = useState(null)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -184,6 +233,14 @@ function FolderView({ projectID, item, classes }) {
     setFiles([])
     setParents(tempParents)
   }
+
+function getJsonKeys(json) {
+  const keys = [];
+  Object.keys(json).forEach(function (key) {
+    keys.push(key);
+  });
+  return keys;
+}
 
   useEffect(() => {
 
@@ -236,7 +293,76 @@ function FolderView({ projectID, item, classes }) {
   }, [parents, sortBy, order]);
 
   console.log("FolderView with PID: ", projectID)
-
+  return(
+  <div>
+    <Table size={"small"} className={classes.table}>
+    <EnhancedTableHead className={classes.tableHead}>
+      <div className={classes.locationDisplay}>
+        <AddLocation className={classes.locationIcon} />
+        <ReferenceField
+          label={'en.models.agents.location'}
+          source={Constants.model_fk_fields.LOCATION}
+          reference={Constants.models.LOCATIONS}
+          linkType={Constants.resource_operations.SHOW}
+          basePath={`/${Constants.models.PROJECTS}`}
+          resource={Constants.models.PROJECTS}
+          record={item}
+        >
+          <LocationShow />
+        </ReferenceField>
+      </div>
+    </EnhancedTableHead>
+    <TableBody>
+      {!loading && folders && folders.length > 0 && 
+      folders.map( folder => {
+        return <TableRow onClick={() => setFile(folder)}>
+          <TableCell className={classes.nameCell}>
+            {folder.name}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {folder.filesize}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {folder.path_parent}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {folder.indexed_date}
+          </TableCell>
+        </TableRow>
+      })
+      }
+      {!loading && files && files.length > 0 && 
+        files.map( file => {
+          return <TableRow onClick={() => setFile(file)}>
+          <TableCell className={classes.nameCell}>
+            {file.name}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {file.filesize}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {file.path_parent}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {file.indexed_date}
+          </TableCell>
+        </TableRow>
+      })
+      }
+    </TableBody>
+    </Table>
+    {file &&
+      <Dialog fullWidth open={file} onClose={() => setFile(null)} aria-label="Show File">
+      <DialogTitle>
+      {file.name}
+      </DialogTitle>
+      <DialogContent>
+        <FileDetails item={file} getJsonKeys={getJsonKeys} />
+      </DialogContent>
+    </Dialog>
+    }
+  </div> )
+/*
     return (
       <ReducedExpansionPanel
         expanded={"true"}
@@ -269,7 +395,6 @@ function FolderView({ projectID, item, classes }) {
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
             >
-              {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
               <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
               <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
               <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
@@ -334,7 +459,9 @@ function FolderView({ projectID, item, classes }) {
           { _isMounted && loading && <Typography>{`Loading...`}</Typography>}
       </ReducedExpansionPanel>
     );
+    */
 }
+
 
 const enhance = compose(
   withStyles(styles),
