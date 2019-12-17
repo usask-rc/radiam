@@ -6,6 +6,7 @@ import {
   Sort,
   ArrowUpward,
   ArrowDownward,
+  ArrowBack,
 } from '@material-ui/icons';
 import { compose } from 'recompose';
 import Constants from '../../_constants/index';
@@ -219,18 +220,24 @@ function FolderView({ projectID, item, classes }) {
   const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
+  const [filePage, setFilePage] = useState(1)
+  const [folderPage, setFolderPage] = useState(1)
   const [perPage, setPerPage] = useState(5)
   const [sortBy, setSortBy] = useState("last_modified")
   const [order, setOrder] = useState("-")
   const [file, setFile] = useState(null)
+  const [fileTotal, setFileTotal] = useState(0)
+  const [folderTotal, setFolderTotal] = useState(0)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
     setLoading(true)
-    setFolders([])
-    setPage(1)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
     setFiles([])
+    setFolders([])
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
@@ -239,7 +246,10 @@ function FolderView({ projectID, item, classes }) {
     let tempParents = [...parents]
     tempParents.splice(tempParents.length - 1, 1)
     setLoading(true)
-    setPage(1)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
     setFolders([])
     setFiles([])
     setParents(tempParents)
@@ -258,22 +268,33 @@ function getJsonKeys(json) {
     let folderPath = parents[parents.length - 1]
     _isMounted = true
 
-    let params = {
+    let fileParams = {
       folderPath: folderPath,
       projectID: projectID,
       numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-      page: page,
+      page: filePage,
       sortBy: sortBy,
       order: order,
          //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
 
+    let folderParams = {
+        folderPath: folderPath,
+        projectID: projectID,
+        numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+        page: folderPage,
+        sortBy: sortBy,
+        order: order,
+           //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+        //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
+    }
+
     //TODO: requires an order by component as well
-    getFolderFiles(params, "directory").then((data) => {
+    getFolderFiles(folderParams, "directory").then((data) => {
       if (_isMounted){
         //TODO:will have to change when pagination comes
-
+        setFolderTotal(data.total)
         if (folders && folders.length  > 0 ){
           const prevFolders = folders
           setFolders([...prevFolders, ...data.files])
@@ -291,9 +312,10 @@ function getJsonKeys(json) {
     })
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-    getFolderFiles(params, "file").then((data) => {
+    getFolderFiles(fileParams, "file").then((data) => {
       console.log("folder files data: ", data)
       if (_isMounted){
+        setFileTotal(data.total)
         if (files && files.length > 0){
           const prevFiles = files
           console.log("setting files to: ", [...prevFiles, ...data.files])
@@ -316,7 +338,7 @@ function getJsonKeys(json) {
     return function cleanup() {
       _isMounted = false;
     }
-  }, [parents, sortBy, order, page, perPage]);
+  }, [parents, sortBy, order, filePage, folderPage, perPage]);
 
   console.log("FolderView with PID: ", projectID)
   return(
@@ -340,8 +362,8 @@ function getJsonKeys(json) {
     </EnhancedTableHead>
     <TableBody>
       {!loading && (parents.length > 1) &&
-        <TableRow className={classes.folderRow} onClick={() => parents.length > 1 ? removeParent() : null}>
-          <TableCell>{`...`}</TableCell>
+        <TableRow className={classes.folderRow}>
+          <TableCell onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
@@ -368,6 +390,14 @@ function getJsonKeys(json) {
         }
       </React.Fragment>
       }
+      {!loading && folders && folders.length < folderTotal &&
+        <TableRow className={classes.folderRow} onClick={() => setFolderPage(folderPage + 1)}>
+          <TableCell>{`...`}</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      }
       {!loading && files && files.length > 0 && 
         files.map( file => {
           return <TableRow className={classes.fileRow} onClick={() => setFile(file)}>
@@ -386,8 +416,8 @@ function getJsonKeys(json) {
         </TableRow>
       })
       }
-      {!loading && files && 
-        <TableRow className={classes.fileRow} onClick={() => setPage(page + 1)}>
+      {!loading && files && files.length < fileTotal &&
+        <TableRow className={classes.fileRow} onClick={() => setFilePage(filePage + 1)}>
           <TableCell>{`...`}</TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
