@@ -154,12 +154,12 @@ class RadiamAuthGroupMemberFilter(BaseFilterBackend):
         user = request.user
 
         if not user.is_superuser:
-            admingroups = user.get_admin_groups()
+            groups = user.get_groups()
 
-            query = Q(group__in=admingroups) | Q(user=request.user)
+            query = Q(group__in=groups)
             group_memberships = groupmember_queryset.filter(
                 query
-            )
+            ).distinct()
 
             return group_memberships
 

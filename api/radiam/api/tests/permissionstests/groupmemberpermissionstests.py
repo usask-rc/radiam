@@ -312,7 +312,7 @@ class TestAdminuserGroupMemberPermissions(APITestCase):
         self.assertContains(
             response=response,
             text='',
-            status_code=404)
+            status_code=403)
 
 
 class TestManageruserGroupMemberPermissions(APITestCase):
@@ -330,7 +330,9 @@ class TestManageruserGroupMemberPermissions(APITestCase):
         """
         Test Manager user can read GroupMember list
         """
-        groupmember_count = GroupMember.objects.filter(user=self.user).count()
+        # for every group self.user belongs to
+        groupmember_count = 0
+        groupmember_count += GroupMember.objects.filter(group="718aaa07-0891-4931-8c73-1304f4a21d0d").count()
 
         request = self.factory.get(reverse('groupmember-list'))
         request.user = self.user
@@ -344,9 +346,9 @@ class TestManageruserGroupMemberPermissions(APITestCase):
             status_code=200)
         self.assertEquals(response.data['count'], groupmember_count)
 
-    def test_manageruser_read_groupmember_detail_denied(self):
+    def test_manageruser_read_groupmember_detail(self):
         """
-        Test Manager user cannot read GroupMember detail for a user in a group that they belong to.
+        Test Manager user can read GroupMember detail for a user in a group that they belong to.
         """
         # get a groupmember. it should not matter which one as admin
         detail_groupmember = GroupMember.objects.get(id='d246ea39-192a-4848-a003-493598f6f38e')
@@ -361,7 +363,7 @@ class TestManageruserGroupMemberPermissions(APITestCase):
         self.assertContains(
             response=response,
             text="",
-            status_code=404)
+            status_code=200)
 
     def test_manageruser_write_groupmember_list_denied(self):
         """
@@ -457,6 +459,10 @@ class TestMemberuserGroupMemberPermissions(APITestCase):
         Test Member user can read GroupMember list
         """
 
+        # for every group self.user belongs to
+        groupmember_count = 0
+        groupmember_count += GroupMember.objects.filter(group="718aaa07-0891-4931-8c73-1304f4a21d0d").count()
+
         request = self.factory.get(reverse('groupmember-list'))
         request.user = self.user
         force_authenticate(request, user=request.user)
@@ -467,11 +473,11 @@ class TestMemberuserGroupMemberPermissions(APITestCase):
             response=response,
             text="",
             status_code=200)
-        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['count'], groupmember_count)
 
-    def test_memberuser_read_groupmember_detail_denied(self):
+    def test_memberuser_read_groupmember_detail(self):
         """
-        Test Member user cannot read GroupMember detail for a user in a group that they belong to.
+        Test Member user can read GroupMember detail for a user in a group that they belong to.
         """
 
         detail_groupmember = GroupMember.objects.get(id='d246ea39-192a-4848-a003-493598f6f38e')
@@ -486,7 +492,7 @@ class TestMemberuserGroupMemberPermissions(APITestCase):
         self.assertContains(
             response=response,
             text="",
-            status_code=404)
+            status_code=200)
 
     def test_memberuser_write_groupmember_list_denied(self):
         """

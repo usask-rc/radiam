@@ -337,19 +337,6 @@
 },
 {
     "model": "api.groupmember",
-    "pk": "8b8895aa-437f-4af5-95d7-e16cff14eb03",
-    "fields": {
-        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
-        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
-        "user": "169c6cfa-ee4d-437d-bb76-39930493c1e3",
-        "is_active": true,
-        "date_created": "2019-04-25T16:49:07.357Z",
-        "date_updated": "2019-04-25T16:49:07.357Z",
-        "date_expires": null
-    }
-},
-{
-    "model": "api.groupmember",
     "pk": "b56abbd6-34b4-4cbe-a88c-e44735318b09",
     "fields": {
         "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
