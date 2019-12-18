@@ -387,8 +387,10 @@ class MapForm extends Component {
 
   _setMapRef = ref => {
     this.setState({ mapRef: ref });
-    console.log('mapref is: ', ref);
-    console.log('ref leafletelement is: ', ref.leafletElement);
+    if (ref) {
+        console.log('mapref is: ', ref);
+        console.log('ref leafletelement is: ', ref.leafletElement);
+    }
   };
 
   render() {

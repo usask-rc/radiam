@@ -276,7 +276,7 @@ function FolderView({ projectID, item, classes }) {
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
   const [perPage, setPerPage] = useState(100)
-  const [sortBy, setSortBy] = useState("last_modified")
+  const [sortBy, setSortBy] = useState("name.keyword")
   const [order, setOrder] = useState("-")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
@@ -535,7 +535,7 @@ function getJsonKeys(json) {
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
             >
-              <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
+              <MenuItem value={"name.keyword"}>File Name</MenuItem>
               <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
               <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
               <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
