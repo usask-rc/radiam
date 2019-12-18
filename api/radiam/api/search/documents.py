@@ -1,6 +1,7 @@
 from datetime import datetime
 from elasticsearch_dsl import Document, Date, Nested, Boolean, \
     analyzer, InnerDoc, Completion, Keyword, Text, Integer, tokenizer
+from uuid import uuid4
 
 
 class ESDataset(Document):
@@ -24,6 +25,8 @@ class ESDataset(Document):
     path_parent = Text(analyzer=linux_analyzer, fields={"keyword": Keyword()})
     # Type is set to a keyword so that it will be possible to sort on it.
     type = Keyword()
+    entity = Text()
+
 
     class Meta:
         doc_type = "_doc"
@@ -37,6 +40,8 @@ class ESDataset(Document):
             agnostic = self.path.replace('\\', '/')
             self.path_agnostic = agnostic
             self.path_agnostic_keyword = agnostic
+        if not self.entity or not self.entity.strip():
+            self.entity = str(uuid4())
         return super().save(**kwargs)
 
     def update(self, **kwargs):
@@ -48,4 +53,6 @@ class ESDataset(Document):
             agnostic = self.path.replace('\\', '/')
             self.path_agnostic = agnostic
             self.path_agnostic_keyword = agnostic
+        if not self.entity or not self.entity.strip():
+            self.entity = str(uuid4())
         return super().update(**kwargs)
