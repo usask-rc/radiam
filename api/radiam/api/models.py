@@ -762,7 +762,7 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         )
         ElasticSearchModel.save(self, analyzer=linux_analyzer, document=ESDataset, *args, **kwargs)
         models.Model.save(self, *args, **kwargs)
-        ESDataset.init(index=self.id)
+        ESDataset.init(index=str(self.id))
 
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)

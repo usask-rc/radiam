@@ -1304,7 +1304,6 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         radiam_service = RadiamService(project_id)
 
         # Get a document by ID
-        ESDataset.init(index=project_id)
         doc = ESDataset.get(index=project_id, id=pk)
 
         doc_updates = self.request.data
