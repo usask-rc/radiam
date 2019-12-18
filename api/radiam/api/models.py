@@ -11,13 +11,16 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 from elasticsearch import exceptions as es_exceptions
+from elasticsearch_dsl import analyzer, Index, tokenizer
 
 # from . import services
 from .search import RadiamService
+from .search.exceptions import IndexNotCreatedException
 from .exceptions import ElasticSearchRequestError
 from .signals import (radiam_user_created, radiam_user_updated, radiam_project_created,
     radiam_project_deleted)
 from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
+from .search.documents import ESDataset
 
 from django_rest_passwordreset.signals import reset_password_token_created
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -53,14 +56,20 @@ class ElasticSearchModel():
     """
     Add necessary operations for saving and deleting a model from elastic search
     """
-    def save(self, *args, **kwargs):
+    def save(self, analyzer=None, document=None, *args, **kwargs):
         """
         Create the model and create an index in ES
         """
-        rs = RadiamService(self.id)
-        if not rs.index_exists(self.id):
+        index = Index(self.id)
+        if not index.exists():
             try:
-                rs.create_index(self.id)
+                if analyzer:
+                    index.analyzer(analyzer)
+                if document:
+                    index.document(document)
+                index.create()
+                if not index.exists():
+                    raise IndexNotCreatedException
             except es_exceptions.RequestError as error:
                 raise ElasticSearchRequestError(error.info)
             else:
@@ -748,8 +757,12 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         return geo_data
 
     def save(self, *args, **kwargs):
-        ElasticSearchModel.save(self, *args, **kwargs)
+        linux_analyzer = analyzer('linux_path_analyzer',
+            tokenizer=tokenizer('linux_path_tokenizer', type='path_hierarchy')
+        )
+        ElasticSearchModel.save(self, analyzer=linux_analyzer, document=ESDataset, *args, **kwargs)
         models.Model.save(self, *args, **kwargs)
+        ESDataset.init(index=self.id)
 
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)

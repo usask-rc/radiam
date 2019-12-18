@@ -1173,6 +1173,8 @@ class ProjectSearchViewSet(viewsets.ViewSet):
         else:
             raise ProjectNotFoundException()
 
+    def get_cache_key(self, project_id, location, agent, path):
+        return "{}.{}.{}.{}".format(project_id, location, agent, path)
 
     def create(self, request, project_id):
         """
@@ -1196,8 +1198,7 @@ class ProjectSearchViewSet(viewsets.ViewSet):
             raise BadRequestException("No request data found")
 
         if type(data).__name__ not in 'list':
-
-            key = "{}.{}.{}.{}".format(project_id, data['location'], data['agent'], data['path'])
+            key = self.get_cache_key(project_id, data['location'], data['agent'], data['path'])
             while True:
                 doc_id = self.cache.gets(key)
                 if doc_id is None:
@@ -1315,6 +1316,9 @@ class ProjectSearchViewSet(viewsets.ViewSet):
     def perform_destroy(self, project_id, pk):
         # ES Python clients don't actually return anything on delete,
         # API calls right to ES would... is this a problem?
+        doc = ESDataset.get(index=project_id, id=pk)
+        key = self.get_cache_key(project_id, doc.location, doc.agent, doc.path)
+        self.cache.delete(key)
         radiam_service = RadiamService(project_id)
         result = radiam_service.delete_doc(project_id, pk)
         return Response(result)
