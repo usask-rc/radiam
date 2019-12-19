@@ -1014,7 +1014,10 @@ class ProjectSerializer(serializers.ModelSerializer, MetadataSerializer):
         """
 
         group = self.initial_data['group']
-        project_group_member = GroupMember.objects.filter(user=value.id).filter(group=group)
+        project_group_member = GroupMember.objects.filter(
+            user=value.id,
+            group=group
+        )
         if not project_group_member:
             raise serializers.ValidationError('Invalid primary contact user.')
         else:
