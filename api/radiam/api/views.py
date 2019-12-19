@@ -960,11 +960,13 @@ class ProjectViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
 
     @action(methods=['post'],
             detail=True,
-            url_name='search')
+            url_name='search',
+            permission_classes=(IsAuthenticated,))
     def search(self, request, pk=None):
         """
         Elasticsearch Search within a specific project's index.
         """
+
         project_id = pk
 
         self.serializer_class = ESDatasetSerializer
