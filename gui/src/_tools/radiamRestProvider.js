@@ -101,7 +101,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
 
-        console.log("params sent to get_list are: ", params)
+        console.log("params sent to get_list are: ", params, url)
 
 
         if (params)
@@ -136,15 +136,32 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
             const { page, perPage } = params.pagination;
+
+            let order = ""
+            let field = ""
+            let ordering = ""
+            if (params.sort && params.sort.field && params.sort.order){
+              if (params.sort.order === "DESC"){
+                order = "-" 
+              }
+              field = params.sort.field
+
+              ordering = `&ordering=${order}${field}`
+            }
             
-            url = `${apiUrl}/${resource}/?`;
+            url = `${apiUrl}/${resource}/?page=${page}&perPage=${perPage}${ordering}`;
+
+            /*
             if (page && sort) {
               url = `${url}${page}&${sort}`;
             } else if (page) {
               url = `${url}${page}`;
             } else if (sort) {
               url = `${url}${sort}`;
-            }/*
+            }
+            */
+            
+            /*
             const { page, perPage } = params.pagination;
             const { sortField, sortOrder } = params.sort;
 

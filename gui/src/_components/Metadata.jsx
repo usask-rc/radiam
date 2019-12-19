@@ -1461,7 +1461,7 @@ class BaseMetadataEditActions extends Component {
     console.log("componentwillmount props: ", this.props)
     if (showRelatedUsers){
 
-      if (id){
+      if (id) {
         const params={id: id, is_active: true}
         getGroupUsers(params).then((data) => {
         console.log("getgroupusers returned data: ", data)

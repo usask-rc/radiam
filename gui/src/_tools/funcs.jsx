@@ -19,6 +19,7 @@ export function getAPIEndpoint() {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
   */
+ 
   return `/${Constants.API_ENDPOINT}`;
 }
 
@@ -297,7 +298,6 @@ export function getParentGroupList(group_id, groupList = []){
 
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
-
     //get this group's details, then ascend if it has a parent.
     dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
       .then(response => {
@@ -445,6 +445,7 @@ export function getUserGroups(record) {
             return response.data;
           })
           .then(groupMembers => {
+
             groupMembers.map(groupMember => {
               dataProvider(GET_ONE, Constants.models.GROUPS, {
                 id: groupMember.group,
