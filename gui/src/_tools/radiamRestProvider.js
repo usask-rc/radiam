@@ -136,28 +136,21 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
             const { page, perPage } = params.pagination;
-            
-            url = `${apiUrl}/${resource}/?`;
-            if (page && sort) {
-              url = `${url}${page}&${sort}`;
-            } else if (page) {
-              url = `${url}${page}`;
-            } else if (sort) {
-              url = `${url}${sort}`;
-            }/*
-            const { page, perPage } = params.pagination;
-            const { sortField, sortOrder } = params.sort;
 
-            let query = {
-              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
-              _sort: sortField ? sortField : null,
-              _order: sortOrder ? sortOrder : null,
-              _start: (page - 1) * perPage,
-              _end: page * perPage,
-              page: page,
-              perPage: perPage,
-            };*/
-            //url = url + `?${stringify(query)}`;
+            let order = ""
+            let field = ""
+            let ordering = ""
+            if (params.sort){
+              if (params.sort.order === "DESC"){
+                order = "-" 
+              }
+              field = params.sort.field
+
+              ordering = `ordering=${order}${field}`
+            }
+            
+            url = `${apiUrl}/${resource}/?page=${page}&perPage=${perPage}&${ordering}`;
+            
           }
         }
 
