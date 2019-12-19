@@ -359,8 +359,6 @@ class BaseGroupEdit extends Component {
     this.state = {
       config: false,
     };
-
-    console.log("basegroupedit props: ", props)
   }
 
   render() {
