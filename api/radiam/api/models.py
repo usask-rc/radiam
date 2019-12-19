@@ -93,7 +93,8 @@ class ElasticSearchModel():
             doc = self.MetadataDoc.get(self.id)
             doc.delete()
         except es_exceptions.NotFoundError:
-            raise Exception('Deleting non-existent doc')
+            # Has it already been deleted?
+            pass
 
 
 class User(AbstractUser, UserPermissionMixin):
@@ -402,7 +403,8 @@ class GeoData(models.Model):
             doc.delete()
 
         except es_exceptions.NotFoundError:
-            raise Exception('Deleting non-existent doc')
+            # Deleting non-existant doc
+            pass
 
 
 class UserAgent(models.Model):
@@ -768,7 +770,20 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
         try:
+            userAgentProjectConfigs = UserAgentProjectConfig.objects.filter(project=self.id)
+            for userAgentProjectConfig in userAgentProjectConfigs:
+                userAgentProjectConfig.delete()
+
             entity = Entity.objects.get(project=self.id)
+
+            selectedSchemas = SelectedSchema.objects.filter(entity=entity.id)
+            for schema in selectedSchemas:
+                schema.delete()
+
+            selectedFields = SelectedField.objects.filter(entity=entity.id)
+            for field in selectedFields:
+                field.delete()
+
             entity.delete()
         except ObjectDoesNotExist:
             pass
