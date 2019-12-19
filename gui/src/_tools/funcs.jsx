@@ -18,8 +18,7 @@ export function getAPIEndpoint() {
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-*/
-  
+  */
   return `/${Constants.API_ENDPOINT}`;
 }
 
@@ -143,13 +142,17 @@ export function getFolderFiles(
   params,
   type,
 ) {
+
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const queryParams = {
     //folderPath may or may not contain an item itself.
     filter: { path_parent: params.folderPath, type:type },
     pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: params.sortBy, order: params.order },
+    q: params.q,
   };
+
+  console.log("getFolderFiles queryParams: ", queryParams, "get_files")
 
   return new Promise((resolve, reject) => {
     dataProvider(
@@ -176,6 +179,7 @@ export function getFolderFiles(
         });
       })
       .catch(err => {
+        console.log("folder files data error: ", err)
         reject(err);
       });
   });

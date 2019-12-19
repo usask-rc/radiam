@@ -62,19 +62,30 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           })
         }
 
+        console.log("get_files params.q ? ", params)
         if (params.q){
 
           if (!query.query){
-            query.query = {}
+            query.query = {
+              bool: {
+                must: {
+
+                }
+              }
+            }
           }
           
-          query.query["multi_match"] = {
-            "query": params.q,
+          query.query.bool.must = {
+          multi_match:{
+            "query": `${params.q}`,
             "fields": ["*"],
             "lenient": "true"
           }
         }
+      }
+      
 
+        console.log("query before stringify get_files: ", query)
         //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
 
@@ -298,6 +309,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
 
+        console.log("GET_FILES ret: ", ret)
         ret.data.map(item => (item.key = item.id));
         return ret;
 

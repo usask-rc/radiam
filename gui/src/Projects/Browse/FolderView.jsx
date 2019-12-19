@@ -9,6 +9,7 @@ import {
   ArrowBack,
   Description,
   Folder,
+  Search,
 } from '@material-ui/icons';
 import { compose } from 'recompose';
 import Constants from '../../_constants/index';
@@ -28,6 +29,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  TextField,
 } from '@material-ui/core';
 import FileSummary from '../../_components/files/FileSummary';
 import FolderDisplay from './FolderDisplay';
@@ -188,7 +190,7 @@ const styles = theme => ({
 });
 
 const headCells = [
-  {id: "name", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
+  {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
   {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
@@ -225,15 +227,16 @@ const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
 
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, onRequestSort } = props;
+  const { classes, order, search, orderBy, onRequestSort, handleSearch } = props;
   const createSortHandler = property => event => {
       onRequestSort(event, property);
   };
 
+  console.log("EnhancedTableHead order: ", order, "props: ", props)
   return (
       <TableHead className={classes.tableHead}>
       <TableRow>
-          {headCells.map(headCell => (
+          {headCells.map((headCell, idx) => (
           <TableCell
               key={headCell.id}
               align={headCell.numeric ? 'right' : 'left'}
@@ -243,20 +246,31 @@ function EnhancedTableHead(props) {
               {headCell.canOrder ? 
               <TableSortLabel
                   active={orderBy === headCell.id}
-                  direction={order}
+                  direction={order === "-" ? "desc" : "asc"}
                   onClick={createSortHandler(headCell.id)}
                   
               >
               {headCell.label}
-              {orderBy === headCell.id ? (
-                  <span className={classes.visuallyHidden}>
-                  {order === '-' ? 'sorted descending' : 'sorted ascending'}
-                  </span>
-              ) : null}
               </TableSortLabel>
               :
               headCell.label
               }
+              {idx === 0 && <React.Fragment>
+                <form className={classes.flex} onSubmit={handleSearch}>
+
+                <TextField
+                  id={Constants.paths.SEARCH}
+                  name={Constants.paths.SEARCH}
+                  type={Constants.paths.SEARCH}
+                  className={classes.textField}
+                  defaultValue={search}
+                  placeholder={`Search Files`}
+                />
+                <Search />
+                </form>
+            </React.Fragment>
+              }
+            
           </TableCell>
           ))}
       </TableRow>
@@ -275,9 +289,10 @@ function FolderView({ projectID, item, classes }) {
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(100)
+  const [perPage, setPerPage] = useState(10)
   const [sortBy, setSortBy] = useState("name.keyword")
-  const [order, setOrder] = useState("-")
+  const [search, setSearch] = useState("")
+  const [order, setOrder] = useState("")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
@@ -296,8 +311,16 @@ function FolderView({ projectID, item, classes }) {
   }
 
   const handleRequestSort = (event, property) => {
-    const isDesc = order === property && order === '-';
-    setOrder(isDesc ? '' : '-');
+
+    setOrder(order === "-" ? "" : "-")
+    setLoading(true)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
+    setFiles([])
+    setFolders([])
+    console.log("sort property: ", property)
     setSortBy(property);
 };
 
@@ -322,6 +345,20 @@ function getJsonKeys(json) {
   return keys;
 }
 
+  const handleSearch = (e) => {
+    console.log("handlesearch: ", e.target.elements.search.value)
+    setLoading(true)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
+    setFolders([])
+    setFiles([])
+    setSearch(e.target.elements.search.value)
+    e.preventDefault()
+
+  }
+
   useEffect(() => {
 
     let folderPath = parents[parents.length - 1]
@@ -334,6 +371,7 @@ function getJsonKeys(json) {
       page: filePage,
       sortBy: sortBy,
       order: order,
+      q: search,
          //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -345,6 +383,7 @@ function getJsonKeys(json) {
         page: folderPage,
         sortBy: sortBy,
         order: order,
+        q: search,
            //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -353,6 +392,7 @@ function getJsonKeys(json) {
 
     //TODO: requires an order by component as well
     getFolderFiles(folderParams, "directory").then((data) => {
+      console.log("folder files data: ", data.files)
       if (_isMounted){
         //TODO:will have to change when pagination comes
         setFolderTotal(data.total)
@@ -376,7 +416,7 @@ function getJsonKeys(json) {
     .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
     getFolderFiles(fileParams, "file").then((data) => {
-      console.log("folder files data: ", data)
+      console.log("files data: ", data)
       if (_isMounted){
         setFileTotal(data.total)
         if (files && files.length > 0){
@@ -401,14 +441,46 @@ function getJsonKeys(json) {
     return function cleanup() {
       _isMounted = false;
     }
-  }, [parents, sortBy, order, filePage, folderPage, perPage]);
+  }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
+
+  /*
+
+  useEffect(() => {
+    _isMounted = true
+    const params = {
+      q: search,
+      id: projectID,
+      pagination: { page: page, perPage: perPage },
+      sort: { field: sort, order: order },
+    };
+
+    getProjectData(params).then(data => {
+      if (_isMounted){
+        setData(data)
+        setStatus({loading: false})
+      }
+    }).catch(err => {
+      setStatus({loading: false, error: err})
+    })
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+    
+  }, [search, page, perPage, sort, order]);
+
+  */
 
   console.log("FolderView with PID: ", projectID)
   return(
   <div>
     <Table size={"small"} className={classes.table}>
     <EnhancedTableHead classes={classes}
-    onRequestSort={handleRequestSort}>
+    onRequestSort={handleRequestSort}
+    order={order}
+    orderBy={sortBy}
+    handleSearch={handleSearch}>
       <div className={classes.locationDisplay}>
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
@@ -428,7 +500,8 @@ function getJsonKeys(json) {
       {!loading && (parents.length > 1) &&
         <TableRow className={classes.folderRow}>
           <TableCell className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /><Typography className={classes.parentDisplay}>{`${parents[parents.length - 2]}`}</Typography></TableCell>
-          <TableCell></TableCell>
+          <TableCell>
+          </TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
         </TableRow>
