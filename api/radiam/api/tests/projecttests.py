@@ -53,7 +53,7 @@ class TestProjectAPI(BaseSearchTestCase):
         doc.get.return_value = doc
         doc.update.return_value = None
 
-        research_group = ResearchGroup.objects.get(id='23e69896-c60a-4e6c-a444-ba906ada91fb')
+        research_group = ResearchGroup.objects.get(id='989912c3-c8b2-4740-9336-0a6d4d505e33')
 
         body = {
             'name': 'test project',
@@ -280,7 +280,8 @@ class TestProjectAPI(BaseSearchTestCase):
         updated_primary_contact_user = User.objects.get(username='testuser1')
 
         body = {
-            "primary_contact_user": str(updated_primary_contact_user.id)
+            "primary_contact_user": str(updated_primary_contact_user.id),
+            "group": str(detail_project.group.id)
         }
 
         request = self.factory.patch(

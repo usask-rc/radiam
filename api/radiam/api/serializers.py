@@ -1008,6 +1008,21 @@ class ProjectSerializer(serializers.ModelSerializer, MetadataSerializer):
 
         return instance
 
+    def validate_primary_contact_user(self, value):
+        """
+        Ensure the project primary contact user is a member of the project group
+        """
+
+        group = self.initial_data['group']
+        project_group_member = GroupMember.objects.filter(
+            user=value.id,
+            group=group
+        )
+        if not project_group_member:
+            raise serializers.ValidationError('Invalid primary contact user.')
+        else:
+            return value
+
     def _save_geodata(self, geo, instance):
         """
         If the linked GeoData object exists, update it. If not, create it.
