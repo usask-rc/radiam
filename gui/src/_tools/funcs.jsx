@@ -274,6 +274,8 @@ export function getProjectData(params, folders = false) {
 export function getParentGroupList(group_id, groupList = []){
   return new Promise((resolve, reject) => {
     //resolve upon having all parent groups
+    console.log("group id in getParentGroupList is: ", group_id)
+
     dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
     .then(response => {
       groupList.push(response.data)
@@ -295,6 +297,8 @@ export function getParentGroupList(group_id, groupList = []){
 
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
+
+    console.log("group id in getGroupData is: ", group_id)
 
     //get this group's details, then ascend if it has a parent.
     dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
@@ -443,7 +447,10 @@ export function getUserGroups(record) {
             return response.data;
           })
           .then(groupMembers => {
+
             groupMembers.map(groupMember => {
+              console.log("group id in getUserGroups is: ", groupMember.group)
+
               dataProvider(GET_ONE, Constants.models.GROUPS, {
                 id: groupMember.group,
               })

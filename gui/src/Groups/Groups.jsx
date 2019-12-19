@@ -130,7 +130,7 @@ const actionStyles = theme => ({
 })
 
 //check if this user should have permission to access the edit page.
-const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) => {
+const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
@@ -142,10 +142,13 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) =>
     }
   }, [data])
 
+  console.log("GroupShowActions props: ", props)
+
   if (showEdit){
+    console.log("in groupShowActions, data is: ", data)
     return(
     <Toolbar className={classes.toolbar}>
-      <EditButton basePath={basePath} record={data} />
+      <EditButton basePath={basePath} id={props.id} record={data} {...props} />
     </Toolbar>
     )
   }
@@ -154,7 +157,6 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes}) =>
   }
 })
 
-//TODO: ADM-1939 - be able to add users via this group show page
 export const GroupShow = withStyles(styles)(withTranslate(({ classes, permissions, translate, ...props}) => {
 
   const [createModal, setCreateModal] = useState(false)
@@ -196,10 +198,16 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   }, [createModal, editModal, viewModal])
 
   return(
-  <Show actions={!props.inModal && <GroupShowActions />} {...props}>
+  <Show actions={!props.inModal && <GroupShowActions {...props} />} {...props}>
     <SimpleShowLayout>
       <GroupTitle prefix={"Viewing"} />
       {groupMembers && <RelatedUsers setCreateModal={canEditGroup ? setCreateModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers} inModal={props.inModal}  {...props}  /> }
+
+      <TextField
+        label={"en.models.groups.id"}
+        source={Constants.model_fields.ID}
+        disabled
+      />
 
       <TextField
         label={"en.models.groups.name"}
@@ -351,13 +359,15 @@ class BaseGroupEdit extends Component {
     this.state = {
       config: false,
     };
+
+    console.log("basegroupedit props: ", props)
   }
 
   render() {
 
     const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, id, ...others } = this.props;
 
-    return <Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} {...this.props} />} {...others}>
+    return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm
         basePath={basePath}
         toolbar={<EditToolbar />}
@@ -398,7 +408,7 @@ class BaseGroupEdit extends Component {
           </React.Fragment>
           )}
       </SimpleForm>
-    </Edit>
+    </Edit>)
   }
 };
 
