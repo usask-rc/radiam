@@ -14,11 +14,9 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
  
   return `/${Constants.API_ENDPOINT}`;
 }
@@ -325,9 +323,6 @@ export function getUserDetails() {
       })
       .catch(err => {
         reject(err);
-        toastErrors(
-          'Could not connect to server.  Please login and try again.'
-        );
       });
   });
 }
@@ -569,8 +564,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
         if (response.status >= 200 && response.status < 300) {
           return response.json();
         }
-        console.log("failed request: , ", request)
-        console.log("failed respnose: ", response)
         throw new Error(response.statusText); //error here when creating dataset nested in project
       })
       .then(data => {
@@ -612,12 +605,15 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
             throw new Error(response.statusText);
           })
           .then(data => {
-            console.log("inmodal: ", inModal);
+            console.log("Data from geoJSON update: ", data);
             if (!inModal){ //stop redirect if in a modal
               props.history.push(`/${props.resource}`);
             }
           });
-      });
+      }).catch(err => {
+        console.log("err in POST new object with geo: ", err, formData, geo, props)
+      })
+      ;
   } else {
     //TODO: logout the user.
     toastErrors(Constants.warnings.NO_AUTH_TOKEN);

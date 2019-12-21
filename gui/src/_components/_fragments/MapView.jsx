@@ -47,18 +47,13 @@ const MapView = ({ classes, record }) => {
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
         var layer = e.target;
-
-        if (_isMounted){
-            setLocation([e.latlng.lat, e.latlng.lng])
-            setCurFeature(layer.feature)
-            setPopup({active: true, for: layer._leaflet_id})
-        }
+        setLocation([e.latlng.lat, e.latlng.lng])
+        setCurFeature(layer.feature)
+        setPopup({active: true, for: layer._leaflet_id})
     }
 
     function _onPopupClose() {
-        if (_isMounted){
         setPopup({popup: {active: false, for: ""}})
-        }
     }
 
     //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
@@ -140,9 +135,9 @@ const MapView = ({ classes, record }) => {
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
             if (_isMounted){
-            setLocation(latLng)
-            setMapLoading(false)}
-        }
+                setLocation(latLng)
+                setMapLoading(false)}
+            }
 
     }
 
@@ -184,26 +179,26 @@ const MapView = ({ classes, record }) => {
                     <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
 
                     {popup && popup.active &&
-                    <Popup className={classes.mapPopup}
-                    position = {location}
-                    onClose={_onPopupClose}
-                    >
-                    {curFeature.properties && 
-                    <React.Fragment>
-                        <Typography variant="h5" className={classes.mapPopupTitle}>
-                            {`Feature Data:`}
-                        </Typography>
-                        <Divider/>
-                        {Object.keys(curFeature.properties).map(key => {
-                            return(
-                            <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
-                                {`${key} : ${curFeature.properties[key]}`}
-                            </Typography>
-                            );
-                        })}
-                        </React.Fragment>
-                    }
-                    </Popup>
+                        <Popup className={classes.mapPopup}
+                            position = {location}
+                            onClose={_onPopupClose}
+                        >
+                            {curFeature.properties && 
+                                <React.Fragment>
+                                    <Typography variant="h5" className={classes.mapPopupTitle}>
+                                        {`Feature Data:`}
+                                    </Typography>
+                                    <Divider/>
+                                    {Object.keys(curFeature.properties).map(key => {
+                                        return(
+                                        <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
+                                            {`${key} : ${curFeature.properties[key]}`}
+                                        </Typography>
+                                        );
+                                    })}
+                                </React.Fragment>
+                            }
+                        </Popup>
                     }
                 </Map>
                 </React.Fragment>

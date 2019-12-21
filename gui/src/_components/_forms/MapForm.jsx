@@ -387,10 +387,6 @@ class MapForm extends Component {
 
   _setMapRef = ref => {
     this.setState({ mapRef: ref });
-    if (ref) {
-        console.log('mapref is: ', ref);
-        console.log('ref leafletelement is: ', ref.leafletElement);
-    }
   };
 
   render() {
@@ -413,7 +409,7 @@ class MapForm extends Component {
             </Typography>
             <Map
               ref={ref => {
-                if (!mapRef) {
+                if (!mapRef && ref) {
                   this._setMapRef(ref);
                 }
               }}

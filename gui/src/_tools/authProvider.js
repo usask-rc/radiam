@@ -242,7 +242,7 @@ export default (type, params, ...rest) => {
         return response.json();
       }).catch(function (error) {
         console.log("Error thrown from response is: ", error)
-        toast.error("Incorrect User Credentials.  Please try again.")
+        toast.error("Could not log in.  Please ensure your credentials are correct.")
       })
       .then(curTok => {
         var token = JSON.stringify(curTok);
