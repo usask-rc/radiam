@@ -151,7 +151,6 @@ return(
 )};
 
 //NOTE: what if we use the source parameter like everything else?  will this work???!?
-
 class PageThree extends Component {
   constructor(props){
     super(props)
@@ -160,11 +159,9 @@ class PageThree extends Component {
 
   geoDataCallback = callbackGeo => {
     //send our geodata back up to the stepper, we don't have any reason to handle it here.
-    console.log("receiving geodata from map in gDC: ", geo)
-
-    const {record} = this.props
+    console.log("receiving geodata from map in gDC: ", callbackGeo)
     const { geo } = this.state
-    if (geo !== record.geo){
+    if (callbackGeo !== geo){
       this.setState({geo: callbackGeo})
       this.setState({isFormDirty: true})
     }
@@ -172,7 +169,7 @@ class PageThree extends Component {
 
   handleSubmit = (data, redirect) => {
 
-    console.log("data in handlesubmit is: ", data)
+    console.log("data in handlesubmit is: ", data, this.state)
       this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, this.state.geo, this.props, redirect)
       }
