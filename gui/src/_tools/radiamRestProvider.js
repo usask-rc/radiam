@@ -135,7 +135,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
-            const { page, perPage } = params.pagination;
+            let { page, perPage } = params.pagination;
+            
+            if (!perPage){
+              perPage = 10
+            }
 
             let order = ""
             let field = ""
@@ -149,7 +153,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               ordering = `&ordering=${order}${field}`
             }
             
-            url = `${apiUrl}/${resource}/?page=${page}&perPage=${perPage}${ordering}`;
+            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
 
             /*
             if (page && sort) {
