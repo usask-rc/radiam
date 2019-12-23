@@ -576,7 +576,7 @@ function getJsonKeys(json) {
       {`Searching: ${search}`}
       </DialogTitle>
       <DialogContent className={classes.fileDialogContent}>
-        <FileSearch />
+        <FileSearch files={searchFiles} />
       </DialogContent>
     </Dialog>
     }
