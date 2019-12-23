@@ -40,7 +40,6 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
-import FileSearch from './FileSearch';
 
 const styles = theme => ({
   backCell: {
@@ -378,10 +377,19 @@ function getJsonKeys(json) {
         q: search
       }
 
-      getFolderFiles(fileParams).then((data) => {
+      getFolderFiles(fileParams, "file").then((data) => {
         console.log("search files data: ", data)
         if (_isMounted){
           setFiles(data.files)
+          setLoading(false)
+        }
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
+
+      
+      getFolderFiles(fileParams, "directory").then((data) => {
+        console.log("search files data: ", data)
+        if (_isMounted){
+          setFolders(data.files)
           setLoading(false)
         }
       }).catch((err => {console.error("error in getFiles is: ", err)}))
@@ -405,6 +413,7 @@ function getJsonKeys(json) {
       page: filePage,
       sortBy: sortBy,
       order: order,
+      q: search
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -416,6 +425,7 @@ function getJsonKeys(json) {
         page: folderPage,
         sortBy: sortBy,
         order: order,
+        q: search
         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -579,16 +589,6 @@ function getJsonKeys(json) {
       </DialogContent>
     </Dialog>}
 
-    {searchFiles && searchFiles.length > 0 && 
-    <Dialog fullWidth className ={classes.fileDialog} open={searchFiles} onClose={() => {setSearchFiles(null); setSearch(null); return null}} aria-label="ShowFile">
-      <DialogTitle>
-      {`Searching: ${search}`}
-      </DialogTitle>
-      <DialogContent className={classes.fileDialogContent}>
-        <FileSearch files={searchFiles} />
-      </DialogContent>
-    </Dialog>
-    }
   </div> )
 }
 
