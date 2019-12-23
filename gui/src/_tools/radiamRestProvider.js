@@ -90,8 +90,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         options.body = JSON.stringify(query);
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
-        if (params.sort){
-          sort = `ordering=${params.sort.order}${params.sort.field}`
+        if (params.sort && params.sort.field && params.sort.field.length > 0){
+          let sortOrder = ""
+          if (params.sort.order){
+            sortOrder = "-"
+          }
+          sort = `ordering=${sortOrder}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
         console.log("url before get_files request: ", url)
@@ -144,7 +148,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             let order = ""
             let field = ""
             let ordering = ""
-            if (params.sort && params.sort.field && params.sort.order){
+            if (params.sort && params.sort.field && params.sort.field.length > 0 && params.sort.order && params.sort.order.length > 0){
               if (params.sort.order === "DESC"){
                 order = "-" 
               }

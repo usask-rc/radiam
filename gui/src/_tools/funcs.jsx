@@ -139,7 +139,7 @@ export function getFirstCoordinate(layer) {
 
 export function getFolderFiles(
   params,
-  type,
+  type="file",
 ) {
 
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.

@@ -12,6 +12,7 @@ const styles = theme => {
 
 //displaying a list of files returned from the `search`
 const FileSearch = ({files, ...props}) => {
+    console.log("FileSearch files, props: ", files, props)
     return(<Table>
         <TableHead>
             <TableCell>
