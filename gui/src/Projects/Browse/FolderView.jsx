@@ -297,7 +297,7 @@ function FolderView({ projectID, item, classes }) {
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
-  const [searchFiles, setSearchFiles] = useState()
+  const [searchFiles, setSearchFiles] = useState(null)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -368,21 +368,24 @@ function getJsonKeys(json) {
     _isMounted = true
     let folderPath = parents[0] //TODO: there can arise a conflict with two identical folder paths but different locations.
 
-    let fileParams = {
-      folderPath: folderPath,
-      projectID: projectID,
-      numFiles: 1000,  //TODO: paginate the file search component
-      page: 1, //TODO: affix this to some other panel
-      q: search
-    }
 
-    getFolderFiles(fileParams).then((data) => {
-      console.log("search files data: ", data)
-      if (_isMounted){
-        setSearchFiles(data.files)
-        setLoading(false)
+    if (search && search.length > 0){
+      let fileParams = {
+        folderPath: folderPath,
+        projectID: projectID,
+        numFiles: 1000,  //TODO: paginate the file search component
+        page: 1, //TODO: affix this to some other panel
+        q: search
       }
-    }).catch((err => {console.error("error in getFiles is: ", err)}))
+
+      getFolderFiles(fileParams).then((data) => {
+        console.log("search files data: ", data)
+        if (_isMounted){
+          setFiles(data.files)
+          setLoading(false)
+        }
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
+    }
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
@@ -576,8 +579,8 @@ function getJsonKeys(json) {
       </DialogContent>
     </Dialog>}
 
-    {search && searchFiles && 
-    <Dialog fullWidth className ={classes.fileDialog} open={search} onClose={() => {setSearchFiles(null); setSearch(null); return null}} aria-label="ShowFile">
+    {searchFiles && searchFiles.length > 0 && 
+    <Dialog fullWidth className ={classes.fileDialog} open={searchFiles} onClose={() => {setSearchFiles(null); setSearch(null); return null}} aria-label="ShowFile">
       <DialogTitle>
       {`Searching: ${search}`}
       </DialogTitle>
