@@ -258,14 +258,14 @@ function EnhancedTableHead(props) {
               {idx === 0 && <React.Fragment>
                 <form className={classes.flex} onSubmit={handleSearch}>
 
-                <TextField
-                  id={Constants.paths.SEARCH}
-                  name={Constants.paths.SEARCH}
-                  type={Constants.paths.SEARCH}
-                  className={classes.textField}
-                  defaultValue={search}
-                  placeholder={`Search Files`}
-                />
+                  <TextField
+                    id={Constants.paths.SEARCH}
+                    name={Constants.paths.SEARCH}
+                    type={Constants.paths.SEARCH}
+                    className={classes.textField}
+                    value={search}
+                    placeholder={`Search Files`}
+                  />
                 <Search />
                 </form>
             </React.Fragment>
@@ -291,12 +291,11 @@ function FolderView({ projectID, item, classes }) {
   const [folderPage, setFolderPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [sortBy, setSortBy] = useState("name.keyword")
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
-  const [searchFiles, setSearchFiles] = useState(null)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
@@ -307,6 +306,7 @@ function FolderView({ projectID, item, classes }) {
     setFolderTotal(0)
     setFiles([])
     setFolders([])
+    setSearch("")
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
@@ -335,6 +335,7 @@ function FolderView({ projectID, item, classes }) {
     setFolderTotal(0)
     setFolders([])
     setFiles([])
+    setSearch("")
     setParents(tempParents)
   }
 
@@ -413,7 +414,6 @@ function getJsonKeys(json) {
       page: filePage,
       sortBy: sortBy,
       order: order,
-      q: search
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -425,7 +425,6 @@ function getJsonKeys(json) {
         page: folderPage,
         sortBy: sortBy,
         order: order,
-        q: search
         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }

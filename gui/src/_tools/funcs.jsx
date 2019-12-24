@@ -145,7 +145,7 @@ export function getFolderFiles(
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const queryParams = {
     //folderPath may or may not contain an item itself.
-    filter: { path_parent: params.folderPath, type:type },
+    filter: { path_parent: params.folderPath || null, type:type },
     pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: params.sortBy, order: params.order },
     q: params.q,
