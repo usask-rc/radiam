@@ -329,7 +329,7 @@ export const GroupMemberForm = props => {
       reference={Constants.models.GROUPS}
       resource={Constants.models.GROUPS}
       defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
-      disabled={props.record && props.record.group ? true : false}
+      disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
       <SelectInput optionText={Constants.model_fields.NAME} />
