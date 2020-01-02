@@ -204,12 +204,6 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
       {groupMembers && <RelatedUsers setCreateModal={canEditGroup ? setCreateModal : null} setEditModal={canEditGroup ? setEditModal : null} setViewModal={setViewModal} groupMembers={groupMembers} inModal={props.inModal}  {...props}  /> }
 
       <TextField
-        label={"en.models.groups.id"}
-        source={Constants.model_fields.ID}
-        disabled
-      />
-
-      <TextField
         label={"en.models.groups.name"}
         source={Constants.model_fields.NAME}
       />

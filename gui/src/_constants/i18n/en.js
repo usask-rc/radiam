@@ -412,6 +412,7 @@ export default {
         search: "Search",
       },
       groups: {
+        id: "Id",
         name: 'Group Name',
         active: 'Active',
         description: 'Description',

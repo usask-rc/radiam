@@ -12,7 +12,7 @@ class UserDetails extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { groupMembers: [], viewModal: false, }
+        this.state = { groupMembers: [], viewModal: false }
     }
 
     componentDidMount() {

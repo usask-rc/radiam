@@ -198,7 +198,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
       return function cleanup() {
         _isMounted = false;
       }
-    }, [createModal, viewModal])
+    }, [createModal, editModal, viewModal])
 
     if (permissions){
       return (<Show actions={<ProjectShowActions setCanEditModal={setCanEditModal}/>}  {...props} >
