@@ -26,6 +26,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+        //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
         options.method = Constants.methods.POST
@@ -37,8 +38,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         if (params.filter){
           Object.keys(params.filter).map(key => {
               //for any value where there are slashes, we need exact matches
-              if (key === "path_parent"){
+              if (key === "path_parent" && !params.q){
                 matches[`${key}.keyword`] = params.filter[key]
+              }
+              else if (key === "path_parent" && params.q){
+                //want to search in this folder and all descending folders
+                //for now a search will just search all folders which should suffice.
               }
               else{
                 matches[key] = params.filter[key]
@@ -90,8 +95,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         options.body = JSON.stringify(query);
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
-        if (params.sort){
-          sort = `ordering=${params.sort.order}${params.sort.field}`
+        if (params.sort && params.sort.field && params.sort.field.length > 0){
+          let sortOrder = ""
+          if (params.sort.order){
+            sortOrder = "-"
+          }
+          sort = `ordering=${sortOrder}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
         console.log("url before get_files request: ", url)
@@ -144,7 +153,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             let order = ""
             let field = ""
             let ordering = ""
-            if (params.sort && params.sort.field && params.sort.order){
+            if (params.sort && params.sort.field && params.sort.field.length > 0 && params.sort.order && params.sort.order.length > 0){
               if (params.sort.order === "DESC"){
                 order = "-" 
               }
