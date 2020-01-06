@@ -310,10 +310,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     </ReferenceArrayInput>
 
     { props.mode === Constants.resource_operations.EDIT && props.id && (
-      <React.Fragment>
+      <>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />
-      </React.Fragment>
+      </>
     )}
 
     <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>

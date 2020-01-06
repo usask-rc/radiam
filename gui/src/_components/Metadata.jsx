@@ -1155,9 +1155,9 @@ class BaseConfigMetadata extends MetadataComponent {
     const { config } = this.state
 
     return <Drawer anchor="bottom" open={config} onClose={() => drawerState.close()} {...others}>
-      <React.Fragment>
+      <>
         { this.renderBody() }
-      </React.Fragment>
+      </>
     </Drawer>;
   };
 }
@@ -1244,7 +1244,7 @@ class BaseEditMetadata extends MetadataComponent {
                     />
 
                 : type === "container" ?
-                    <React.Fragment></React.Fragment>
+                    <></>
 
                 : type ==="date" ?
                     <DateInput
@@ -1317,7 +1317,7 @@ class BaseEditMetadata extends MetadataComponent {
           }
 
           { !field.many_values &&
-            <React.Fragment>
+            <>
               {   type ==="boolean" ?
                     <NullableBooleanInput
                       key={"text-input-" + field.id}
@@ -1393,7 +1393,7 @@ class BaseEditMetadata extends MetadataComponent {
 
                 : null }
                 { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
-            </React.Fragment>
+            </>
           }
 
         </div>
@@ -1456,7 +1456,7 @@ class BaseMetadataEditActions extends Component {
     drawerState.register(this, this.setConfig);
   }
 
-  componentWillMount(){
+  componentDidMount(){
     const {id, showRelatedUsers} = this.props
     console.log("componentwillmount props: ", this.props)
     if (showRelatedUsers){
@@ -1743,7 +1743,7 @@ class BaseShowMetadata extends MetadataComponent {
             </div>);
         } else {
             return (<div className={classes.container} key={"text-container-" + field.id}>
-            <React.Fragment>
+            <>
               { (type === "boolean" || type === "date" || type === "dateYear" || type === Constants.model_fields.EMAIL || type === "float" || type === "integer" || type === "text" || type === "url") &&
                 <Typography className={classes.label}>{translate(field.label + ".label")}</Typography>
               }
@@ -1813,7 +1813,7 @@ class BaseShowMetadata extends MetadataComponent {
 
                 : null }
               { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
-            </React.Fragment>
+            </>
             </div>);
           }
       } else {

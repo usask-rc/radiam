@@ -107,14 +107,14 @@ class Dashboard extends PureComponent {
       <div className={classes.root}>
       <Responsive
         medium={
-          <React.Fragment>
+          <>
             <WelcomeCards loading={loading} hasFiles={hasFiles}  />
             {!loading &&
-              <React.Fragment>
+              <>
                 <ProjectCards loading={loading} projects={projects} />
-              </React.Fragment>
+              </>
             }
-          </React.Fragment>
+          </>
         }
       />
       </div>

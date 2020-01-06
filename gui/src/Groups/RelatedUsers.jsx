@@ -75,7 +75,7 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
   return(
       <div className={classes.container}>
         {loading ? `Loading...` :
-          <React.Fragment>
+          <>
             {groupAdmins && groupAdmins.length > 0 &&
 
             <div className={classes.roleDisplayContainer}>
@@ -165,7 +165,7 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
             {setCreateModal && !inModal && 
                 <Chip label={`+ Add User`} className={classes.newUserChipDisplay} variant="outlined" key={"newUserChip"} clickable onClick={() => setCreateModal(true)}/>
             }
-          </React.Fragment>
+          </>
         }
       </div>
     )

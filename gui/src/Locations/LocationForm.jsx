@@ -200,7 +200,7 @@ class LocationForm extends Component {
                 <TranslationSelect optionText={Constants.model_fields.LABEL} />
               </ReferenceInput>
             </Grid>
-            <React.Fragment>
+            <>
               <Grid item xs={12}>
                 <TextInput
                   label={'en.models.locations.globus_endpoint'}
@@ -214,7 +214,7 @@ class LocationForm extends Component {
                   source="globus_path"
                 />
               </Grid>
-            </React.Fragment>
+            </>
             {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
               <Grid item xs={12}>
                 <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />

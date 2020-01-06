@@ -147,6 +147,8 @@ class Login extends Component {
   render() {
     const { classes, handleSubmit, isLoading, translate } = this.props;
     const { forgotPassword } = this.state
+    console.log("Login.jsx rendered.  Props: ", this.props)
+
     return (
       <div className={classes.main}>
         <Card className={classes.card}>
@@ -156,7 +158,7 @@ class Login extends Component {
             </Avatar>
           </div>
           {!forgotPassword ? (
-            <React.Fragment>
+            <>
               <form onSubmit={handleSubmit(this.login)}>
                 <div className={classes.form}>
                   <div className={classes.input}>
@@ -201,9 +203,9 @@ class Login extends Component {
                 </Link>
               </div>
               
-            </React.Fragment>
+            </>
           ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
-              <React.Fragment>
+              <>
                 <form onSubmit={handleSubmit(this.forgotPassword)}>
                   <div className={classes.form}>
                     <div className={classes.input}>
@@ -239,7 +241,7 @@ class Login extends Component {
                     </Link>
                   </div>
                 </form>
-              </React.Fragment>
+              </>
             )}
         </Card>
         <ToastContainer />

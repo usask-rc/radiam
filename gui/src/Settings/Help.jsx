@@ -53,7 +53,7 @@ const styles = {
 };
 
 const Help = ({ classes, translate }) => (
-    <React.Fragment>
+    <>
     <Card className={classes.container}>
         <CardContent>
             <Typography className={classes.headlineTop} variant="h5" component="h5">
@@ -111,7 +111,7 @@ const Help = ({ classes, translate }) => (
 
         </CardContent>
     </Card>
-    </React.Fragment>
+    </>
 )
 const mapStateToProps = state => ({
     theme: state.theme,

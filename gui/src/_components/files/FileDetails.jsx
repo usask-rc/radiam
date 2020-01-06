@@ -28,17 +28,17 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
       {getJsonKeys(item).map(key => {
         
       return(
-        <React.Fragment key={key}>
+        <div key={key}>
         {!isObject(item[key]) && 
             key !== Constants.model_fields.NAME &&
             key !== 'key' &&
             key !== 'children' ? (
-              <React.Fragment>
+              <>
                 <Grid item xs={12} s={2} md={6}>
                   <Typography className={classes.title}>{key}</Typography>
                 </Grid>
                 <Grid item xs={12} s={2} md={6}>
-                  <React.Fragment>
+                  <>
                     {key === Constants.model_fk_fields.LOCATION ? (
                       <ReferenceField
                         label={'en.models.projects.location'}
@@ -68,12 +68,12 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                     ) : (
                       item[key]
                     )}
-                  </React.Fragment>
+                  </>
                 </Grid>
-              </React.Fragment>
+              </>
             ) : isObject(item[key]) && key !== 'children' ? 
             
-        <React.Fragment>
+        <>
           <Typography
             className={classes.title}
           >{`${key}:`}
@@ -83,10 +83,10 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
             getJsonKeys={getJsonKeys}
             classes={classes}
           />
-        </React.Fragment> :
+        </> :
         null
         }
-        </React.Fragment>
+        </div>
       
       )})}
     </Grid>

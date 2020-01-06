@@ -126,11 +126,11 @@ class ChangeDetails extends Component {
         return (
             <Responsive
                 medium={
-                    <React.Fragment>
+                    <>
                         <UserEditWithDeletion basePath="/users" resource="users" id={user.id}  />
                         <ToastContainer />
                         {redirect && <Redirect to="/login"/>}
-                    </React.Fragment>
+                    </>
                 }
             />
         );

@@ -139,7 +139,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
         <Typography>{`${status.error}`}</Typography>
         </div>
       ) : data && data.files && data.files.length > 0 ? (
-        <React.Fragment>
+        <>
           <FileList data={data.files} />
           <Pagination
             page={page}
@@ -149,7 +149,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             rowsPerPageOptions={[25, 50, 100]}
             total={data.nbFiles}
           />
-        </React.Fragment>
+        </>
       ) : !status.loading && search && data && data.files.length === 0 ? 
       <Typography className={classes.loading}>
         {`No Files were found matching Search String: ${search}`}

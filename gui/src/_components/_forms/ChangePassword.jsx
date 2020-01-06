@@ -152,10 +152,10 @@ class ChangePassword extends Component {
     const { redirect } = this.state
     console.log("state in changepassword is: ", this.state)
     return (
-      <React.Fragment>
+      <>
       <Responsive
         medium={
-          <React.Fragment>
+          <>
             <div className={classes.main}>
               <div className={classes.leftCol}>
                 <form className={classes.flex} onSubmit={this.handleSubmit}>
@@ -179,11 +179,11 @@ class ChangePassword extends Component {
                 </form>
               </div>
             </div>
-          </React.Fragment>
+          </>
         }
       />
       {redirect && <Redirect to="/login"/>}
-      </React.Fragment>
+      </>
     );
   }
 }

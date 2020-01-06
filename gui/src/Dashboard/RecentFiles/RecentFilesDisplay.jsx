@@ -90,7 +90,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
   return (
     <Card className={classes.container}>
 
-      <React.Fragment>
+      <>
           <Typography
             className={classes.headlineTop}
             variant="h5"
@@ -113,7 +113,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
             >
               {projects.map((item, i) => {
                 return item.files && item.files.length > 0 &&
-                  <Tab label={<React.Fragment><ReferenceField
+                  <Tab label={<><ReferenceField
                     record={item}
                     basePath={Constants.models.PROJECTS}
                     linkType={false}
@@ -126,7 +126,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
                       classes={{ image: classes.image }}
                       source={Constants.model_fields.AVATAR_IMAGE}
                     />
-                  </ReferenceField>{item.name}</React.Fragment>} value={i} key={item.id} className={classes.tabText}>
+                  </ReferenceField>{item.name}</>} value={i} key={item.id} className={classes.tabText}>
                   </Tab>
               })}
             </Tabs>
@@ -135,7 +135,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
             })}
           </div>) : <Typography>Loading Files...</Typography> //is this necessary?
         }
-      </React.Fragment>
+      </>
     </Card >
 
   );

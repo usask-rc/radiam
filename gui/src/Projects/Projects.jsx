@@ -227,7 +227,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
-                <React.Fragment>
+                <>
                   <ShowMetadata
                     type={Constants.model_fk_fields.PROJECT}
                     translate={translate}
@@ -261,7 +261,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                     </DialogContent>
                   </Dialog>}
                   
-                </React.Fragment>
+                </>
 
               )}
             </ShowController>
@@ -287,7 +287,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
 
 const renderUserInput = ({ input, users }) => {
-  return (<React.Fragment>
+  return (<>
     <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
     <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
       {...input}
@@ -296,7 +296,7 @@ const renderUserInput = ({ input, users }) => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
       })}
     </Select>
-  </React.Fragment>)
+  </>)
 }
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />

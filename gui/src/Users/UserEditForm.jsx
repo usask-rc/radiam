@@ -114,7 +114,7 @@ class UserEditForm extends Component {
     render() {
         const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
         const {setViewModal} = this.props
-        return (<React.Fragment>
+        return (<>
             <SimpleForm
                 save={this.handleSubmit}
                 resource={Constants.models.USERS}
@@ -189,7 +189,7 @@ class UserEditForm extends Component {
             
             <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
             {redirect && <Redirect to="/login"/>}
-        </React.Fragment>
+        </>
         );
     }
 }

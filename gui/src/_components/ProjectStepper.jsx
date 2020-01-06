@@ -105,7 +105,7 @@ const PageOne = ({ classes, values, handleNext, ...props }) =>
   }
 
 return(
-  <React.Fragment>
+  <>
   <SimpleForm
     toolbar={<ProjectStepperToolbar
       handleNext={handleNext} />}
@@ -147,7 +147,7 @@ return(
     />
   </SimpleForm>
   <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-  </React.Fragment>
+  </>
 )};
 
 //NOTE: what if we use the source parameter like everything else?  will this work???!?
@@ -186,14 +186,14 @@ class PageThree extends Component {
     const { handleBack, record } = this.props
     const { isFormDirty } = this.state
     return(
-      <React.Fragment>
+      <>
         <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
           {record && 
             <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
           }
         </SimpleForm>
         <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-      </React.Fragment>
+      </>
     )
   }
 }
@@ -295,7 +295,7 @@ class PageTwo extends Component {
     console.log("groupContactList is: ", groupContactList)
 
     return (
-      <React.Fragment>
+      <>
     <SimpleForm redirect={Constants.resource_operations.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
       <div>
         <ReferenceInput
@@ -324,13 +324,13 @@ class PageTwo extends Component {
       }
     </SimpleForm>
     <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-    </React.Fragment>
+    </>
     )
   }
 }
 
 const renderUserInput = ({ input, users }) => {
-  return (<React.Fragment>
+  return (<>
     <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
     <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
       {...input}
@@ -339,7 +339,7 @@ const renderUserInput = ({ input, users }) => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
       })}
     </Select>
-  </React.Fragment>)
+  </>)
 }
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
@@ -377,7 +377,7 @@ export class ProjectStepper extends React.Component {
     const { activeStep } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         <ProjectTitle prefix={`Creating Project`} />
       <Stepper activeStep={activeStep} orientation="vertical">
 
@@ -396,7 +396,7 @@ export class ProjectStepper extends React.Component {
           </Step>
         ))}
       </Stepper>
-      </React.Fragment>
+      </>
     );
   }
 }

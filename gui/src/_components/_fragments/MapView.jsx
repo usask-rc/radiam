@@ -153,9 +153,9 @@ const MapView = ({ classes, record }) => {
     });
 
     return(
-        <React.Fragment>
+        <>
             {location && location.length > 0 && (
-            <React.Fragment>
+            <>
                 <Typography variant={"h5"} component={"h5"}>
                     {`GeoJSON Map Data`}
                 </Typography>
@@ -184,7 +184,7 @@ const MapView = ({ classes, record }) => {
                             onClose={_onPopupClose}
                         >
                             {curFeature.properties && 
-                                <React.Fragment>
+                                <>
                                     <Typography variant="h5" className={classes.mapPopupTitle}>
                                         {`Feature Data:`}
                                     </Typography>
@@ -196,14 +196,14 @@ const MapView = ({ classes, record }) => {
                                         </Typography>
                                         );
                                     })}
-                                </React.Fragment>
+                                </>
                             }
                         </Popup>
                     }
                 </Map>
-                </React.Fragment>
+                </>
             )}
-        </React.Fragment>
+        </>
     )
 }
 const enhance = compose(withStyles(styles));

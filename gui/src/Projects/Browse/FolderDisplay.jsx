@@ -18,7 +18,7 @@ const FolderDisplay = ({ classes, file }) => (
         </Grid>
 
         {file && file.file_num_in_dir > 0 &&
-            <React.Fragment>
+            <>
                 <Grid
                     item
                     xs={"auto"}
@@ -28,10 +28,10 @@ const FolderDisplay = ({ classes, file }) => (
                 <Grid item xs={"auto"}>
                     {`${file.file_num_in_dir}`}
                 </Grid>
-            </React.Fragment>
+            </>
         }
         {file && file.items - file.file_num_in_dir > 0 && 
-            <React.Fragment>
+            <>
                 <Grid item xs={"auto"}
                 >
                     <Folder className={classes.folderIcon} />
@@ -39,7 +39,7 @@ const FolderDisplay = ({ classes, file }) => (
                 <Grid item xs={"auto"}>
                     {`${file.items - file.file_num_in_dir}`}
                 </Grid>
-            </React.Fragment>
+            </>
         }
     </Grid>
 )

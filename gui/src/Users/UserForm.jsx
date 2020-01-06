@@ -159,7 +159,7 @@ class UserForm extends Component {
 
     render() {
         const { group, group_role, redirect, isFormDirty} = this.state
-        return (<React.Fragment>
+        return (<>
             <SimpleForm
                 onSubmit={this.handleSubmit}
                 resource={Constants.models.USERS}
@@ -248,7 +248,7 @@ class UserForm extends Component {
             </Toolbar>
             <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
             {redirect && <Redirect to="/login"/>}
-        </React.Fragment>
+        </>
         );
     }
 }

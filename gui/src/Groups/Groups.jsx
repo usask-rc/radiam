@@ -233,7 +233,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         { controllerProps => {
           console.log("controllerprops in group: ", controllerProps)
         return(
-          <React.Fragment>
+          <>
             <ShowMetadata
               type={Constants.model_fk_fields.GROUP}
               translate={translate}
@@ -261,7 +261,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
                 <UserDetails basePath="/users" resource="users" setViewModal={setViewModal} record={{...viewModal.user}} />
               </DialogContent>
             </Dialog>}
-          </React.Fragment>
+          </>
         )}}
       </ShowController>
 
@@ -394,10 +394,10 @@ class BaseGroupEdit extends Component {
           />
         </ReferenceInput>
         { id && (
-          <React.Fragment>
+          <>
             <EditMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
             <ConfigMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
-          </React.Fragment>
+          </>
           )}
       </SimpleForm>
     </Edit>)

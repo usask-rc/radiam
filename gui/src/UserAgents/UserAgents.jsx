@@ -185,7 +185,7 @@ return(
       }
 
       {controllerProps.record && controllerProps.record.remote_api_username && controllerProps.record.remote_api_token && 
-      <React.Fragment>
+      <>
       <TextField
         label={"en.models.agents.remote_api_username"}
         source={Constants.model_fields.REMOTE_API_USERNAME}
@@ -195,7 +195,7 @@ return(
         label={"en.models.agents.remote_api_token"}
         source={Constants.model_fields.REMOTE_API_TOKEN}
       />
-      </React.Fragment>
+      </>
       }
     
       <TextField
@@ -321,7 +321,7 @@ export const UserAgentEdit = props => {
           }
 
           return(
-            <React.Fragment>
+            <>
             <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
             <SimpleFormIterator disableRemove disableAdd>
               <ReferenceInput
@@ -341,7 +341,7 @@ export const UserAgentEdit = props => {
               <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
             </Grid>
           </Grid>
-          </React.Fragment>)
+          </>)
         }
         }
         </FormDataConsumer>

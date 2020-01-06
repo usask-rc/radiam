@@ -57,7 +57,7 @@ class RecentFilesSummary extends React.Component {
     const { id, files, classes } = this.props;
     const { redirect } = this.state
     return (
-      <React.Fragment>
+      <>
         {files && files.length > 0 && (
           <Card>
             <CardContent>
@@ -85,7 +85,7 @@ class RecentFilesSummary extends React.Component {
             }}
           />
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

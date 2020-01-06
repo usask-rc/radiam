@@ -149,7 +149,7 @@ export class IndexedSimpleFormIterator extends Component {
                                 <section className={classes.form}>
                                     {Children.map(children, (input, index2) =>
                                         isValidElement(input) ? (
-                                          <React.Fragment>
+                                          <>
                                             <IndexedFormInput
                                                 basePath={
                                                     input.props.basePath ||
@@ -178,11 +178,11 @@ export class IndexedSimpleFormIterator extends Component {
                                                 resource={resource}
                                             />
                                           { renderChildren(childClasses, translate, field, depth + 1, parentPath + "." + field.id + "[" + index + "]") }
-                                          </React.Fragment>
+                                          </>
                                         ) :
-                                          <React.Fragment>
+                                          <>
                                             { renderChildren(childClasses, translate, field, depth + 1, parentPath + "[" + index + "]") }
-                                          </React.Fragment>
+                                          </>
                                     )}
                                 </section>
                                 {!this.disableRemoveField(

@@ -255,7 +255,7 @@ function EnhancedTableHead(props) {
               :
               headCell.label
               }
-              {idx === 0 && <React.Fragment>
+              {idx === 0 && <>
                 <form className={classes.flex} onSubmit={handleSearch}>
 
                   <TextField
@@ -268,7 +268,7 @@ function EnhancedTableHead(props) {
                   />
                 <Search />
                 </form>
-            </React.Fragment>
+            </>
               }
             
           </TableCell>
@@ -521,7 +521,7 @@ function getJsonKeys(json) {
         </TableRow>
       }
       {!loading && folders && folders.length > 0 && 
-      <React.Fragment>
+      <>
         {folders.map( folder => {
           return <TableRow className={classes.folderRow} onClick={() => addParent(folder.path)}>
             <TableCell className={classes.nameCell}>
@@ -539,7 +539,7 @@ function getJsonKeys(json) {
           </TableRow>
         })
         }
-      </React.Fragment>
+      </>
       }
       {!loading && folders && folders.length < folderTotal &&
         <TableRow className={classes.folderRow} onClick={() => setFolderPage(folderPage + 1)}>

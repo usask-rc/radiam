@@ -35,7 +35,7 @@ const ForgotPassword = ({classes, translate, renderInput, forgotPassword, toggle
     }*/
 
     return (
-        <React.Fragment>
+        <>
             <div className={classes.form}>
             <div className={classes.input}>
                 <TextField
@@ -66,7 +66,7 @@ const ForgotPassword = ({classes, translate, renderInput, forgotPassword, toggle
         >
         {translate("en.auth.return_to_login")}
         </Button>
-        </React.Fragment>
+        </>
     )
 }
 

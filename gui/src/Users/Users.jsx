@@ -63,9 +63,9 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
 const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
 const PostBulkActionButtons = props => (
-  <React.Fragment>
+  <>
     <ToggleActiveButton label="Toggle Active" {...props} />
-  </React.Fragment>
+  </>
 )
 
 

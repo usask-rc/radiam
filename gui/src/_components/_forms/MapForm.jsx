@@ -401,9 +401,9 @@ class MapForm extends Component {
     });
 
     return (
-      <React.Fragment>
+      <>
         {location && location.length > 0 && (
-          <React.Fragment>
+          <>
             <Typography className={classes.mapTitle} component={'p'}>
               {`Geolocation Map Input`}
             </Typography>
@@ -465,9 +465,9 @@ class MapForm extends Component {
                 </Popup>
               )}
             </Map>
-          </React.Fragment>
+          </>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

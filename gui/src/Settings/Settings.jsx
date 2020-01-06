@@ -19,7 +19,7 @@ const styles = {
 
 //TODO: this file should contain email / password change components.
 const Settings = ({ translate }) => (
-  <React.Fragment>
+  <>
     <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
         <Typography>
@@ -46,7 +46,7 @@ const Settings = ({ translate }) => (
       </ExpansionPanelDetails>
     </ExpansionPanel>
     <ToastContainer />
-  </React.Fragment>
+  </>
 );
 
 const mapStateToProps = state => ({

@@ -146,10 +146,10 @@ class DSForm extends Component {
                 </ReferenceArrayInput>
             
                 { mode === Constants.resource_operations.EDIT && id && (
-                <React.Fragment>
+                <>
                     <EditMetadata id={id} type="dataset"/>
                     <ConfigMetadata id={id} type="dataset" />
-                </React.Fragment>
+                </>
                 )}
             
                 { record && 

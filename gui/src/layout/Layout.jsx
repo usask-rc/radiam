@@ -10,9 +10,9 @@ const CustomLayout = (props) => <Layout
 appBar={CustomAppBar} 
 menu={RadiamMenu} {...props} />;
 
-export default connect(
+export default React.memo(connect(
   state => ({
     theme: state.theme === "dark" ? darkTheme : lightTheme
   }),
   {}
-)(CustomLayout);
+)(CustomLayout));

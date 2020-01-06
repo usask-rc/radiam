@@ -165,7 +165,7 @@ class ResetPassword extends Component {
       <div className={classes.main}>
         {!completed ? (
           <Card className={classes.card}>
-            <React.Fragment>
+            <>
               <form onSubmit={this.updatePassword}>
                 <div className={classes.form}>
                   <div className={classes.avatar}>
@@ -207,10 +207,10 @@ class ResetPassword extends Component {
                   </Button>
                 </CardActions>
               </form>
-            </React.Fragment>
+            </>
           </Card>
         ) : (
-            <React.Fragment>
+            <>
               <Link to="/login">
                 <Button
                   className={classes.button}
@@ -222,7 +222,7 @@ class ResetPassword extends Component {
                   Return to Login
               </Button>
               </Link>
-            </React.Fragment>
+            </>
           )}
         <ToastContainer />
       </div>

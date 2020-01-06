@@ -114,7 +114,7 @@ const styles = {
 
 const App = props => {
   return (
-    <React.Fragment>
+    <>
       <Admin
         loginPage={Login}
         customRoutes={customRoutes}
@@ -331,7 +331,7 @@ const App = props => {
         ]}}
       </Admin>
       <ToastContainer />
-    </React.Fragment>
+    </>
   );
 };
 

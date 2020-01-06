@@ -10,7 +10,7 @@ const styles = {
     button: { margin: '1em' },
 };
 const NewPassword = ({ classes, handleChange }) => (
-    <React.Fragment>
+    <>
         <div className={classes.input}>
             <TextField
                 id={Constants.password_change.PASSWORD_NEW}
@@ -28,7 +28,7 @@ const NewPassword = ({ classes, handleChange }) => (
                 onChange={handleChange}
                 type={Constants.fields.PASSWORD} />
         </div>
-    </React.Fragment>)
+    </>)
 
 const enhance = compose(
     translate,

@@ -15,7 +15,7 @@ const styles = {
     textField: {width: "20em",}
 };
 const RequestPassword = ({ classes, handleChange }) => (
-    <React.Fragment>
+    <>
         <div className={classes.input}>
             <TextField
                 id={Constants.password_change.PASSWORD_OLD}
@@ -25,7 +25,7 @@ const RequestPassword = ({ classes, handleChange }) => (
                 className={classes.textField}
                 type={Constants.fields.PASSWORD} />
         </div>
-    </React.Fragment>)
+    </>)
 
 const enhance = compose(
     translate,
