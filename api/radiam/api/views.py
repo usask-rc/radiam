@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings, settings
 
 from rest_framework.filters import OrderingFilter
+from django.db.models.functions import Lower
 from django_filters.rest_framework import DjangoFilterBackend
 
 from dry_rest_permissions.generics import (
@@ -300,6 +301,20 @@ class RadiamOrderingFilter(OrderingFilter):
         # No ordering was included, or all the ordering fields were invalid
         return self.get_default_ordering(view)
 
+class CaseInsensitiveOrderingFilter(OrderingFilter):
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+
+        if ordering:
+            new_ordering = []
+            for field in ordering:
+                if field.startswith('-'):
+                    new_ordering.append(Lower(field[1:]).desc())
+                else:
+                    new_ordering.append(Lower(field).asc())
+            return queryset.order_by(*new_ordering)
+        return queryset
+
 
 class GeoSearchMixin(object):
     """
@@ -427,7 +442,7 @@ class UserViewSet(RadiamViewSet):
        filters.SearchFilter,
        DjangoFilterBackend,
        RadiamAuthUserFilter,
-       OrderingFilter,
+       CaseInsensitiveOrderingFilter,
     )
     search_fields = ['username', 'first_name', 'last_name', 'email']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
