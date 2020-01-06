@@ -276,6 +276,19 @@ class RadiamOrderingFilter(OrderingFilter):
     rest_parameter is the string value of the query string parameter to replace and
     replaced_by can be a list of query string parameters to add to the ordering instead
     """
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+
+        if ordering:
+            new_ordering = []
+            for field in ordering:
+                if field.startswith('-'):
+                    new_ordering.append(Lower(field[1:]).desc())
+                else:
+                    new_ordering.append(Lower(field).asc())
+            return queryset.order_by(*new_ordering)
+        return queryset
+
     def get_replacements(self):
         raise NotImplementedError(".get_replacements() must be overridden.")
 
