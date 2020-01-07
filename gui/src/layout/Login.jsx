@@ -1,11 +1,10 @@
 //Login.jsx
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { propTypes, reduxForm, Field } from "redux-form";
+import { propTypes, reduxForm } from "redux-form";
 import { connect } from "react-redux";
 import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import TextField from "@material-ui/core/TextField";
 import {
@@ -14,7 +13,6 @@ import {
   withStyles
 } from "@material-ui/core/styles";
 import LockIcon from "@material-ui/icons/Lock";
-
 import { translate, userLogin } from "react-admin";
 import { lightTheme } from "./themes";
 import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
@@ -100,11 +98,11 @@ class Login extends Component {
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: email
     })
-      .then(response =>
+      .then(() =>
         toast.success("Please check your email for a password reset link.")
       )
       .catch(err =>
-        toast.success("Please check your email for a password reset link.")
+        toast.error("Error: ", err)
       );
   };
 
@@ -116,14 +114,13 @@ class Login extends Component {
 
   login = auth =>{
     const {userLogin, location} = this.props
-    const { forgotPassword } = this.state
     return userLogin(
       auth,
       location.state ? location.state.nextPathname : "/"
     )};
 
   render() {
-    const { classes, handleSubmit, isLoading, translate } = this.props;
+    const { classes, handleSubmit, isLoading } = this.props;
     const { forgotPassword } = this.state
     console.log("Login.jsx rendered.  Props: ", this.props)
 
@@ -137,10 +134,10 @@ class Login extends Component {
           </div>
 
           {!forgotPassword ? (
-              <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
+            <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
-                <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
-                handleChange={this.handleChange} isLoading={isLoading}/>
+            <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
+            handleChange={this.handleChange} isLoading={isLoading}/>
           )}
         </Card>
         <ToastContainer />
