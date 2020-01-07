@@ -15,9 +15,11 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
+  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
+  */
   return `/${Constants.API_ENDPOINT}`;
 }
 
@@ -71,7 +73,7 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
 //this gets all projects that the user has worked on.
 //we want to get all (recent) files in a project and display them in an expandable listview.
 //TODO: handle potential setstate on unmounted component
-export function getRecentProjects() {
+export function getRecentProjects(count=1000) {
 
   return new Promise((resolve, reject) => {
       
@@ -83,7 +85,7 @@ export function getRecentProjects() {
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
       order: { field: Constants.model_fields.NAME },
-      pagination: { page: 1, perPage: 1000 }, //TODO: this needs some sort of expandable pagination control for many files in a folder.
+      pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
     })
       .then(response => response.data)
       .then(projects => {
@@ -124,15 +126,9 @@ export function getRecentProjects() {
             if (projectCtr === projects.length)
             {
               resolve({projects: projectList, hasFiles: hasFiles, loading: false})
-              //this.setState({ projects: projectList, hasFiles: this.state.hasFiles || hasFiles, loading:false });
             }
-
           }).catch(error => {
-            projectCtr += 1
-            if (projectCtr === projects.length)
-            {
-              resolve({ projects: projectList, hasFiles: this.state.hasFiles || hasFiles,  loading:false });
-            }
+            reject("GetRecentProj Rejected: ", error)
           });
           return project;
         });
