@@ -31,7 +31,7 @@ class UserEditForm extends Component {
 
     componentDidMount() {
         const { record } = this.props
-
+        console.log("usereditform cdm state: ", this.state)
         getUserGroups(record).then(data => {
             console.log("user groups are: ", data)
             this.setState({groupMembers: data})
@@ -44,7 +44,6 @@ class UserEditForm extends Component {
         const { id, username, email } = this.state
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(Constants.WEBTOKEN);
-
         if (token) {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);

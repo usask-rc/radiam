@@ -135,7 +135,7 @@ class Login extends Component {
 
           {!forgotPassword ? (
             <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
-          ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
+          ) : ( 
             <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
             handleChange={this.handleChange} isLoading={isLoading}/>
           )}

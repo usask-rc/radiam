@@ -17,7 +17,6 @@ const styles = theme => ({
 
   main: {
     flexDirection: "column",
-    minHeight: "100vh",
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundRepeat: "no-repeat",

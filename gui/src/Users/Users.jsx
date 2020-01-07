@@ -176,8 +176,6 @@ export const UserCreate = props => {
 //TODO: refactor all these goddamn user edit forms into one
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-  console.log("UserEdit props: ", props)
     return(
     <Edit toolbar={<EditToolbar />} {...props}>
       <UserEditForm {...other}/>

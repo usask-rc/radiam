@@ -61,9 +61,6 @@ const styles = theme => ({
 //there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangeDetails extends Component {
     
-    
-
-    
     handleSubmit = event => {
         const {id} = this.state
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -83,23 +80,15 @@ class ChangeDetails extends Component {
     }
 
     getCurrentUserDetails() {
-        const { mounted } = this.state
         getUserDetails().then(data => 
         {
-            if (mounted){
-                this.setState(data)
-            }
-            else{
-                this.setState({redirect: true})
-            }
+            this.setState(data)
             return data
         })
         .catch(err => 
             {
-                if (mounted)
-                {
-                    this.setState({redirect: true})
-                }
+                console.error("Error in getCurrentUserDetails: ", err)
+                this.setState({redirect: true})
             }
         )
     }
@@ -109,16 +98,11 @@ class ChangeDetails extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: null, mounted: false }
+        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: false }
     }
 
     componentDidMount() {
-        this.setState({mounted: true})
         this.getCurrentUserDetails();
-    }
-
-    componentWillUnmount(){
-        this.setState({mounted: false})
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
