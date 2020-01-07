@@ -7,8 +7,6 @@ import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 import {
   MuiThemeProvider,
@@ -18,41 +16,25 @@ import {
 import LockIcon from "@material-ui/icons/Lock";
 
 import { translate, userLogin } from "react-admin";
-import * as Constants from "../_constants/index";
 import { lightTheme } from "./themes";
 import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Link } from "@material-ui/core";
+import LoginForm from "./LoginForm"
+import ForgotForm from "./ForgotForm";
 
 const styles = theme => ({
-  actions: {
-    padding: "0 1em 1em 1em"
-  },
   avatar: {
     margin: "1em",
     display: "flex",
     justifyContent: "center"
   },
-  button: {
-    textTransform: "none",
-  },
   card: {
     minWidth: 300,
     marginTop: "6em"
   },
-  forgotContainer: {
-    alignItems: "center",
-    textAlign: "center",
-  },
-  form: {
-    padding: "0 1em 1em 1em"
-  },
   icon: {
     backgroundColor: theme.palette.secondary.main
-  },
-  input: {
-    marginTop: "1em"
   },
   main: {
     display: "flex",
@@ -64,9 +46,6 @@ const styles = theme => ({
     backgroundSize: "cover"
   },
 });
-const validateEmail = value =>
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
-  'Invalid email address' : undefined
 
 // see http://redux-form.com/6.4.3/examples/material-ui/
 const renderInput = ({
@@ -143,7 +122,6 @@ class Login extends Component {
       location.state ? location.state.nextPathname : "/"
     )};
 
-  //TODO: these pages can be extracted into their own classes... somehow.  The `submitForm()` is preventing it, and needs to be looked into.
   render() {
     const { classes, handleSubmit, isLoading, translate } = this.props;
     const { forgotPassword } = this.state
@@ -157,92 +135,13 @@ class Login extends Component {
               <LockIcon />
             </Avatar>
           </div>
+
           {!forgotPassword ? (
-            <>
-              <form onSubmit={handleSubmit(this.login)}>
-                <div className={classes.form}>
-                  <div className={classes.input}>
-                    <Field
-                      autoFocus
-                      name={Constants.login_details.USERNAME}
-                      component={renderInput}
-                      label={translate("en.auth.username")}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className={classes.input}>
-                    <Field
-                      name={Constants.login_details.PASSWORD}
-                      component={renderInput}
-                      label={translate("en.auth.password")}
-                      type={Constants.fields.PASSWORD}
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-                <CardActions className={classes.actions}>
-                  <Button
-                    variant="outlined"
-                    type={Constants.fields.SUBMIT}
-                    color="primary"
-                    disabled={isLoading}
-                    className={classes.button}
-                    fullWidth
-                  >
-                    {isLoading && <CircularProgress size={25} thickness={2} />}
-                    {translate("en.auth.sign_in")}
-                  </Button>
-                </CardActions>
-              </form>
-              <div className={classes.forgotContainer}>
-                <Link
-                  href="#"
-                  onClick={this.toggleForgotPassword}
-                >
-                  {translate("en.auth.forgot")}
-                </Link>
-              </div>
-              
-            </>
+              <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( //TODO: separate both of these components (the login form and the forgot password form) into their own components.
-              <>
-                <form onSubmit={handleSubmit(this.forgotPassword)}>
-                  <div className={classes.form}>
-                    <div className={classes.input}>
-                      <Field
-                        autoFocus
-                        name={Constants.login_details.EMAIL}
-                        component={renderInput}
-                        onChange={this.handleChange}
-                        label={translate("en.auth.email")}
-                        disabled={isLoading}
-                        validate={validateEmail}
-                      />
-                    </div>
-                  </div>
-                  <CardActions className={classes.actions}>
-                    <Button
-                      variant="outlined"
-                      type={Constants.fields.SUBMIT}
-                      color="primary"
-                      disabled={isLoading}
-                      className={classes.button}
-                      fullWidth
-                    >
-                      {isLoading && <CircularProgress size={25} thickness={2} />}
-                      {translate("en.auth.send_email")}
-                    </Button>
-                  </CardActions>
-                  <div className={classes.forgotContainer}>
-                    <Link
-                    href="#"
-                    onClick={this.toggleForgotPassword}>
-                      {translate("en.auth.return_to_login")}
-                    </Link>
-                  </div>
-                </form>
-              </>
-            )}
+                <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
+                handleChange={this.handleChange} isLoading={isLoading}/>
+          )}
         </Card>
         <ToastContainer />
       </div>

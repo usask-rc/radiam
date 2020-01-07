@@ -1,0 +1,74 @@
+//ForgotForm.jsx
+
+import React, { Component } from 'react'
+import { withStyles, Button } from '@material-ui/core';
+import {translate} from "ra-core"
+import { Field } from 'redux-form';
+import * as Constants from "../_constants/index"
+import { MuiThemeProvider } from 'material-ui/styles';
+import { CardActions, CircularProgress } from 'material-ui';
+import ToggleForgot from './ToggleForgot';
+import compose from "recompose/compose"
+
+const styles = () => ({
+    form: {
+        padding: "0 1em 1em 1em"
+    },
+    input: {
+        marginTop: "1em"
+    },   
+    actions: {
+        padding: "0 1em 1em 1em"
+    },
+    button: {
+        textTransform: "none",
+    },
+});
+
+
+const validateEmail = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+  'Invalid email address' : undefined
+const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, isLoading }) => {
+    return(
+        <MuiThemeProvider>
+            <form onSubmit={handleSubmit(forgotPassword)}>
+                <div className={classes.form}>
+                    <div className={classes.input}>
+                        <Field
+                        autoFocus
+                        name={Constants.login_details.EMAIL}
+                        component={renderInput}
+                        onChange={handleChange}
+                        label={translate("en.auth.email")}
+                        disabled={isLoading}
+                        validate={validateEmail}
+                        />
+                    </div>
+                </div>
+                <CardActions className={classes.actions}>
+                    <Button
+                        variant="outlined"
+                        type={Constants.fields.SUBMIT}
+                        color="primary"
+                        disabled={isLoading}
+                        className={classes.button}
+                        fullWidth
+                    >
+                        {isLoading && <CircularProgress size={25} thickness={2} />}
+                        {translate("en.auth.send_email")}
+                    </Button>
+                </CardActions>
+                <ToggleForgot forgotText={"en.auth.return_to_login"} toggleForgotPassword={toggleForgotPassword} />
+            </form>
+        </MuiThemeProvider>
+    )
+}
+
+
+const enhance = compose(
+    translate,
+    withStyles(styles)
+);
+
+export default enhance(ForgotForm)
