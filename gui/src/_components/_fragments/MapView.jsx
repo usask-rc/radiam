@@ -106,6 +106,7 @@ const MapView = ({ classes, record }) => {
         return lng % 180
     }
 
+    //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
     function success(pos) {
         //if there are no features, default our location to the user's location.
 

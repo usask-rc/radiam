@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
 import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
+import moment from 'moment';
 var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -69,6 +70,72 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
   }
 }
 
+//this gets all projects that the user has worked on.
+//we want to get all (recent) files in a project and display them in an expandable listview.
+//TODO: handle potential setstate on unmounted component
+export function getRecentProjects(count=1000) {
+
+  return new Promise((resolve, reject) => {
+      
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const now = moment();
+    let projectCtr = 0
+    let projectList = []
+    let hasFiles = false
+
+    dataProvider(GET_LIST, Constants.models.PROJECTS, {
+      order: { field: Constants.model_fields.NAME },
+      pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
+    })
+      .then(response => response.data)
+      .then(projects => {
+
+        //Get the files from each project
+        //TODO: once we can search we can search files on age range and avoid this entire filtering process
+        projects.map(project => {
+
+          //get the most recent file to display it
+          dataProvider(
+            "GET_FILES",
+            Constants.models.PROJECTS + '/' + project.id,
+            {
+              sort: {
+                field: Constants.model_fields.INDEXED_DATE,
+                order: '-',
+              },
+              pagination: {
+                page: 1,
+                perPage: 1,
+              },
+            }
+          //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
+          ).then(response => {
+            const newProject = project
+            newProject.nbFiles = response.total;
+            newProject.recentFile = response.data[0]
+            if (newProject.recentFile){
+              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), 'days')
+              newProject.daysOld = timeDiff
+              newProject.recentFile.timeAgo = `${timeDiff} days ago`
+              hasFiles = true
+            }
+            //TODO: might be better done with a promise.all
+            projectCtr += 1
+            projectList.push(newProject)
+
+            if (projectCtr === projects.length)
+            {
+              resolve({projects: projectList, hasFiles: hasFiles, loading: false})
+            }
+          }).catch(error => {
+            reject("GetRecentProj Rejected: ", error)
+          });
+          return project;
+        });
+      });
+    })
+};
+
 export function getMaxUserRole(){
 
   const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
@@ -111,6 +178,7 @@ export function toastErrors(data) {
   }
 }
 
+//TODO: this can be reused elsewhere in the map views.
 export function getFirstCoordinate(layer) {
   if (layer.feature) {
     const layerGeo = layer.feature.geometry;

@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { Pagination, translate } from 'react-admin';
 import Constants from '../../_constants/index';
 import FileList from '../../_components/files/FileList';
-import { Search, ArrowUpward, ArrowDownward } from '@material-ui/icons';
+import { ArrowUpward, ArrowDownward } from '@material-ui/icons';
 
 import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
 import { getProjectData } from '../../_tools/funcs';
@@ -150,9 +150,9 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             total={data.nbFiles}
           />
         </>
-      ) : !status.loading && search && data && data.files.length === 0 ? 
+      ) : !status.loading && data && data.files.length === 0 ? 
       <Typography className={classes.loading}>
-        {`No Files were found matching Search String: ${search}`}
+        {`No files were found`}
       </Typography>: null}
     </div>
   );

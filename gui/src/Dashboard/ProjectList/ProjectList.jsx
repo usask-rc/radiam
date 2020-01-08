@@ -25,7 +25,6 @@ const styles = {
     iconCell: {
         verticalAlign: "middle",
         width: `${Constants.AVATAR_HEIGHT}`,
-
     },
     image: {
         height: `${Constants.AVATAR_HEIGHT}`,
@@ -60,6 +59,9 @@ const styles = {
     },
     noFiles: {
         color: "LightGray",
+    },
+    projectRow: {
+        minHeight: `${Constants.AVATAR_HEIGHT}`,
     },
     chipItem: {
         margin: "0.25em"
@@ -173,7 +175,7 @@ EnhancedTableHead.propTypes = {
 
 
 
-const ProjectList = ({classes, loading, projects}) => {
+const ProjectList = ({classes, projects}) => {
 
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
@@ -257,6 +259,7 @@ const ProjectList = ({classes, loading, projects}) => {
                 const isItemSelected = isSelected(project.name)
                 return (
                     <TableRow key={project.id}
+                    className={classes.projectRow}
                     hover
                     onClick={event => handleClick(event, project.name)}
                     tabIndex={-1}
@@ -303,17 +306,11 @@ const ProjectList = ({classes, loading, projects}) => {
                                 <Typography className={classes.noFiles}>{`None`}</Typography>
                             }
                         </TableCell>
-                    </TableRow>)
+                    </TableRow>
+                )
             })
         }
     </TableBody>
-    
-    {/*
-{/*<Typography className={classes.lastFileCellText}>{project.recentFile.extension ? <Description/> : <FolderOpen/>} 
-                                    {`${project.recentFile.name} - ${project.recentFile.timeAgo}`}
-                                </Typography> 
-                            */  
-    }
     </Table>
     <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
