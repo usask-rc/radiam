@@ -142,13 +142,14 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...
     }
   }, [data])
 
+  const {hasCreate, hasShow, hasEdit, hasList, ...rest} = props
   console.log("GroupShowActions props: ", props)
 
   if (showEdit){
     console.log("in groupShowActions, data is: ", data)
     return(
     <Toolbar className={classes.toolbar}>
-      <EditButton basePath={basePath} id={props.id} record={data} {...props} />
+      <EditButton basePath={basePath} id={props.id} record={data} {...rest} />
     </Toolbar>
     )
   }
