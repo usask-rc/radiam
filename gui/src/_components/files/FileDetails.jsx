@@ -16,6 +16,12 @@ const styles = theme => ({
     display: 'flex',
     paddingBottom: "1em",
   },
+  value: {
+    paddingRight: "1em",
+  },
+  key: {
+    paddingRight: "1em",
+  },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -24,22 +30,18 @@ const styles = theme => ({
 
 const FileDetails = ({ classes, item, getJsonKeys }) => {
   return (
-    <Grid className={classes.card} container spacing={1} direction="row">
+    <Grid className={classes.card} container spacing={2} direction="row">
       {getJsonKeys(item).map(key => {
-        
       return(
-        <div key={key}>
+        <React.Fragment>
         {!isObject(item[key]) && 
             key !== Constants.model_fields.NAME &&
             key !== 'key' &&
             key !== 'children' ? (
-              <>
-                <Grid item xs={12} s={2} md={6}>
+              
+                <Grid className={classes.key} item xs={6}>
                   <Typography className={classes.title}>{key}</Typography>
-                </Grid>
-                <Grid item xs={12} s={2} md={6}>
-                  <>
-                    {key === Constants.model_fk_fields.LOCATION ? (
+                  {key === Constants.model_fk_fields.LOCATION ? (
                       <ReferenceField
                         label={'en.models.projects.location'}
                         source={Constants.model_fk_fields.LOCATION}
@@ -68,9 +70,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                     ) : (
                       item[key]
                     )}
-                  </>
                 </Grid>
-              </>
             ) : isObject(item[key]) && key !== 'children' ? 
             
         <>
@@ -86,8 +86,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
         </> :
         null
         }
-        </div>
-      
+        </React.Fragment>
       )})}
     </Grid>
   );
