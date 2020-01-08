@@ -469,6 +469,7 @@ export function getGroupMembers(record) {
               console.log("in promise all data is: ", data, "groupmembers is: ", groupMembers)
               resolve(groupMembers)
             }).catch(err => reject(err))
+
             return groupMembers;
           })
           .catch(err => {
@@ -479,54 +480,44 @@ export function getGroupMembers(record) {
   });
 }
 
+//given a user, return a list of groupmember entries containing the groups they are in along with their role within it.
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
-    let userGroupMembers = [];
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
         const { id, is_active } = record;
-
+        
         dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
           filter: { user: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
           sort: { field: Constants.model_fields.GROUP, order: 'DESC' },
         })
-          .then(response => {
-            return response.data;
-          })
-          .then(groupMembers => {
+        .then(response => {
+          return response.data;
+        })
+        .then(groupMembers => {
 
-            groupMembers.map(groupMember => {
-              dataProvider(GET_ONE, Constants.models.GROUPS, {
-                id: groupMember.group,
-              })
-                .then(response => {
-                  return response.data;
-                })
-                .then(researchgroup => {
-                  groupMember.group = researchgroup;
-                  groupMember.group_role = groupRoles.filter(
-                    role => role.id === groupMember.group_role
-                  )[0];
-                  userGroupMembers = [...userGroupMembers, groupMember];
-                  if (userGroupMembers.length === groupMembers.length) {
-                    resolve(groupMembers);
-                  }
-                })
-                .catch(err =>
-                  reject(
-                    'error in attempt to get researchgroup with associated groupmember: ' +
-                      err
-                  )
-                );
-              return groupMember;
-            });
-            return groupMembers;
-          })
-          .catch(err => {
-            reject('error in in get groupmembers: ', err);
+          const promises = []
+          groupMembers.map(groupMember => {
+
+            promises.push(getGroupData(groupMember.group).then(researchgroup => {
+              console.log("data returned from getgroupdata in getusergroups is: ", researchgroup)
+              groupMember.group = researchgroup
+              groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+              return researchgroup
+            }))
+            return groupMember
           });
+
+          Promise.all(promises).then(data => {
+            resolve(groupMembers)
+          }).catch(err => reject(err))
+          return groupMembers;
+        })
+        .catch(err => {
+          reject('error in in get groupmembers: ', err);
+        });
         return groupRoles;
       });
   });
