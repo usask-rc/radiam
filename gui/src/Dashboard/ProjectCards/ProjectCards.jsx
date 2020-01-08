@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Grid } from '@material-ui/core';
-import ProjectCardDisplay from './ProjectCardDisplay';
 import ProjectList from '../ProjectList/ProjectList';
 
 const ProjectCards = ({ loading, projects }) => 
@@ -14,20 +13,7 @@ const ProjectCards = ({ loading, projects }) =>
             {!loading &&
                 projects &&
                 projects.length > 0 &&
-
                 <ProjectList loading={loading} projects={projects} />
-
-
-            /*projects.map((project) => {
-                    if (project.nbFiles > 0) {
-                        return (
-                            
-                            <ProjectCardDisplay key={project.id} project={project} />
-                        );
-                    }
-                    return null
-                })
-                */
             }
         </Grid>
     )

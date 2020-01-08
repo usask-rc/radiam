@@ -178,6 +178,7 @@ export function toastErrors(data) {
   }
 }
 
+//TODO: this can be reused elsewhere in the map views.
 export function getFirstCoordinate(layer) {
   if (layer.feature) {
     const layerGeo = layer.feature.geometry;

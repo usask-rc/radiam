@@ -1,12 +1,8 @@
 //Dashboard.jsx
 import React, { PureComponent } from 'react';
-import { GET_LIST } from 'react-admin';
-import { httpClient, radiamRestProvider } from '../_tools';
-import { getAPIEndpoint, getRecentProjects } from '../_tools/funcs';
+import { getRecentProjects } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
-import * as Constants from '../_constants/index';
 import ProjectCards from "./ProjectCards/ProjectCards"
-import moment from 'moment';
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
 

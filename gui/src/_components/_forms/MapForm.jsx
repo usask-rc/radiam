@@ -331,6 +331,7 @@ class MapForm extends Component {
         leafletGeoJSON.eachLayer(layer => {
           const layerType = layer.feature.geometry.type;
 
+          //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
           if (
             layerType === 'LineString' ||
             layerType === 'Polygon' ||
