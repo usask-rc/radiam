@@ -85,12 +85,8 @@ export function getRecentProjects(count=1000) {
       .then(response => response.data)
       .then(projects => {
 
-        //Get the files from each project
-        //TODO: once we can search we can search files on age range and avoid this entire filtering process
-
         const promises = []
         projects.map(project => {
-
           promises.push(getProjectData({id: project.id,
             sort: {
               field: Constants.model_fields.INDEXED_DATE,
@@ -114,19 +110,19 @@ export function getRecentProjects(count=1000) {
           }))
           return project
         });
-        Promise.all(promises).then(data => {
-          let hasFiles = false
-          projects.map(project => {
-            if (project.recentFile){
-              hasFiles = true
-            }
-          })
-          resolve({projects: projects, loading: false, hasFiles: hasFiles})
-        }).catch(err => {
-          reject(err)
+      Promise.all(promises).then(data => {
+        let hasFiles = false
+        projects.map(project => {
+          if (project.recentFile){
+            hasFiles = true
+          }
         })
-      });
-    })
+        resolve({projects: projects, loading: false, hasFiles: hasFiles})
+      }).catch(err => {
+        reject(err)
+      })
+    });
+  })
 };
 
 export function getMaxUserRole(){
@@ -369,7 +365,18 @@ export function getGroupData(group_id) {
   });
 }
 
-export function getUserDetails() {
+//get a single user
+//TODO: merge into a greater `get one item` function
+export function getUserDetails(userID){
+  return new Promise((resolve, reject) => {
+    dataProvider("GET_ONE", Constants.models.USERS, {id: userID})
+    .then(response => {
+      resolve(response.data)
+    }).catch(err => reject(err))
+  })
+}
+
+export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
     dataProvider('CURRENT_USER', Constants.models.USERS)
       .then(response => {
@@ -391,7 +398,6 @@ export function getUserDetails() {
 
 //TODO: this can probably be consolidated with getGroupUsers
 export function getUsersInGroup(record) {
-  console.log('record called to getusersin group: ', record);
   return new Promise((resolve, reject) => {
     let groupUsers = [];
     const { id, is_active } = record;
@@ -409,24 +415,22 @@ export function getUsersInGroup(record) {
         return response.data;
       })
       .then(groupMembers => {
+        const promises = []
         groupMembers.map(groupMember => {
-          dataProvider(GET_ONE, Constants.models.USERS, {
-            id: groupMember.user,
-          })
-            .then(response => {
-              return response.data;
-            })
-            .then(user => {
-              groupMember.user = user;
-              groupUsers = [...groupUsers, user];
-
-              if (groupUsers.length === groupMembers.length) {
-                resolve(groupUsers);
-              }
-            })
-            .catch(err => reject('error in attempt to get user: ', err));
-          return groupMember;
+          promises.push(getUserDetails(groupMember.user).then(user => {
+            groupMember.user = user
+            groupUsers.push(user)
+            return groupMember
+          }))
         });
+
+        Promise.all(promises).then(data => {
+          console.log("promise all data is: ", data)
+          resolve(groupUsers)
+          return data
+        })
+        .catch(err => reject(err))
+
         return groupMembers;
       })
       .catch(err => reject('error in attempt to fetch groupMembers: ', err));

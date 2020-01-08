@@ -9,7 +9,7 @@ import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
 import { Help, HelpOutline } from "@material-ui/icons";
 import UserAvatar from "react-user-avatar"
-import { getUserDetails } from "../_tools/funcs.jsx";
+import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
   appBarText: {
@@ -60,7 +60,7 @@ const CustomAppBar = ({ classes, ...props }) => {
 
   useEffect(() => {
     _isMounted = true
-    getUserDetails().then(data => 
+    getCurrentUserDetails().then(data => 
       {
         console.log("data returned from get current user details is: ", data)
         if (_isMounted){

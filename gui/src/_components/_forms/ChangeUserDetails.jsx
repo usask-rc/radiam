@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button, CardActions, TextField, Typography } from "@material-ui/core";
 import * as Constants from "../../_constants/index";
-import { getAPIEndpoint, toastErrors, getUserDetails } from "../../_tools/funcs";
+import { getAPIEndpoint, toastErrors, getCurrentUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
 import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
@@ -80,7 +80,7 @@ class ChangeDetails extends Component {
     }
 
     getCurrentUserDetails() {
-        getUserDetails().then(data => 
+        getCurrentUserDetails().then(data => 
         {
             this.setState(data)
             return data
