@@ -46,7 +46,7 @@ import * as Constants from "../_constants/index";
 import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
-import { getGroupUsers } from "../_tools/funcs";
+import { getGroupMembers } from "../_tools/funcs";
 import { Cancel } from "@material-ui/icons";
 
 const configStyles = {
@@ -1463,8 +1463,8 @@ class BaseMetadataEditActions extends Component {
 
       if (id) {
         const params={id: id, is_active: true}
-        getGroupUsers(params).then((data) => {
-        console.log("getgroupusers returned data: ", data)
+        getGroupMembers(params).then((data) => {
+        console.log("getGroupMembers returned data: ", data)
         this.setState({groupMembers: data})
         return data
       }).catch(err => console.error("err: ", err))

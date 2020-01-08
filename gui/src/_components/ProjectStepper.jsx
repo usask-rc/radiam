@@ -279,7 +279,7 @@ class PageTwo extends Component {
             this.setState({groupContactList: groupContactList})
           }
           
-        }).catch(err => console.error('error returned from getgroupusers is: ', err))
+        }).catch(err => console.error('error returned from getGroupMembers is: ', err))
       })
     }else{
       console.error("no group selected from which to provide candidate contacts")

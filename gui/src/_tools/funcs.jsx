@@ -396,7 +396,8 @@ export function getCurrentUserDetails() {
   });
 }
 
-//TODO: this can probably be consolidated with getGroupUsers
+//TODO: this can probably be consolidated with getGroupMembers
+//returns a list of users in said group
 export function getUsersInGroup(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = [];
@@ -437,9 +438,9 @@ export function getUsersInGroup(record) {
   });
 }
 
-export function getGroupUsers(record) {
+//given a group, return a list of groupmembers with full User and Role data included.
+export function getGroupMembers(record) {
   return new Promise((resolve, reject) => {
-    let groupUsers = [];
     dataProvider(GET_LIST, Constants.models.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
@@ -454,31 +455,20 @@ export function getGroupUsers(record) {
             return response.data;
           })
           .then(groupMembers => {
+
+            const promises = []
+
             groupMembers.map(groupMember => {
-              dataProvider(GET_ONE, Constants.models.USERS, {
-                id: groupMember.user,
-              })
-                .then(response => {
-                  return response.data;
-                })
-                .then(user => {
-                  groupMember.user = user;
-                  groupMember.group_role = groupRoles.filter(
-                    role => role.id === groupMember.group_role
-                  )[0];
-                  groupUsers = [...groupUsers, groupMember];
-                  if (groupUsers.length === groupMembers.length) {
-                    resolve(groupMembers);
-                  }
-                })
-                .catch(err =>
-                  reject(
-                    'error in attempt to get researchgroup with associated groupmember: ' +
-                      err
-                  )
-                );
-              return groupMember;
+              promises.push(getUserDetails(groupMember.user).then(user => {
+                groupMember.user = user
+                groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+                return user
+              }))
             });
+            Promise.all(promises).then(data => {
+              console.log("in promise all data is: ", data, "groupmembers is: ", groupMembers)
+              resolve(groupMembers)
+            }).catch(err => reject(err))
             return groupMembers;
           })
           .catch(err => {

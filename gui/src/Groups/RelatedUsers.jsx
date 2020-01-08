@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import * as Constants from '../_constants/index';
 import '../_components/components.css';
 import { Chip, Typography, Tooltip } from '@material-ui/core';
-import {  getGroupUsers } from '../_tools/funcs';
+import {  getGroupMembers } from '../_tools/funcs';
 import UserAvatar from "react-user-avatar";
 import { Link } from  "react-router-dom";
 import { withStyles } from '@material-ui/styles';

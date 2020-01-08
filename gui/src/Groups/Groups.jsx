@@ -34,7 +34,7 @@ import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupMembers } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
@@ -183,8 +183,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     
     if (props.id){
       const params={id: props.id, is_active: true}
-      getGroupUsers(params).then((data) => {
-        console.log("getgroupusers returned data: ", data)
+      getGroupMembers(params).then((data) => {
+        console.log("getGroupMembers returned data: ", data)
         if (_isMounted){
           setGroupMembers(data)
         }
