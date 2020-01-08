@@ -15,11 +15,9 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
   return `/${Constants.API_ENDPOINT}`;
 }
 
@@ -79,9 +77,6 @@ export function getRecentProjects(count=1000) {
       
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const now = moment();
-    let projectCtr = 0
-    let projectList = []
-    let hasFiles = false
 
     dataProvider(GET_LIST, Constants.models.PROJECTS, {
       order: { field: Constants.model_fields.NAME },
@@ -92,46 +87,44 @@ export function getRecentProjects(count=1000) {
 
         //Get the files from each project
         //TODO: once we can search we can search files on age range and avoid this entire filtering process
+
+        const promises = []
         projects.map(project => {
 
-          //get the most recent file to display it
-          dataProvider(
-            "GET_FILES",
-            Constants.models.PROJECTS + '/' + project.id,
-            {
-              sort: {
-                field: Constants.model_fields.INDEXED_DATE,
-                order: '-',
-              },
-              pagination: {
-                page: 1,
-                perPage: 1,
-              },
+          promises.push(getProjectData({id: project.id,
+            sort: {
+              field: Constants.model_fields.INDEXED_DATE,
+              order: '-',
+            },
+            pagination: {
+              page: 1,
+              perPage: 1,
             }
-          //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
-          ).then(response => {
-            const newProject = project
-            newProject.nbFiles = response.total;
-            newProject.recentFile = response.data[0]
-            if (newProject.recentFile){
-              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), 'days')
+          }).then((data) => {
+            if (data.files.length > 0){
+              const newProject = project
+              newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
+              newProject.nbFiles = data.nbFiles
+              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), "days")
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
+              project = newProject
+            }
+            return data
+          }))
+          return project
+        });
+        Promise.all(promises).then(data => {
+          let hasFiles = false
+          projects.map(project => {
+            if (project.recentFile){
               hasFiles = true
             }
-            //TODO: might be better done with a promise.all
-            projectCtr += 1
-            projectList.push(newProject)
-
-            if (projectCtr === projects.length)
-            {
-              resolve({projects: projectList, hasFiles: hasFiles, loading: false})
-            }
-          }).catch(error => {
-            reject("GetRecentProj Rejected: ", error)
-          });
-          return project;
-        });
+          })
+          resolve({projects: projects, loading: false, hasFiles: hasFiles})
+        }).catch(err => {
+          reject(err)
+        })
       });
     })
 };

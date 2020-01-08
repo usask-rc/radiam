@@ -43,7 +43,7 @@ class Dashboard extends PureComponent {
                 <WelcomeCards loading={loading} hasFiles={hasFiles}  />
                 {!loading &&
                   <>
-                    <ProjectCards loading={loading} projects={projects} />
+                    <ProjectCards projects={projects} />
                   </>
                 }
               </>
