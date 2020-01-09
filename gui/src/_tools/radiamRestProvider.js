@@ -1,5 +1,5 @@
 //radiamrestprovider.jsx
-import * as Constants from '../_constants/index';
+import {PATHS, METHODS, MODELS} from '../_constants/index';
 import { stringify } from 'query-string';
 import {
   fetchUtils,
@@ -28,8 +28,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
-        url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
-        options.method = Constants.methods.POST
+        url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
+        options.method = METHODS.POST
 
         let query = {}
         let matches = {}
@@ -197,24 +197,24 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     
 
       case 'CURRENT_USER': {
-        url = `${apiUrl}/${Constants.models.USERS}/current/`;
+        url = `${apiUrl}/${MODELS.USERS}/current/`;
 
-        options.method = Constants.methods.GET;
+        options.method = METHODS.GET;
         break;
       }
 
       case 'PASSWORD_RESET_EMAIL': {
         url = `${apiUrl}/password_reset/`;
 
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         options.body = JSON.stringify({ email: params.email });
         break;
       }
 
       case 'PASSWORD_CHANGE': {
-        url = `${apiUrl}/${Constants.models.USERS}/${params.userID}/${Constants.paths.SET_PASSWORD}/`;
+        url = `${apiUrl}/${MODELS.USERS}/${params.userID}/${PATHS.SET_PASSWORD}/`;
 
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         options.body = JSON.stringify({
           old_password: params.old_password,
           new_password: params.new_password,
@@ -262,7 +262,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         options.method = 'PUT';
         if (
-          resource === Constants.models.PROJECTAVATARS &&
+          resource === MODELS.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);
@@ -278,9 +278,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case CREATE:
         console.log("formdata in create: ", formData)
         url = `${apiUrl}/${resource}/`;
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         if (
-          resource === Constants.models.PROJECTAVATARS &&
+          resource === MODELS.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);

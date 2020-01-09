@@ -5,10 +5,10 @@ import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
-import { withStyles, Typography } from '@material-ui/core';
-import equal from 'fast-deep-equal';
+import {withStyles} from "@material-ui/core/styles"
+import Typography from "@material-ui/core/Typography"
 import { getFirstCoordinate } from '../../_tools/funcs';
-import * as Constants from '../../_constants/index';
+import {OSMTILEURL} from '../../_constants/index';
 
 const styles = {
   mapDisplay: {
@@ -430,7 +430,7 @@ class MapForm extends Component {
                   'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                 }
                 userAgent={navigator.userAgent}
-                url={Constants.OSMTILEURL}
+                url={OSMTILEURL}
               />
 
               <FeatureGroup

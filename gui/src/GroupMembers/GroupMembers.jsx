@@ -1,4 +1,4 @@
-//GroupMember.jsx
+//GroupMembers.jsx
 import React, { useState, useEffect } from "react";
 import {
   Create,
@@ -17,7 +17,7 @@ import {
   SimpleShowLayout,
   TextField,
 } from "react-admin";
-import * as Constants from "../_constants/index";
+import {RESOURCE_OPERATIONS, ROLE_USER, WARNINGS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { getAsyncValidateTwoNotExists } from "../_tools/asyncChecker";
 import TranslationField from "../_components/_fields/TranslationField";
@@ -29,7 +29,6 @@ import GroupMemberTitle from "./GroupMemberTitle";
 import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveProp } from "../_tools/funcs";
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { TextInput } from "ra-ui-materialui/lib/input";
 
 
 const listStyles = {
@@ -54,24 +53,24 @@ const GroupMemberFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
     <ReferenceInput
       label={"en.models.groupmembers.user"}
-      source={Constants.model_fk_fields.USER}
-      reference={Constants.models.USERS}
+      source={MODEL_FK_FIELDS.USER}
+      reference={MODELS.USERS}
     >
-      <SelectInput optionText={Constants.model_fields.USERNAME} />
+      <SelectInput optionText={MODEL_FIELDS.USERNAME} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.group"}
-      source={Constants.model_fk_fields.GROUP}
-      reference={Constants.models.GROUPS}
+      source={MODEL_FK_FIELDS.GROUP}
+      reference={MODELS.GROUPS}
     >
-      <SelectInput optionText={Constants.model_fields.NAME} />
+      <SelectInput optionText={MODEL_FIELDS.NAME} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.role"}
-      source={Constants.model_fk_fields.GROUP_ROLE}
-      reference={Constants.models.ROLES}
+      source={MODEL_FK_FIELDS.GROUP_ROLE}
+      reference={MODELS.ROLES}
     >
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
   </Filter>
 ));
@@ -88,18 +87,18 @@ export const GroupMemberList = withStyles(listStyles)(
         }}
         exporter={false}
         filters={<GroupMemberFilter />}
-        sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
+        sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: "DESC" }}
         perPage={10}
         pagination={<CustomPagination />}
         bulkActionButtons={false}
       >
-        <Datagrid rowClick={Constants.resource_operations.SHOW}>
+        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
 
           <ReferenceField
             linkType={false}
             label={"en.models.groupmembers.user"}
-            source={Constants.model_fk_fields.USER}
-            reference={Constants.models.USERS}
+            source={MODEL_FK_FIELDS.USER}
+            reference={MODELS.USERS}
             allowEmpty //TODO: this `not loading user` issue will be fixed when ADM-1712 is resolved
           >
             <UserShow />
@@ -107,28 +106,28 @@ export const GroupMemberList = withStyles(listStyles)(
           <ReferenceField
             linkType={false}
             label={"en.models.groupmembers.group"}
-            source={Constants.model_fk_fields.GROUP}
-            reference={Constants.models.GROUPS}>
-            <TextField source={Constants.model_fields.NAME}  />
+            source={MODEL_FK_FIELDS.GROUP}
+            reference={MODELS.GROUPS}>
+            <TextField source={MODEL_FIELDS.NAME}  />
           </ReferenceField>
           <ReferenceField
             linkType={false}
             label={"en.models.groupmembers.role"}
-            source={Constants.model_fk_fields.GROUP_ROLE}
-            reference={Constants.models.ROLES}
+            source={MODEL_FK_FIELDS.GROUP_ROLE}
+            reference={MODELS.ROLES}
           >
             <TranslationField
               label={"en.models.roles.label"}
-              source={Constants.model_fields.LABEL}
+              source={MODEL_FIELDS.LABEL}
             />
           </ReferenceField>
           <DateField
             label={"en.models.generic.date_updated"}
-            source={Constants.model_fields.DATE_UPDATED}
+            source={MODEL_FIELDS.DATE_UPDATED}
           />
           <DateField
             label={"en.models.generic.date_expires"}
-            source={Constants.model_fields.DATE_EXPIRES}
+            source={MODEL_FIELDS.DATE_EXPIRES}
           />
         </Datagrid>
       </List>
@@ -146,7 +145,7 @@ const actionStyles = theme => ({
 
 const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
 {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
   useEffect(() => {
@@ -176,28 +175,28 @@ export const GroupMemberShow = props => (
       <ReferenceField
         linkType={false}
         label={"en.models.groupmembers.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
+        source={MODEL_FK_FIELDS.USER}
+        reference={MODELS.USERS}
       >
         <UserShow />
       </ReferenceField>
       <ReferenceField
         linkType={false}
         label={"en.models.groupmembers.group"}
-        source={Constants.model_fk_fields.GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.GROUP}
+        reference={MODELS.GROUPS}
       >
-        <TextField source={Constants.model_fields.NAME} />
+        <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <ReferenceField
         linkType={false}
         label={"en.models.groupmembers.role"}
-        source={Constants.model_fk_fields.GROUP_ROLE}
-        reference={Constants.models.ROLES}
+        source={MODEL_FK_FIELDS.GROUP_ROLE}
+        reference={MODELS.ROLES}
       >
         <TranslationField
           label={"en.models.roles.label"}
-          source={Constants.model_fields.LABEL}
+          source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
       <DateField
@@ -208,7 +207,7 @@ export const GroupMemberShow = props => (
           month: "long",
           day: "numeric"
         }}
-        source={Constants.model_fields.CREATED_AT}
+        source={MODEL_FIELDS.CREATED_AT}
       />
       <DateField
         label={"en.models.generic.date_updated"}
@@ -218,7 +217,7 @@ export const GroupMemberShow = props => (
           month: "long",
           day: "numeric"
         }}
-        source={Constants.model_fields.DATE_UPDATED}
+        source={MODEL_FIELDS.DATE_UPDATED}
       />
       <DateField
         label={"en.models.generic.date_expires"}
@@ -228,7 +227,7 @@ export const GroupMemberShow = props => (
           month: "long",
           day: "numeric"
         }}
-        source={Constants.model_fields.DATE_EXPIRES}
+        source={MODEL_FIELDS.DATE_EXPIRES}
       />
     </SimpleShowLayout>
   </Show>
@@ -243,16 +242,16 @@ const validateRole = required('en.validate.groupmembers.role');
  */
 const asyncValidate = getAsyncValidateTwoNotExists(
   {
-    id: Constants.model_fields.ID,
-    name : Constants.model_fk_fields.USER,
-    reject: Constants.warnings.TOO_MANY_ROLES,
+    id: MODEL_FIELDS.ID,
+    name : MODEL_FK_FIELDS.USER,
+    reject: WARNINGS.TOO_MANY_ROLES,
   },
   {
-    id: Constants.model_fields.ID,
-    name : Constants.model_fk_fields.GROUP,
-    reject: Constants.warnings.TOO_MANY_ROLES,
+    id: MODEL_FIELDS.ID,
+    name : MODEL_FK_FIELDS.GROUP,
+    reject: WARNINGS.TOO_MANY_ROLES,
   },
-  Constants.models.GROUPMEMBERS
+  MODELS.GROUPMEMBERS
 );
 
 export const GroupMemberForm = props => {
@@ -271,7 +270,7 @@ export const GroupMemberForm = props => {
 
         //if data previously existed, PUT instead
         if (data.id){
-          putObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+          putObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
             console.log("data after updating groupmember: ", data)
             if (props.setEditModal){
               props.setEditModal(false)
@@ -279,7 +278,7 @@ export const GroupMemberForm = props => {
           })
         }
         else{
-          postObjectWithoutSaveProp(data, Constants.models.GROUPMEMBERS).then(data => {
+          postObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
             console.log("data after posting new groupmember: ", data)
             if (props.setCreateModal){
               props.setCreateModal(false)
@@ -304,9 +303,9 @@ export const GroupMemberForm = props => {
   //if the primary way we're going to be accessing this form is via Groups, we already have this data for Create.
   return(
   <SimpleForm {...props}
-    redirect={Constants.resource_operations.LIST}
+    redirect={RESOURCE_OPERATIONS.LIST}
     asyncValidate={asyncValidate}
-    asyncBlurFields={ [ Constants.model_fk_fields.GROUP, Constants.model_fk_fields.USER ] }
+    asyncBlurFields={ [ MODEL_FK_FIELDS.GROUP, MODEL_FK_FIELDS.USER ] }
     onChange={handleChange}
     save={handleSubmit}
   >
@@ -314,9 +313,9 @@ export const GroupMemberForm = props => {
 
     <ReferenceInput
       label={"en.models.groupmembers.user"}
-      source={Constants.model_fk_fields.USER}
-      reference={Constants.models.USERS}
-      resource={Constants.models.USERS}
+      source={MODEL_FK_FIELDS.USER}
+      reference={MODELS.USERS}
+      resource={MODELS.USERS}
       defaultValue={props.user ? props.user : (() => setIsFormDirty(false))}
       disabled={props.record && props.record.user ? true : false}
       validate={validateUser}
@@ -325,32 +324,32 @@ export const GroupMemberForm = props => {
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.group"}
-      source={Constants.model_fk_fields.GROUP}
-      reference={Constants.models.GROUPS}
-      resource={Constants.models.GROUPS}
+      source={MODEL_FK_FIELDS.GROUP}
+      reference={MODELS.GROUPS}
+      resource={MODELS.GROUPS}
       defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
-      <SelectInput optionText={Constants.model_fields.NAME} />
+      <SelectInput optionText={MODEL_FIELDS.NAME} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.role"}
-      source={Constants.model_fk_fields.GROUP_ROLE}
-      reference={Constants.models.ROLES}
-      resource={Constants.models.ROLES}
+      source={MODEL_FK_FIELDS.GROUP_ROLE}
+      reference={MODELS.ROLES}
+      resource={MODELS.ROLES}
       defaultValue={props.group_role ? props.group_role : (() => setIsFormDirty(false))}
       validate={validateRole}
     >
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
     <DateInput
       label={"en.models.generic.date_expires"}
-      source={Constants.model_fields.DATE_EXPIRES}
+      source={MODEL_FIELDS.DATE_EXPIRES}
       defaultValue={props.date_expires ? props.date_expires : (() => setIsFormDirty(false))}
       allowEmpty
     />
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
   </SimpleForm>
   )
 }

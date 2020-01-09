@@ -1,7 +1,7 @@
 //LoginForm.jsx
 import React from 'react'
 import { Field } from 'redux-form'
-import * as Constants from "../_constants/index"
+import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
 import compose from "recompose/compose"
 import { translate } from "ra-core";
 import { withStyles } from '@material-ui/core/styles';
@@ -34,7 +34,7 @@ const LoginForm = ({classes, translate, isLoading, renderInput, toggleForgotPass
                     <div className={classes.input}>
                         <Field
                             autoFocus
-                            name={Constants.login_details.USERNAME}
+                            name={LOGIN_DETAILS.USERNAME}
                             component={renderInput}
                             label={translate("en.auth.username")}
                             disabled={isLoading}
@@ -42,10 +42,10 @@ const LoginForm = ({classes, translate, isLoading, renderInput, toggleForgotPass
                     </div>
                     <div className={classes.input}>
                         <Field
-                            name={Constants.login_details.PASSWORD}
+                            name={LOGIN_DETAILS.PASSWORD}
                             component={renderInput}
                             label={translate("en.auth.password")}
-                            type={Constants.fields.PASSWORD}
+                            type={FIELDS.PASSWORD}
                             disabled={isLoading}
                         />
                     </div>
@@ -53,7 +53,7 @@ const LoginForm = ({classes, translate, isLoading, renderInput, toggleForgotPass
                 <CardActions className={classes.actions}>
                     <Button
                         variant="outlined"
-                        type={Constants.fields.SUBMIT}
+                        type={FIELDS.SUBMIT}
                         color="primary"
                         disabled={isLoading}
                         className={classes.button}

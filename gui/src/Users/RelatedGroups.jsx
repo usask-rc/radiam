@@ -1,7 +1,7 @@
 //RelatedGroups.jsx
 import React, { useState, useEffect } from 'react';
 import { Chip, Tooltip } from '@material-ui/core';
-import * as Constants from "../_constants/index"
+import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER} from "../_constants/index";
 import { withStyles } from '@material-ui/styles';
 import { Link } from 'ra-ui-materialui';
 import { Redirect } from "react-router-dom"
@@ -47,13 +47,13 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         let tempU = []
         //sort groupmembers into different categories
         groupMembers.map(groupMember => {
-            if (groupMember.group_role.id === Constants.ROLE_GROUP_ADMIN){
+            if (groupMember.group_role.id === ROLE_GROUP_ADMIN){
                 tempGA.push(groupMember)
             }
-            else if (groupMember.group_role.id === Constants.ROLE_DATA_MANAGER){
+            else if (groupMember.group_role.id === ROLE_DATA_MANAGER){
                 tempDM.push(groupMember)
             }
-            else if (groupMember.group_role.id === Constants.ROLE_MEMBER){
+            else if (groupMember.group_role.id === ROLE_MEMBER){
                 tempM.push(groupMember)
             }
             else{

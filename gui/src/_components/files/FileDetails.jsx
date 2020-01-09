@@ -2,10 +2,11 @@
 import React from 'react';
 import { AgentShow } from '../_fields/AgentShow';
 import compose from 'recompose/compose';
-import * as Constants from '../../_constants/index';
+import {MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from '../../_constants/index';
 import { formatBytes } from '../../_tools/funcs';
 import { LocationShow } from '../_fields/LocationShow';
-import { Grid, Typography } from '@material-ui/core';
+import Grid from "@material-ui/core/Grid"
+import Typography from "@material-ui/core/Typography"
 import { ReferenceField, translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { isObject } from 'util';
@@ -35,37 +36,37 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
       return(
         <React.Fragment>
         {!isObject(item[key]) && 
-            key !== Constants.model_fields.NAME &&
+            key !== MODEL_FIELDS.NAME &&
             key !== 'key' &&
             key !== 'children' ? (
               
                 <Grid className={classes.key} item xs={6}>
                   <Typography className={classes.title}>{key}</Typography>
-                  {key === Constants.model_fk_fields.LOCATION ? (
+                  {key === MODEL_FK_FIELDS.LOCATION ? (
                       <ReferenceField
                         label={'en.models.projects.location'}
-                        source={Constants.model_fk_fields.LOCATION}
-                        reference={Constants.models.LOCATIONS}
-                        linkType={Constants.resource_operations.SHOW}
-                        basePath={`/${Constants.models.PROJECTS}`}
-                        resource={Constants.models.PROJECTS}
+                        source={MODEL_FK_FIELDS.LOCATION}
+                        reference={MODELS.LOCATIONS}
+                        linkType={RESOURCE_OPERATIONS.SHOW}
+                        basePath={`/${MODELS.PROJECTS}`}
+                        resource={MODELS.PROJECTS}
                         record={item}
                       >
                         <LocationShow />
                       </ReferenceField>
-                    ) : key === Constants.model_fk_fields.AGENT ? (
+                    ) : key === MODEL_FK_FIELDS.AGENT ? (
                       <ReferenceField
                         label={'en.models.projects.agent'}
-                        source={Constants.model_fk_fields.AGENT}
-                        reference={Constants.models.AGENTS}
-                        linkType={Constants.resource_operations.SHOW}
-                        basePath={`/${Constants.models.PROJECTS}`}
-                        resource={Constants.models.PROJECTS}
+                        source={MODEL_FK_FIELDS.AGENT}
+                        reference={MODELS.AGENTS}
+                        linkType={RESOURCE_OPERATIONS.SHOW}
+                        basePath={`/${MODELS.PROJECTS}`}
+                        resource={MODELS.PROJECTS}
                         record={item}
                       >
                         <AgentShow />
                       </ReferenceField>
-                    ) : key === Constants.model_fields.FILESIZE ? (
+                    ) : key === MODEL_FIELDS.FILESIZE ? (
                       formatBytes(item[key], 2)
                     ) : (
                       item[key]

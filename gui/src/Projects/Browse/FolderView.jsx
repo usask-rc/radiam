@@ -6,9 +6,7 @@ import Description from "@material-ui/icons/Description"
 import Folder from "@material-ui/icons/Folder"
 import Search from "@material-ui/icons/Search"
 import { compose } from 'recompose';
-import Constants from '../../_constants/index';
-
-import ExpansionPanel from "@material-ui/core/ExpansionPanel"
+import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
 import Typography from "@material-ui/core/Typography"
 import Table from "@material-ui/core/Table"
 import TableHead from "@material-ui/core/TableHead"
@@ -21,7 +19,6 @@ import DialogTitle from "@material-ui/core/DialogTitle"
 import DialogContent from "@material-ui/core/DialogContent"
 import TextField from "@material-ui/core/TextField"
 import { translate } from "ra-core"
-import FileSummary from '../../_components/files/FileSummary';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
@@ -247,9 +244,9 @@ function EnhancedTableHead(props) {
                 <form className={classes.flex} onSubmit={handleSearch}>
 
                   <TextField
-                    id={Constants.paths.SEARCH}
-                    name={Constants.paths.SEARCH}
-                    type={Constants.paths.SEARCH}
+                    id={PATHS.SEARCH}
+                    name={PATHS.SEARCH}
+                    type={PATHS.SEARCH}
                     className={classes.textField}
                     value={search}
                     placeholder={`Search Files`}
@@ -487,11 +484,11 @@ function getJsonKeys(json) {
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
           label={'en.models.agents.location'}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
-          linkType={Constants.resource_operations.SHOW}
-          basePath={`/${Constants.models.PROJECTS}`}
-          resource={Constants.models.PROJECTS}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
+          linkType={RESOURCE_OPERATIONS.SHOW}
+          basePath={`/${MODELS.PROJECTS}`}
+          resource={MODELS.PROJECTS}
           record={item}
         >
           <LocationShow />

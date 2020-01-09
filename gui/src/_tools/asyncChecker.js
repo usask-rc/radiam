@@ -1,6 +1,6 @@
 import { getAPIEndpoint } from "../_tools/funcs";
 import { httpClient } from "../_tools/httpClient";
-import * as Constants from "../_constants/index"
+import {METHODS, MODEL_FIELDS} from "../_constants/index"
 
 //TODO:we need another validator for updates - if Names are unique, we want to be able to maintain the same name on an item that we are updating.  This is not currently possible.
 
@@ -10,7 +10,7 @@ export function getAsyncValidateNotExists(checkField, endpoint_path) {
       if (data[checkField.name]) {
         let param = checkField.param ? checkField.param : checkField.name;
         let url = `${getAPIEndpoint()}/${endpoint_path}/?${param}=${data[checkField.name]}`;
-        return httpClient(url, { "method": Constants.methods.GET }).then(response => {
+        return httpClient(url, { "method": METHODS.GET }).then(response => {
           if (response.json && response.json.count && response.json.count > 0) {
 
             if (response.json.results[0].id && data.id && response.json.results[0].id === data.id){//check to ensure the value we found isn't just this one.
@@ -18,7 +18,7 @@ export function getAsyncValidateNotExists(checkField, endpoint_path) {
             }
             else{
               let rejection = {};
-              rejection[checkField[Constants.model_fields.NAME]] = checkField["reject"];
+              rejection[checkField[MODEL_FIELDS.NAME]] = checkField["reject"];
               reject(rejection);
             }
           } else {
@@ -40,15 +40,15 @@ export function getAsyncValidateTwoNotExists(one, two, endpoint_path) {
         let twoParam = two.param ? two.param : `${two.name}=${data[two.name]}`;
         let param = `${oneParam}&${twoParam}`;
         let url = `${getAPIEndpoint()}/${endpoint_path}/?${param}`
-        return httpClient(url, { "method": Constants.methods.GET }).then(response => {
+        return httpClient(url, { "method": METHODS.GET }).then(response => {
           if (response.json && response.json.count && response.json.count > 0) {
             if (response.json.results[0].id && data.id && response.json.results[0].id === data.id){
               resolve({})
             }
             else{
               let rejection = {};
-              rejection[one[Constants.model_fields.NAME]] = one["reject"];
-              rejection[two[Constants.model_fields.NAME]] = two["reject"];
+              rejection[one[MODEL_FIELDS.NAME]] = one["reject"];
+              rejection[two[MODEL_FIELDS.NAME]] = two["reject"];
               reject(rejection);
             }
 

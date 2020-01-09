@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button'
 import {withStyles} from '@material-ui/core/styles'
 import { translate } from "ra-core"
 import { Field } from 'redux-form';
-import * as Constants from "../_constants/index"
+import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import CardActions from 'material-ui/Card/CardActions';
 import CircularProgress from "material-ui/CircularProgress"
@@ -39,7 +39,7 @@ const ForgotForm = ({classes, handleSubmit, forgotPassword, toggleForgotPassword
                     <div className={classes.input}>
                         <Field
                         autoFocus
-                        name={Constants.login_details.EMAIL}
+                        name={LOGIN_DETAILS.EMAIL}
                         component={renderInput}
                         onChange={handleChange}
                         label={translate("en.auth.email")}
@@ -51,7 +51,7 @@ const ForgotForm = ({classes, handleSubmit, forgotPassword, toggleForgotPassword
                 <CardActions className={classes.actions}>
                     <Button
                         variant="outlined"
-                        type={Constants.fields.SUBMIT}
+                        type={FIELDS.SUBMIT}
                         color="primary"
                         disabled={isLoading}
                         className={classes.button}

@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Pagination, translate } from 'react-admin';
-import Constants from '../../_constants/index';
+import {PATHS, MODEL_FIELDS} from "../../_constants/index";
 import FileList from '../../_components/files/FileList';
 import ArrowUpward from "@material-ui/icons/ArrowUpward"
 import ArrowDownward from "@material-ui/icons/ArrowDownward"
@@ -104,9 +104,9 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       {data && data.files && (
         <form className={classes.flex} onSubmit={handleSubmit}>
           <TextField
-            id={Constants.paths.SEARCH}
-            name={Constants.paths.SEARCH}
-            type={Constants.paths.SEARCH}
+            id={PATHS.SEARCH}
+            name={PATHS.SEARCH}
+            type={PATHS.SEARCH}
             className={classes.textField}
             defaultValue={search || ''}
             placeholder={`Search Files`}
@@ -121,10 +121,10 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
             <MenuItem value={"name.keyword"}>{`File Name`}</MenuItem>
             <MenuItem value={"path.agnostic.keyword"}>{`File Path`}</MenuItem>
-            <MenuItem value={Constants.model_fields.INDEXED_DATE}>{`Indexed On`}</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
-            <MenuItem value={Constants.model_fields.FILESIZE}>{`Filesize`}</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_ACCESS}>{`Last Accessed`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.INDEXED_DATE}>{`Indexed On`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.FILESIZE}>{`Filesize`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.LAST_ACCESS}>{`Last Accessed`}</MenuItem>
           </Select>
 
           <div className={classes.sortDisplay}>

@@ -4,7 +4,7 @@ import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../_constants/index"
+import {MODEL_FIELDS} from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
 import Help from "@material-ui/icons/Help";
@@ -85,7 +85,7 @@ const CustomAppBar = ({ classes, ...props }) => {
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />
-    <Typography className={classes.appBarText}>{localStorage.getItem(Constants.model_fields.USERNAME)}</Typography>
+    <Typography className={classes.appBarText}>{localStorage.getItem(MODEL_FIELDS.USERNAME)}</Typography>
   </AppBar>
 )};
 

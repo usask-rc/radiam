@@ -17,37 +17,37 @@ module.exports = Object.freeze({
   SUPPORTEMAIL: "support@radiam.ca",
   USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
   USERMANUALFILENAME: "Radiam_user_manual.pdf",
-  fields: {
+  FIELDS: {
     PASSWORD: "password",
     SUBMIT: "submit"
   },
-  methods: {
+  METHODS: {
     POST: "POST",
     GET: "GET",
     PUT: "PUT",
     DELETE: "DELETE",
   },
-  resource_operations: {
+  RESOURCE_OPERATIONS: {
     SHOW: "show",
     LIST: "list",
     EDIT: "edit"
   },
-  login_details: {
+  LOGIN_DETAILS: {
     USERNAME: "username",
     EMAIL: "email",
     PASSWORD: "password",
     PASSWORD_CONFIRM: "confirmPassword"
   },
-  password_change: {
+  PASSWORD_CHANGE: {
     PASSWORD_OLD: "old_password",
     PASSWORD_CONFIRM: "confirm_password",
     PASSWORD_NEW: "new_password"
   },
-  paths:{
+  PATHS:{
     SET_PASSWORD: "set_password",
     SEARCH: "search",
   },
-  models: {
+  MODELS: {
     AGENTS: "useragents",
     DATA_COLLECTION_METHOD: "datacollectionmethod",
     DATA_COLLECTION_STATUS: "datacollectionstatus",
@@ -67,7 +67,7 @@ module.exports = Object.freeze({
     USERS: "users",
   },
   //this exists to help turn foreign key references into their model endpoint counterparts.
-  model_fk_fields: {
+  MODEL_FK_FIELDS: {
     AGENT: "agent",
     DATA_COLLECTION_STATUS: "data_collection_status",
     DATA_COLLECTION_METHOD: "data_collection_method",
@@ -84,7 +84,7 @@ module.exports = Object.freeze({
     SENSITIVITY: "sensitivity",
   },
   //this needs renaming but I can't quite figure what it should be called.  This dict is for getting all foreign key labels in a given model.
-  fk_fields: {
+  FK_FIELDS: {
     RESEARCHGROUPS: ["parent_group"],
     USERAGENTS: ["user", "location"],
     GROUPMEMBERS: ["user", "group", "group_role"],
@@ -104,7 +104,7 @@ module.exports = Object.freeze({
     ]
   },
   //storage for individual reference fields for data models.
-  model_fields: {
+  MODEL_FIELDS: {
     ABSTRACT: "abstract",
     ACTIVE: "is_active",
     AVATAR: "avatar",
@@ -147,11 +147,11 @@ module.exports = Object.freeze({
     TITLE: "title",
     USERNAME: "username",
   },
-  sort_fields: {
+  SORT_FIELDS: {
     ASCENDING: "ASC",
     DESCENDING: "DESC",
   },
-  role_labels: {
+  ROLE_LABELS: {
     ADMIN: "Group Admin",
     DATA_MANAGER: "Data Manager",
     MEMBER: "Member",
@@ -159,7 +159,7 @@ module.exports = Object.freeze({
   },
   //the place to put these is probably in en.js - however, I'm not too keen on having to import translate into more places.
   //these are error / warning messages for form or api failures.
-  warnings: {
+  WARNINGS: {
     TOO_MANY_ROLES: "This user is already assigned a role in this group. Only one role is allowed per group.",
     UNSAVED_CHANGES: "This form contains unsaved changes.  Leave without saving?",
     NO_AUTH_TOKEN: "No authentication token detected.  Returning to the login page.  Please login and try again.",

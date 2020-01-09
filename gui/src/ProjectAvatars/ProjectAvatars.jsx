@@ -15,26 +15,26 @@ import {
   withTranslate,
 } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../_constants/index";
+import {AVATAR_HEIGHT, RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 
 const styles = theme => ({
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`
+    height: `${AVATAR_HEIGHT}`
   },
 });
 
 export const ProjectAvatarsList = withStyles(styles)(({ classes, ...props }) => (
   <List {...props} exporter={false}
-    sort={{ field: Constants.model_fields.AVATAR_IMAGE, order: "DESC" }}
+    sort={{ field: MODEL_FIELDS.AVATAR_IMAGE, order: "DESC" }}
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ImageField
         classes={classes}
-        source={Constants.model_fields.AVATAR_IMAGE}
-        title={Constants.model_fields.AVATAR_IMAGE}
+        source={MODEL_FIELDS.AVATAR_IMAGE}
+        title={MODEL_FIELDS.AVATAR_IMAGE}
         label={"en.models.project_avatars.avatar_image"} />
       <NumberField
         source="width"
@@ -51,8 +51,8 @@ export const ProjectAvatarsShow = withStyles(styles)(({ classes, ...props }) => 
     <SimpleShowLayout>
       <ImageField
         classes={classes}
-        source={Constants.model_fields.AVATAR_IMAGE}
-        title={Constants.model_fields.AVATAR_IMAGE}
+        source={MODEL_FIELDS.AVATAR_IMAGE}
+        title={MODEL_FIELDS.AVATAR_IMAGE}
         label={"en.models.project_avatars.avatar_image"} />
       <NumberField
         source="width"
@@ -67,18 +67,18 @@ export const ProjectAvatarsShow = withStyles(styles)(({ classes, ...props }) => 
 const validateAvatar = required('en.validate.projectavatar.avatar_image');
 
 const ProjectAvatarForm = ({ classes, translate, ...props }) => {
-  return <SimpleForm {...props} redirect={Constants.resource_operations.LIST}>
+  return <SimpleForm {...props} redirect={RESOURCE_OPERATIONS.LIST}>
     <ImageInput
       wultiple={false}
-      source={Constants.model_fields.AVATAR_IMAGE}
+      source={MODEL_FIELDS.AVATAR_IMAGE}
       label="en.models.project_avatars.avatar_image"
       accept="image/*"
       placeholder={translate('en.models.project_avatars.drop_image')}
       validate={validateAvatar}>
       <ImageField
         classes={classes}
-        source={Constants.model_fields.AVATAR_IMAGE}
-        title={Constants.model_fields.TITLE}
+        source={MODEL_FIELDS.AVATAR_IMAGE}
+        title={MODEL_FIELDS.TITLE}
       />
     </ImageInput>
   </SimpleForm>

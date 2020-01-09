@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react'
 import compose from 'recompose/compose';
 import { FeatureGroup, Map, Popup, TileLayer } from 'react-leaflet';
 import L from "leaflet";
-import { Typography, Divider } from '@material-ui/core';
+import Typography from "@material-ui/core/Typography"
+import Divider from "@material-ui/core/Divider"
 import withStyles from '@material-ui/core/styles/withStyles';
-import * as Constants from "../../_constants/index"
+import {OSMTILEURL} from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -173,7 +174,7 @@ const MapView = ({ classes, record }) => {
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
-                        url={Constants.OSMTILEURL}
+                        url={OSMTILEURL}
                         //url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
                     />
 

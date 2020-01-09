@@ -21,7 +21,7 @@ import {
 } from 'react-admin';
 import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import * as Constants from '../_constants/index';
+import {RESOURCE_OPERATIONS, MODEL_FK_FIELDS, MODELS, ROLE_USER, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
@@ -70,7 +70,7 @@ const actionStyles = theme => ({
 
  export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => {
 
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
@@ -79,7 +79,7 @@ const actionStyles = theme => ({
 
       const params = { id: data.project }
       const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
-      dataProvider(GET_ONE, Constants.models.PROJECTS, params).then(response => {
+      dataProvider(GET_ONE, MODELS.PROJECTS, params).then(response => {
         isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
         //now have a group - check for adminship
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
@@ -105,61 +105,61 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
-          source={Constants.model_fields.TITLE}
+          source={MODEL_FIELDS.TITLE}
         />
 
         <ReferenceField
           linkType={false}
           label={"en.models.grants.project"}
-          source={Constants.model_fk_fields.PROJECT}
-          reference={Constants.models.PROJECTS}
+          source={MODEL_FK_FIELDS.PROJECT}
+          reference={MODELS.PROJECTS}
         >
           <ProjectName label={"en.models.projects.name"}/>
         </ReferenceField>
 
         <TextField
           label={"en.models.datasets.data_abstract"}
-          source={Constants.model_fields.DATA_ABSTRACT}
+          source={MODEL_FIELDS.DATA_ABSTRACT}
         />
 
         <TextField
           label={"en.models.datasets.study_site"}
-          source={Constants.model_fields.STUDY_SITE}
+          source={MODEL_FIELDS.STUDY_SITE}
         />
 
         <ReferenceField
           label={"en.models.datasets.data_collection_status"}
-          source={Constants.model_fields.DATA_COLLECTION_STATUS}
-          reference={Constants.models.DATA_COLLECTION_STATUS}
+          source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+          reference={MODELS.DATA_COLLECTION_STATUS}
           linkType={false}
         >
           <TranslationField
             label={"en.models.roles.label"}
-            source={Constants.model_fields.LABEL}
+            source={MODEL_FIELDS.LABEL}
           />
         </ReferenceField>
 
-        <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={Constants.models.DATA_COLLECTION_METHOD} source={Constants.model_fields.DATA_COLLECTION_METHOD}>
+        <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
           <SingleFieldList linkType={"show"}>
-            <TranslationChipField source={Constants.model_fields.LABEL}/>
+            <TranslationChipField source={MODEL_FIELDS.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
 
         <ReferenceField
           label={"en.models.datasets.distribution_restriction"}
-          source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
-          reference={Constants.models.DISTRIBUTION_RESTRICTION}
+          source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+          reference={MODELS.DISTRIBUTION_RESTRICTION}
           linkType={false}
         >
           <TranslationField
             label={"en.models.roles.label"}
-            source={Constants.model_fields.LABEL}
+            source={MODEL_FIELDS.LABEL}
           />
         </ReferenceField>
 
-        <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={Constants.models.SENSITIVITY_LEVEL} source={Constants.model_fields.SENSITIVITY_LEVEL}>
+        <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
           <SingleFieldList linkType={"show"}>
-            <TranslationChipField source={Constants.model_fields.LABEL} />
+            <TranslationChipField source={MODEL_FIELDS.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>
 
@@ -237,11 +237,11 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   console.log("props record after editmodal transofmration: ", props.record)
 
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={Constants.resource_operations.LIST}>
+  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}>
     <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"
-      source={Constants.model_fields.TITLE}
+      source={MODEL_FIELDS.TITLE}
       validate={validateTitle}
       
     />
@@ -249,67 +249,67 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       className="input-large"
       label={"en.models.datasets.data_abstract"}
       options={{ multiline: true }}
-      source={Constants.model_fields.ABSTRACT}
+      source={MODEL_FIELDS.ABSTRACT}
     />
     <TextInput
       className="input-small"
       label={"en.models.datasets.study_site"}
-      source={Constants.model_fields.STUDY_SITE}
+      source={MODEL_FIELDS.STUDY_SITE}
     />
 
     <ReferenceInput
       label={'en.models.datasets.project'}
-      source={Constants.model_fk_fields.PROJECT}
-      reference={Constants.models.PROJECTS}
+      source={MODEL_FK_FIELDS.PROJECT}
+      reference={MODELS.PROJECTS}
       validate={validateProject}
       defaultValue={props.project ? props.project : null}
       disabled={props.project ? true : false}
     >
-      <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
+      <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
 
     <ReferenceInput
-      resource={Constants.models.DATA_COLLECTION_STATUS}
+      resource={MODELS.DATA_COLLECTION_STATUS}
       className="input-small"
       label={"en.models.datasets.data_collection_status"}
-      source={Constants.model_fields.DATA_COLLECTION_STATUS}
-      reference={Constants.models.DATA_COLLECTION_STATUS}
+      source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+      reference={MODELS.DATA_COLLECTION_STATUS}
       required>
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
 
     <ReferenceInput
-      resource={Constants.models.DISTRIBUTION_RESTRICTION}
+      resource={MODELS.DISTRIBUTION_RESTRICTION}
       className="input-small"
       label={"en.models.datasets.distribution_restriction"}
-      source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
-      reference={Constants.models.DISTRIBUTION_RESTRICTION}
+      source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+      reference={MODELS.DISTRIBUTION_RESTRICTION}
       required>
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
 
     <ReferenceArrayInput
       allowEmpty
-      resource={Constants.models.DATA_COLLECTION_METHOD}
+      resource={MODELS.DATA_COLLECTION_METHOD}
       className="input-medium"
       label={"en.models.datasets.data_collection_method"}
-      source={Constants.model_fields.DATA_COLLECTION_METHOD}
-      reference={Constants.models.DATA_COLLECTION_METHOD}
+      source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
+      reference={MODELS.DATA_COLLECTION_METHOD}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
     <ReferenceArrayInput
-      resource={Constants.models.SENSITIVITY_LEVEL}
+      resource={MODELS.SENSITIVITY_LEVEL}
       className="input-medium"
       label={"en.models.datasets.sensitivity_level"}
-      source={Constants.model_fields.SENSITIVITY_LEVEL}
-      reference={Constants.models.SENSITIVITY_LEVEL}
+      source={MODEL_FIELDS.SENSITIVITY_LEVEL}
+      reference={MODELS.SENSITIVITY_LEVEL}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
 
-    { props.mode === Constants.resource_operations.EDIT && props.id && (
+    { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
       <>
         <EditMetadata id={props.id} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />
@@ -334,7 +334,7 @@ export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
-      <DatasetForm mode={Constants.resource_operations.EDIT} {...other} />
+      <DatasetForm mode={RESOURCE_OPERATIONS.EDIT} {...other} />
     </Edit>
   );
 });

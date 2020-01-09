@@ -7,12 +7,12 @@ import {
   AUTH_GET_PERMISSIONS
 } from "react-admin";
 import { getAPIEndpoint } from "./funcs";
-import * as Constants from "../_constants/index"
+import { METHODS, WEBTOKEN, MODELS, MODEL_FIELDS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS } from "../_constants/index"
 import { toast } from "react-toastify";
 
 function validateToken(checkToken) {
   const request = new Request(getAPIEndpoint() + "/token/verify/", {
-    method: Constants.methods.POST,
+    method: METHODS.POST,
     body: JSON.stringify({ token: checkToken }),
     headers: new Headers({ "Content-Type": "application/json" })
   });
@@ -23,7 +23,7 @@ function validateToken(checkToken) {
         resolve(response.json())
       }
       else if (response.status === 401 || response.status === 403){
-        let curTok = JSON.parse(localStorage.getItem(Constants.WEBTOKEN));
+        let curTok = JSON.parse(localStorage.getItem(WEBTOKEN));
         refreshAccessToken(curTok).then(resolve()).catch(err => reject(err))
       }
       else{
@@ -36,7 +36,7 @@ function validateToken(checkToken) {
 
 function refreshAccessToken(curTok) {
   const request = new Request(getAPIEndpoint() + "/token/refresh/", {
-    method: Constants.methods.POST,
+    method: METHODS.POST,
     body: JSON.stringify({ refresh: curTok.refresh }),
     headers: new Headers({ "Content-Type": "application/json" })
   });
@@ -46,7 +46,7 @@ function refreshAccessToken(curTok) {
     validateToken(curTok.refresh).then(fetch(request)
       .then(response => {
         if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
-          localStorage.removeItem(Constants.WEBTOKEN)
+          localStorage.removeItem(WEBTOKEN)
           window.location.hash = "#/login"
           console.error(response.statusText);
         }
@@ -54,7 +54,7 @@ function refreshAccessToken(curTok) {
       })
       .then(token => {
         curTok.access = token.access;
-        localStorage.setItem(Constants.WEBTOKEN, JSON.stringify(curTok));
+        localStorage.setItem(WEBTOKEN, JSON.stringify(curTok));
         resolve()
       })
       .catch(err => reject(err)))
@@ -71,7 +71,7 @@ function getRequest(url, suppliedToken) {
     headers.set("Authorization", "Bearer " + token.access);
   }
   const request = new Request(getAPIEndpoint() + url, {
-    method: Constants.methods.GET,
+    method: METHODS.GET,
     headers: headers
   });
 
@@ -80,7 +80,7 @@ function getRequest(url, suppliedToken) {
 
 function getGroupRoles() {
   return new Promise((resolve, reject) => {
-    const request = getRequest(`/${Constants.models.ROLES}/`);
+    const request = getRequest(`/${MODELS.ROLES}/`);
     fetch(request)
       .then(response => {
         if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
@@ -96,7 +96,7 @@ function getGroupRoles() {
           var groupRole = result.results[i];
           groupRoles.push(groupRole);
         }
-        localStorage.setItem(Constants.models.ROLES, JSON.stringify(groupRoles));
+        localStorage.setItem(MODELS.ROLES, JSON.stringify(groupRoles));
         resolve(groupRoles)
       }).catch(err => reject(err));
   })
@@ -106,8 +106,8 @@ function getUser(groupRoles) {
 
   return new Promise((resolve, reject) => {
       
-    const username = localStorage.getItem(Constants.model_fields.USERNAME);
-    const request = getRequest(`/${Constants.models.USERS}/?${Constants.model_fields.USERNAME}=` + username);
+    const username = localStorage.getItem(MODEL_FIELDS.USERNAME);
+    const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=` + username);
     fetch(request)
       .then(response => {
         if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
@@ -130,7 +130,7 @@ function getUser(groupRoles) {
           user.is_admin = false;
         }
         user.id = newUser.id;
-        localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
+        localStorage.setItem(ROLE_USER, JSON.stringify(user));
         resolve(user);
       })
       .catch(err => reject(err));
@@ -159,10 +159,10 @@ function getGroupMemberships(user) {
           for (var rolesIndex = 0; rolesIndex < user.groupRoles.length; rolesIndex++) {
             if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
               groupMembership.group_role = user.groupRoles[rolesIndex];
-              if (user.groupRoles[rolesIndex].id === Constants.ROLE_DATA_MANAGER) {
+              if (user.groupRoles[rolesIndex].id === ROLE_DATA_MANAGER) {
                 user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
                 dataManagerships.push(groupMembership.group)
-              } else if (user.groupRoles[rolesIndex].id === Constants.ROLE_GROUP_ADMIN) {
+              } else if (user.groupRoles[rolesIndex].id === ROLE_GROUP_ADMIN) {
 
                 user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
                 groupAdminships.push(groupMembership.group)
@@ -180,7 +180,7 @@ function getGroupMemberships(user) {
         user.groupAdminships = groupAdminships
         user.dataManagerships = dataManagerships
         user.groupUserships = groupUserships
-        localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
+        localStorage.setItem(ROLE_USER, JSON.stringify(user));
         resolve(user)
       }).catch(error => {
         reject(error)
@@ -212,7 +212,7 @@ function getGroups(user) {
           groups.push(group);
         }
         user.groups = groups;
-        localStorage.setItem(Constants.ROLE_USER, JSON.stringify(user));
+        localStorage.setItem(ROLE_USER, JSON.stringify(user));
         resolve(user)
       }).catch(error => {
         console.log("Unable to get groups", error);
@@ -225,9 +225,9 @@ function getGroups(user) {
 export default (type, params, ...rest) => {
   if (type === AUTH_LOGIN) {
     const { username, password } = params;
-    localStorage.setItem(Constants.login_details.USERNAME, username);
+    localStorage.setItem(LOGIN_DETAILS.USERNAME, username);
     const request = new Request(getAPIEndpoint() + "/token/", {
-      method: Constants.methods.POST,
+      method: METHODS.POST,
       body: JSON.stringify({ username, password }),
       headers: new Headers({ "Content-Type": "application/json" })
     });
@@ -245,7 +245,7 @@ export default (type, params, ...rest) => {
       })
       .then(curTok => {
         var token = JSON.stringify(curTok);
-        localStorage.setItem(Constants.WEBTOKEN, token);
+        localStorage.setItem(WEBTOKEN, token);
         Promise.resolve(curTok);
       })
       .catch(function (error) {
@@ -269,15 +269,15 @@ export default (type, params, ...rest) => {
       });
   }
   if (type === AUTH_LOGOUT) {
-    localStorage.removeItem(Constants.models.ROLES);
-    localStorage.removeItem(Constants.WEBTOKEN);
-    localStorage.removeItem(Constants.ROLE_USER);
-    localStorage.removeItem(Constants.login_details.USERNAME);
+    localStorage.removeItem(MODELS.ROLES);
+    localStorage.removeItem(WEBTOKEN);
+    localStorage.removeItem(ROLE_USER);
+    localStorage.removeItem(LOGIN_DETAILS.USERNAME);
 
     return Promise.resolve();
   }
   if (type === AUTH_ERROR) {
-    const getToken = localStorage.getItem(Constants.WEBTOKEN);
+    const getToken = localStorage.getItem(WEBTOKEN);
     if (getToken) {
       return validateToken(JSON.parse(getToken).access)
         .then(Promise.resolve())
@@ -291,7 +291,7 @@ export default (type, params, ...rest) => {
     }
   }
   if (type === AUTH_CHECK) {
-    const getToken = localStorage.getItem(Constants.WEBTOKEN);
+    const getToken = localStorage.getItem(WEBTOKEN);
 
     //I'm confident that the same thing can be achieved with withRouter from react-router
     //get the model and ID from the URL and check for user authorization on this page.
@@ -309,8 +309,8 @@ export default (type, params, ...rest) => {
   }
   if (type === AUTH_GET_PERMISSIONS) {
 
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-    return user ? Promise.resolve(user) : Promise.resolve({ role: Constants.ROLE_ANONYMOUS, is_admin: false });
+    const user = JSON.parse(localStorage.getItem(ROLE_USER));
+    return user ? Promise.resolve(user) : Promise.resolve({ role: ROLE_ANONYMOUS, is_admin: false });
 
   }
   return Promise.reject("Unknown method");

@@ -1,5 +1,5 @@
 //funcs.jsx
-import * as Constants from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
@@ -15,18 +15,17 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-  /*
+  
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
-  return `/${Constants.API_ENDPOINT}`;
+  return `/${API_ENDPOINT}`;
 }
 
 //given a group id and our cookies, can we edit this value?
 export function isAdminOfAParentGroup(group_id){
   return new Promise((resolve, reject) => {
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+    const user = JSON.parse(localStorage.getItem(ROLE_USER))
 
     if (user && user.is_admin){
       resolve(true)
@@ -51,7 +50,7 @@ export function isAdminOfAParentGroup(group_id){
 
 export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
   //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (group !== null){
       if (user.groupAdminships && group in user.groupAdminships){
@@ -80,8 +79,8 @@ export function getRecentProjects(count=1000) {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const now = moment();
 
-    dataProvider(GET_LIST, Constants.models.PROJECTS, {
-      order: { field: Constants.model_fields.NAME },
+    dataProvider(GET_LIST, MODELS.PROJECTS, {
+      order: { field: MODEL_FIELDS.NAME },
       pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
     })
       .then(response => response.data)
@@ -91,7 +90,7 @@ export function getRecentProjects(count=1000) {
         projects.map(project => {
           promises.push(getProjectData({id: project.id,
             sort: {
-              field: Constants.model_fields.INDEXED_DATE,
+              field: MODEL_FIELDS.INDEXED_DATE,
               order: '-',
             },
             pagination: {
@@ -129,7 +128,7 @@ export function getRecentProjects(count=1000) {
 
 export function getMaxUserRole(){
 
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
       return "admin"
@@ -216,7 +215,7 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + params.projectID,
+      MODELS.PROJECTS + '/' + params.projectID,
       queryParams
     )
       .then(response => {
@@ -246,10 +245,10 @@ export function getFolderFiles(
 
 export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
-    dataProvider(GET_LIST, Constants.models.DATASETS, {
+    dataProvider(GET_LIST, MODELS.DATASETS, {
       filter: { project: projectID, is_active: true },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: Constants.model_fields.TITLE, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.TITLE, order: 'DESC' },
     })
       .then(response => response.data)
       .then(assocDatasets => {
@@ -270,7 +269,7 @@ export function getRootPaths(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + projectID,
+      MODELS.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -318,7 +317,7 @@ export function getProjectData(params, folders = false) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + params.id,
+      MODELS.PROJECTS + '/' + params.id,
       params
     )
       .then(response => {
@@ -335,7 +334,7 @@ export function getProjectData(params, folders = false) {
 export function getParentGroupList(group_id, groupList = []){
   return new Promise((resolve, reject) => {
     //resolve upon having all parent groups
-    dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
+    dataProvider(GET_ONE, MODELS.GROUPS, {id: group_id})
     .then(response => {
       groupList.push(response.data)
       if (response.data.parent_group === null){
@@ -357,7 +356,7 @@ export function getParentGroupList(group_id, groupList = []){
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
     //get this group's details, then ascend if it has a parent.
-    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
+    dataProvider(GET_ONE, MODELS.GROUPS, { id: group_id })
       .then(response => {
         resolve(response.data);
       })
@@ -371,7 +370,7 @@ export function getGroupData(group_id) {
 //TODO: merge into a greater `get one item` function
 export function getUserDetails(userID){
   return new Promise((resolve, reject) => {
-    dataProvider("GET_ONE", Constants.models.USERS, {id: userID})
+    dataProvider("GET_ONE", MODELS.USERS, {id: userID})
     .then(response => {
       resolve(response.data)
     }).catch(err => reject(err))
@@ -380,16 +379,16 @@ export function getUserDetails(userID){
 
 export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
-    dataProvider('CURRENT_USER', Constants.models.USERS)
+    dataProvider('CURRENT_USER', MODELS.USERS)
       .then(response => {
-        const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+        const localID = JSON.parse(localStorage.getItem(ROLE_USER))
           .id;
 
         if (response.data.id === localID) {
           resolve(response.data);
         } else {
           reject({ redirect: true });
-          toastErrors(Constants.warnings.NO_AUTH_TOKEN);
+          toastErrors(WARNINGS.NO_AUTH_TOKEN);
         }
       })
       .catch(err => {
@@ -405,10 +404,10 @@ export function getUsersInGroup(record) {
     let groupUsers = [];
     const { id, is_active } = record;
 
-    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+    dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
       filter: { group: id, is_active: is_active },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: Constants.model_fields.USER, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
     })
       .then(response => {
         
@@ -443,15 +442,15 @@ export function getUsersInGroup(record) {
 //given a group, return a list of groupmembers with full User and Role data included.
 export function getGroupMembers(record) {
   return new Promise((resolve, reject) => {
-    dataProvider(GET_LIST, Constants.models.ROLES)
+    dataProvider(GET_LIST, MODELS.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
         const { id, is_active } = record;
 
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+        dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { group: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: Constants.model_fields.USER, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
         })
           .then(response => {
             return response.data;
@@ -485,15 +484,15 @@ export function getGroupMembers(record) {
 //given a user, return a list of groupmember entries containing the groups they are in along with their role within it.
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
-    dataProvider(GET_LIST, Constants.models.ROLES)
+    dataProvider(GET_LIST, MODELS.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
         const { id, is_active } = record;
         
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+        dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { user: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: Constants.model_fields.GROUP, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.GROUP, order: 'DESC' },
         })
         .then(response => {
           return response.data;
@@ -552,7 +551,7 @@ export function submitObjectWithGeo(
   formData,
   geo,
   props,
-  redirect = Constants.resource_operations.LIST,
+  redirect = RESOURCE_OPERATIONS.LIST,
   inModal=false
 ) {
   console.log('formData heading into submitobjectwithgeo is: ', formData);
@@ -578,7 +577,7 @@ function updateObjectWithGeo(formData, geo, props) {
     };
   }
   if (props.save){
-    props.save(formData, Constants.resource_operations.LIST);
+    props.save(formData, RESOURCE_OPERATIONS.LIST);
   }
   else{
     putObjectWithoutSaveProp(formData, props.resource)
@@ -616,7 +615,7 @@ export function postObjectWithoutSaveProp(formData, resource){
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
   let headers = new Headers({ 'Content-Type': 'application/json' });
-  const token = localStorage.getItem(Constants.WEBTOKEN);
+  const token = localStorage.getItem(WEBTOKEN);
 
   if (token) {
     const parsedToken = JSON.parse(token);
@@ -624,7 +623,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
 
     //POST the new object, then update it immediately afterwards with any geoJSON it carries.
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
-      method: Constants.methods.POST,
+      method: METHODS.POST,
       body: JSON.stringify({ ...formData }),
       headers: headers,
     });
@@ -660,7 +659,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
         const request = new Request(
           getAPIEndpoint() + `/${props.resource}/${data.id}/`,
           {
-            method: Constants.methods.PUT,
+            method: METHODS.PUT,
             body: JSON.stringify({ ...data }),
             headers: headers,
           }
@@ -685,7 +684,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
       ;
   } else {
     //TODO: logout the user.
-    toastErrors(Constants.warnings.NO_AUTH_TOKEN);
+    toastErrors(WARNINGS.NO_AUTH_TOKEN);
 
     if (props && props.history) {
       props.history.push(`/login`);
@@ -701,7 +700,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
 export function getTranslation(
   translate,
   item,
-  namespace = Constants.I18N_TLE
+  namespace = I18N_TLE
 ) {
   if (item !== translate(`${namespace}.${item}`)) {
     return translate(`${namespace}.${item}`);
@@ -749,11 +748,11 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     resource = resource.toUpperCase();
   }
 
-  if (resource in Constants.fk_fields) {
+  if (resource in FK_FIELDS) {
     //this other version is for non-nullable foreign keys.
     if (Array.isArray(data)) {
       data.map(item => {
-        Constants.fk_fields[resource].map(field => {
+        FK_FIELDS[resource].map(field => {
           //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
           if (item[field] && isObject(item[field])) {
             //TODO: something has to be done here, but I don't quite know what yet.
@@ -767,7 +766,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further on monday.
     else {
       if (direction !== 1) {
-        Constants.fk_fields[resource].map(field => {
+        FK_FIELDS[resource].map(field => {
           if (data[field]) {
             //currently this only holds single nested objects - the ID we want is in that URL.
             if (data[field] && isObject(data[field])) {
@@ -797,7 +796,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
           data.data_collection_method &&
           data.data_collection_method[0] &&
           !data.data_collection_method[0].hasOwnProperty(
-            Constants.model_fields.ID
+            MODEL_FIELDS.ID
           )
         ) {
           data.data_collection_method = data.data_collection_method.map(
@@ -812,7 +811,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
         if (
           data.sensitivity_level &&
           data.sensitivity_level[0] &&
-          !data.sensitivity_level[0].hasOwnProperty(Constants.model_fields.ID)
+          !data.sensitivity_level[0].hasOwnProperty(MODEL_FIELDS.ID)
         ) {
           data.sensitivity_level = data.sensitivity_level.map(sensitivity => {
             return {

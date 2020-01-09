@@ -22,7 +22,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import * as Constants from "../_constants/index";
+import {MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS, LOCATIONTYPE_OSF, ROLE_USER} from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import { locationSelect, LocationShow } from "../_components/_fields/LocationShow";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
@@ -55,16 +55,16 @@ const UserAgentFilter = withStyles(filterStyles)(({ classes, ...props }) => (
   <Filter classes={classes} {...props}>
     <ReferenceInput
       label={"en.models.agents.user"}
-      source={Constants.model_fk_fields.USER}
-      reference={Constants.models.USERS}
+      source={MODEL_FK_FIELDS.USER}
+      reference={MODELS.USERS}
       alwaysOn
     >
       <SelectInput optionText={userSelect} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.agents.location"}
-      source={Constants.model_fk_fields.LOCATION}
-      reference={Constants.models.LOCATIONS}
+      source={MODEL_FK_FIELDS.LOCATION}
+      reference={MODELS.LOCATIONS}
       alwaysOn
     >
       <SelectInput optionText={locationSelect} />
@@ -83,17 +83,17 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     }}
     exporter={false}
     filters={<UserAgentFilter />}
-    sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
+    sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
     bulkActionButtons={false}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ReferenceField
         linkType={false}
         label={"en.models.agents.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
+        source={MODEL_FK_FIELDS.USER}
+        reference={MODELS.USERS}
         allowEmpty={false}
       >
         <UserShow />
@@ -101,8 +101,8 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
       <ReferenceField
         linkType={false}
         label={"en.models.agents.location"}
-        source={Constants.model_fk_fields.LOCATION}
-        reference={Constants.models.LOCATIONS}
+        source={MODEL_FK_FIELDS.LOCATION}
+        reference={MODELS.LOCATIONS}
       >
         <LocationShow />
       </ReferenceField>
@@ -120,7 +120,7 @@ const actionStyles = theme => ({
 
 const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
 {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
   useEffect(() => {
@@ -161,24 +161,24 @@ return(
       <ReferenceField
         linkType={false}
         label={"en.models.agents.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
+        source={MODEL_FK_FIELDS.USER}
+        reference={MODELS.USERS}
       >
         <UserShow />
       </ReferenceField>
       <ReferenceField
         linkType={false}
         label={"en.models.agents.location"}
-        source={Constants.model_fk_fields.LOCATION}
-        reference={Constants.models.LOCATIONS}
+        source={MODEL_FK_FIELDS.LOCATION}
+        reference={MODELS.LOCATIONS}
       >
         <LocationShow />
       </ReferenceField>
      {controllerProps.record && controllerProps.record.project_config_list && 
-      <ArrayField source={Constants.model_fields.PROJECT_CONFIG_LIST} label={"Target Projects"}>
+      <ArrayField source={MODEL_FIELDS.PROJECT_CONFIG_LIST} label={"Target Projects"}>
         <SingleFieldList>
-          <ReferenceField source={Constants.model_fk_fields.PROJECT} reference={Constants.models.PROJECTS} linkType="show">
-            <ChipField source={Constants.model_fields.NAME} />
+          <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} linkType="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
           </ReferenceField>
         </SingleFieldList>
       </ArrayField>
@@ -188,23 +188,23 @@ return(
       <>
       <TextField
         label={"en.models.agents.remote_api_username"}
-        source={Constants.model_fields.REMOTE_API_USERNAME}
+        source={MODEL_FIELDS.REMOTE_API_USERNAME}
       />
       
       <TextField
         label={"en.models.agents.remote_api_token"}
-        source={Constants.model_fields.REMOTE_API_TOKEN}
+        source={MODEL_FIELDS.REMOTE_API_TOKEN}
       />
       </>
       }
     
       <TextField
         label={"en.models.agents.version"}
-        source={Constants.model_fields.VERSION}
+        source={MODEL_FIELDS.VERSION}
       />
       <BooleanField
         label={"en.models.generic.active"}
-        source={Constants.model_fields.ACTIVE}
+        source={MODEL_FIELDS.ACTIVE}
       />
     </SimpleShowLayout>
   </Show>)}
@@ -221,7 +221,7 @@ export const UserAgentCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...other}>
-      <SimpleForm {...other} redirect={Constants.resource_operations.LIST}>
+      <SimpleForm {...other} redirect={RESOURCE_OPERATIONS.LIST}>
       <UserAgentTitle prefix={"Creating Agent"} />
 
       <FormDataConsumer>
@@ -233,32 +233,32 @@ export const UserAgentCreate = props => {
         <Grid xs={12}>  
         <ReferenceInput
         label={"en.models.agents.user"}
-        source={Constants.model_fk_fields.USER}
-        reference={Constants.models.USERS}
+        source={MODEL_FK_FIELDS.USER}
+        reference={MODELS.USERS}
         validate={validateUser}
         >
-          <SelectInput source={Constants.model_fields.USERNAME} optionText={userSelect} />
+          <SelectInput source={MODEL_FIELDS.USERNAME} optionText={userSelect} />
         </ReferenceInput>
         </Grid>
         <Grid xs={12}>
         <ReferenceInput
           label={"en.models.agents.location"}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
-          filter={{location_type: Constants.LOCATIONTYPE_OSF}}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
+          filter={{location_type: LOCATIONTYPE_OSF}}
           validate={validateLocation}
         >
-          <SelectInput optionText={locationSelect} source={Constants.model_fields.DISPLAY_NAME} />
+          <SelectInput optionText={locationSelect} source={MODEL_FIELDS.DISPLAY_NAME} />
         </ReferenceInput>
         </Grid>
         <Grid xs={12}>
-        <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST} required>
+        <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST} required>
           <SimpleFormIterator>
             <ReferenceInput
             label={"en.models.agents.projects"}
-            source={Constants.model_fk_fields.PROJECT}
-            reference={Constants.models.PROJECTS}>
-              <SelectInput optionText={Constants.model_fields.NAME}/>
+            source={MODEL_FK_FIELDS.PROJECT}
+            reference={MODELS.PROJECTS}>
+              <SelectInput optionText={MODEL_FIELDS.NAME}/>
             </ReferenceInput>
           </SimpleFormIterator>
         </ArrayInput>
@@ -273,7 +273,7 @@ export const UserAgentCreate = props => {
         <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
         </Grid>
         <Grid xs={12}>
-        <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+        <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
         </Grid>
         </Grid>
         )
@@ -295,16 +295,16 @@ export const UserAgentEdit = props => {
         <ReferenceField
           linkType={false}
           label={"en.models.agents.location"}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
         >
           <LocationShow/>
         </ReferenceField>
         <ReferenceField
           linkType={false}
           label={"en.models.agents.user"}
-          source={Constants.model_fk_fields.USER}
-          reference={Constants.models.USERS}
+          source={MODEL_FK_FIELDS.USER}
+          reference={MODELS.USERS}
           allowEmpty={false}
         >
           <UserShow />
@@ -322,13 +322,13 @@ export const UserAgentEdit = props => {
 
           return(
             <>
-            <ArrayInput source={Constants.model_fields.PROJECT_CONFIG_LIST}>
+            <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
             <SimpleFormIterator disableRemove disableAdd>
               <ReferenceInput
               label={"en.models.agents.projects"}
-              source={Constants.model_fk_fields.PROJECT}
-              reference={Constants.models.PROJECTS}>
-                <SelectInput optionText={Constants.model_fields.NAME} disabled/>
+              source={MODEL_FK_FIELDS.PROJECT}
+              reference={MODELS.PROJECTS}>
+                <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
               </ReferenceInput>
               {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
             </SimpleFormIterator>
@@ -338,7 +338,7 @@ export const UserAgentEdit = props => {
               <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
             </Grid>
             <Grid xs={12}>
-              <BooleanInput source={Constants.model_fields.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+              <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
             </Grid>
           </Grid>
           </>)
