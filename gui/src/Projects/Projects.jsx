@@ -37,7 +37,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets } from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets, getPrimaryContactCandidates } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -350,55 +350,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
     else{
       //now get a list of users in each group
-      setGroupContactList([])
-      getPrimaryContactCandidates()
+      getPrimaryContactCandidates(groupList).then(data => setGroupContactList(data))
     }
   };
-
-  const getPrimaryContactCandidates = () => {
-    if (groupList){
-      let iteratedGroups = []
-      let groupContactCandidates = {} //using a dict to prevent duplicates
-
-      groupList.map(group => {
-
-        console.log("getting contacts from group: ", group)
-        getUsersInGroup(group).then(data => {
-        
-          data.map(item => {
-            groupContactCandidates[item.id] = item
-            return item;
-          })
-
-          iteratedGroups.push(group)
-
-          if (iteratedGroups.length === groupList.length){
-            let groupContactList = []
-            Object.keys(groupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-              return key
-            })
-
-            if (groupContactList.length > 0)
-            {
-              setGroupContactList(groupContactList)
-              setStatus({error: false, loading: false})
-            }
-            else{
-                setGroupContactList([])
-                setStatus({error: false, loading: false})
-                //TODO: block form submission if we don't have a PCU.
-            }
-          }
-        }).catch(err => 
-          setStatus({error: err, loading: false}))
-          
-        return group
-        })
-    }else{
-      console.error("no group selected from which to provide candidate contacts")
-    }
-  }
 
   if (record && isAdminOfAParentGroup(record.group)) {
     if (projectGroup === null){

@@ -523,6 +523,30 @@ export function getUserGroups(record) {
   });
 }
 
+//TODO: contact candidates have to be in a gross format to work with the existing drop down list system.
+export function getPrimaryContactCandidates(groupList) {
+  let contactCandidates = {}
+  return new Promise((resolve, reject) => {
+    const promises = []
+    groupList.map(group => {
+      promises.push(getUsersInGroup(group).then(data => {
+        data.map(item => {
+          contactCandidates[item.id] = item;
+          return item;
+        })
+      }))
+    })
+
+    Promise.all(promises).then(data => {
+      const candidateList = []
+      console.log("getPrimaryContactCandidates data: ", contactCandidates)
+      Object.keys(contactCandidates).map(key => candidateList.push(contactCandidates[key]))
+      console.log("candidatelist being resolved: ", candidateList)
+      resolve(candidateList)
+    })
+  })
+}
+
 //TODO: convert to promise / callback system
 export function submitObjectWithGeo(
   formData,

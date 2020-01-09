@@ -25,7 +25,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getUsersInGroup } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getUsersInGroup, getPrimaryContactCandidates } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 import ProjectTitle from '../Projects/ProjectTitle';
@@ -249,43 +249,9 @@ class PageTwo extends Component {
     }
     else{
       //now get a list of users in each group
-      this.getPrimaryContactCandidates()
+      getPrimaryContactCandidates(this.state.groupList).then(data => this.setState({groupContactList: data}))
     }
   };
-
-  //TODO: this also needs a bit of refactoring
-  getPrimaryContactCandidates = () => {
-    if (this.state.groupList){
-      let iteratedGroups = []
-      this.state.groupList.map(group => {
-        getUsersInGroup(group).then(data => {
-          let groupContactCandidates = this.state.groupContactCandidates
-
-          data.map(item => {
-            groupContactCandidates[item.id] = item
-          })
-
-          if (this.state.isMounted){
-            this.setState({groupContactCandidates:groupContactCandidates})
-            iteratedGroups.push(group)
-          }
-
-          if (iteratedGroups.length === this.state.groupList.length){
-            let groupContactList = []
-            Object.keys(groupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-            })
-            console.log("groupContactList to be set is: ", groupContactList)
-            this.setState({groupContactList: groupContactList})
-          }
-          
-        }).catch(err => console.error('error returned from getGroupMembers is: ', err))
-      })
-    }else{
-      console.error("no group selected from which to provide candidate contacts")
-    }
-  }
-  
 
   render() {
     const { handleBack, handleNext } = this.props
