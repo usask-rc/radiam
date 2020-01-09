@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
-import { AddCircleOutline, RemoveCircleOutline } from '@material-ui/icons'
-import { Button, Divider, FormControl, IconButton, TextField,  } from '@material-ui/core';
+import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
+import RemoveCircleOutline from "@material-ui/icons/RemoveCircleOutline"
+import Button from "@material-ui/core/Button"
+import Divider from "@material-ui/core/Divider"
+import FormControl from "@material-ui/core/FormControl"
+import IconButton from "@material-ui/core/IconButton"
+import TextField from "@material-ui/core/TextField"
 import { withStyles } from "@material-ui/core/styles"
 //a form that can contain an indefinite number of inputs, expanded and contracted with + and -, made to be displayed in a Modal.
 

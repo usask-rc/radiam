@@ -1,39 +1,27 @@
 //FolderView.jsx
 import React, { useState, useEffect } from 'react';
-import {
-  AddLocation,
-  FolderOpen,
-  Sort,
-  ArrowUpward,
-  ArrowDownward,
-  ArrowBack,
-  Description,
-  Folder,
-  Search,
-} from '@material-ui/icons';
+import AddLocation from "@material-ui/icons/AddLocation"
+import ArrowBack from "@material-ui/icons/ArrowBack"
+import Description from "@material-ui/icons/Description"
+import Folder from "@material-ui/icons/Folder"
+import Search from "@material-ui/icons/Search"
 import { compose } from 'recompose';
 import Constants from '../../_constants/index';
-import {
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
-  Select,
-  MenuItem,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableSortLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-} from '@material-ui/core';
+
+import ExpansionPanel from "@material-ui/core/ExpansionPanel"
+import Typography from "@material-ui/core/Typography"
+import Table from "@material-ui/core/Table"
+import TableHead from "@material-ui/core/TableHead"
+import TableBody from "@material-ui/core/TableBody"
+import TableRow from "@material-ui/core/TableRow"
+import TableCell from "@material-ui/core/TableCell"
+import TableSortLabel from "@material-ui/core/TableSortLabel"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import TextField from "@material-ui/core/TextField"
+import { translate } from "ra-core"
 import FileSummary from '../../_components/files/FileSummary';
-import FolderDisplay from './FolderDisplay';
-import { translate } from 'ra-core';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';

@@ -7,7 +7,8 @@ import { withStyles } from "@material-ui/core/styles";
 import * as Constants from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
-import { Help, HelpOutline } from "@material-ui/icons";
+import Help from "@material-ui/icons/Help";
+import HelpOutline from "@material-ui/icons/HelpOutline"
 import UserAvatar from "react-user-avatar"
 import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 

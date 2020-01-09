@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 import * as Constants from '../_constants/index';
 import '../_components/components.css';
-import { Chip, Typography } from '@material-ui/core';
+import Chip from "@material-ui/core/Chip";
+import Typography from "@material-ui/core/Typography"
 import { getRelatedDatasets } from '../_tools/funcs';
 import { Link } from  "react-router-dom";
 import { withStyles } from '@material-ui/styles';
-import { Edit } from '@material-ui/icons';
+import Edit from '@material-ui/icons/Edit';
 
 const styles = theme => ({
   chipDisplay: {

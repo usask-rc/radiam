@@ -1,23 +1,21 @@
 //App.jsx
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import {
-  AddLocation,
-  AvTimer,
-  Fingerprint,
-  FlipToFront,
-  Group,
-  GroupAdd,
-  InsertChart,
-  Person,
-  PersonOutline,
-  Layers,
-  LocationCity,
-  Search,
-  Visibility,
-  VisibilityOff,
-  VpnKey,
-} from '@material-ui/icons';
+import AddLocation from "@material-ui/icons/AddLocation"
+import AvTimer from "@material-ui/icons/AvTimer"
+import Fingerprint from "@material-ui/icons/Fingerprint"
+import FlipToFront from "@material-ui/icons/FlipToFront"
+import Group from "@material-ui/icons/Group"
+import GroupAdd from "@material-ui/icons/GroupAdd"
+import InsertChart from "@material-ui/icons/InsertChart"
+import Person from "@material-ui/icons/Person"
+import PersonOutline from "@material-ui/icons/PersonOutline"
+import Layers from "@material-ui/icons/Layers"
+import LocationCity from "@material-ui/icons/LocationCity"
+import Search from "@material-ui/icons/Search"
+import Visibility from "@material-ui/icons/Visibility"
+import VisibilityOff from "@material-ui/icons/VisibilityOff"
+import VpnKey from "@material-ui/icons/VpnKey"
 import authProvider from '../_tools/authProvider';
 import radiamRestProvider from '../_tools/radiamRestProvider';
 import { getAPIEndpoint } from '../_tools/funcs';

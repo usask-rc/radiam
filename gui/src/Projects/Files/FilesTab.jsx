@@ -7,9 +7,12 @@ import Typography from '@material-ui/core/Typography';
 import { Pagination, translate } from 'react-admin';
 import Constants from '../../_constants/index';
 import FileList from '../../_components/files/FileList';
-import { ArrowUpward, ArrowDownward } from '@material-ui/icons';
-
-import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
+import ArrowUpward from "@material-ui/icons/ArrowUpward"
+import ArrowDownward from "@material-ui/icons/ArrowDownward"
+import Select from "@material-ui/core/Select"
+import MenuItem from "@material-ui/core/MenuItem"
+import TextField from "@material-ui/core/TextField"
+import Divider from "@material-ui/core/Divider"
 import { getProjectData } from '../../_tools/funcs';
 
 const styles = theme => ({

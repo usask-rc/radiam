@@ -5,8 +5,11 @@ import compose from "recompose/compose";
 import { changeTheme } from "./actions";
 import ChangePassword from "../_components/_forms/ChangePassword";
 import ChangeDetails from "../_components/_forms/ChangeUserDetails";
-import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Typography } from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel"
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary"
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails"
+import Typography from "@material-ui/core/Typography"
+import ExpandMore from "@material-ui/icons/ExpandMore";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { ToastContainer } from "react-toastify";
 import { getTranslation } from "../_tools/funcs"

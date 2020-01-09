@@ -47,7 +47,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
 import { getGroupMembers } from "../_tools/funcs";
-import { Cancel } from "@material-ui/icons";
+import Cancel from "@material-ui/icons/Cancel";
 
 const configStyles = {
   root: {

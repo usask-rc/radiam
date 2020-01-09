@@ -6,8 +6,10 @@ import { connect } from "react-redux";
 import { changeLocale } from "react-admin";
 import compose from "recompose/compose";
 import { changeTheme } from "./actions";
-import { Typography, Card, CardContent } from '@material-ui/core';
-import { HelpOutline } from '@material-ui/icons';
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import CardContent from "@material-ui/core/CardContent"
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import * as Constants from "../_constants/index"
 
 const styles = {

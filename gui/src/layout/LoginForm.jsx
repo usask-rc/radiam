@@ -4,9 +4,11 @@ import { Field } from 'redux-form'
 import * as Constants from "../_constants/index"
 import compose from "recompose/compose"
 import { translate } from "ra-core";
-import { withStyles, Button } from '@material-ui/core';
-import { CardActions, CircularProgress } from 'material-ui';
-import { MuiThemeProvider } from 'material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
+import Button from "@material-ui/core/Button"
+import CardActions from "@material-ui/core/CardActions"
+import CircularProgress from "material-ui/CircularProgress"
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ToggleForgot from './ToggleForgot';
 
 const styles = () => ({
