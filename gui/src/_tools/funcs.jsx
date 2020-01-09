@@ -539,11 +539,9 @@ export function getPrimaryContactCandidates(groupList) {
 
     Promise.all(promises).then(data => {
       const candidateList = []
-      console.log("getPrimaryContactCandidates data: ", contactCandidates)
       Object.keys(contactCandidates).map(key => candidateList.push(contactCandidates[key]))
-      console.log("candidatelist being resolved: ", candidateList)
       resolve(candidateList)
-    })
+    }).catch(err => reject(err))
   })
 }
 
@@ -595,24 +593,22 @@ export function putObjectWithoutSaveProp(formData, resource){
     }).catch(err => {
         reject(err)
     })
-  }
-    )
+  })
 }
 
 //for the rare cases that we don't have the Save prop and want to POST some model item
 export function postObjectWithoutSaveProp(formData, resource){
   return new Promise((resolve, reject) => {
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-  const params = { data: formData, resource:resource }
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = { data: formData, resource:resource }
 
-  dataProvider(CREATE, resource, params).then(response => {
-      resolve(response)
-  }).catch(err => {
-      reject(err)
+    dataProvider(CREATE, resource, params).then(response => {
+        resolve(response)
+    }).catch(err => {
+        reject(err)
+    })
   })
-}
-  )
 }
 
 //TODO: When creating Projects, there is a failure somewhere here.
