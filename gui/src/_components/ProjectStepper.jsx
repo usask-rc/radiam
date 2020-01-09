@@ -171,7 +171,8 @@ class PageThree extends Component {
 
     console.log("data in handlesubmit is: ", data, this.state)
       this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, this.state.geo, this.props, redirect)
+        const { geo } = this.state
+        submitObjectWithGeo(data, geo, this.props, redirect)
       }
     )
   };
@@ -234,10 +235,10 @@ class PageTwo extends Component {
       getGroupData(group_id).then(
         data => {
 
-          let groupList = this.state.groupList
+          const { isMounted, groupList } = this.state
           groupList.push(data)
 
-          if (this.state.isMounted){
+          if (isMounted){
             this.setState(groupList)
             this.getAllParentGroups(data.parent_group)
           }
@@ -248,8 +249,9 @@ class PageTwo extends Component {
         console.error("error returned in getallparentgroups: ", err)})
     }
     else{
+      const { groupList } = this.state
       //now get a list of users in each group
-      getPrimaryContactCandidates(this.state.groupList).then(data => this.setState({groupContactList: data}))
+      getPrimaryContactCandidates(groupList).then(data => this.setState({groupContactList: data}))
     }
   };
 
