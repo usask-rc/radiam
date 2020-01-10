@@ -31,73 +31,22 @@ const styles = theme => ({
     verticalAlign: "middle",
     display: "flex",
   },
-  baseFolder: {
-    backgroundColor: "beige",
-  },
-  baseFolderText: {
-    fontWeight: 'bold',
-    display: 'flex',
-  },
-  buttonContainer: {
-    textAlign: 'right',
-  },
-  details: {
-    flexDirection: 'column',
-    textAlign: 'left',
-  },
   displayFileIcons: {
     display: "flex",
     flexDirection: "row",
-
   },
   fileIcons: {
     display: "flex",
     verticalAlign: "middle",
     flexDirection: "row",
   },
-  fileInfoDisplay: {
-    display: 'flex',
-    flexDirection: "row",
-  },
-  sortDisplay: {
-    display: 'flex',
-    flexDirection: "row",
-  },
   fileDialog: {
     minWidth: "50em",
-  },
-  fileSummary: {
-    paddingRight: '2em',
-    marginRight: '20em',
-  },
-  folderContents: {
-    display: 'flex',
-  },
-  folderContentsName: {
-    textAlign: 'flex-start',
-    fontSize: 16,
-  },
-  folderContentsCount: {
-    textAlign: 'flex-end',
-    verticalAlign: 'middle',
-  },
-  folderContentsGrid: {
-    display: 'inline-block',
-  },
-  folderIcon: {
-    marginRight: '0.25em',
-  },
-  folderLineItem: {
-    display: "flex",
-    flexDirection: "row",
   },
   iconDisplay: {
     marginTop: "-0.1em",
     paddingLeft: "0.1em",
     paddingRight: "0.1em",
-  },
-  listItemText: {
-    paddingRight: 0,
   },
   locationDisplay: {
     margin: '0.25em',
@@ -106,50 +55,12 @@ const styles = theme => ({
   locationIcon: {
     verticalAlign: "middle",
   },
-  main: {
-    flex: '1',
-    marginRight: '2em',
-    marginLeft: '5em',
-    marginTop: '2em',
-    textAlign: 'right',
-  },
-  nestedFolderPanel: {
-    backgroundColor: '#BEBEBE',
-    width: 'inherit',
-    marginRight: '1em',
-    borderRadius: 3,
-  },
-  noDataFoundText: {
-    fontWeight: 'bold',
-    padding: "1em",
-  },
-  parentPanel: {
-    textAlign: 'left',
-  },
   parentDisplay: {
     marginLeft: "1em",
-  },
-  sortIcon: {
-    height: '1em',
-    width: '1em',
-    verticalAlign: "middle",
-  },
-  orderIcon: {
-    height: '1.25em',
-    width: '1.25em',
-    verticalAlign: "middle",
-  },
-  smallDisplay: {
-    textAlign: 'right',
-    verticalAlign: 'middle',
-  },
-  sortSelect: {
-    textAlign: 'right',
   },
   table: {
     marginBottom: "2em",
     borderRadius: "16",
-
   },
   folderRow: {
     backgroundColor: "beige",
@@ -163,16 +74,11 @@ const styles = theme => ({
     textAlign: "left",
     backgroundColor: "LightGray",
   },
-  title: {
-    fontSize: 16,
-    fontDecoration: 'bold',
-  },
   value: {
     padding: '0 16px',
     minHeight: 48,
     textAlign: 'right',
   },
-  smallIcon: {},
 });
 
 const headCells = [
@@ -185,8 +91,6 @@ const headCells = [
 
 const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
   const { file_num_in_dir, items } = props.folder
-
-  console.log("Displayfileicons folder :", props, file_num_in_dir, items)
 
   if (items > 0){
     return(
