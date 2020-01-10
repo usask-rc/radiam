@@ -154,9 +154,10 @@ const styles = theme => ({
   folderRow: {
     backgroundColor: "beige",
     borderRadius: "16",
+    cursor: "pointer",
   },
   fileRow: {
-
+    cursor: "pointer",
   },
   tableHead: {
     textAlign: "left",

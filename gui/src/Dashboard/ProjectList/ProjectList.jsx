@@ -132,34 +132,34 @@ function EnhancedTableHead(props) {
 
     return (
         <TableHead>
-        <TableRow>
-            {headCells.map(headCell => (
-            <TableCell
-                key={headCell.id}
-                align={headCell.numeric ? 'right' : 'left'}
-                padding={headCell.disablePadding ? 'none' : 'default'}
-                sortDirection={orderBy === headCell.id ? order : false}
-            >
-                {headCell.canOrder ? 
-                <TableSortLabel
-                    active={orderBy === headCell.id}
-                    direction={order}
-                    onClick={createSortHandler(headCell.id)}
-                    
+            <TableRow>
+                {headCells.map(headCell => (
+                <TableCell
+                    key={headCell.id}
+                    align={headCell.numeric ? 'right' : 'left'}
+                    padding={headCell.disablePadding ? 'none' : 'default'}
+                    sortDirection={orderBy === headCell.id ? order : false}
                 >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                    <span className={classes.visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                    </span>
-                ) : null}
-                </TableSortLabel>
-                :
-                headCell.label
-                }
-            </TableCell>
-            ))}
-        </TableRow>
+                    {headCell.canOrder ? 
+                    <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={order}
+                        onClick={createSortHandler(headCell.id)}
+                        
+                    >
+                    {headCell.label}
+                    {orderBy === headCell.id ? (
+                        <span className={classes.visuallyHidden}>
+                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </span>
+                    ) : null}
+                    </TableSortLabel>
+                    :
+                    headCell.label
+                    }
+                </TableCell>
+                ))}
+            </TableRow>
         </TableHead>
     );
 }
