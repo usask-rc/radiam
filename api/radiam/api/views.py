@@ -460,7 +460,7 @@ class UserViewSet(RadiamViewSet):
     search_fields = ['username', 'first_name', 'last_name', 'email']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
     ordering_fields = ('username','first_name','last_name', 'email', 'date_created', 'date_updated', 'notes')
-    ordering = ('last_name', 'first_name', 'username', )
+    ordering = ('first_name', 'last_name', 'username', )
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
     # permission_classes = (IsSuperuserOrSelf,)
