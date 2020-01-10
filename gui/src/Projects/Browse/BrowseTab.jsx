@@ -44,9 +44,9 @@ function BrowseTab({ projectID, classes }) {
             path_parent: data.files[0].path_parent, 
             path: data.files[0].path,
             location: data.files[0].location
-           }
+          }
 
-           setListOfRootPaths([folderItem])
+          setListOfRootPaths([folderItem])
           setStatus({loading: false, error: false})
           }
           else{
@@ -86,7 +86,6 @@ function BrowseTab({ projectID, classes }) {
             item={item}
             projectID={projectID}
             key={item.key}
-            classes={classes}
           />
         }
       )

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField } from '@material-ui/core';
 import { Redirect } from 'react-router';
-import * as Constants from "../../_constants/index"
+import {PATHS, MODEL_FIELDS }from "../../_constants/index"
 
 const ProjectSearch = ({ classes, project }) => {
     const [search, setSearch] = useState("")
@@ -18,11 +18,11 @@ const ProjectSearch = ({ classes, project }) => {
         <form onSubmit={handleSearch}>
             <div className={classes.searchArea}>
                 <TextField
-                    id={Constants.paths.SEARCH}
-                    type={Constants.paths.SEARCH}
+                    id={PATHS.SEARCH}
+                    type={PATHS.SEARCH}
                     className={classes.textField}
                     onChange={handleChange}
-                    placeholder= {`${project.nbFiles} ${Constants.model_fields.FILES}`}
+                    placeholder= {`${project.nbFiles} ${MODEL_FIELDS.FILES}`}
                     autoFocus
                 />
             </div>

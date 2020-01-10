@@ -1,7 +1,7 @@
 //UserForm.jsx
 import React, { Component } from 'react';
 import { SimpleForm, TextInput, SelectInput, ReferenceInput, DateInput, SaveButton, Toolbar } from "react-admin";
-import * as Constants from "../_constants/index"
+import {WEBTOKEN, WARNINGS, MODEL_FIELDS, MODELS, METHODS, MODEL_FK_FIELDS } from "../_constants/index";
 import { getAPIEndpoint } from '../_tools';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { toast } from 'react-toastify';
@@ -33,14 +33,14 @@ class UserForm extends Component {
         this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
-        const token = localStorage.getItem(Constants.WEBTOKEN);
+        const token = localStorage.getItem(WEBTOKEN);
 
         if (token) {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);
         } else {
             toastErrors(
-                Constants.warnings.NO_AUTH_TOKEN
+                WARNINGS.NO_AUTH_TOKEN
             );
             this.setState({redirect: true})
         }
@@ -49,12 +49,12 @@ class UserForm extends Component {
 
 
         if (date_expires) {
-            date_expires = translateDates(date_expires, Constants.model_fields.DATE_EXPIRES);
+            date_expires = translateDates(date_expires, MODEL_FIELDS.DATE_EXPIRES);
         }
 
         const request = new Request(
-            `${getAPIEndpoint()}/${Constants.models.USERS}/`, {
-                method: Constants.methods.POST,
+            `${getAPIEndpoint()}/${MODELS.USERS}/`, {
+                method: METHODS.POST,
                 body: JSON.stringify({ ...this.state }),
                 headers: headers
             }
@@ -74,7 +74,7 @@ class UserForm extends Component {
                 if (data.id) {
                     //create a groupmember with these details
                     const groupMemberRequest = new Request(getAPIEndpoint() + "/groupmembers/", {
-                        method: Constants.methods.POST,
+                        method: METHODS.POST,
                         body: JSON.stringify({ ...this.state, date_expires: date_expires, user: data.id }),
                         headers: headers
                     })
@@ -88,7 +88,7 @@ class UserForm extends Component {
                             throw new Error(response.statusText);
                         })
                             .then(data => {
-                                history.push(`/${Constants.models.USERS}`);
+                                history.push(`/${MODELS.USERS}`);
                             })
                             .catch(err => {
                                 toastErrors(err)
@@ -97,11 +97,11 @@ class UserForm extends Component {
                     }
                     else if (group_role || group) {
                         toastErrors("Due to incomplete form, User: ", username, " was created without a Group.");
-                        history.push(`/${Constants.models.USERS}`);
+                        history.push(`/${MODELS.USERS}`);
                     }
                     else {
                         toast.success("User: " + username + " was successfully created.")
-                        history.push(`/${Constants.models.USERS}`);
+                        history.push(`/${MODELS.USERS}`);
                     }
 
                 }
@@ -159,73 +159,73 @@ class UserForm extends Component {
 
     render() {
         const { group, group_role, redirect, isFormDirty} = this.state
-        return (<React.Fragment>
+        return (<>
             <SimpleForm
                 onSubmit={this.handleSubmit}
-                resource={Constants.models.USERS}
+                resource={MODELS.USERS}
                 toolbar={null}
                 asyncValidate={asyncValidate}
-                asyncBlurFields={[Constants.model_fields.USERNAME]}>
+                asyncBlurFields={[MODEL_FIELDS.USERNAME]}>
                 <UserTitle prefix={"Creating User"} />
 
                 <TextInput
                     label={"en.models.users.username"}
-                    source={Constants.model_fields.USERNAME}
+                    source={MODEL_FIELDS.USERNAME}
                     onChange={this.handleChange}
                     validate={validateUsername}
                 />
                 <TextInput
                     label={"en.models.users.fname"}
-                    source={Constants.model_fields.FIRST_NAME}
+                    source={MODEL_FIELDS.FIRST_NAME}
                     onChange={this.handleChange}
                 />
                 <TextInput
                     label={"en.models.users.lname"}
-                    source={Constants.model_fields.LAST_NAME}
+                    source={MODEL_FIELDS.LAST_NAME}
                     onChange={this.handleChange}
                 />
                 <TextInput
-                    type={Constants.model_fields.EMAIL}
+                    type={MODEL_FIELDS.EMAIL}
                     label={"en.models.users.email"}
-                    source={Constants.model_fields.EMAIL}
+                    source={MODEL_FIELDS.EMAIL}
                     onChange={this.handleChange}
                     validate={validateEmail}
                 />
                 <TextInput
                     label={"en.models.users.notes"}
-                    source={Constants.model_fields.NOTES}
+                    source={MODEL_FIELDS.NOTES}
                     onChange={this.handleChange}
                 />
                 <TextInput
                     label={"en.models.users.user_orcid_id"}
-                    source={Constants.model_fields.ORCID_ID}
+                    source={MODEL_FIELDS.ORCID_ID}
                     onChange={this.handleChange}
                     validate={validateOrcid}
                 />
                 <ReferenceInput
                     label={"en.models.groupmembers.group"}
-                    source={Constants.model_fk_fields.GROUP}
-                    reference={Constants.models.GROUPS}
+                    source={MODEL_FK_FIELDS.GROUP}
+                    reference={MODELS.GROUPS}
                     onChange={this.handleSelectChange}
                     defaultValue={group}
                     required
                 >
                     <SelectInput
                         validate={group_role ? validateGroup : null}
-                        optionText={Constants.model_fields.NAME}
+                        optionText={MODEL_FIELDS.NAME}
                     />
                 </ReferenceInput>
                 <ReferenceInput
                     label={"en.models.groupmembers.role"}
-                    source={Constants.model_fk_fields.GROUP_ROLE}
-                    reference={Constants.models.ROLES}
-                    resource={Constants.models.ROLES}
+                    source={MODEL_FK_FIELDS.GROUP_ROLE}
+                    reference={MODELS.ROLES}
+                    resource={MODELS.ROLES}
                     onChange={this.handleSelectChange}
                     required
                 >
                     <TranslationSelect
                         validate={group ? validateRole : null}
-                        optionText={Constants.model_fields.LABEL}
+                        optionText={MODEL_FIELDS.LABEL}
                     />
                 </ReferenceInput>
                 <DateInput
@@ -237,7 +237,7 @@ class UserForm extends Component {
                         day: "numeric"
                     }}
                     defaultValue={""}
-                    source={Constants.model_fields.DATE_EXPIRES}
+                    source={MODEL_FIELDS.DATE_EXPIRES}
                     onChange={this.handleSelectChange}
                 />
             </SimpleForm>
@@ -246,9 +246,9 @@ class UserForm extends Component {
                     onClick={this.handleSubmit}
                 />
             </Toolbar>
-            <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
             {redirect && <Redirect to="/login"/>}
-        </React.Fragment>
+        </>
         );
     }
 }
@@ -256,6 +256,6 @@ class UserForm extends Component {
 /**
  * Check with the API whether a Group Name has already been used.
  */
-const asyncValidate = getAsyncValidateNotExists({ id: Constants.model_fields.ID,  name: Constants.model_fields.USERNAME, reject: "There is already a user with this username. Please pick another username." }, Constants.models.USERS);
+const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID,  name: MODEL_FIELDS.USERNAME, reject: "There is already a user with this username. Please pick another username." }, MODELS.USERS);
 
 export default UserForm;

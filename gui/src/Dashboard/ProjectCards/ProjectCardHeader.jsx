@@ -2,7 +2,7 @@ import React from 'react';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
 import { Link, Typography } from '@material-ui/core';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
-import * as Constants from "../../_constants/index"
+import {MODELS, MODEL_FIELDS} from "../../_constants/index"
 
 
 const ProjectCardHeader = ({ classes, project }) =>
@@ -10,16 +10,16 @@ const ProjectCardHeader = ({ classes, project }) =>
         <div className={classes.headerDiv}>
             <ReferenceField
                 record={project}
-                basePath={Constants.models.PROJECTS}
+                basePath={MODELS.PROJECTS}
                 linkType={false}
-                source={Constants.model_fields.AVATAR}
-                reference={Constants.models.PROJECTAVATARS}
+                source={MODEL_FIELDS.AVATAR}
+                reference={MODELS.PROJECTAVATARS}
                 allowEmpty
             >
 
                 <ImageField
                     classes={{ image: classes.image }}
-                    source={Constants.model_fields.AVATAR_IMAGE}
+                    source={MODEL_FIELDS.AVATAR_IMAGE}
                 />
 
             </ReferenceField>

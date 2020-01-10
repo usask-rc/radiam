@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 
 import { compose } from 'recompose';
-import * as Constants from '../_constants/index';
+import {LOCATIONTYPE_OSF, MODELS, MODEL_FIELDS, MODEL_FK_FIELDS, WARNINGS} from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
 import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
@@ -77,7 +77,7 @@ class LocationForm extends Component {
   handleSubmit = (data) => {
     const { geo } = this.state    
     this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, geo, this.props, data.location_type === Constants.LOCATIONTYPE_OSF ? `/${Constants.models.AGENTS}/create` : `/${Constants.models.LOCATIONS}`);
+        submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`);
     })
     
   };
@@ -177,30 +177,30 @@ class LocationForm extends Component {
             <Grid item xs={12}>
               <TextInput
                 label={'en.models.locations.display_name'}
-                source={Constants.model_fields.DISPLAY_NAME}
+                source={MODEL_FIELDS.DISPLAY_NAME}
               />
             </Grid>
             <Grid item xs={12}>
               <TextInput
                 label={'en.models.locations.host_name'}
-                source={Constants.model_fields.HOST_NAME}
+                source={MODEL_FIELDS.HOST_NAME}
                 validate={validateHostname}
-                defaultValue={formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF ? "osf.io" : ""}
+                defaultValue={formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF ? "osf.io" : ""}
               />
             </Grid>
             <Grid item xs={12}>
               <ReferenceInput
                 label={'en.models.locations.type'}
-                resource={Constants.models.LOCATIONTYPES}
-                source={Constants.model_fk_fields.LOCATION_TYPE}
-                reference={Constants.models.LOCATIONTYPES}
+                resource={MODELS.LOCATIONTYPES}
+                source={MODEL_FK_FIELDS.LOCATION_TYPE}
+                reference={MODELS.LOCATIONTYPES}
                 validate={validateLocationType}
-                defaultValue={Constants.LOCATIONTYPE_OSF}
+                defaultValue={LOCATIONTYPE_OSF}
               >
-                <TranslationSelect optionText={Constants.model_fields.LABEL} />
+                <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
               </ReferenceInput>
             </Grid>
-            <React.Fragment>
+            <>
               <Grid item xs={12}>
                 <TextInput
                   label={'en.models.locations.globus_endpoint'}
@@ -214,8 +214,8 @@ class LocationForm extends Component {
                   source="globus_path"
                 />
               </Grid>
-            </React.Fragment>
-            {formData && formData.location_type && formData.location_type === Constants.LOCATIONTYPE_OSF &&
+            </>
+            {formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF &&
               <Grid item xs={12}>
                 <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
               </Grid>
@@ -227,12 +227,12 @@ class LocationForm extends Component {
               />
             </Grid>
             <Grid item xs={12}>
-              <LongTextInput label={'en.models.locations.notes'} source={Constants.model_fields.NOTES} />
+              <LongTextInput label={'en.models.locations.notes'} source={MODEL_FIELDS.NOTES} />
             </Grid>
 
             <Grid item xs={12} key={mapFormKey}>
               <MapForm
-                content_type={Constants.model_fk_fields.LOCATION}
+                content_type={MODEL_FK_FIELDS.LOCATION}
                 recordGeo={geo}
                 id={id}
                 geoDataCallback={this.geoDataCallback}
@@ -245,7 +245,7 @@ class LocationForm extends Component {
       }
       </FormDataConsumer>
 
-        <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+        <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
       </SimpleForm>
     );
   }

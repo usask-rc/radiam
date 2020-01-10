@@ -9,7 +9,7 @@ import { getAPIEndpoint } from "../_tools";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../_constants/index";
+import {METHODS, LOGIN_DETAILS, FIELDS} from "../_constants/index";
 import { toastErrors } from "../_tools/funcs";
 import { required } from "ra-core";
 
@@ -116,7 +116,7 @@ class ResetPassword extends Component {
       const request = new Request(
         getAPIEndpoint() + "/password_reset/confirm/",
         {
-          method: Constants.methods.POST,
+          method: METHODS.POST,
           body: JSON.stringify({ token, password }),
           headers: new Headers({ "Content-Type": "application/json" })
         }
@@ -165,7 +165,7 @@ class ResetPassword extends Component {
       <div className={classes.main}>
         {!completed ? (
           <Card className={classes.card}>
-            <React.Fragment>
+            <>
               <form onSubmit={this.updatePassword}>
                 <div className={classes.form}>
                   <div className={classes.avatar}>
@@ -175,23 +175,23 @@ class ResetPassword extends Component {
                   </div>
                   <div className={classes.input}>
                     <TextField
-                      id={Constants.login_details.PASSWORD}
+                      id={LOGIN_DETAILS.PASSWORD}
                       label={"Password"}
-                      onChange={this.handleChange(Constants.login_details.PASSWORD)}
+                      onChange={this.handleChange(LOGIN_DETAILS.PASSWORD)}
                       value={password}
                       fullWidth
-                      type={Constants.fields.PASSWORD}
+                      type={FIELDS.PASSWORD}
                       validate={validatePassword}
                     />
                   </div>
                   <div className={classes.input}>
                     <TextField
-                      id={Constants.login_details.PASSWORD_CONFIRM}
+                      id={LOGIN_DETAILS.PASSWORD_CONFIRM}
                       label={"Confirm Password"}
-                      onChange={this.handleChange(Constants.login_details.PASSWORD_CONFIRM)}
+                      onChange={this.handleChange(LOGIN_DETAILS.PASSWORD_CONFIRM)}
                       value={confirmPassword}
                       fullWidth
-                      type={Constants.fields.PASSWORD}
+                      type={FIELDS.PASSWORD}
                       validate={validateConfirmPassword}
                     />
                   </div>
@@ -199,7 +199,7 @@ class ResetPassword extends Component {
                 <CardActions className={classes.actions}>
                   <Button
                     variant="outlined"
-                    type={Constants.fields.SUBMIT}
+                    type={FIELDS.SUBMIT}
                     color="primary"
                     fullWidth
                   >
@@ -207,10 +207,10 @@ class ResetPassword extends Component {
                   </Button>
                 </CardActions>
               </form>
-            </React.Fragment>
+            </>
           </Card>
         ) : (
-            <React.Fragment>
+            <>
               <Link to="/login">
                 <Button
                   className={classes.button}
@@ -222,7 +222,7 @@ class ResetPassword extends Component {
                   Return to Login
               </Button>
               </Link>
-            </React.Fragment>
+            </>
           )}
         <ToastContainer />
       </div>

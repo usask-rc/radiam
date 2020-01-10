@@ -3,32 +3,32 @@ import { translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
 import compose from 'recompose/compose';
 import { TextField } from "@material-ui/core";
-import * as Constants from "../../_constants/index"
+import {PASSWORD_CHANGE, FIELDS} from "../../_constants/index"
 
 const styles = {
     label: { width: '10em', display: 'inline-block' },
     button: { margin: '1em' },
 };
 const NewPassword = ({ classes, handleChange }) => (
-    <React.Fragment>
+    <>
         <div className={classes.input}>
             <TextField
-                id={Constants.password_change.PASSWORD_NEW}
-                name={Constants.password_change.PASSWORD_NEW}
+                id={PASSWORD_CHANGE.PASSWORD_NEW}
+                name={PASSWORD_CHANGE.PASSWORD_NEW}
                 label={"New Password"}
                 onChange={handleChange}
-                type={Constants.fields.PASSWORD} />
+                type={FIELDS.PASSWORD} />
         </div>
 
         <div className={classes.input}>
             <TextField
-                id={Constants.password_change.PASSWORD_CONFIRM}
-                name={Constants.password_change.PASSWORD_CONFIRM}
+                id={PASSWORD_CHANGE.PASSWORD_CONFIRM}
+                name={PASSWORD_CHANGE.PASSWORD_CONFIRM}
                 label={"Confirm New Password"}
                 onChange={handleChange}
-                type={Constants.fields.PASSWORD} />
+                type={FIELDS.PASSWORD} />
         </div>
-    </React.Fragment>)
+    </>)
 
 const enhance = compose(
     translate,

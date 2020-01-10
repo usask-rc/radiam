@@ -3,12 +3,12 @@ import get from 'lodash/get';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from "@material-ui/core/styles";
 import { FieldProps, InjectedFieldProps, ReferenceField, } from "react-admin";
-import * as Constants from "../../_constants/index";
+import {MODEL_FIELDS, MODELS, AVATAR_HEIGHT} from "../../_constants/index";
 
 
 const styles = {
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`
+    height: `${AVATAR_HEIGHT}`
   },
   imageContainer: {
     float: "left",
@@ -42,11 +42,11 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
         basePath={basePath}
         linkType={false}
         record={record}
-        source={Constants.model_fields.AVATAR}
-        reference={Constants.models.PROJECTAVATARS}
+        source={MODEL_FIELDS.AVATAR}
+        reference={MODELS.PROJECTAVATARS}
         allowEmpty
       >
-        <ShowImage classes={classes} source={Constants.model_fields.AVATAR_IMAGE} record={record} />
+        <ShowImage classes={classes} source={MODEL_FIELDS.AVATAR_IMAGE} record={record} />
       </ReferenceField>
     </div>
     <div className={classes.nameContainer}>
@@ -63,7 +63,7 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
 
 ProjectName.defaultProps = {
   addLabel: true,
-  sortBy: Constants.model_fields.NAME,
+  sortBy: MODEL_FIELDS.NAME,
 };
 
 export default ProjectName;

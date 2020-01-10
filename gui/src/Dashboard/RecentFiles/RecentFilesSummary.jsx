@@ -12,7 +12,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { translate } from 'react-admin';
 import compose from 'recompose/compose';
 import FileList from '../../_components/files/FileList';
-import * as Constants from '../../_constants/index';
+import {AVATAR_HEIGHT, MODEL_FIELDS} from '../../_constants/index';
 import FileSummaryNameDisplay from './FileSummaryNameDisplay';
 import FileSummaryButton from './FileSummaryButton';
 
@@ -28,7 +28,7 @@ const styles = theme => ({
     transform: 'rotate(180deg)',
   },
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`,
+    height: `${AVATAR_HEIGHT}`,
     margin: '-6px 6px 0px 0px',
     float: 'left',
   },
@@ -57,7 +57,7 @@ class RecentFilesSummary extends React.Component {
     const { id, files, classes } = this.props;
     const { redirect } = this.state
     return (
-      <React.Fragment>
+      <>
         {files && files.length > 0 && (
           <Card>
             <CardContent>
@@ -81,11 +81,11 @@ class RecentFilesSummary extends React.Component {
           <Redirect
             to={{
               pathname: `/projects/${id}/show/files`,
-              state: { sortType: Constants.model_fields.INDEXED_DATE },
+              state: { sortType: MODEL_FIELDS.INDEXED_DATE },
             }}
           />
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

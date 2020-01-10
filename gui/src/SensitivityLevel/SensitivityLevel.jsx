@@ -10,7 +10,7 @@ import {
   SimpleForm,
   TextInput
 } from "react-admin";
-import * as Constants from "../_constants/index";
+import {MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import TranslationField from "../_components/_fields/TranslationField";
 import CustomPagination from "../_components/CustomPagination";
 
@@ -19,10 +19,10 @@ export const SensitivityLevelList = props => (
     pagination={<CustomPagination />}
     bulkActionButtons={false}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <TranslationField
         label={"en.models.sensitivity_level.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
       />
     </Datagrid>
   </List>
@@ -33,7 +33,7 @@ export const SensitivityLevelShow = props => (
     <SimpleShowLayout>
       <TranslationField
         label={"en.models.sensitivity_level.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
       />
     </SimpleShowLayout>
   </Show>
@@ -43,10 +43,10 @@ const validateLabel = required('en.validate.sensitivitylevel.label');
 
 export const SensitivityLevelCreate = props => (
   <Create {...props}>
-    <SimpleForm redirect={Constants.resource_operations.LIST}>
+    <SimpleForm redirect={RESOURCE_OPERATIONS.LIST}>
       <TextInput
         label={"en.models.sensitivity_level.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
         validate={validateLabel}
       />
     </SimpleForm>
@@ -59,10 +59,10 @@ export const SensitivityLevelTitle = ({ record }) => {
 
 export const SensitivityLevelEdit = props => (
   <Edit title={<SensitivityLevelTitle />} {...props}>
-    <SimpleForm redirect={Constants.resource_operations.LIST}>
+    <SimpleForm redirect={RESOURCE_OPERATIONS.LIST}>
       <TextInput
         label={"en.models.sensitivity_level.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
         validate={validateLabel}
       />
     </SimpleForm>

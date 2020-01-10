@@ -25,7 +25,7 @@ import {
 import { Field } from 'redux-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
-import * as Constants from "../_constants/index";
+import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
 import FilesTab from "./Files/FilesTab";
 import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
@@ -37,7 +37,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets } from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets, getPrimaryContactCandidates } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -53,7 +53,7 @@ const styles = {
     backgroundColor: 'inherit',
   },
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`,
+    height: `${AVATAR_HEIGHT}`,
   },
   root: {
     backgroundColor: 'inherit',
@@ -83,11 +83,11 @@ const ProjectFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     />
     <ReferenceInput
       label={'en.models.projects.group'}
-      source={Constants.model_fk_fields.GROUP}
-      reference={Constants.models.GROUPS}
+      source={MODEL_FK_FIELDS.GROUP}
+      reference={MODELS.GROUPS}
       alwaysOn
     >
-      <SelectInput optionText={Constants.model_fields.NAME} />
+      <SelectInput optionText={MODEL_FIELDS.NAME} />
     </ReferenceInput>
   </Filter>
 ));
@@ -102,18 +102,18 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     }}
     exporter={false}
     filters={<ProjectFilter />}
-    sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
+    sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ProjectName label={'en.models.projects.name'} />
       <ReferenceField
         linkType={false}
         label={'en.models.projects.primary_contact_user'}
-        source={Constants.model_fields.PRIMARY_CONTACT_USER}
-        reference={Constants.models.USERS}
+        source={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+        reference={MODELS.USERS}
         allowEmpty
       >
         <UserShow />
@@ -121,14 +121,14 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
       <ReferenceField
         linkType={false}
         label={'en.models.projects.group'}
-        source={Constants.model_fk_fields.GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.GROUP}
+        reference={MODELS.GROUPS}
       >
-        <TextField source={Constants.model_fields.NAME} />
+        <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <TextField
         label={'en.models.projects.keywords'}
-        source={Constants.model_fields.KEYWORDS}
+        source={MODEL_FIELDS.KEYWORDS}
       />
     </Datagrid>
   </List>
@@ -143,8 +143,8 @@ const actionStyles = theme => ({
 
 const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEditModal, classes}) => 
 {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
-  const [showEdit, setShowEdit] = useState(user.is_admin)
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
+  const [showEdit, setShowEdit] = useState(user ? user.is_admin : false)
 
   useEffect(() => {
     console.log("data in useeffect projectshowactions: ", data)
@@ -198,7 +198,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
       return function cleanup() {
         _isMounted = false;
       }
-    }, [createModal, viewModal])
+    }, [createModal, editModal, viewModal])
 
     if (permissions){
       return (<Show actions={<ProjectShowActions setCanEditModal={setCanEditModal}/>}  {...props} >
@@ -208,28 +208,28 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <ProjectName label={'en.models.projects.name'} />
             <TextField
               label={'en.models.projects.keywords'}
-              source={Constants.model_fields.KEYWORDS}
+              source={MODEL_FIELDS.KEYWORDS}
             />
             <ReferenceField
               label={'en.models.projects.primary_contact_user'}
-              source={Constants.model_fields.PRIMARY_CONTACT_USER}
-              reference={Constants.models.USERS}
+              source={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+              reference={MODELS.USERS}
             >
               <UserShow />
             </ReferenceField>
             <ReferenceField
               label={'en.models.projects.group'}
-              source={Constants.model_fields.GROUP}
-              reference={Constants.models.GROUPS}
+              source={MODEL_FIELDS.GROUP}
+              reference={MODELS.GROUPS}
             >
-              <TextField source={Constants.model_fields.NAME} />
+              <TextField source={MODEL_FIELDS.NAME} />
             </ReferenceField>
             {/** Needs a ShowController to get the record into the ShowMetadata **/}
             <ShowController translate={translate} {...props}>
               { controllerProps => (
-                <React.Fragment>
+                <>
                   <ShowMetadata
-                    type={Constants.model_fk_fields.PROJECT}
+                    type={MODEL_FK_FIELDS.PROJECT}
                     translate={translate}
                     record={controllerProps.record}
                     basePath={controllerProps.basePath}
@@ -261,13 +261,13 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                     </DialogContent>
                   </Dialog>}
                   
-                </React.Fragment>
+                </>
 
               )}
             </ShowController>
             <MapView/>
           </Tab>
-          <Tab label={Constants.model_fields.FILES} path={Constants.model_fields.FILES}>
+          <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>
             <ProjectName label={'en.models.projects.name'} />
             <FilesTab projectID={props.id} />
           </Tab>
@@ -287,16 +287,16 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
 
 const renderUserInput = ({ input, users }) => {
-  return (<React.Fragment>
-    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
-    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+  return (<>
+    <InputLabel htmlFor={MODEL_FIELDS.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
       {...input}
     >
       {users && [...users].map(user => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
       })}
     </Select>
-  </React.Fragment>)
+  </>)
 }
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
@@ -350,55 +350,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
     else{
       //now get a list of users in each group
-      setGroupContactList([])
-      getPrimaryContactCandidates()
+      getPrimaryContactCandidates(groupList).then(data => setGroupContactList(data))
     }
   };
-
-  const getPrimaryContactCandidates = () => {
-    if (groupList){
-      let iteratedGroups = []
-      let groupContactCandidates = {} //using a dict to prevent duplicates
-
-      groupList.map(group => {
-
-        console.log("getting contacts from group: ", group)
-        getUsersInGroup(group).then(data => {
-        
-          data.map(item => {
-            groupContactCandidates[item.id] = item
-            return item;
-          })
-
-          iteratedGroups.push(group)
-
-          if (iteratedGroups.length === groupList.length){
-            let groupContactList = []
-            Object.keys(groupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-              return key
-            })
-
-            if (groupContactList.length > 0)
-            {
-              setGroupContactList(groupContactList)
-              setStatus({error: false, loading: false})
-            }
-            else{
-                setGroupContactList([])
-                setStatus({error: false, loading: false})
-                //TODO: block form submission if we don't have a PCU.
-            }
-          }
-        }).catch(err => 
-          setStatus({error: err, loading: false}))
-          
-        return group
-        })
-    }else{
-      console.error("no group selected from which to provide candidate contacts")
-    }
-  }
 
   if (record && isAdminOfAParentGroup(record.group)) {
     if (projectGroup === null){
@@ -410,32 +364,34 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
         <TextInput
           className="input-small"
           label={"en.models.projects.name"}
-          source={Constants.model_fields.NAME}
+          source={MODEL_FIELDS.NAME}
           validate={validateName} />
       </div>
         <ReferenceInput
-          resource={Constants.models.PROJECTAVATARS}
+          resource={MODELS.PROJECTAVATARS}
           className="input-small"
-          label={Constants.model_fields.AVATAR} 
-          source={Constants.model_fields.AVATAR}  reference={Constants.models.PROJECTAVATARS}>
-            <SelectInput source={Constants.model_fields.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={Constants.model_fields.AVATAR_IMAGE} />}/>
+          perPage={1000}
+
+          label={MODEL_FIELDS.AVATAR} 
+          source={MODEL_FIELDS.AVATAR}  reference={MODELS.PROJECTAVATARS}>
+            <SelectInput source={MODEL_FIELDS.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}/>
         </ReferenceInput>
       <div>
         <TextInput
           className="input-small"
           label={"en.models.projects.keywords"}
-          source={Constants.model_fields.KEYWORDS} />
+          source={MODEL_FIELDS.KEYWORDS} />
       </div>
       <div>
         <ReferenceInput
           resource="researchgroups"
           className="input-small"
           label={"en.models.projects.group"}
-          source={Constants.model_fields.GROUP}
-          reference={Constants.models.GROUPS}
+          source={MODEL_FIELDS.GROUP}
+          reference={MODELS.GROUPS}
           onChange={handleSelectChange}
           validate={validateGroup}>
-          <SelectInput optionText={Constants.model_fields.NAME} />
+          <SelectInput optionText={MODEL_FIELDS.NAME} />
         </ReferenceInput>
         { groupContactList.length > 0 ?
           (<div>
@@ -445,7 +401,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
               placeholder={`Primary Contact`}
               validate={validatePrimaryContactUser}
               className="input-small"
-              users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+              users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
               />
           </div>)
           :
@@ -465,8 +421,8 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
         }
         { record.id && (
           <div>
-            <EditMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
-            <ConfigMetadata id={record.id} type={Constants.model_fk_fields.PROJECT}/>
+            <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
+            <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
           </div>
         )}
 
@@ -493,6 +449,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   }
 });
 
+//TODO: geojson object does not properly update afterwards.
+//it doesn't send in the appropriate geojson in the PUT - it either doesn't get it from the map, or it doesnt send it properly in the update function.
+//this functionality works in DATASETS but not here.  The data never gets sent to the API, so it must never be scalped from the map.
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
     <Create submitOnEnter={false} {...props}>
@@ -513,7 +472,7 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return (<Edit actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={Constants.resource_operations.LIST} submitOnEnter={false}>
+      <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}>
         <ProjectTitle prefix={`Updating`} />
         <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>

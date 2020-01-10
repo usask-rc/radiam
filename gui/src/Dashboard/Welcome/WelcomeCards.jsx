@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import AgentInstall from './AgentInstall';
 import Welcome from './Welcome';
 import { Grid } from '@material-ui/core';
-import * as Constants from "../../_constants/index"
-import {  getUsersInGroup, getMaxUserRole, getGroupData } from '../../_tools/funcs';
+import {ROLE_USER} from "../../_constants/index"
+import { getUsersInGroup, getMaxUserRole, getGroupData } from '../../_tools/funcs';
 import SecondSteps from './SecondSteps';
 import FewUsers from './FewUsers';
 
 
 const WelcomeCards = ({loading, hasFiles}) => {
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+    const user = JSON.parse(localStorage.getItem(ROLE_USER));
     let _isMounted = false
     const [userManagedGroups, setUserManagedGroups] = useState([])
 
@@ -23,7 +23,9 @@ const WelcomeCards = ({loading, hasFiles}) => {
 
     //TODO: protect against leaks using ismounted
     const getAssociatedUsers = (managedGroups) => {
+        
 
+        console.log("getassociatedusers managedgroups list: ", managedGroups)
         let managedGroupsList = []
 
         //first, get this group data by making a call to /researchgroups/{id}/
@@ -60,12 +62,20 @@ const WelcomeCards = ({loading, hasFiles}) => {
                 //do not query for groups
             }
             else{
-                const managedGroups = [...user.groupAdminships, ...user.dataManagerships] 
-                if (_isMounted){
-                    getAssociatedUsers(managedGroups)
+                //TODO: error: attempt to spread noniterable instance
+                let managedGroups = []
+                if (user.groupAdminships){
+                    managedGroups = [...user.groupAdminships]
                 }
+                if (user.dataManagerships){
+                    managedGroups = [...managedGroups, ...user.dataManagerships]
+                }
+                    if (_isMounted && managedGroups.length > 0){
+                        getAssociatedUsers(managedGroups)
+                    }
             }
         }
+        
         else{
             //punt to front page - no user cookie available
             console.error("No User Cookie Detected - Returning to front page")

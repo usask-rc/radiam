@@ -1,7 +1,7 @@
 //UserEditForm.jsx
 import React, { Component } from 'react';
 import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
-import * as Constants from "../_constants/index"
+import {WEBTOKEN, WARNINGS, MODELS, METHODS, MODEL_FIELDS} from "../_constants/index";
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { email, maxLength, minLength, required, FormDataConsumer, regex } from 'ra-core';
@@ -19,8 +19,6 @@ const validateLastName = [required('en.validate.user.lastname')]
 const validateEmail = [required('en.validate.user.email'), email()];
 const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid orcid, pattern is ####-####-####-####")]
 
-
-
 class UserEditForm extends Component {
     constructor(props) {
         super(props);
@@ -31,7 +29,7 @@ class UserEditForm extends Component {
 
     componentDidMount() {
         const { record } = this.props
-
+        console.log("usereditform cdm state: ", this.state)
         getUserGroups(record).then(data => {
             console.log("user groups are: ", data)
             this.setState({groupMembers: data})
@@ -43,21 +41,20 @@ class UserEditForm extends Component {
         const { history } = this.props
         const { id, username, email } = this.state
         let headers = new Headers({ "Content-Type": "application/json" });
-        const token = localStorage.getItem(Constants.WEBTOKEN);
-
+        const token = localStorage.getItem(WEBTOKEN);
         if (token) {
             const parsedToken = JSON.parse(token);
             headers.set("Authorization", `Bearer ${parsedToken.access}`);
         } else {
             toastErrors(
-                Constants.warnings.NO_AUTH_TOKEN
+                WARNINGS.NO_AUTH_TOKEN
             );
             this.setState({redirect: true})
         }
 
         const request = new Request(
-            getAPIEndpoint() + `/${Constants.models.USERS}/${id}/`, {
-                method: Constants.methods.PUT,
+            getAPIEndpoint() + `/${MODELS.USERS}/${id}/`, {
+                method: METHODS.PUT,
                 body: JSON.stringify({ ...this.state }),
                 headers: headers
             }
@@ -74,7 +71,7 @@ class UserEditForm extends Component {
                 console.log("data on return : ", data)
                 toast.success("User Successfully Updated")
                 if (history){
-                    history.push(`/${Constants.models.USERS}`)
+                    history.push(`/${MODELS.USERS}`)
                 }
                 else{
                     //accessing from a modal, we don't care about redirection.
@@ -114,12 +111,12 @@ class UserEditForm extends Component {
     render() {
         const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
         const {setViewModal} = this.props
-        return (<React.Fragment>
+        return (<>
             <SimpleForm
                 save={this.handleSubmit}
-                resource={Constants.models.USERS}
+                resource={MODELS.USERS}
                 asyncValidate={asyncValidate}
-                asyncBlurFields={[Constants.model_fields.USERNAME]} >
+                asyncBlurFields={[MODEL_FIELDS.USERNAME]} >
                 
                 <FormDataConsumer>
                     {({formData }) => 
@@ -131,7 +128,7 @@ class UserEditForm extends Component {
                 {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
                 <TextInput
                     label={"en.models.users.username"}
-                    source={Constants.model_fields.USERNAME}
+                    source={MODEL_FIELDS.USERNAME}
                     onChange={this.handleChange}
                     validate={validateUsername}
                     defaultValue={username}
@@ -139,42 +136,42 @@ class UserEditForm extends Component {
                 />
                 <TextInput
                     label={"en.models.users.fname"}
-                    source={Constants.model_fields.FIRST_NAME}
+                    source={MODEL_FIELDS.FIRST_NAME}
                     onChange={this.handleChange}
                     validate={validateFirstName}
                     defaultValue={first_name}
                 />
                 <TextInput
                     label={"en.models.users.lname"}
-                    source={Constants.model_fields.LAST_NAME}
+                    source={MODEL_FIELDS.LAST_NAME}
                     onChange={this.handleChange}
                     validate={validateLastName}
                     defaultValue={last_name}
                 />
                 <TextInput
-                    type={Constants.model_fields.EMAIL}
+                    type={MODEL_FIELDS.EMAIL}
                     label={"en.models.users.email"}
-                    source={Constants.model_fields.EMAIL}
+                    source={MODEL_FIELDS.EMAIL}
                     onChange={this.handleChange}
                     validate={validateEmail}
                     defaultValue={email}
                 />
                 <TextInput
                     label={"en.models.users.notes"}
-                    source={Constants.model_fields.NOTES}
+                    source={MODEL_FIELDS.NOTES}
                     onChange={this.handleChange}
                     defaultValue={notes}
                 />
                 <TextInput
                     label={"en.models.users.user_orcid_id"}
-                    source={Constants.model_fields.ORCID_ID}
+                    source={MODEL_FIELDS.ORCID_ID}
                     onChange={this.handleChange}
                     defaultValue={user_orcid_id}
                     validate={validateOrcid}
                 />
                 <BooleanInput
                     label={"en.models.generic.active"}
-                    source={Constants.model_fields.ACTIVE}
+                    source={MODEL_FIELDS.ACTIVE}
                     defaultValue={is_active}
                     onChange={this.handleSelectChange}
                 />
@@ -187,9 +184,9 @@ class UserEditForm extends Component {
                 }
             </SimpleForm>
             
-            <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+            <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
             {redirect && <Redirect to="/login"/>}
-        </React.Fragment>
+        </>
         );
     }
 }
@@ -197,5 +194,5 @@ class UserEditForm extends Component {
 /**
  * Check with the API whether a Group Name has already been used.
  */
-const asyncValidate = getAsyncValidateNotExists({ id: Constants.model_fields.ID,  name: Constants.model_fields.USERNAME, reject: "There is already a user with this username. Please pick another username." }, Constants.models.USERS);
+const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID,  name: MODEL_FIELDS.USERNAME, reject: "There is already a user with this username. Please pick another username." }, MODELS.USERS);
 export default UserEditForm;

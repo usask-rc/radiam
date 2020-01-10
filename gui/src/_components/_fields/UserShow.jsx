@@ -3,13 +3,14 @@ import React, { SFC } from "react";
 import get from 'lodash/get';
 import Typography from '@material-ui/core/Typography';
 import { FieldProps, InjectedFieldProps, fieldPropTypes } from "react-admin";
-import * as Constants from "../../_constants/index";
+import {MODEL_FIELDS, AVATAR_HEIGHT} from "../../_constants/index";
+
 import { withStyles } from "@material-ui/core/styles";
 import UserAvatar from "react-user-avatar"
 
 const styles = {
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`
+    height: `${AVATAR_HEIGHT}`
   },
   imageContainer: {
     float: "left",
@@ -38,9 +39,9 @@ export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = w
   record = {},
   ...rest
 }) => {
-  const first = get(record, Constants.model_fields.FIRST_NAME);
-  const last = get(record, Constants.model_fields.LAST_NAME);
-  const username = get(record, Constants.model_fields.USERNAME);
+  const first = get(record, MODEL_FIELDS.FIRST_NAME);
+  const last = get(record, MODEL_FIELDS.LAST_NAME);
+  const username = get(record, MODEL_FIELDS.USERNAME);
 
   if (first && last) {
     return (
@@ -75,7 +76,7 @@ export const UserShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = w
 
 UserShow.defaultProps = {
   addLabel: true,
-  sortBy: Constants.model_fields.USERNAME,
+  sortBy: MODEL_FIELDS.USERNAME,
 };
 
 
@@ -83,7 +84,7 @@ const EnhancedUserShow = withStyles(styles)(UserShow);
 
 EnhancedUserShow.defaultProps = {
   addLabel: true,
-  sortBy: Constants.model_fields.USERNAME,
+  sortBy: MODEL_FIELDS.USERNAME,
 };
 
 EnhancedUserShow.displayName = 'EnhancedUserShow';

@@ -5,7 +5,7 @@ import { Link } from  "react-router-dom";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../../_constants/index"
+import {MODELS} from "../../_constants/index"
 import GroupAddIcon from "@material-ui/icons/GroupAdd"
 
 
@@ -127,7 +127,7 @@ const FewUsers = ({ classes, userManagedGroups, translate }) => {
                   <Typography key={group.id} className={classes.groupDetails} variant="body2" component="p">
                     {`${group.name} : ${group.users.length} users`}
 
-                    <Link to={{pathname: `/${Constants.models.GROUPMEMBERS}/Create`, group: group.id}}>
+                    <Link to={{pathname: `/${MODELS.GROUPMEMBERS}/Create`, group: group.id}}>
                       <Chip label={`+ Add User`} className={classes.addUserChipDisplay} variant="outlined" key={`${group.id}_adduser`} clickable />
                     </Link>
                   </Typography>

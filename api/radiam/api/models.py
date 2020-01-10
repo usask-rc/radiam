@@ -11,13 +11,16 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 from elasticsearch import exceptions as es_exceptions
+from elasticsearch_dsl import analyzer, Index, tokenizer
 
 # from . import services
 from .search import RadiamService
+from .search.exceptions import IndexNotCreatedException
 from .exceptions import ElasticSearchRequestError
-from .signals import (radiam_user_created, radiam_project_created,
+from .signals import (radiam_user_created, radiam_user_updated, radiam_project_created,
     radiam_project_deleted)
 from .documents import  DatasetMetadataDoc, GeoDataDoc, ProjectMetadataDoc, ResearchGroupMetadataDoc
+from .search.documents import ESDataset
 
 from django_rest_passwordreset.signals import reset_password_token_created
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -53,14 +56,20 @@ class ElasticSearchModel():
     """
     Add necessary operations for saving and deleting a model from elastic search
     """
-    def save(self, *args, **kwargs):
+    def save(self, analyzer=None, document=None, *args, **kwargs):
         """
         Create the model and create an index in ES
         """
-        rs = RadiamService(self.id)
-        if not rs.index_exists(self.id):
+        index = Index(self.id)
+        if not index.exists():
             try:
-                rs.create_index(self.id)
+                if analyzer:
+                    index.analyzer(analyzer)
+                if document:
+                    index.document(document)
+                index.create()
+                if not index.exists():
+                    raise IndexNotCreatedException
             except es_exceptions.RequestError as error:
                 raise ElasticSearchRequestError(error.info)
             else:
@@ -84,7 +93,8 @@ class ElasticSearchModel():
             doc = self.MetadataDoc.get(self.id)
             doc.delete()
         except es_exceptions.NotFoundError:
-            raise Exception('Deleting non-existent doc')
+            # Has it already been deleted?
+            pass
 
 
 class User(AbstractUser, UserPermissionMixin):
@@ -289,6 +299,44 @@ def send_user_welcome_email(sender, user, reset_password_token, *args, **kwargs)
         print(render_to_string('user_welcome_email.html', context=context))
 
 
+@receiver(radiam_user_updated)
+def send_user_update_email(sender, email, username, first_name, *args, **kwargs):
+    """
+    When a new user is updated, send them a notification email informing
+    the user.
+    """
+
+    request = kwargs['request']
+
+    context = {
+        'username': username,
+        'first_name': first_name,
+        'host': request.get_host(),
+        'scheme': request.scheme,
+    }
+
+    user_update_subj = "Radiam Notification"
+
+    if settings.DEBUG and hasattr(settings, 'DEV_EMAIL_ADDRESSES'):
+        email_addresses = settings.DEV_EMAIL_ADDRESSES
+    else:
+        email_addresses = [email]
+
+    if use_email():
+        try:
+            send_mail(user_update_subj,
+                      render_to_string('notify_user_update_email.txt',
+                                       context=context, ),
+                      'noreply@radiam.ca',
+                      email_addresses,
+                      html_message=render_to_string('notify_user_update_email.html',
+                                                    context=context)
+                      )
+        except:
+            print(render_to_string('notify_user_update_email.html', context=context))
+    else:
+        print(render_to_string('notify_user_update_email.html', context=context))
+
 class GeoData(models.Model):
     """
     GeoData
@@ -355,7 +403,8 @@ class GeoData(models.Model):
             doc.delete()
 
         except es_exceptions.NotFoundError:
-            raise Exception('Deleting non-existent doc')
+            # Deleting non-existant doc
+            pass
 
 
 class UserAgent(models.Model):
@@ -710,14 +759,31 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         return geo_data
 
     def save(self, *args, **kwargs):
-        ElasticSearchModel.save(self, *args, **kwargs)
+        linux_analyzer = analyzer('linux_path_analyzer',
+            tokenizer=tokenizer('linux_path_tokenizer', type='path_hierarchy')
+        )
+        ElasticSearchModel.save(self, analyzer=linux_analyzer, document=ESDataset, *args, **kwargs)
         models.Model.save(self, *args, **kwargs)
+        ESDataset.init(index=str(self.id))
 
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
         try:
+            userAgentProjectConfigs = UserAgentProjectConfig.objects.filter(project=self.id)
+            for userAgentProjectConfig in userAgentProjectConfigs:
+                userAgentProjectConfig.delete()
+
             entity = Entity.objects.get(project=self.id)
+
+            selectedSchemas = SelectedSchema.objects.filter(entity=entity.id)
+            for schema in selectedSchemas:
+                schema.delete()
+
+            selectedFields = SelectedField.objects.filter(entity=entity.id)
+            for field in selectedFields:
+                field.delete()
+
             entity.delete()
         except ObjectDoesNotExist:
             pass

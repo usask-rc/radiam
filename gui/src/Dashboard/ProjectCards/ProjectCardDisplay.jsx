@@ -9,7 +9,7 @@ import {
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from 'react-router';
-import * as Constants from '../../_constants/index';
+import {AVATAR_HEIGHT} from '../../_constants/index';
 import ProjectCardHeader from './ProjectCardHeader';
 import ProjectKeywords from './ProjectKeywords';
 import ProjectSearch from './ProjectSearch';
@@ -31,7 +31,7 @@ const styles = {
     float: 'left',
   },
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`,
+    height: `${AVATAR_HEIGHT}`,
     margin: '-6px 6px 0px 0px',
   },
   searchIcon: {

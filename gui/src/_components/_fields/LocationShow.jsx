@@ -2,7 +2,8 @@ import React, { SFC } from "react";
 import get from 'lodash/get';
 import Typography from '@material-ui/core/Typography';
 import { FieldProps, InjectedFieldProps, fieldPropTypes } from "react-admin";
-import * as Constants from "../../_constants/index";
+import {MODEL_FIELDS} from "../../_constants/index";
+
 
 export const locationSelect = choice => choice.display_name ?
   `${choice.display_name}` : `${choice.host_name}`;
@@ -15,8 +16,8 @@ export const LocationShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes>
   record = {},
   ...rest
 }) => {
-  const display_name = get(record, Constants.model_fields.DISPLAY_NAME);
-  const host_name = get(record, Constants.model_fields.HOST_NAME);
+  const display_name = get(record, MODEL_FIELDS.DISPLAY_NAME);
+  const host_name = get(record, MODEL_FIELDS.HOST_NAME);
   if (display_name) {
     return (
       <Typography

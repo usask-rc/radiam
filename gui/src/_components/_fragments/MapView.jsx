@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react'
 import compose from 'recompose/compose';
 import { FeatureGroup, Map, Popup, TileLayer } from 'react-leaflet';
 import L from "leaflet";
-import { Typography, Divider } from '@material-ui/core';
+import Typography from "@material-ui/core/Typography"
+import Divider from "@material-ui/core/Divider"
 import withStyles from '@material-ui/core/styles/withStyles';
-import * as Constants from "../../_constants/index"
+import {OSMTILEURL} from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -47,18 +48,13 @@ const MapView = ({ classes, record }) => {
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
         var layer = e.target;
-
-        if (_isMounted){
-            setLocation([e.latlng.lat, e.latlng.lng])
-            setCurFeature(layer.feature)
-            setPopup({active: true, for: layer._leaflet_id})
-        }
+        setLocation([e.latlng.lat, e.latlng.lng])
+        setCurFeature(layer.feature)
+        setPopup({active: true, for: layer._leaflet_id})
     }
 
     function _onPopupClose() {
-        if (_isMounted){
         setPopup({popup: {active: false, for: ""}})
-        }
     }
 
     //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
@@ -111,6 +107,7 @@ const MapView = ({ classes, record }) => {
         return lng % 180
     }
 
+    //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
     function success(pos) {
         //if there are no features, default our location to the user's location.
 
@@ -140,9 +137,9 @@ const MapView = ({ classes, record }) => {
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
             if (_isMounted){
-            setLocation(latLng)
-            setMapLoading(false)}
-        }
+                setLocation(latLng)
+                setMapLoading(false)}
+            }
 
     }
 
@@ -158,9 +155,9 @@ const MapView = ({ classes, record }) => {
     });
 
     return(
-        <React.Fragment>
+        <>
             {location && location.length > 0 && (
-            <React.Fragment>
+            <>
                 <Typography variant={"h5"} component={"h5"}>
                     {`GeoJSON Map Data`}
                 </Typography>
@@ -177,38 +174,38 @@ const MapView = ({ classes, record }) => {
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
-                        url={Constants.OSMTILEURL}
+                        url={OSMTILEURL}
                         //url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
                     />
 
                     <FeatureGroup ref = {(reactFGref) =>{_onFeatureGroupReady(reactFGref);}} />
 
                     {popup && popup.active &&
-                    <Popup className={classes.mapPopup}
-                    position = {location}
-                    onClose={_onPopupClose}
-                    >
-                    {curFeature.properties && 
-                    <React.Fragment>
-                        <Typography variant="h5" className={classes.mapPopupTitle}>
-                            {`Feature Data:`}
-                        </Typography>
-                        <Divider/>
-                        {Object.keys(curFeature.properties).map(key => {
-                            return(
-                            <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
-                                {`${key} : ${curFeature.properties[key]}`}
-                            </Typography>
-                            );
-                        })}
-                        </React.Fragment>
-                    }
-                    </Popup>
+                        <Popup className={classes.mapPopup}
+                            position = {location}
+                            onClose={_onPopupClose}
+                        >
+                            {curFeature.properties && 
+                                <>
+                                    <Typography variant="h5" className={classes.mapPopupTitle}>
+                                        {`Feature Data:`}
+                                    </Typography>
+                                    <Divider/>
+                                    {Object.keys(curFeature.properties).map(key => {
+                                        return(
+                                        <Typography key={`popup-${curFeature.properties[key]}`} className={classes.mapPopupDetails}>
+                                            {`${key} : ${curFeature.properties[key]}`}
+                                        </Typography>
+                                        );
+                                    })}
+                                </>
+                            }
+                        </Popup>
                     }
                 </Map>
-                </React.Fragment>
+                </>
             )}
-        </React.Fragment>
+        </>
     )
 }
 const enhance = compose(withStyles(styles));

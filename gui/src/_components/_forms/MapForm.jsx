@@ -5,10 +5,10 @@ import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
-import { withStyles, Typography } from '@material-ui/core';
-import equal from 'fast-deep-equal';
+import {withStyles} from "@material-ui/core/styles"
+import Typography from "@material-ui/core/Typography"
 import { getFirstCoordinate } from '../../_tools/funcs';
-import * as Constants from '../../_constants/index';
+import {OSMTILEURL} from '../../_constants/index';
 
 const styles = {
   mapDisplay: {
@@ -331,6 +331,7 @@ class MapForm extends Component {
         leafletGeoJSON.eachLayer(layer => {
           const layerType = layer.feature.geometry.type;
 
+          //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
           if (
             layerType === 'LineString' ||
             layerType === 'Polygon' ||
@@ -387,8 +388,6 @@ class MapForm extends Component {
 
   _setMapRef = ref => {
     this.setState({ mapRef: ref });
-    console.log('mapref is: ', ref);
-    console.log('ref leafletelement is: ', ref.leafletElement);
   };
 
   render() {
@@ -403,15 +402,15 @@ class MapForm extends Component {
     });
 
     return (
-      <React.Fragment>
+      <>
         {location && location.length > 0 && (
-          <React.Fragment>
+          <>
             <Typography className={classes.mapTitle} component={'p'}>
               {`Geolocation Map Input`}
             </Typography>
             <Map
               ref={ref => {
-                if (!mapRef) {
+                if (!mapRef && ref) {
                   this._setMapRef(ref);
                 }
               }}
@@ -431,7 +430,7 @@ class MapForm extends Component {
                   'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                 }
                 userAgent={navigator.userAgent}
-                url={Constants.OSMTILEURL}
+                url={OSMTILEURL}
               />
 
               <FeatureGroup
@@ -467,9 +466,9 @@ class MapForm extends Component {
                 </Popup>
               )}
             </Map>
-          </React.Fragment>
+          </>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

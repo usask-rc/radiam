@@ -67,7 +67,7 @@ class TestSuperuserProjectPermissions(APITestCase):
         doc.get.return_value = doc
         doc.update.return_value = None
 
-        research_group = ResearchGroup.objects.get(id='718aaa07-0891-4931-8c73-1304f4a21d0d')
+        research_group = ResearchGroup.objects.get(id='b09cd262-a06a-4771-8ec4-785e949abaa3')
 
         body = {
             'name': 'test project',

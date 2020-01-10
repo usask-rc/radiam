@@ -42,12 +42,12 @@ import { withStyles } from "@material-ui/core/styles";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import compose from "recompose/compose";
 import PropTypes from 'prop-types';
-import * as Constants from "../_constants/index";
+import {MODEL_FK_FIELDS, MODELS, MODEL_FIELDS} from "../_constants/index";
 import SettingsIcon from '@material-ui/icons/Settings';
 import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
-import { getGroupUsers } from "../_tools/funcs";
-import { Cancel } from "@material-ui/icons";
+import { getGroupMembers } from "../_tools/funcs";
+import Cancel from "@material-ui/icons/Cancel";
 
 const configStyles = {
   root: {
@@ -424,13 +424,13 @@ class MetadataComponent extends Component {
   getParentEntitySchemasFields = (id, type) => {
     if (type && id) {
       switch (type) {
-        case Constants.model_fk_fields.GROUP:
+        case MODEL_FK_FIELDS.GROUP:
           this.getGroupParentEntitySchemaFields(id);
           break;
-        case Constants.model_fk_fields.PROJECT:
+        case MODEL_FK_FIELDS.PROJECT:
           this.getProjectParentEntitySchemaFields(id);
           break;
-        case Constants.model_fk_fields.DATASET:
+        case MODEL_FK_FIELDS.DATASET:
           this.getDatasetParentEntitySchemaFields(id);
           break;
         default:
@@ -448,11 +448,11 @@ class MetadataComponent extends Component {
     const fetchData = async () => {
       await dataProvider(
         GET_ONE,
-        Constants.models.GROUPS,
+        MODELS.GROUPS,
         params
       ).then(response => {
         if (response && response.data && response.data.parent_group) {
-          this.getEntitySchemasFields(response.data.parent_group, Constants.model_fk_fields.GROUP, true);
+          this.getEntitySchemasFields(response.data.parent_group, MODEL_FK_FIELDS.GROUP, true);
         } else {
           // There are no more parents to check.
           return;
@@ -474,11 +474,11 @@ class MetadataComponent extends Component {
     const fetchData = async () => {
       await dataProvider(
         GET_ONE,
-        Constants.models.PROJECTS,
+        MODELS.PROJECTS,
         params
       ).then(response => {
         if (response && response.data && response.data.group) {
-          this.getEntitySchemasFields(response.data.group, Constants.model_fk_fields.GROUP, true);
+          this.getEntitySchemasFields(response.data.group, MODEL_FK_FIELDS.GROUP, true);
         } else {
           // There are no more parents to check.
           console.error("Every project should have a group, how did we not find one?");
@@ -500,11 +500,11 @@ class MetadataComponent extends Component {
     const fetchData = async () => {
       await dataProvider(
         GET_ONE,
-        Constants.models.DATASETS,
+        MODELS.DATASETS,
         params
       ).then(response => {
         if (response && response.data && response.data.project) {
-          this.getEntitySchemasFields(response.data.project, Constants.model_fk_fields.PROJECT, true);
+          this.getEntitySchemasFields(response.data.project, MODEL_FK_FIELDS.PROJECT, true);
         } else {
           // There are no more parents to check.
           console.error("Every dataset should have a project, how did we not find one with " + id);
@@ -1155,9 +1155,9 @@ class BaseConfigMetadata extends MetadataComponent {
     const { config } = this.state
 
     return <Drawer anchor="bottom" open={config} onClose={() => drawerState.close()} {...others}>
-      <React.Fragment>
+      <>
         { this.renderBody() }
-      </React.Fragment>
+      </>
     </Drawer>;
   };
 }
@@ -1219,7 +1219,7 @@ class BaseEditMetadata extends MetadataComponent {
           type ==="container" ||
           type ==="date" ||
           type ==="dateYear" ||
-          type === Constants.model_fields.EMAIL ||
+          type === MODEL_FIELDS.EMAIL ||
           type ==="float" ||
           type ==="integer" ||
           type ==="text" ||
@@ -1244,7 +1244,7 @@ class BaseEditMetadata extends MetadataComponent {
                     />
 
                 : type === "container" ?
-                    <React.Fragment></React.Fragment>
+                    <></>
 
                 : type ==="date" ?
                     <DateInput
@@ -1264,7 +1264,7 @@ class BaseEditMetadata extends MetadataComponent {
                       validate={ field.required ? validateRequired : null }
                     />
 
-                : type === Constants.model_fields.EMAIL ?
+                : type === MODEL_FIELDS.EMAIL ?
                     <TextInput
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
@@ -1317,7 +1317,7 @@ class BaseEditMetadata extends MetadataComponent {
           }
 
           { !field.many_values &&
-            <React.Fragment>
+            <>
               {   type ==="boolean" ?
                     <NullableBooleanInput
                       key={"text-input-" + field.id}
@@ -1344,7 +1344,7 @@ class BaseEditMetadata extends MetadataComponent {
                       className={ field.visible ? null : classes.invisible }
                       validate={ field.required ? validateRequired : null }
                     />
-                : type === Constants.model_fields.EMAIL ?
+                : type === MODEL_FIELDS.EMAIL ?
                     <TextInput
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
@@ -1393,7 +1393,7 @@ class BaseEditMetadata extends MetadataComponent {
 
                 : null }
                 { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
-            </React.Fragment>
+            </>
           }
 
         </div>
@@ -1456,15 +1456,15 @@ class BaseMetadataEditActions extends Component {
     drawerState.register(this, this.setConfig);
   }
 
-  componentWillMount(){
+  componentDidMount(){
     const {id, showRelatedUsers} = this.props
     console.log("componentwillmount props: ", this.props)
     if (showRelatedUsers){
 
-      if (id){
+      if (id) {
         const params={id: id, is_active: true}
-        getGroupUsers(params).then((data) => {
-        console.log("getgroupusers returned data: ", data)
+        getGroupMembers(params).then((data) => {
+        console.log("getGroupMembers returned data: ", data)
         this.setState({groupMembers: data})
         return data
       }).catch(err => console.error("err: ", err))
@@ -1602,7 +1602,7 @@ class BaseShowMetadata extends MetadataComponent {
           type ==="container" ||
           type ==="date" ||
           type ==="dateYear" ||
-          type === Constants.model_fields.EMAIL ||
+          type === MODEL_FIELDS.EMAIL ||
           type ==="float" ||
           type ==="integer" ||
           type ==="text" ||
@@ -1667,7 +1667,7 @@ class BaseShowMetadata extends MetadataComponent {
                           />
                         </div>
 
-                    : type === Constants.model_fields.EMAIL ?
+                    : type === MODEL_FIELDS.EMAIL ?
                         <div>
                           <Typography className={classes.label}>{translate(field.label + ".label")}</Typography>
                           <EmailField
@@ -1743,8 +1743,8 @@ class BaseShowMetadata extends MetadataComponent {
             </div>);
         } else {
             return (<div className={classes.container} key={"text-container-" + field.id}>
-            <React.Fragment>
-              { (type === "boolean" || type === "date" || type === "dateYear" || type === Constants.model_fields.EMAIL || type === "float" || type === "integer" || type === "text" || type === "url") &&
+            <>
+              { (type === "boolean" || type === "date" || type === "dateYear" || type === MODEL_FIELDS.EMAIL || type === "float" || type === "integer" || type === "text" || type === "url") &&
                 <Typography className={classes.label}>{translate(field.label + ".label")}</Typography>
               }
               {   type ==="boolean" ?
@@ -1770,7 +1770,7 @@ class BaseShowMetadata extends MetadataComponent {
                       source={this.getSource(field, parentPath)}
                       record={record}
                     />
-                : type === Constants.model_fields.EMAIL ?
+                : type === MODEL_FIELDS.EMAIL ?
                     <EmailField
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
@@ -1813,7 +1813,7 @@ class BaseShowMetadata extends MetadataComponent {
 
                 : null }
               { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
-            </React.Fragment>
+            </>
             </div>);
           }
       } else {

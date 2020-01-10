@@ -1,10 +1,9 @@
 import React from "react";
-import { Grid, Typography } from "@material-ui/core";
-import {
-    Folder,
-    Add,
-    Description,
-} from '@material-ui/icons';
+import Grid from "@material-ui/core/Grid"
+import Typography from "@material-ui/core/Typography"
+import Folder from "@material-ui/icons/Folder"
+import Add from "@material-ui/icons/Add"
+import Description from "@material-ui/icons/Description"
 const FolderDisplay = ({ classes, file }) => (
     <Grid container alignItems="center" className={classes.folderLineItem}>
         <Grid item xs={"auto"}>
@@ -18,7 +17,7 @@ const FolderDisplay = ({ classes, file }) => (
         </Grid>
 
         {file && file.file_num_in_dir > 0 &&
-            <React.Fragment>
+            <>
                 <Grid
                     item
                     xs={"auto"}
@@ -28,10 +27,10 @@ const FolderDisplay = ({ classes, file }) => (
                 <Grid item xs={"auto"}>
                     {`${file.file_num_in_dir}`}
                 </Grid>
-            </React.Fragment>
+            </>
         }
         {file && file.items - file.file_num_in_dir > 0 && 
-            <React.Fragment>
+            <>
                 <Grid item xs={"auto"}
                 >
                     <Folder className={classes.folderIcon} />
@@ -39,7 +38,7 @@ const FolderDisplay = ({ classes, file }) => (
                 <Grid item xs={"auto"}>
                     {`${file.items - file.file_num_in_dir}`}
                 </Grid>
-            </React.Fragment>
+            </>
         }
     </Grid>
 )

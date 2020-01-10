@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Tab, TextField, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';
-import * as Constants from "../../_constants/index"
+import {AVATAR_HEIGHT, MODELS, MODEL_FIELDS} from "../../_constants/index"
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
 import RecentFilesSummary from './RecentFilesSummary';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
@@ -41,7 +41,7 @@ const styles = theme => ({
 
   },
   image: {
-    height: `${Constants.AVATAR_HEIGHT}`,
+    height: `${AVATAR_HEIGHT}`,
   },
   listItemText: {
     paddingRight: 0,
@@ -90,7 +90,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
   return (
     <Card className={classes.container}>
 
-      <React.Fragment>
+      <>
           <Typography
             className={classes.headlineTop}
             variant="h5"
@@ -113,20 +113,20 @@ function RecentFilesDisplay({ projects, translate, classes }) {
             >
               {projects.map((item, i) => {
                 return item.files && item.files.length > 0 &&
-                  <Tab label={<React.Fragment><ReferenceField
+                  <Tab label={<><ReferenceField
                     record={item}
-                    basePath={Constants.models.PROJECTS}
+                    basePath={MODELS.PROJECTS}
                     linkType={false}
-                    source={Constants.model_fields.AVATAR}
-                    reference={Constants.models.PROJECTAVATARS}
+                    source={MODEL_FIELDS.AVATAR}
+                    reference={MODELS.PROJECTAVATARS}
                     className={classes.projectName}
                     allowEmpty
                   >
                     <ImageField
                       classes={{ image: classes.image }}
-                      source={Constants.model_fields.AVATAR_IMAGE}
+                      source={MODEL_FIELDS.AVATAR_IMAGE}
                     />
-                  </ReferenceField>{item.name}</React.Fragment>} value={i} key={item.id} className={classes.tabText}>
+                  </ReferenceField>{item.name}</>} value={i} key={item.id} className={classes.tabText}>
                   </Tab>
               })}
             </Tabs>
@@ -135,7 +135,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
             })}
           </div>) : <Typography>Loading Files...</Typography> //is this necessary?
         }
-      </React.Fragment>
+      </>
     </Card >
 
   );

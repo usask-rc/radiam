@@ -46,7 +46,6 @@ class _DocumentService:
         :param updated_doc: The updated document
         :return:
         """
-        ESDataset.init(index=index_name)
         doc = ESDataset.get(index=index_name, id=pk)
         doc.update(index=index_name, refresh=True, **updated_doc)
         return doc
@@ -63,12 +62,8 @@ class _DocumentService:
 
         # At the moment this functions exactly the same way as update_doc.
         # do we need to distinguish between a full update and a partial update?...
-
-        ESDataset.init(index=index_name)
         doc = ESDataset.get(index=index_name, id=pk)
-
         result = doc.update(index=index_name, refresh=True, **doc_updates)
-
         return result
 
     def delete_doc(self, index_name, pk):
@@ -79,12 +74,8 @@ class _DocumentService:
         :param pk: The id of the document to delete
         :return:
         """
-
-        ESDataset.init(index=index_name)
         doc = ESDataset.get(index=index_name, id=pk)
-
         result = doc.delete(index=index_name, refresh=True)
-
         return result
 
         # check for existence of deleted doc

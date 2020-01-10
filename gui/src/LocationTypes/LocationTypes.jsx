@@ -1,7 +1,7 @@
 //LocationTypes.jsx
 import React, { useState, useEffect } from "react";
 import { Create, Datagrid, Edit, List, required, Show, SimpleForm, SimpleShowLayout, TextInput } from "react-admin";
-import * as Constants from "../_constants/index";
+import {RESOURCE_OPERATIONS, WARNINGS, MODEL_FIELDS} from "../_constants/index";
 import TranslationField from "../_components/_fields/TranslationField";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
@@ -11,10 +11,10 @@ export const LocationTypeList = props => (
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <TranslationField
         label={"en.models.locationtypes.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
       />
     </Datagrid>
   </List>
@@ -25,7 +25,7 @@ export const LocationTypeShow = props => (
     <SimpleShowLayout>
       <TranslationField
         label={"en.models.locationtypes.label"}
-        source={Constants.model_fields.LABEL}
+        source={MODEL_FIELDS.LABEL}
       />
     </SimpleShowLayout>
   </Show>
@@ -57,13 +57,13 @@ const LocationTypeForm = props => {
   }
   
   return(
-  <SimpleForm {...props} redirect={Constants.resource_operations.LIST} onChange={handleChange} save={handleSubmit}>
+  <SimpleForm {...props} redirect={RESOURCE_OPERATIONS.LIST} onChange={handleChange} save={handleSubmit}>
     <TextInput
       label={"en.models.locationtypes.label"}
-      source={Constants.model_fields.LABEL}
+      source={MODEL_FIELDS.LABEL}
       validate={validateLabel}
     />
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
   </SimpleForm>
 )
   };

@@ -220,7 +220,7 @@ class TestAdminuserUserPermissions(APITestCase):
 
     def test_admin_user_read_nonmember_user_detail_denied(self):
         """
-        Test Admin user cannot read User detail
+        Test Admin user cannot read User detail from member not of their group
         """
 
         detail_user = User.objects.get(username='testuser4')
@@ -416,7 +416,7 @@ class TestManageruserUserPermissions(APITestCase):
         self.assertContains(
             response=response,
             text="",
-            status_code=404)
+            status_code=403)
 
     def test_manager_user_write_user_list_denied(self):
         """
@@ -497,7 +497,7 @@ class TestManageruserUserPermissions(APITestCase):
         self.assertContains(
             response=response,
             text='',
-            status_code=404)
+            status_code=403)
 
     def test_manager_user_cannot_delete_self(self):
         """
@@ -599,7 +599,7 @@ class TestMemberuserUserPermissions(APITestCase):
         self.assertContains(
             response=response,
             text="",
-            status_code=404)
+            status_code=403)
 
     def test_member_user_write_user_list(self):
         """
@@ -681,7 +681,7 @@ class TestMemberuserUserPermissions(APITestCase):
         self.assertContains(
             response=response,
             text='',
-            status_code=404)
+            status_code=403)
 
     def test_member_user_cannot_delete_self(self):
         """
@@ -723,4 +723,4 @@ class TestMemberuserUserPermissions(APITestCase):
         self.assertContains(
             response=response,
             text='',
-            status_code=404)
+            status_code=403)

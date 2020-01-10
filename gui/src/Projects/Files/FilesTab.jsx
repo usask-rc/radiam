@@ -5,11 +5,14 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Pagination, translate } from 'react-admin';
-import Constants from '../../_constants/index';
+import {PATHS, MODEL_FIELDS} from "../../_constants/index";
 import FileList from '../../_components/files/FileList';
-import { Search, ArrowUpward, ArrowDownward } from '@material-ui/icons';
-
-import { Select, MenuItem, TextField, Divider } from '@material-ui/core';
+import ArrowUpward from "@material-ui/icons/ArrowUpward"
+import ArrowDownward from "@material-ui/icons/ArrowDownward"
+import Select from "@material-ui/core/Select"
+import MenuItem from "@material-ui/core/MenuItem"
+import TextField from "@material-ui/core/TextField"
+import Divider from "@material-ui/core/Divider"
 import { getProjectData } from '../../_tools/funcs';
 
 const styles = theme => ({
@@ -47,7 +50,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
-  const [order, setOrder] = useState('-'); //in case we ever want to be able to toggle asc/desc sorted values
+  const [order, setOrder] = useState(''); //in case we ever want to be able to toggle asc/desc sorted values
   const [search, setSearch] = useState(
     (props &&
       props.location &&
@@ -60,7 +63,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       props.location &&
       props.location.state &&
       props.location.state.sortType) ||
-    'last_modified'
+    'path.agnostic.keyword'
   );
 
   const handleSubmit = e => {
@@ -101,9 +104,9 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       {data && data.files && (
         <form className={classes.flex} onSubmit={handleSubmit}>
           <TextField
-            id={Constants.paths.SEARCH}
-            name={Constants.paths.SEARCH}
-            type={Constants.paths.SEARCH}
+            id={PATHS.SEARCH}
+            name={PATHS.SEARCH}
+            type={PATHS.SEARCH}
             className={classes.textField}
             defaultValue={search || ''}
             placeholder={`Search Files`}
@@ -116,11 +119,12 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             onChange={e => setSort(e.target.value)}
           >
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-            <MenuItem value={Constants.model_fields.NAME}>{`File Name`}</MenuItem>
-            <MenuItem value={Constants.model_fields.INDEXED_DATE}>{`Indexed On`}</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
-            <MenuItem value={Constants.model_fields.FILESIZE}>{`Filesize`}</MenuItem>
-            <MenuItem value={Constants.model_fields.LAST_ACCESS}>{`Last Accessed`}</MenuItem>
+            <MenuItem value={"name.keyword"}>{`File Name`}</MenuItem>
+            <MenuItem value={"path.agnostic.keyword"}>{`File Path`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.INDEXED_DATE}>{`Indexed On`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.FILESIZE}>{`Filesize`}</MenuItem>
+            <MenuItem value={MODEL_FIELDS.LAST_ACCESS}>{`Last Accessed`}</MenuItem>
           </Select>
 
           <div className={classes.sortDisplay}>
@@ -138,7 +142,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
         <Typography>{`${status.error}`}</Typography>
         </div>
       ) : data && data.files && data.files.length > 0 ? (
-        <React.Fragment>
+        <>
           <FileList data={data.files} />
           <Pagination
             page={page}
@@ -148,10 +152,10 @@ function FilesTab({ projectID, classes, translate, ...props }) {
             rowsPerPageOptions={[25, 50, 100]}
             total={data.nbFiles}
           />
-        </React.Fragment>
-      ) : !status.loading && search && data && data.files.length === 0 ? 
+        </>
+      ) : !status.loading && data && data.files.length === 0 ? 
       <Typography className={classes.loading}>
-        {`No Files were found matching Search String: ${search}`}
+        {`No files were found`}
       </Typography>: null}
     </div>
   );

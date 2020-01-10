@@ -1,5 +1,5 @@
 //radiamrestprovider.jsx
-import * as Constants from '../_constants/index';
+import {PATHS, METHODS, MODELS} from '../_constants/index';
 import { stringify } from 'query-string';
 import {
   fetchUtils,
@@ -26,9 +26,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+        //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
-        url = `${apiUrl}/${resource}/${Constants.paths.SEARCH}/`
-        options.method = Constants.methods.POST
+        url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
+        options.method = METHODS.POST
 
         let query = {}
         let matches = {}
@@ -37,8 +38,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         if (params.filter){
           Object.keys(params.filter).map(key => {
               //for any value where there are slashes, we need exact matches
-              if (key === "path_parent"){
+              if (key === "path_parent" && !params.q){
                 matches[`${key}.keyword`] = params.filter[key]
+              }
+              else if (key === "path_parent" && params.q){
+                //want to search in this folder and all descending folders
+                //for now a search will just search all folders which should suffice.
               }
               else{
                 matches[key] = params.filter[key]
@@ -62,35 +67,50 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           })
         }
 
+        console.log("get_files params.q ? ", params)
         if (params.q){
 
           if (!query.query){
-            query.query = {}
+            query.query = {
+              bool: {
+                must: {
+
+                }
+              }
+            }
           }
           
-          query.query["multi_match"] = {
-            "query": params.q,
+          query.query.bool.must = {
+          multi_match:{
+            "query": `${params.q}`,
             "fields": ["*"],
             "lenient": "true"
           }
         }
+      }
+      
 
+        console.log("query before stringify get_files: ", query)
         //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
-        if (params.sort){
-          sort = `ordering=${params.sort.order}${params.sort.field}`
+        if (params.sort && params.sort.field && params.sort.field.length > 0){
+          let sortOrder = ""
+          if (params.sort.order){
+            sortOrder = "-"
+          }
+          sort = `ordering=${sortOrder}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-
+        console.log("url before get_files request: ", url)
         break;
       }
 
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
 
-        console.log("params sent to get_list are: ", params)
+        console.log("params sent to get_list are: ", params, url)
 
 
         if (params)
@@ -124,16 +144,37 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
-            const { page, perPage } = params.pagination;
+            let { page, perPage } = params.pagination;
             
-            url = `${apiUrl}/${resource}/?`;
+            if (!perPage){
+              perPage = 10
+            }
+
+            let order = ""
+            let field = ""
+            let ordering = ""
+            if (params.sort && params.sort.field && params.sort.field.length > 0 && params.sort.order && params.sort.order.length > 0){
+              if (params.sort.order === "DESC"){
+                order = "-" 
+              }
+              field = params.sort.field
+
+              ordering = `&ordering=${order}${field}`
+            }
+            
+            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
+
+            /*
             if (page && sort) {
               url = `${url}${page}&${sort}`;
             } else if (page) {
               url = `${url}${page}`;
             } else if (sort) {
               url = `${url}${sort}`;
-            }/*
+            }
+            */
+            
+            /*
             const { page, perPage } = params.pagination;
             const { sortField, sortOrder } = params.sort;
 
@@ -156,24 +197,24 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     
 
       case 'CURRENT_USER': {
-        url = `${apiUrl}/${Constants.models.USERS}/current/`;
+        url = `${apiUrl}/${MODELS.USERS}/current/`;
 
-        options.method = Constants.methods.GET;
+        options.method = METHODS.GET;
         break;
       }
 
       case 'PASSWORD_RESET_EMAIL': {
         url = `${apiUrl}/password_reset/`;
 
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         options.body = JSON.stringify({ email: params.email });
         break;
       }
 
       case 'PASSWORD_CHANGE': {
-        url = `${apiUrl}/${Constants.models.USERS}/${params.userID}/${Constants.paths.SET_PASSWORD}/`;
+        url = `${apiUrl}/${MODELS.USERS}/${params.userID}/${PATHS.SET_PASSWORD}/`;
 
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         options.body = JSON.stringify({
           old_password: params.old_password,
           new_password: params.new_password,
@@ -221,7 +262,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         options.method = 'PUT';
         if (
-          resource === Constants.models.PROJECTAVATARS &&
+          resource === MODELS.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);
@@ -237,9 +278,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case CREATE:
         console.log("formdata in create: ", formData)
         url = `${apiUrl}/${resource}/`;
-        options.method = Constants.methods.POST;
+        options.method = METHODS.POST;
         if (
-          resource === Constants.models.PROJECTAVATARS &&
+          resource === MODELS.PROJECTAVATARS &&
           get(params, 'data.avatar_image.rawFile')
         ) {
           formData.append('avatar_image', params.data.avatar_image.rawFile);
@@ -298,6 +339,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
 
+        console.log("GET_FILES ret: ", ret)
         ret.data.map(item => (item.key = item.id));
         return ret;
 

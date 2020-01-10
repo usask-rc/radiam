@@ -1,32 +1,36 @@
 //FolderView.jsx
 import React, { useState, useEffect } from 'react';
-import {
-  AddLocation,
-  FolderOpen,
-  Sort,
-  ArrowUpward,
-  ArrowDownward,
-} from '@material-ui/icons';
+import AddLocation from "@material-ui/icons/AddLocation"
+import ArrowBack from "@material-ui/icons/ArrowBack"
+import Description from "@material-ui/icons/Description"
+import Folder from "@material-ui/icons/Folder"
+import Search from "@material-ui/icons/Search"
 import { compose } from 'recompose';
-import Constants from '../../_constants/index';
-import {
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
-  Select,
-  MenuItem,
-} from '@material-ui/core';
-import FileSummary from '../../_components/files/FileSummary';
-import FolderDisplay from './FolderDisplay';
-import { translate } from 'ra-core';
+import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
+import Typography from "@material-ui/core/Typography"
+import Table from "@material-ui/core/Table"
+import TableHead from "@material-ui/core/TableHead"
+import TableBody from "@material-ui/core/TableBody"
+import TableRow from "@material-ui/core/TableRow"
+import TableCell from "@material-ui/core/TableCell"
+import TableSortLabel from "@material-ui/core/TableSortLabel"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import TextField from "@material-ui/core/TextField"
+import { translate } from "ra-core"
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes } from '../../_tools/funcs';
+import FileDetails from '../../_components/files/FileDetails';
 
 const styles = theme => ({
+  backCell: {
+    verticalAlign: "middle",
+    display: "flex",
+  },
   baseFolder: {
     backgroundColor: "beige",
   },
@@ -41,6 +45,16 @@ const styles = theme => ({
     flexDirection: 'column',
     textAlign: 'left',
   },
+  displayFileIcons: {
+    display: "flex",
+    flexDirection: "row",
+
+  },
+  fileIcons: {
+    display: "flex",
+    verticalAlign: "middle",
+    flexDirection: "row",
+  },
   fileInfoDisplay: {
     display: 'flex',
     flexDirection: "row",
@@ -48,6 +62,9 @@ const styles = theme => ({
   sortDisplay: {
     display: 'flex',
     flexDirection: "row",
+  },
+  fileDialog: {
+    minWidth: "50em",
   },
   fileSummary: {
     paddingRight: '2em',
@@ -73,6 +90,11 @@ const styles = theme => ({
   folderLineItem: {
     display: "flex",
     flexDirection: "row",
+  },
+  iconDisplay: {
+    marginTop: "-0.1em",
+    paddingLeft: "0.1em",
+    paddingRight: "0.1em",
   },
   listItemText: {
     paddingRight: 0,
@@ -104,6 +126,9 @@ const styles = theme => ({
   parentPanel: {
     textAlign: 'left',
   },
+  parentDisplay: {
+    marginLeft: "1em",
+  },
   sortIcon: {
     height: '1em',
     width: '1em',
@@ -121,6 +146,22 @@ const styles = theme => ({
   sortSelect: {
     textAlign: 'right',
   },
+  table: {
+    marginBottom: "2em",
+    borderRadius: "16",
+
+  },
+  folderRow: {
+    backgroundColor: "beige",
+    borderRadius: "16",
+  },
+  fileRow: {
+
+  },
+  tableHead: {
+    textAlign: "left",
+    backgroundColor: "LightGray",
+  },
   title: {
     fontSize: 16,
     fontDecoration: 'bold',
@@ -133,26 +174,95 @@ const styles = theme => ({
   smallIcon: {},
 });
 
-const ReducedExpansionPanelDetails = withStyles(() => ({
-  root: {
-    width: '100%',
-    margin: '0.4em',
-    padding: '0.4em',
-  },
-}))(ExpansionPanelDetails);
+const headCells = [
+  {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
+  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
+  {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
+  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
+  //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
+]
 
-const ReducedExpansionPanel = withStyles(() => ({
-  root: {
-    fontWeight: 'bold',
-    width: '100%',
-    marginLeft: '2em',
-    border: '2px solid #87CEFA',
-    borderRadius: 5,
-  },
-  expanded: {
-    height: '80%',
-  },
-}))(ExpansionPanel);
+const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
+  const { file_num_in_dir, items } = props.folder
+
+  console.log("Displayfileicons folder :", props, file_num_in_dir, items)
+
+  if (items > 0){
+    return(
+      <div className={classes.displayFileIcons}>
+          {
+            items - file_num_in_dir > 0 &&
+            <div className={classes.fileIcons}>
+            {items - file_num_in_dir}
+            <Folder className={classes.iconDisplay} />
+          </div>
+          }
+          {file_num_in_dir > 0 && 
+          <div className={classes.fileIcons}>
+            {file_num_in_dir}
+            <Description className={classes.iconDisplay} />
+          </div>
+          }
+      </div>
+    )
+  }
+
+  return null;
+})
+
+
+function EnhancedTableHead(props) {
+  const { classes, order, search, orderBy, onRequestSort, handleSearch } = props;
+  const createSortHandler = property => event => {
+      onRequestSort(event, property);
+  };
+
+  console.log("EnhancedTableHead order: ", order, "props: ", props)
+  return (
+      <TableHead className={classes.tableHead}>
+      <TableRow>
+          {headCells.map((headCell, idx) => (
+          <TableCell
+              key={headCell.id}
+              align={headCell.numeric ? 'right' : 'left'}
+              padding={headCell.disablePadding ? 'none' : 'default'}
+              sortDirection={orderBy === headCell.id ? order : false}
+          >
+              {headCell.canOrder ? 
+              <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={order === "-" ? "desc" : "asc"}
+                  onClick={createSortHandler(headCell.id)}
+                  
+              >
+              {headCell.label}
+              </TableSortLabel>
+              :
+              headCell.label
+              }
+              {idx === 0 && <>
+                <form className={classes.flex} onSubmit={handleSearch}>
+
+                  <TextField
+                    id={PATHS.SEARCH}
+                    name={PATHS.SEARCH}
+                    type={PATHS.SEARCH}
+                    className={classes.textField}
+                    value={search}
+                    placeholder={`Search Files`}
+                  />
+                <Search />
+                </form>
+            </>
+              }
+            
+          </TableCell>
+          ))}
+      </TableRow>
+      </TableHead>
+  );
+}
+
 
 function FolderView({ projectID, item, classes }) {
 
@@ -162,179 +272,310 @@ function FolderView({ projectID, item, classes }) {
   const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
   const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
-  const [numFiles, setNumFiles] = useState(100)
-  const [sortBy, setSortBy] = useState("last_modified")
-  const [order, setOrder] = useState("-")
+  const [filePage, setFilePage] = useState(1)
+  const [folderPage, setFolderPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const [sortBy, setSortBy] = useState("name.keyword")
+  const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
+  const [order, setOrder] = useState("desc")
+  const [file, setFile] = useState(null)
+  const [fileTotal, setFileTotal] = useState(0)
+  const [folderTotal, setFolderTotal] = useState(0)
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
     setLoading(true)
-    setFolders([])
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
     setFiles([])
+    setFolders([])
+    setSearch("")
     setParents(tempParents)
     //add a path to the list of parents at the end of the list
   }
+
+  const handleRequestSort = (event, property) => {
+
+    setOrder(order === "-" ? "" : "-")
+    setLoading(true)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
+    setFiles([])
+    setFolders([])
+    console.log("sort property: ", property)
+    setSortBy(property);
+};
 
   const removeParent = () => {
     let tempParents = [...parents]
     tempParents.splice(tempParents.length - 1, 1)
     setLoading(true)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
     setFolders([])
     setFiles([])
+    setSearch("")
     setParents(tempParents)
   }
+
+function getJsonKeys(json) {
+  const keys = [];
+  Object.keys(json).forEach(function (key) {
+    keys.push(key);
+  });
+  return keys;
+}
+
+  const handleSearch = (e) => {
+    console.log("handlesearch: ", e.target.elements.search.value)
+    setLoading(true)
+    setFilePage(1)
+    setFolderPage(1)
+    setFileTotal(0)
+    setFolderTotal(0)
+    setFolders([])
+    setFiles([])
+    setSearch(e.target.elements.search.value)
+    e.preventDefault()
+
+  }
+
+  useEffect(() => {
+    //search the given project with the appropriate location and search param
+
+    //folderpath is probably irrelevant
+    _isMounted = true
+    let folderPath = parents[0] //TODO: there can arise a conflict with two identical folder paths but different locations.
+
+
+    if (search && search.length > 0){
+      let fileParams = {
+        folderPath: folderPath,
+        projectID: projectID,
+        numFiles: 1000,  //TODO: paginate the file search component
+        page: 1, //TODO: affix this to some other panel
+        q: search
+      }
+
+      getFolderFiles(fileParams, "file").then((data) => {
+        console.log("search files data: ", data)
+        if (_isMounted){
+          setFiles(data.files)
+          setLoading(false)
+        }
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
+
+      
+      getFolderFiles(fileParams, "directory").then((data) => {
+        console.log("search files data: ", data)
+        if (_isMounted){
+          setFolders(data.files)
+          setLoading(false)
+        }
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
+    }
+
+    //if we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+    }
+  }, [search])
 
   useEffect(() => {
 
     let folderPath = parents[parents.length - 1]
     _isMounted = true
 
-    let params = {
+    let fileParams = {
       folderPath: folderPath,
       projectID: projectID,
-      numFiles: numFiles,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-      page: page,
+      numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      page: filePage,
       sortBy: sortBy,
       order: order,
-         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
 
-    //TODO: requires an order by component as well
-    getFolderFiles(params, "directory").then((data) => {
-      if (_isMounted){
-        //TODO:will have to change when pagination comes
-        setFolders(data.files)
-      }
-      return data
-    }).then(() => {
-      if (_isMounted && folders){
-        setLoading(false)
-      }
-    })
-    .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
-
-    getFolderFiles(params, "file").then((data) => {
-      if (_isMounted){
-        //TODO:will have to change when pagination comes
-        setFiles(data.files)
-      }
-    }).then(() => 
-    {
-      if (_isMounted && files)
-      {
-        setLoading(false)
-      }
+    let folderParams = {
+        folderPath: folderPath,
+        projectID: projectID,
+        numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+        page: folderPage,
+        sortBy: sortBy,
+        order: order,
+        //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+        //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
-    ).catch((err => {console.error("error in getFiles is: ", err)}))
+
+    if (!search){ //TODO: there is a better way to separate this out
+
+      getFolderFiles(folderParams, "directory").then((data) => {
+        console.log("folder files data: ", data.files)
+        if (_isMounted){
+          //TODO:will have to change when pagination comes
+          setFolderTotal(data.total)
+          //cases for where we want to add more files via `...`
+          //TODO: sort functionality adds duplicates in - the logic has to change here.
+          if (folders && folders.length  > 0 ){
+            const prevFolders = folders
+            setFolders([...prevFolders, ...data.files])
+            console.log("setting files to: ", [...prevFolders, ...data.files])
+          }
+          else{
+            setFolders(data.files)
+          }
+        }
+        return data
+      }).then(() => {
+        if (_isMounted && folders){
+          setLoading(false)
+        }
+      })
+      .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
+
+      getFolderFiles(fileParams, "file").then((data) => {
+        console.log("files data: ", data)
+        if (_isMounted){
+          setFileTotal(data.total)
+          if (files && files.length > 0){
+            const prevFiles = files
+            console.log("setting files to: ", [...prevFiles, ...data.files])
+            setFiles([...prevFiles, ...data.files])
+          }
+          else{
+            setFiles(data.files)
+          }
+        }
+      }).then(() => 
+      {
+        if (_isMounted && files)
+        {
+          setLoading(false)
+        }
+      }
+      ).catch((err => {console.error("error in getFiles is: ", err)}))
+
+    }
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
-  }, [parents, sortBy, order]);
+  }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
+
 
   console.log("FolderView with PID: ", projectID)
-
-    return (
-      <ReducedExpansionPanel
-        expanded={"true"}
-        className={classes.parentPanel}
-        TransitionProps={{ unmountOnExit: true }}
-      >
-        <div className={classes.fileInfoDisplay}>
-          <div className={classes.locationDisplay}>
-            <AddLocation className={classes.locationIcon} />
-            <ReferenceField
-              label={'en.models.agents.location'}
-              source={Constants.model_fk_fields.LOCATION}
-              reference={Constants.models.LOCATIONS}
-              linkType={Constants.resource_operations.SHOW}
-              basePath={`/${Constants.models.PROJECTS}`}
-              resource={Constants.models.PROJECTS}
-              record={item}
-            >
-            
-              <LocationShow />
-            </ReferenceField>
-          </div>
-
-          <div className={classes.sortDisplay}>
-            <Sort className={classes.sortIcon} />
-            <Select
-              id={'sort-select'}
-              label={`Sort By`}
-              className={classes.sortSelect}
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-            >
-              {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
-              <MenuItem value={Constants.model_fields.NAME}>File Name</MenuItem>
-              <MenuItem value={Constants.model_fields.INDEXED_DATE}>Indexed On</MenuItem>
-              <MenuItem value={Constants.model_fields.LAST_MODIFIED}>Last Modified</MenuItem>
-              <MenuItem value={Constants.model_fields.FILESIZE}>Filesize</MenuItem>
-              <MenuItem value={Constants.model_fields.LAST_ACCESS}>Last Accessed</MenuItem>
-            </Select>
-          </div>
-
-          <div className={classes.sortDisplay}>
-            {order === "-" ? <ArrowUpward className={classes.orderIcon} onClick={() => setOrder("")}/> : <ArrowDownward className={classes.orderIcon} onClick={() => setOrder("-")}/>}
-          </div>
-        </div>
-        <ExpansionPanelSummary
-          className={classes.baseFolder}
-          onClick={() => {
-              if (parents.length > 1){
-                removeParent()
-              }
-            }
-          }
+  return(
+  <div>
+    <Table size={"small"} className={classes.table}>
+    <EnhancedTableHead classes={classes}
+    onRequestSort={handleRequestSort}
+    order={order}
+    orderBy={sortBy}
+    handleSearch={handleSearch}>
+      <div className={classes.locationDisplay}>
+        <AddLocation className={classes.locationIcon} />
+        <ReferenceField
+          label={'en.models.agents.location'}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
+          linkType={RESOURCE_OPERATIONS.SHOW}
+          basePath={`/${MODELS.PROJECTS}`}
+          resource={MODELS.PROJECTS}
+          record={item}
         >
-          <FolderOpen className={classes.folderIcon} />
-          <Typography
-            className={classes.baseFolderText}
-          >{`${parents[parents.length - 1]}`}</Typography>
-        </ExpansionPanelSummary>
+          <LocationShow />
+        </ReferenceField>
+      </div>
+    </EnhancedTableHead>
+    <TableBody>
+      {!loading && (parents.length > 1) &&
+        <TableRow className={classes.folderRow}>
+          <TableCell className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /><Typography className={classes.parentDisplay}>{`${parents[parents.length - 2]}`}</Typography></TableCell>
+          <TableCell>
+          </TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      }
+      {!loading && folders && folders.length > 0 && 
+      <>
+        {folders.map( folder => {
+          return <TableRow className={classes.folderRow} key={folder.id} onClick={() => addParent(folder.path)}>
+            <TableCell className={classes.nameCell}>
+              {folder.name}
+            </TableCell>
+            <TableCell className={classes.fileCountCell}>
+              <DisplayFileIcons folder={folder} classes={classes} />
+            </TableCell>
+            <TableCell className={classes.nameCell}>
+              {folder.path_parent}
+            </TableCell>
+            <TableCell className={classes.nameCell}>
+              {folder.indexed_date}
+            </TableCell>
+          </TableRow>
+        })
+        }
+      </>
+      }
+      {!loading && folders && folders.length < folderTotal &&
+        <TableRow className={classes.folderRow} onClick={() => setFolderPage(folderPage + 1)}>
+          <TableCell>{`... ${folderTotal - folders.length} more directories`}</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      }
+      {!loading && files && files.length > 0 && 
+        files.map( file => {
+          return <TableRow className={classes.fileRow} key={file.id} onClick={() => setFile(file)}>
+          <TableCell className={classes.nameCell}>
+            {file.name}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {formatBytes(file.filesize)}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {file.path_parent}
+          </TableCell>
+          <TableCell className={classes.nameCell}>
+            {file.indexed_date}
+          </TableCell>
+        </TableRow>
+      })
+      }
+      {!loading && files && files.length < fileTotal &&
+        <TableRow className={classes.fileRow} onClick={() => setFilePage(filePage + 1)}>
+          <TableCell>{`... ${fileTotal - files.length} more files`}</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      }
+      
+    </TableBody>
+    </Table>
+    {file &&
+    <Dialog fullWidth className={classes.fileDialog} open={file} onClose={() => setFile(null)} aria-label="Show File">
+      <DialogTitle>
+      {file.name}
+      </DialogTitle>
+      <DialogContent className={classes.fileDialogContent}>
+        <FileDetails item={file} getJsonKeys={getJsonKeys} />
+      </DialogContent>
+    </Dialog>}
 
-        {!loading && folders && folders.length > 0 && folders.map(folder => {
-          return (
-              <ReducedExpansionPanelDetails key={`nested_file:${folder.key}`}>
-                    <ExpansionPanelSummary
-                      className={classes.nestedFolderPanel}
-                      onClick={() => {
-                          addParent(folder.path) //TODO: this is probably wrong we want to use setparent to create a list of parents
-                      }}
-                    >
-                      <FolderDisplay classes={classes} file={folder} />
-                    </ExpansionPanelSummary>
-              </ReducedExpansionPanelDetails>
-            );
-        })}
-
-        {!loading && files &&
-          files.length > 0 &&
-          files.map(file => {
-            return (
-              <ReducedExpansionPanelDetails key={`nested_file:${file.key}`}>
-                  <FileSummary
-                    item={file}
-                    key={file.key}
-                    caller={`browser`}
-                    className={classes.fileSummary}
-                  />
-              </ReducedExpansionPanelDetails>
-            );
-          })}
-
-          {!loading && files.length === 0 && folders.length === 0 && 
-            <Typography className={classes.noDataFoundText}>{`No data was found in this directory.`}</Typography>
-          }
-
-          { _isMounted && loading && <Typography>{`Loading...`}</Typography>}
-      </ReducedExpansionPanel>
-    );
+  </div> )
 }
+
 
 const enhance = compose(
   withStyles(styles),

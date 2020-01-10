@@ -1,11 +1,9 @@
 import React from 'react';
-import {
-  CardContent,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  Grid
-} from '@material-ui/core';
+import CardContent from "@material-ui/core/CardContent"
+import ExpansionPanel from "@material-ui/core/ExpansionPanel"
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary"
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails"
+import Grid from "@material-ui/core/Grid"
 import FileDetails from './FileDetails';
 import FilePanelSummary from './FilePanelSummary';
 import PropTypes from 'prop-types';

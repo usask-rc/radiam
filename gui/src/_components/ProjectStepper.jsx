@@ -3,7 +3,7 @@ import React, { Component, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import compose from "recompose/compose";
 import { connect } from 'react-redux';
-import * as Constants from "../_constants/index";
+import {MODEL_FIELDS, MODELS, WARNINGS, RESOURCE_OPERATIONS} from "../_constants/index";
 import { DisabledInput } from 'ra-ui-materialui/lib/input';
 import { Field } from 'redux-form'
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
@@ -25,7 +25,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getUsersInGroup } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getPrimaryContactCandidates } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 import ProjectTitle from '../Projects/ProjectTitle';
@@ -93,7 +93,7 @@ const ProjectStepperToolbar = ({ handleBack, handleNext, doSave, ...props }) => 
 /**
  * Check with the API whether a project with the name has already been created.
  */
-const asyncValidate = getAsyncValidateNotExists({ id: Constants.model_fields.ID, name: Constants.model_fields.NAME, reject: "There is already a project with this name. Please pick another name." }, Constants.models.PROJECTS);
+const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
 
 const PageOne = ({ classes, values, handleNext, ...props }) => 
 {
@@ -105,53 +105,52 @@ const PageOne = ({ classes, values, handleNext, ...props }) =>
   }
 
 return(
-  <React.Fragment>
+  <>
   <SimpleForm
     toolbar={<ProjectStepperToolbar
       handleNext={handleNext} />}
     asyncValidate={props.record.id ? null : asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
-    asyncBlurFields={[Constants.model_fields.NAME]}
+    asyncBlurFields={[MODEL_FIELDS.NAME]}
     
   >
-    {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={Constants.model_fields.ID} defaultValue={props.record.id} />}
+    {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={MODEL_FIELDS.ID} defaultValue={props.record.id} />}
     <TextInput
       className="input-small"
       label={"en.models.projects.name"}
-      source={Constants.model_fields.NAME}
+      source={MODEL_FIELDS.NAME}
       validate={validateName}
       defaultValue={props.record.name || ""}
       onChange={handleChange}
     />
     <ReferenceInput
-      resource={Constants.models.PROJECTAVATARS}
+      resource={MODELS.PROJECTAVATARS}
       className="input-small"
       label="en.models.projects.avatar"
       validate={validateAvatar}
       allowEmpty={false}
       perPage={1000}
       sort={{ field: 'random', order: 'ASC' }}
-      source={Constants.model_fields.AVATAR} reference={Constants.models.PROJECTAVATARS}
+      source={MODEL_FIELDS.AVATAR} reference={MODELS.PROJECTAVATARS}
       defaultValue={props.record.avatar || ""}
     >
       <SelectInput
-        source={Constants.model_fields.AVATAR_IMAGE}
-        optionText={<ImageField classes={{ image: classes.image }} source={Constants.model_fields.AVATAR_IMAGE} />}
+        source={MODEL_FIELDS.AVATAR_IMAGE}
+        optionText={<ImageField classes={{ image: classes.image }} source={MODEL_FIELDS.AVATAR_IMAGE} />}
         onChange={handleChange}/>
     </ReferenceInput>
     <TextInput
       className="input-medium"
       label={"en.models.projects.keywords"}
-      source={Constants.model_fields.KEYWORDS}
+      source={MODEL_FIELDS.KEYWORDS}
       defaultValue={props.record.keywords || ""}
       onChange={handleChange}
     />
   </SimpleForm>
-  <Prompt when={dirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-  </React.Fragment>
+  <Prompt when={dirty} message={WARNINGS.UNSAVED_CHANGES}/>
+  </>
 )};
 
 //NOTE: what if we use the source parameter like everything else?  will this work???!?
-
 class PageThree extends Component {
   constructor(props){
     super(props)
@@ -160,11 +159,9 @@ class PageThree extends Component {
 
   geoDataCallback = callbackGeo => {
     //send our geodata back up to the stepper, we don't have any reason to handle it here.
-    console.log("receiving geodata from map in gDC: ", geo)
-
-    const {record} = this.props
+    console.log("receiving geodata from map in gDC: ", callbackGeo)
     const { geo } = this.state
-    if (geo !== record.geo){
+    if (callbackGeo !== geo){
       this.setState({geo: callbackGeo})
       this.setState({isFormDirty: true})
     }
@@ -172,9 +169,10 @@ class PageThree extends Component {
 
   handleSubmit = (data, redirect) => {
 
-    console.log("data in handlesubmit is: ", data)
+    console.log("data in handlesubmit is: ", data, this.state)
       this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, this.state.geo, this.props, redirect)
+        const { geo } = this.state
+        submitObjectWithGeo(data, geo, this.props, redirect)
       }
     )
   };
@@ -189,14 +187,14 @@ class PageThree extends Component {
     const { handleBack, record } = this.props
     const { isFormDirty } = this.state
     return(
-      <React.Fragment>
-        <SimpleForm save={this.handleSubmit} redirect={Constants.resource_operations.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
+      <>
+        <SimpleForm save={this.handleSubmit} redirect={RESOURCE_OPERATIONS.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
           {record && 
             <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
           }
         </SimpleForm>
-        <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-      </React.Fragment>
+        <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
+      </>
     )
   }
 }
@@ -237,10 +235,10 @@ class PageTwo extends Component {
       getGroupData(group_id).then(
         data => {
 
-          let groupList = this.state.groupList
+          const { isMounted, groupList } = this.state
           groupList.push(data)
 
-          if (this.state.isMounted){
+          if (isMounted){
             this.setState(groupList)
             this.getAllParentGroups(data.parent_group)
           }
@@ -251,44 +249,11 @@ class PageTwo extends Component {
         console.error("error returned in getallparentgroups: ", err)})
     }
     else{
+      const { groupList } = this.state
       //now get a list of users in each group
-      this.getPrimaryContactCandidates()
+      getPrimaryContactCandidates(groupList).then(data => this.setState({groupContactList: data}))
     }
   };
-
-  //TODO: this also needs a bit of refactoring
-  getPrimaryContactCandidates = () => {
-    if (this.state.groupList){
-      let iteratedGroups = []
-      this.state.groupList.map(group => {
-        getUsersInGroup(group).then(data => {
-          let groupContactCandidates = this.state.groupContactCandidates
-
-          data.map(item => {
-            groupContactCandidates[item.id] = item
-          })
-
-          if (this.state.isMounted){
-            this.setState({groupContactCandidates:groupContactCandidates})
-            iteratedGroups.push(group)
-          }
-
-          if (iteratedGroups.length === this.state.groupList.length){
-            let groupContactList = []
-            Object.keys(groupContactCandidates).map(key => {
-              groupContactList.push(groupContactCandidates[key])
-            })
-            console.log("groupContactList to be set is: ", groupContactList)
-            this.setState({groupContactList: groupContactList})
-          }
-          
-        }).catch(err => console.error('error returned from getgroupusers is: ', err))
-      })
-    }else{
-      console.error("no group selected from which to provide candidate contacts")
-    }
-  }
-  
 
   render() {
     const { handleBack, handleNext } = this.props
@@ -298,20 +263,20 @@ class PageTwo extends Component {
     console.log("groupContactList is: ", groupContactList)
 
     return (
-      <React.Fragment>
-    <SimpleForm redirect={Constants.resource_operations.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
+      <>
+    <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
       <div>
         <ReferenceInput
           className="input-small"
           label={"en.models.projects.group"}
-          reference={Constants.models.GROUPS}
-          resource={Constants.models.GROUPS}
-          source={Constants.model_fields.GROUP}
+          reference={MODELS.GROUPS}
+          resource={MODELS.GROUPS}
+          source={MODEL_FIELDS.GROUP}
           validate={validateGroup}
           onChange={this.handleChange}
           defaultValue={group || ""}
         >
-          <SelectInput optionText={Constants.model_fields.NAME} />
+          <SelectInput optionText={MODEL_FIELDS.NAME} />
         </ReferenceInput>
       </div>
       {groupContactList.length > 0 && <div>
@@ -321,28 +286,28 @@ class PageTwo extends Component {
             placeholder={`Primary Contact`}
             validate={validatePrimaryContactUser}
             className="input-small"
-            users={groupContactList} id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+            users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
             defaultValue={primary_contact_user || ""} />
       </div>
       }
     </SimpleForm>
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
-    </React.Fragment>
+    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
+    </>
     )
   }
 }
 
 const renderUserInput = ({ input, users }) => {
-  return (<React.Fragment>
-    <InputLabel htmlFor={Constants.model_fields.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
-    <Select id={Constants.model_fields.PRIMARY_CONTACT_USER} name={Constants.model_fields.PRIMARY_CONTACT_USER}
+  return (<>
+    <InputLabel htmlFor={MODEL_FIELDS.PRIMARY_CONTACT_USER}>{`Primary Contact`}</InputLabel>
+    <Select id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
       {...input}
     >
       {users && [...users].map(user => {
         return (<MenuItem value={user.id} key={user.id}>{user.username}</MenuItem>)
       })}
     </Select>
-  </React.Fragment>)
+  </>)
 }
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
@@ -380,7 +345,7 @@ export class ProjectStepper extends React.Component {
     const { activeStep } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         <ProjectTitle prefix={`Creating Project`} />
       <Stepper activeStep={activeStep} orientation="vertical">
 
@@ -399,7 +364,7 @@ export class ProjectStepper extends React.Component {
           </Step>
         ))}
       </Stepper>
-      </React.Fragment>
+      </>
     );
   }
 }

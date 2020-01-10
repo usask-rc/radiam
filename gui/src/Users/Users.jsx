@@ -13,7 +13,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import * as Constants from "../_constants/index";
+import {MODEL_FIELDS, ROLE_USER} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { EditToolbar } from "../_components";
 import UserDetails from "./UserDetails";
@@ -55,7 +55,7 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     />
     <BooleanInput
       label={"en.models.users.active"}
-      source={Constants.model_fields.ACTIVE}
+      source={MODEL_FIELDS.ACTIVE}
       alwaysOn />
   </Filter>
 ));
@@ -63,9 +63,9 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
 const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
 const PostBulkActionButtons = props => (
-  <React.Fragment>
+  <>
     <ToggleActiveButton label="Toggle Active" {...props} />
-  </React.Fragment>
+  </>
 )
 
 
@@ -85,7 +85,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       filterDefaultValues={{is_active: true}}
       exporter={false}
       filters={<UserFilter />}
-      sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
+      sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: "DESC" }}
       perPage={10}
       pagination={<CustomPagination />}
       //bulkActionButtons={<PostBulkActionButtons {...other}/>} - This can be activated as soon as Username is no longer a required field on PUT.
@@ -94,40 +94,33 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       <Datagrid rowClick={userListRowClick} {...other}>
         <TextField
           label={"en.models.users.username"}
-          source={Constants.model_fields.USERNAME}
+          source={MODEL_FIELDS.USERNAME}
         />
         <TextField
           label={"en.models.users.fname"}
-          source={Constants.model_fields.FIRST_NAME}
+          source={MODEL_FIELDS.FIRST_NAME}
         />
         <TextField
           label={"en.models.users.lname"}
-          source={Constants.model_fields.LAST_NAME}
+          source={MODEL_FIELDS.LAST_NAME}
         />
         <EmailField
           className={classes.email}
           label={"en.models.users.email"}
-          source={Constants.model_fields.EMAIL}
+          source={MODEL_FIELDS.EMAIL}
         />
         <TextField
           label={"en.models.users.notes"}
-          source={Constants.model_fields.NOTES}
+          source={MODEL_FIELDS.NOTES}
         />
         <BooleanField
           label={"en.models.users.active"}
-          source={Constants.model_fields.ACTIVE} />
+          source={MODEL_FIELDS.ACTIVE} />
       </Datagrid>
     </List>
   )
 }
 );
-
-/*
-function manages_user(data)  {
-  console.log("data in manages_user: ", data)
-  //given my user id, is this user in a group I manage?
-  return true
-}*/
 
 const actionsStyles = theme => ({
   root: {
@@ -176,8 +169,6 @@ export const UserCreate = props => {
 //TODO: refactor all these goddamn user edit forms into one
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-  console.log("UserEdit props: ", props)
     return(
     <Edit toolbar={<EditToolbar />} {...props}>
       <UserEditForm {...other}/>
@@ -188,7 +179,7 @@ export const UserEdit = props => {
 //TODO: add "are you sure?" prompt.
 //a form for superusers, this is gated in App.jsx.
 export const UserEditWithDeletion = props => {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
