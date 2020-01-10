@@ -16,6 +16,8 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings, settings
 
 from rest_framework.filters import OrderingFilter
+from django.db.models.functions import Lower
+from django.db.models.expressions import F, OrderBy
 from django_filters.rest_framework import DjangoFilterBackend
 
 from dry_rest_permissions.generics import (
@@ -130,6 +132,8 @@ from rest_framework.response import Response
 from django_rest_passwordreset.serializers import EmailSerializer, PasswordTokenSerializer
 from django_rest_passwordreset.models import ResetPasswordToken, clear_expired, get_password_reset_token_expiry_time
 from django_rest_passwordreset.signals import reset_password_token_created, pre_password_reset, post_password_reset
+
+from itertools import chain
 # end
 
 
@@ -275,6 +279,7 @@ class RadiamOrderingFilter(OrderingFilter):
     rest_parameter is the string value of the query string parameter to replace and
     replaced_by can be a list of query string parameters to add to the ordering instead
     """
+
     def get_replacements(self):
         raise NotImplementedError(".get_replacements() must be overridden.")
 
@@ -299,6 +304,29 @@ class RadiamOrderingFilter(OrderingFilter):
 
         # No ordering was included, or all the ordering fields were invalid
         return self.get_default_ordering(view)
+
+class CaseInsensitiveOrderingFilter(OrderingFilter):
+    STRING_ORDERING_FIELDS = [ 'first_name', 'last_name', '-first_name', '-last_name']
+
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+        if ordering:
+            case_insensitive_ordering = []
+
+            for field in ordering:
+                if field not in self.STRING_ORDERING_FIELDS:
+                    if field.startswith('-'):
+                        case_insensitive_ordering.append(F(field[1:]).desc())
+                    else:
+                        case_insensitive_ordering.append(F(field).asc())
+                elif field.startswith('-'):
+                    case_insensitive_ordering.append(Lower(field[1:]).desc())
+                else:
+                    case_insensitive_ordering.append(Lower(field).asc())
+            queryset = queryset.order_by(*case_insensitive_ordering)
+
+
+        return queryset
 
 
 class GeoSearchMixin(object):
@@ -427,7 +455,7 @@ class UserViewSet(RadiamViewSet):
        filters.SearchFilter,
        DjangoFilterBackend,
        RadiamAuthUserFilter,
-       OrderingFilter,
+       CaseInsensitiveOrderingFilter,
     )
     search_fields = ['username', 'first_name', 'last_name', 'email']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
