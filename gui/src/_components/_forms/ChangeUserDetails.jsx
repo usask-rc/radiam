@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {models, ROLE_USER} from "../../_constants/index";
+import {MODELS, ROLE_USER} from "../../_constants/index";
 import { getAPIEndpoint, getCurrentUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
 import { Responsive } from "ra-ui-materialui/lib/layout";
@@ -62,7 +62,7 @@ class ChangeDetails extends Component {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const params = { data: this.state, id: id }
 
-        dataProvider(UPDATE, models.USERS, params).then(response => {
+        dataProvider(UPDATE, MODELS.USERS, params).then(response => {
             toast.success("Account information successfully updated.")
         }).catch(err => {
             console.log("error in user details update is: ", err)

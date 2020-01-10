@@ -5,7 +5,6 @@ import HomeIcon from "@material-ui/icons/Home";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../../_constants/index"
 import GroupAddIcon from "@material-ui/icons/GroupAdd"
 import PersonAdd from "@material-ui/icons/PersonAdd";
 import { getMaxUserRole } from "../../_tools/funcs";
