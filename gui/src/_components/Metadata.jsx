@@ -1458,7 +1458,6 @@ class BaseMetadataEditActions extends Component {
 
   componentDidMount(){
     const {id, showRelatedUsers} = this.props
-    console.log("componentwillmount props: ", this.props)
     if (showRelatedUsers){
 
       if (id) {
