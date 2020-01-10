@@ -72,15 +72,12 @@ const DynamicForm = ({classes, prevProperties, setProperties}) => {
                         </IconButton>
                     </div>
                 )
-        })
+            })
         }
 
         <Divider/>
         <Button variant="contained" color="primary" onClick={e => setProperties(featureParams)}>Confirm</Button>  
     </FormControl>)
-
-    
-    
 };
 
 export default withStyles(styles)(DynamicForm)

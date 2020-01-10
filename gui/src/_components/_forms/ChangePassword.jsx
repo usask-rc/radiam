@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Button, Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography"
 import ConfirmPassword from "../_fragments/ConfirmPassword";
-import {MODELS, PATHS, METHODS, FIELDS, WEBTOKEN, ROLE_USER, WARNINGS, } from "../../_constants/index";
+import { MODELS, PATHS, METHODS, FIELDS, WEBTOKEN, ROLE_USER, WARNINGS, } from "../../_constants/index";
 import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
 import RequestPassword from "../_fragments/RequestPassword";
 import {Redirect} from "react-router"

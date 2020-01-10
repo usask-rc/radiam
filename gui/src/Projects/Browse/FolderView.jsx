@@ -178,7 +178,7 @@ const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
-  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
+  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
@@ -277,7 +277,7 @@ function FolderView({ projectID, item, classes }) {
   const [perPage, setPerPage] = useState(10)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
-  const [order, setOrder] = useState("")
+  const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
@@ -508,7 +508,7 @@ function getJsonKeys(json) {
       {!loading && folders && folders.length > 0 && 
       <>
         {folders.map( folder => {
-          return <TableRow className={classes.folderRow} onClick={() => addParent(folder.path)}>
+          return <TableRow className={classes.folderRow} key={folder.id} onClick={() => addParent(folder.path)}>
             <TableCell className={classes.nameCell}>
               {folder.name}
             </TableCell>
@@ -536,7 +536,7 @@ function getJsonKeys(json) {
       }
       {!loading && files && files.length > 0 && 
         files.map( file => {
-          return <TableRow className={classes.fileRow} onClick={() => setFile(file)}>
+          return <TableRow className={classes.fileRow} key={file.id} onClick={() => setFile(file)}>
           <TableCell className={classes.nameCell}>
             {file.name}
           </TableCell>

@@ -15,7 +15,7 @@ import {
   withTranslate,
 } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import {AVATAR_HEIGHT, RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
+import {AVATAR_HEIGHT, RESOURCE_OPERATIONS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 
 const styles = theme => ({

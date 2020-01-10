@@ -372,7 +372,7 @@ export default {
         date_created: 'Created At',
         date_updated: 'Last Updated',
         date_expires: 'Expires At',
-        date_membership_expires: 'Group Membership Expires At',
+        date_membership_expires: 'Membership Expiry Date',
       },
       agents: {
         user: 'User',

@@ -101,7 +101,7 @@ const styles = {
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
-        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
+        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
         //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
     ]
 

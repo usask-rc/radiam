@@ -84,11 +84,7 @@ class Login extends Component {
   }
 
   handleChange = e => {
-    // If you are using babel, you can use ES 6 dictionary syntax
-    // let change = { [e.target.name] = e.target.value }
-    let change = {};
-    change[e.target.name] = e.target.value;
-    this.setState(change);
+    this.setState({ [e.target.name] : e.target.value});
   };
 
 

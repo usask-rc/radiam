@@ -20,11 +20,13 @@ function validateToken(checkToken) {
   return new Promise((resolve, reject) => {
     fetch(request).then(response => {
       if (response.status >= 200 && response.status < 300){
-        resolve(response.json())
+        resolve(response)
       }
       else if (response.status === 401 || response.status === 403){
         let curTok = JSON.parse(localStorage.getItem(WEBTOKEN));
-        refreshAccessToken(curTok).then(resolve()).catch(err => reject(err))
+        refreshAccessToken(curTok).then(
+          resolve("resolve after refreshaccess call in validate")
+          ).catch(err => reject(err))
       }
       else{
         throw new Error(response.statusText)
@@ -298,7 +300,7 @@ export default (type, params, ...rest) => {
 
     return validateToken(JSON.parse(getToken).access)
       .then(() => {
-          Promise.resolve()
+          Promise.resolve()//there is a uncaught exception here, I don't know what is causing it, but it's seemingly after the promise resolve.
         }
       )
       .catch(

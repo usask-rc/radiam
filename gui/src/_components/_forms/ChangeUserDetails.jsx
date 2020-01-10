@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {models, ROLE_USER} from "../../_constants/index";
 import { getAPIEndpoint, getCurrentUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
-import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
@@ -85,7 +84,6 @@ class ChangeDetails extends Component {
         .catch(err => 
             {
                 console.error("Error in getCurrentUserDetails: ", err)
-                this.setState({redirect: true})
             }
         )
     }
@@ -95,7 +93,7 @@ class ChangeDetails extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         const user = JSON.parse(localStorage.getItem(ROLE_USER))
-        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: false }
+        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
     }
 
     componentDidMount() {
@@ -103,14 +101,14 @@ class ChangeDetails extends Component {
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
-        const { user, redirect } = this.state
+        console.log("CUD props: ", this.props)
+        const { user } = this.state
         return (
             <Responsive
                 medium={
                     <>
                         <UserEditWithDeletion basePath="/users" resource="users" id={user.id}  />
                         <ToastContainer />
-                        {redirect && <Redirect to="/login"/>}
                     </>
                 }
             />

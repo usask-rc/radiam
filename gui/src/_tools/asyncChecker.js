@@ -32,7 +32,7 @@ export function getAsyncValidateNotExists(checkField, endpoint_path) {
   }
 }
 
-export function getAsyncValidateTwoNotExists(one, two, endpoint_path) {
+export function getAsyncValidateDuplicateNotExists(one, two, endpoint_path) {
   return function asyncValidate(data, middleware, context, field) {
     return new Promise(async (resolve, reject) => {
       if (data[one.name] && data[two.name]) {

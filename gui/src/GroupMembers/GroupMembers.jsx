@@ -19,7 +19,7 @@ import {
 } from "react-admin";
 import {RESOURCE_OPERATIONS, ROLE_USER, WARNINGS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { getAsyncValidateTwoNotExists } from "../_tools/asyncChecker";
+import { getAsyncValidateDuplicateNotExists } from "../_tools/asyncChecker";
 import TranslationField from "../_components/_fields/TranslationField";
 import TranslationSelect from "../_components/_fields/TranslationSelect";
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
@@ -240,7 +240,7 @@ const validateRole = required('en.validate.groupmembers.role');
 /**
  * Check with the API whether a user has already been assigned a role in a group.
  */
-const asyncValidate = getAsyncValidateTwoNotExists(
+const asyncValidate = getAsyncValidateDuplicateNotExists(
   {
     id: MODEL_FIELDS.ID,
     name : MODEL_FK_FIELDS.USER,

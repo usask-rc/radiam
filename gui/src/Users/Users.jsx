@@ -122,13 +122,6 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
 }
 );
 
-/*
-function manages_user(data)  {
-  console.log("data in manages_user: ", data)
-  //given my user id, is this user in a group I manage?
-  return true
-}*/
-
 const actionsStyles = theme => ({
   root: {
     float: "right",
