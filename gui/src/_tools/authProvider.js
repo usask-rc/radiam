@@ -1,4 +1,4 @@
-// in authProvider.js
+// in src/authProvider.js
 import {
   AUTH_LOGIN,
   AUTH_LOGOUT,
@@ -7,7 +7,7 @@ import {
   AUTH_GET_PERMISSIONS
 } from "react-admin";
 import { getAPIEndpoint } from "./funcs";
-import { METHODS, WEBTOKEN, MODELS, MODEL_FIELDS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS } from "../_constants/index"
+import {MODELS, MODEL_FIELDS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS, METHODS, WEBTOKEN} from "../_constants/index"
 import { toast } from "react-toastify";
 
 function validateToken(checkToken) {
@@ -17,22 +17,29 @@ function validateToken(checkToken) {
     headers: new Headers({ "Content-Type": "application/json" })
   });
 
-  return new Promise((resolve, reject) => {
-    fetch(request).then(response => {
-      if (response.status >= 200 && response.status < 300){
-        resolve(response)
+  return fetch(request)
+    .then(response => {
+      //if unauthorized, give the client a chance to refresh the token.
+      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
+        //TODO:there is an error between here and the Resolve.  I don't quite know what it is - error is 'uncaught exception: undefined'
+        return response.json();
+      } else {
+        throw new Error(response.statusText);
       }
-      else if (response.status === 401 || response.status === 403){
+    })
+    .then(result => {
+      if (result && result.code && result.code === "token_not_valid") {
         let curTok = JSON.parse(localStorage.getItem(WEBTOKEN));
-        refreshAccessToken(curTok).then(
-          resolve("resolve after refreshaccess call in validate")
-          ).catch(err => reject(err))
+        return refreshAccessToken(curTok)
+          .then(Promise.resolve())
+          .catch(Promise.reject());
+      } else {
+        Promise.resolve();
       }
-      else{
-        throw new Error(response.statusText)
-      }
-    }).catch(err => reject(err))
-  })
+    })
+    .catch(error => {
+      Promise.reject();
+    });
 }
 
 
@@ -43,24 +50,25 @@ function refreshAccessToken(curTok) {
     headers: new Headers({ "Content-Type": "application/json" })
   });
 
-  return new Promise((resolve, reject) => {
-
-    validateToken(curTok.refresh).then(fetch(request)
-      .then(response => {
-        if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
-          localStorage.removeItem(WEBTOKEN)
-          window.location.hash = "#/login"
-          console.error(response.statusText);
-        }
-        return response.json();
-      })
-      .then(token => {
-        curTok.access = token.access;
-        localStorage.setItem(WEBTOKEN, JSON.stringify(curTok));
-        resolve()
-      })
-      .catch(err => reject(err)))
-  })
+  return validateToken(curTok.refresh).then(fetch(request)
+    .then(response => {
+      if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
+        localStorage.removeItem(WEBTOKEN)
+        window.location.hash = "#/login"
+        console.error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(token => {
+      curTok.access = token.access;
+      localStorage.setItem(WEBTOKEN, JSON.stringify(curTok));
+      return Promise.resolve();
+    })
+    .catch(Promise.reject()))
+    .catch(
+      //TODO: refresh token is expired if it doesn't validate.  The user should be logged out here, but I haven't figured this out yet.
+      Promise.reject()
+    );
 }
 
 function getRequest(url, suppliedToken) {
@@ -81,158 +89,151 @@ function getRequest(url, suppliedToken) {
 }
 
 function getGroupRoles() {
-  return new Promise((resolve, reject) => {
-    const request = getRequest(`/${MODELS.ROLES}/`);
-    fetch(request)
-      .then(response => {
-        if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-          return response.json();
-        } else {
-          console.log("response from group roles fetch is: ", response);
-          throw new Error(response.statusText);
-        }
-      })
-      .then(result => {
-        var groupRoles = [];
-        for (var i = 0; i < result.count; i++) {
-          var groupRole = result.results[i];
-          groupRoles.push(groupRole);
-        }
-        localStorage.setItem(MODELS.ROLES, JSON.stringify(groupRoles));
-        resolve(groupRoles)
-      }).catch(err => reject(err));
-  })
+  const request = getRequest(`/${MODELS.ROLES}/`);
+  return fetch(request)
+    .then(response => {
+      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
+        return response.json();
+      } else {
+        console.log("response from group roles fetch is: ", response);
+        throw new Error(response.statusText);
+      }
+    })
+    .then(result => {
+      var groupRoles = [];
+      for (var i = 0; i < result.count; i++) {
+        var groupRole = result.results[i];
+        groupRoles.push(groupRole);
+      }
+      localStorage.setItem(MODELS.ROLES, JSON.stringify(groupRoles));
+      return Promise.resolve(groupRoles);
+    });
 }
 
 function getUser(groupRoles) {
-
-  return new Promise((resolve, reject) => {
-      
-    const username = localStorage.getItem(MODEL_FIELDS.USERNAME);
-    const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=` + username);
-    fetch(request)
-      .then(response => {
-        if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-          return response.json();
-        } else {
-          throw new Error("There was more than one user returned matching that username");
-        }
-      })
-      .then(result => {
-        if (result.count > 1) {
-          throw new Error("We have more than one user with the same username.")
-        }
-        console.log("in getUser, result is: ", result)
-        var user = { is_admin: false, is_data_manager: false, is_group_admin: false, groupRoles: groupRoles };
-        var newUser = result.results[0];
-        var admin = newUser.is_superuser;
-        if (admin) {
-          user.is_admin = true;
-        } else {
-          user.is_admin = false;
-        }
-        user.id = newUser.id;
-        localStorage.setItem(ROLE_USER, JSON.stringify(user));
-        resolve(user);
-      })
-      .catch(err => reject(err));
-  })
+  const username = localStorage.getItem(MODEL_FIELDS.USERNAME);
+  const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=` + username);
+  return fetch(request)
+    .then(response => {
+      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
+        return response.json();
+      } else {
+        throw new Error("There was more than one user returned matching that username");
+      }
+    })
+    .then(result => {
+      if (result.count > 1) {
+        console.log("Had more than one user with the same username", result);
+        throw new Error("We have more than one user with the same username.")
+      }
+      console.log("in getUser, result is: ", result)
+      var user = { is_admin: false, is_data_manager: false, is_group_admin: false, groupRoles: groupRoles };
+      var newUser = result.results[0];
+      var admin = newUser.is_superuser;
+      if (admin) {
+        user.is_admin = true;
+      } else {
+        user.is_admin = false;
+      }
+      user.id = newUser.id;
+      localStorage.setItem(ROLE_USER, JSON.stringify(user));
+      return Promise.resolve(user);
+    });
 }
 
 function getGroupMemberships(user) {
-  return new Promise((resolve, reject) => {
-    const request = getRequest("/groupmembers/?user=" + user.id);
-    fetch(request)
-      .then(response => {
-        if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-          return response.json();
-        } else {
-          console.log("response from group roles fetch is: ", response);
-          throw new Error(response.statusText);
-        }
-      })
-      .then(result => {
-        var groupMemberships = [];
-        var groupAdminships = [];
-        var dataManagerships = [];
-        var groupUserships = [];
-        for (var i = 0; i < result.count; i++) {
-          var groupMembership = result.results[i];
-          for (var rolesIndex = 0; rolesIndex < user.groupRoles.length; rolesIndex++) {
-            if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
-              groupMembership.group_role = user.groupRoles[rolesIndex];
-              if (user.groupRoles[rolesIndex].id === ROLE_DATA_MANAGER) {
-                user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
-                dataManagerships.push(groupMembership.group)
-              } else if (user.groupRoles[rolesIndex].id === ROLE_GROUP_ADMIN) {
+  const request = getRequest("/groupmembers/?user=" + user.id);
+  return fetch(request)
+    .then(response => {
+      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
+        return response.json();
+      } else {
+        console.log("response from group roles fetch is: ", response);
+        throw new Error(response.statusText);
+      }
+    })
+    .then(result => {
+      var groupMemberships = [];
+      var groupAdminships = [];
+      var dataManagerships = [];
+      var groupUserships = [];
+      for (var i = 0; i < result.count; i++) {
+        var groupMembership = result.results[i];
+        for (var rolesIndex = 0; rolesIndex < user.groupRoles.length; rolesIndex++) {
+          if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
+            groupMembership.group_role = user.groupRoles[rolesIndex];
+            if (user.groupRoles[rolesIndex].id === ROLE_DATA_MANAGER) {
+              user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
+              dataManagerships.push(groupMembership.group)
+            } else if (user.groupRoles[rolesIndex].id === ROLE_GROUP_ADMIN) {
 
-                user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
-                groupAdminships.push(groupMembership.group)
-              }
-              else{
-                groupUserships.push(groupMembership.group)
-              }
-              groupMemberships.push(groupMembership.group)
-              break;
+              user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
+              groupAdminships.push(groupMembership.group)
             }
+            else{
+              groupUserships.push(groupMembership.group)
+            }
+            groupMemberships.push(groupMembership.group)
+            break;
           }
-          groupMemberships.push(groupMembership);
         }
-        user.groupMemberships = groupMemberships;
-        user.groupAdminships = groupAdminships
-        user.dataManagerships = dataManagerships
-        user.groupUserships = groupUserships
-        localStorage.setItem(ROLE_USER, JSON.stringify(user));
-        resolve(user)
-      }).catch(error => {
-        reject(error)
-      });
-  })
+        groupMemberships.push(groupMembership);
+      }
+      user.groupMemberships = groupMemberships;
+      user.groupAdminships = groupAdminships
+      user.dataManagerships = dataManagerships
+      user.groupUserships = groupUserships
+
+      localStorage.setItem(ROLE_USER, JSON.stringify(user));
+      return Promise.resolve(user);
+    }).catch(error => {
+      console.log("Unable to get memberships", error);
+      Promise.reject();
+    });
 }
 
 function getGroups(user) {
-  return new Promise((resolve, reject) => {
-    const request = getRequest("/researchgroups/");
-    fetch(request)
-      .then(response => {
-        if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-          return response.json();
-        } else {
-          console.log("response from groups fetch is: ", response);
-          throw new Error(response.statusText);
-        }
-      })
-      .then(result => {
-        var groups = [];
-        for (var i = 0; i < result.count; i++) {
-          var group = result.results[i];
-          for (var membershipsIndex = 0; membershipsIndex < user.groupMemberships.length; membershipsIndex++) {
-            if (user.groupMemberships[membershipsIndex].group === group.id) {
-              user.groupMemberships[membershipsIndex].group = group;
-            }
-          }
-          groups.push(group);
-        }
-        user.groups = groups;
-        localStorage.setItem(ROLE_USER, JSON.stringify(user));
-        resolve(user)
-      }).catch(error => {
-        console.log("Unable to get groups", error);
-        reject(error)
-      });
+  const request = getRequest("/researchgroups/");
+  return fetch(request)
+    .then(response => {
+      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
+        return response.json();
+      } else {
+        console.log("response from groups fetch is: ", response);
+        throw new Error(response.statusText);
+      }
     })
+    .then(result => {
+      var groups = [];
+      for (var i = 0; i < result.count; i++) {
+        var group = result.results[i];
+        for (var membershipsIndex = 0; membershipsIndex < user.groupMemberships.length; membershipsIndex++) {
+          if (user.groupMemberships[membershipsIndex].group === group.id) {
+            user.groupMemberships[membershipsIndex].group = group;
+          }
+        }
+        groups.push(group);
+      }
+      user.groups = groups;
+      localStorage.setItem(ROLE_USER, JSON.stringify(user));
+      return Promise.resolve(user);
+    }).catch(error => {
+      console.log("Unable to get groups", error);
+      Promise.reject();
+    });
 }
 
-//TODO: other functions here are wrapped in promises, but this one has issues when doing that.  Is there a good way to do this?
 export default (type, params, ...rest) => {
   if (type === AUTH_LOGIN) {
     const { username, password } = params;
+    console.log("params are: ", params)
     localStorage.setItem(LOGIN_DETAILS.USERNAME, username);
     const request = new Request(getAPIEndpoint() + "/token/", {
       method: METHODS.POST,
       body: JSON.stringify({ username, password }),
       headers: new Headers({ "Content-Type": "application/json" })
     });
+    console.log("request is: ", request)
     return fetch(request)
       .then(response => {
         if (response.status < 200 || response.status >= 300) {
@@ -240,6 +241,8 @@ export default (type, params, ...rest) => {
           console.log("response statustext is: ", response.statusText);
           throw new Error(response.statusText);
         }
+        console.log("response statustext is: ", response.statusText);
+
         return response.json();
       }).catch(function (error) {
         console.log("Error thrown from response is: ", error)
@@ -300,7 +303,7 @@ export default (type, params, ...rest) => {
 
     return validateToken(JSON.parse(getToken).access)
       .then(() => {
-          Promise.resolve()//there is a uncaught exception here, I don't know what is causing it, but it's seemingly after the promise resolve.
+          Promise.resolve()
         }
       )
       .catch(
