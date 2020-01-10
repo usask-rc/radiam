@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid } from '@material-ui/core';
 import ProjectList from '../ProjectList/ProjectList';
 
-const ProjectCards = ({ loading, projects }) => 
+const ProjectCards = ({ projects }) => 
 {
     return(
         <Grid
@@ -10,10 +10,10 @@ const ProjectCards = ({ loading, projects }) =>
             justify="flex-start"
             container
         >
-            {!loading &&
+            {
                 projects &&
                 projects.length > 0 &&
-                <ProjectList loading={loading} projects={projects} />
+                <ProjectList projects={projects} />
             }
         </Grid>
     )

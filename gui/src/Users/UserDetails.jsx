@@ -1,7 +1,7 @@
 //UserDetails.jsx
 import React, { Component } from 'react';
 import { BooleanField, EmailField, SimpleShowLayout, TextField } from "react-admin";
-import * as Constants from "../_constants/index"
+import {MODELS, MODEL_FIELDS} from "../_constants/index";
 import { getUserGroups } from '../_tools/funcs';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
@@ -25,36 +25,36 @@ class UserDetails extends Component {
         const {setViewModal} = this.props
 
         return (
-            <SimpleShowLayout {...this.props} resource={Constants.models.USERS}>
+            <SimpleShowLayout {...this.props} resource={MODELS.USERS}>
                 <UserTitle prefix={"Viewing"}/>
                 {groupMembers && groupMembers.length > 0 && <RelatedGroups groupMembers={groupMembers} setViewModal={(data) => {this.setState({viewModal:data})}} inModal={setViewModal === undefined ? false : true}/>}
                 <TextField
                     label={"en.models.users.username"}
-                    source={Constants.model_fields.USERNAME}
+                    source={MODEL_FIELDS.USERNAME}
                 />
                 <TextField
                     label={"en.models.users.fname"}
-                    source={Constants.model_fields.FIRST_NAME}
+                    source={MODEL_FIELDS.FIRST_NAME}
                 />
                 <TextField
                     label={"en.models.users.lname"}
-                    source={Constants.model_fields.LAST_NAME}
+                    source={MODEL_FIELDS.LAST_NAME}
                 />
                 <EmailField
                     label={"en.models.users.email"}
-                    source={Constants.model_fields.EMAIL}
+                    source={MODEL_FIELDS.EMAIL}
                 />
                 <TextField
                     label={"en.models.users.notes"}
-                    source={Constants.model_fields.NOTES}
+                    source={MODEL_FIELDS.NOTES}
                 />
                 <TextField
                     label={"en.models.users.user_orcid_id"}
-                    source={Constants.model_fields.ORCID_ID}
+                    source={MODEL_FIELDS.ORCID_ID}
                     />
                 <BooleanField
                     label={"en.models.generic.active"}
-                    source={Constants.model_fields.ACTIVE}
+                    source={MODEL_FIELDS.ACTIVE}
                 />
                 {viewModal &&
                 <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); this.setState({viewModal:false})}} aria-label="Add User">

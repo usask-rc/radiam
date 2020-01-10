@@ -1,12 +1,14 @@
 //ForgotForm.jsx
 
-import React, { Component } from 'react'
-import { withStyles, Button } from '@material-ui/core';
-import {translate} from "ra-core"
+import React from 'react'
+import Button from '@material-ui/core/Button'
+import {withStyles} from '@material-ui/core/styles'
+import { translate } from "ra-core"
 import { Field } from 'redux-form';
-import * as Constants from "../_constants/index"
-import { MuiThemeProvider } from 'material-ui/styles';
-import { CardActions, CircularProgress } from 'material-ui';
+import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import CardActions from 'material-ui/Card/CardActions';
+import CircularProgress from "material-ui/CircularProgress"
 import ToggleForgot from './ToggleForgot';
 import compose from "recompose/compose"
 
@@ -27,9 +29,9 @@ const styles = () => ({
 
 
 const validateEmail = value =>
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
-  'Invalid email address' : undefined
-const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, isLoading }) => {
+value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+'Invalid email address' : undefined
+const ForgotForm = ({classes, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, isLoading }) => {
     return(
         <MuiThemeProvider>
             <form onSubmit={handleSubmit(forgotPassword)}>
@@ -37,7 +39,7 @@ const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleFor
                     <div className={classes.input}>
                         <Field
                         autoFocus
-                        name={Constants.login_details.EMAIL}
+                        name={LOGIN_DETAILS.EMAIL}
                         component={renderInput}
                         onChange={handleChange}
                         label={translate("en.auth.email")}
@@ -49,7 +51,7 @@ const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleFor
                 <CardActions className={classes.actions}>
                     <Button
                         variant="outlined"
-                        type={Constants.fields.SUBMIT}
+                        type={FIELDS.SUBMIT}
                         color="primary"
                         disabled={isLoading}
                         className={classes.button}

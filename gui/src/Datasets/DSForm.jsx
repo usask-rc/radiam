@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-admin';
 import { ConfigMetadata, EditMetadata } from "../_components/Metadata.jsx";
-import * as Constants from '../_constants/index';
+import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import ProjectName from "../_components/_fields/ProjectName";
 import { Prompt } from "react-router"
@@ -78,7 +78,7 @@ class DSForm extends Component {
             <SimpleForm save={this.handleSubmit} name={"datasetForm"} onChange={this.handleChange} {...rest}>
                 <TextInput      
                 label="Title"
-                source={Constants.model_fields.TITLE}
+                source={MODEL_FIELDS.TITLE}
                 validate={validateTitle}
                 
                 />
@@ -86,66 +86,66 @@ class DSForm extends Component {
                 className="input-large"
                 label={"en.models.datasets.data_abstract"}
                 options={{ multiline: true }}
-                source={Constants.model_fields.ABSTRACT}
+                source={MODEL_FIELDS.ABSTRACT}
                 />
                 <TextInput
                 className="input-small"
                 label={"en.models.datasets.study_site"}
-                source={Constants.model_fields.STUDY_SITE}
+                source={MODEL_FIELDS.STUDY_SITE}
                 />
             
                 <ReferenceInput
                 label={'en.models.datasets.project'}
-                source={Constants.model_fk_fields.PROJECT}
-                reference={Constants.models.PROJECTS}
+                source={MODEL_FK_FIELDS.PROJECT}
+                reference={MODELS.PROJECTS}
                 validate={validateProject}
                 defaultValue={location.project ? location.project : null}
                 >
-                <SelectInput source={Constants.model_fields.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
+                <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
                 </ReferenceInput>
             
                 <ReferenceInput
-                resource={Constants.models.DATA_COLLECTION_STATUS}
+                resource={MODELS.DATA_COLLECTION_STATUS}
                 className="input-small"
                 label={"en.models.datasets.data_collection_status"}
-                source={Constants.model_fields.DATA_COLLECTION_STATUS}
-                reference={Constants.models.DATA_COLLECTION_STATUS}
+                source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+                reference={MODELS.DATA_COLLECTION_STATUS}
                 validate={validateDataCollectionStatus}>
-                <TranslationSelect optionText={Constants.model_fields.LABEL} />
+                <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
                 </ReferenceInput>
             
                 <ReferenceInput
-                resource={Constants.models.DISTRIBUTION_RESTRICTION}
+                resource={MODELS.DISTRIBUTION_RESTRICTION}
                 className="input-small"
                 label={"en.models.datasets.distribution_restriction"}
-                source={Constants.model_fields.DISTRIBUTION_RESTRICTION}
-                reference={Constants.models.DISTRIBUTION_RESTRICTION}
+                source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+                reference={MODELS.DISTRIBUTION_RESTRICTION}
                 validate={validateDistributionRestriction}>
-                <TranslationSelect optionText={Constants.model_fields.LABEL} />
+                <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
                 </ReferenceInput>
             
                 <ReferenceArrayInput
                 allowEmpty
-                resource={Constants.models.DATA_COLLECTION_METHOD}
+                resource={MODELS.DATA_COLLECTION_METHOD}
                 className="input-medium"
                 label={"en.models.datasets.data_collection_method"}
-                source={Constants.model_fields.DATA_COLLECTION_METHOD}
-                reference={Constants.models.DATA_COLLECTION_METHOD}
+                source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
+                reference={MODELS.DATA_COLLECTION_METHOD}
                 validate={validateDataCollectionMethod}>
                 <TranslationSelectArray optionText="label" />
                 </ReferenceArrayInput>
             
                 <ReferenceArrayInput
-                resource={Constants.models.SENSITIVITY_LEVEL}
+                resource={MODELS.SENSITIVITY_LEVEL}
                 className="input-medium"
                 label={"en.models.datasets.sensitivity_level"}
-                source={Constants.model_fields.SENSITIVITY_LEVEL}
-                reference={Constants.models.SENSITIVITY_LEVEL}
+                source={MODEL_FIELDS.SENSITIVITY_LEVEL}
+                reference={MODELS.SENSITIVITY_LEVEL}
                 validate={validateSensitivityLevel}>
                 <TranslationSelectArray optionText="label" />
                 </ReferenceArrayInput>
             
-                { mode === Constants.resource_operations.EDIT && id && (
+                { mode === RESOURCE_OPERATIONS.EDIT && id && (
                 <>
                     <EditMetadata id={id} type="dataset"/>
                     <ConfigMetadata id={id} type="dataset" />

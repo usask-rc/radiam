@@ -86,7 +86,6 @@ function BrowseTab({ projectID, classes }) {
             item={item}
             projectID={projectID}
             key={item.key}
-            classes={classes}
           />
         }
       )

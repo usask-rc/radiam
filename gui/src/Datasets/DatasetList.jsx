@@ -10,11 +10,11 @@ import {
   TextField,
   TextInput,
 } from 'react-admin';
-import * as Constants from '../_constants/index';
+import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
 import { withStyles } from '@material-ui/core/styles';
-import { Search } from '@material-ui/icons';
+import Search from '@material-ui/icons/Search';
 
 const listStyles = {
     actions: {
@@ -48,11 +48,11 @@ const listStyles = {
       />
       <ReferenceInput
         label={'en.models.datasets.project'}
-        source={Constants.model_fk_fields.PROJECT}
-        reference={Constants.models.PROJECTS}
+        source={MODEL_FK_FIELDS.PROJECT}
+        reference={MODELS.PROJECTS}
         alwaysOn
       >
-        <SelectInput optionText={Constants.model_fields.NAME} />
+        <SelectInput optionText={MODEL_FIELDS.NAME} />
       </ReferenceInput>
     </Filter>
   ));
@@ -69,27 +69,27 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         }}
         exporter={false}
         filters={<DatasetFilter />}
-        sort={{ field: Constants.model_fields.TITLE, order: 'DESC' }}
+        sort={{ field: MODEL_FIELDS.TITLE, order: 'DESC' }}
         perPage={10}
         pagination={<CustomPagination />}
         bulkActionButtons={false}
       >
-        <Datagrid rowClick={Constants.resource_operations.SHOW}>
+        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
           <TextField
             label={'en.models.datasets.title'}
-            source={Constants.model_fields.TITLE}
+            source={MODEL_FIELDS.TITLE}
           />
           <ReferenceField
             linkType={false}
             label={"en.models.datasets.project"}
-            source={Constants.model_fk_fields.PROJECT}
-            reference={Constants.models.PROJECTS}
+            source={MODEL_FK_FIELDS.PROJECT}
+            reference={MODELS.PROJECTS}
           >
             <ProjectName label={"en.models.projects.name"}/>
           </ReferenceField>
           <TextField
             label={'en.models.datasets.study_site'}
-            source={Constants.model_fields.STUDY_SITE}
+            source={MODEL_FIELDS.STUDY_SITE}
           />
         </Datagrid>
       </List>

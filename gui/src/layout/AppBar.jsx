@@ -4,12 +4,13 @@ import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../_constants/index"
+import {MODEL_FIELDS} from "../_constants/index"
 import RadiamLogo from "./RadiamLogo";
 import { Typography } from "@material-ui/core";
-import { Help, HelpOutline } from "@material-ui/icons";
+import Help from "@material-ui/icons/Help";
+import HelpOutline from "@material-ui/icons/HelpOutline"
 import UserAvatar from "react-user-avatar"
-import { getUserDetails } from "../_tools/funcs.jsx";
+import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
   appBarText: {
@@ -60,7 +61,7 @@ const CustomAppBar = ({ classes, ...props }) => {
 
   useEffect(() => {
     _isMounted = true
-    getUserDetails().then(data => 
+    getCurrentUserDetails().then(data => 
       {
         console.log("data returned from get current user details is: ", data)
         if (_isMounted){
@@ -80,11 +81,11 @@ const CustomAppBar = ({ classes, ...props }) => {
   }, [])
 
   return(
-  <AppBar {...props} refresh={false} userMenu={<CustomUserMenu user={user} />}>
+  <AppBar {...props} userMenu={<CustomUserMenu user={user} />}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />
-    <Typography className={classes.appBarText}>{localStorage.getItem(Constants.model_fields.USERNAME)}</Typography>
+    <Typography className={classes.appBarText}>{localStorage.getItem(MODEL_FIELDS.USERNAME)}</Typography>
   </AppBar>
 )};
 

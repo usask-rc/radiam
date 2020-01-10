@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Button, CardActions, Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography"
 import ConfirmPassword from "../_fragments/ConfirmPassword";
-import * as Constants from "../../_constants/index";
+import { MODELS, PATHS, METHODS, FIELDS, WEBTOKEN, ROLE_USER, WARNINGS, } from "../../_constants/index";
 import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
 import RequestPassword from "../_fragments/RequestPassword";
 import {Redirect} from "react-router"
@@ -64,7 +65,7 @@ class ChangePassword extends Component {
   changePassword(userID) {
     let headers = new Headers({ "Content-Type": "application/json" });
 
-    const token = localStorage.getItem(Constants.WEBTOKEN);
+    const token = localStorage.getItem(WEBTOKEN);
 
     console.log("token and userid are: ", token, userID)
     if (token) {
@@ -74,15 +75,15 @@ class ChangePassword extends Component {
       //TODO: no token?  Log the user out.
       //no idea how to do this when I have no access to History since authprovider is monopolized by the Admin component.
       toastErrors(
-        Constants.warnings.NO_AUTH_TOKEN
+        WARNINGS.NO_AUTH_TOKEN
       );
       this.setState({redirect: true})
     }
 
     const request = new Request(
-      `${getAPIEndpoint()}/${Constants.models.USERS}/${userID}/${Constants.paths.SET_PASSWORD}/`,
+      `${getAPIEndpoint()}/${MODELS.USERS}/${userID}/${PATHS.SET_PASSWORD}/`,
       {
-        method: Constants.methods.POST,
+        method: METHODS.POST,
         body: JSON.stringify({ ...this.state }),
         headers: headers
       }
@@ -113,7 +114,7 @@ class ChangePassword extends Component {
       })
       .catch(err => {
         toastErrors(
-          Constants.warnings.NO_CONNECTION
+          WARNINGS.NO_CONNECTION
         );
       });
   }
@@ -122,7 +123,7 @@ class ChangePassword extends Component {
     const {newPassword, confirmPassword} = this.state
     event.preventDefault();
     //get uuid from storage
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+    const user = JSON.parse(localStorage.getItem(ROLE_USER));
     if (user && user.id) {
       //the endpoint we need is at /users/${user.id}/set_password/
       if (newPassword === confirmPassword) {
@@ -136,7 +137,7 @@ class ChangePassword extends Component {
     //TODO: if we're somehow here and there is no user in localstorage, we need to log out. Probably want a toast to indicate this.
     else {
       toastErrors(
-        Constants.warnings.NO_AUTH_TOKEN
+        WARNINGS.NO_AUTH_TOKEN
       );
       this.setState({redirect: true})
     }
@@ -168,7 +169,7 @@ class ChangePassword extends Component {
 
                     <Button
                       variant="outlined"
-                      type={Constants.fields.SUBMIT}
+                      type={FIELDS.SUBMIT}
                       color="primary"
                       className={classes.submitButton}
                     >

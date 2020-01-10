@@ -1,10 +1,10 @@
 import { fetchUtils } from "react-admin";
-import * as Constants from "../_constants/index"
+import {WEBTOKEN} from "../_constants/index"
 export const httpClient = (url, options = {}) => {
     if (!options.headers) {
         options.headers = new Headers({ Accept: "application/json" });
     }
-    const token = localStorage.getItem(Constants.WEBTOKEN);
+    const token = localStorage.getItem(WEBTOKEN);
 
     if (token) {
         const parsedToken = JSON.parse(token);

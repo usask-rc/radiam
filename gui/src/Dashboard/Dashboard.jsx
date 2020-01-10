@@ -32,8 +32,6 @@ class Dashboard extends PureComponent {
   render() {
     const {classes, permissions} = this.props
     const { loading, hasFiles, projects } = this.state
-
-    console.log("Dashboard rerendered, props: ", this.props)
     if (permissions){
       return (
         <div className={classes.root}>
@@ -43,7 +41,7 @@ class Dashboard extends PureComponent {
                 <WelcomeCards loading={loading} hasFiles={hasFiles}  />
                 {!loading &&
                   <>
-                    <ProjectCards loading={loading} projects={projects} />
+                    <ProjectCards projects={projects} />
                   </>
                 }
               </>

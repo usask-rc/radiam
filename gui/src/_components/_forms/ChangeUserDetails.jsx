@@ -1,15 +1,11 @@
 import React, { Component } from "react";
-import { Button, CardActions, TextField, Typography } from "@material-ui/core";
-import * as Constants from "../../_constants/index";
-import { getAPIEndpoint, toastErrors, getUserDetails } from "../../_tools/funcs";
+import {models, ROLE_USER} from "../../_constants/index";
+import { getAPIEndpoint, getCurrentUserDetails } from "../../_tools/funcs";
 import { radiamRestProvider, httpClient } from "../../_tools";
-import { Redirect } from "react-router"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
-import { UPDATE, regex } from "ra-core";
-import englishMessages from "../../_constants/i18n/en"
-import UserEditForm from "../../Users/UserEditForm";
-import { UserEdit, UserEditWithDeletion } from "../../Users/Users";
+import { UPDATE } from "ra-core";
+import { UserEditWithDeletion } from "../../Users/Users";
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -66,7 +62,7 @@ class ChangeDetails extends Component {
         const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
         const params = { data: this.state, id: id }
 
-        dataProvider(UPDATE, Constants.models.USERS, params).then(response => {
+        dataProvider(UPDATE, models.USERS, params).then(response => {
             toast.success("Account information successfully updated.")
         }).catch(err => {
             console.log("error in user details update is: ", err)
@@ -80,7 +76,7 @@ class ChangeDetails extends Component {
     }
 
     getCurrentUserDetails() {
-        getUserDetails().then(data => 
+        getCurrentUserDetails().then(data => 
         {
             this.setState(data)
             return data
@@ -88,7 +84,6 @@ class ChangeDetails extends Component {
         .catch(err => 
             {
                 console.error("Error in getCurrentUserDetails: ", err)
-                this.setState({redirect: true})
             }
         )
     }
@@ -97,8 +92,8 @@ class ChangeDetails extends Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
-        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "", redirect: false }
+        const user = JSON.parse(localStorage.getItem(ROLE_USER))
+        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
     }
 
     componentDidMount() {
@@ -106,14 +101,14 @@ class ChangeDetails extends Component {
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
-        const { user, redirect } = this.state
+        console.log("CUD props: ", this.props)
+        const { user } = this.state
         return (
             <Responsive
                 medium={
                     <>
                         <UserEditWithDeletion basePath="/users" resource="users" id={user.id}  />
                         <ToastContainer />
-                        {redirect && <Redirect to="/login"/>}
                     </>
                 }
             />

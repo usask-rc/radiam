@@ -1,5 +1,5 @@
 //funcs.jsx
-import * as Constants from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
@@ -19,14 +19,14 @@ export function getAPIEndpoint() {
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
+  return `/${API_ENDPOINT}`;
   */
-  return `/${Constants.API_ENDPOINT}`;
 }
 
 //given a group id and our cookies, can we edit this value?
 export function isAdminOfAParentGroup(group_id){
   return new Promise((resolve, reject) => {
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+    const user = JSON.parse(localStorage.getItem(ROLE_USER))
 
     if (user && user.is_admin){
       resolve(true)
@@ -51,7 +51,7 @@ export function isAdminOfAParentGroup(group_id){
 
 export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
   //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (group !== null){
       if (user.groupAdminships && group in user.groupAdminships){
@@ -79,66 +79,57 @@ export function getRecentProjects(count=1000) {
       
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const now = moment();
-    let projectCtr = 0
-    let projectList = []
-    let hasFiles = false
 
-    dataProvider(GET_LIST, Constants.models.PROJECTS, {
-      order: { field: Constants.model_fields.NAME },
+    dataProvider(GET_LIST, MODELS.PROJECTS, {
+      order: { field: MODEL_FIELDS.NAME },
       pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
     })
       .then(response => response.data)
       .then(projects => {
 
-        //Get the files from each project
-        //TODO: once we can search we can search files on age range and avoid this entire filtering process
+        const promises = []
         projects.map(project => {
-
-          //get the most recent file to display it
-          dataProvider(
-            "GET_FILES",
-            Constants.models.PROJECTS + '/' + project.id,
-            {
-              sort: {
-                field: Constants.model_fields.INDEXED_DATE,
-                order: '-',
-              },
-              pagination: {
-                page: 1,
-                perPage: 1,
-              },
+          promises.push(getProjectData({id: project.id,
+            sort: {
+              field: MODEL_FIELDS.INDEXED_DATE,
+              order: '-',
+            },
+            pagination: {
+              page: 1,
+              perPage: 1,
             }
-          //TODO: on a response code 500, there are no files for that project.  Something more elegant than an error should be put here.
-          ).then(response => {
-            const newProject = project
-            newProject.nbFiles = response.total;
-            newProject.recentFile = response.data[0]
-            if (newProject.recentFile){
-              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), 'days')
+          }).then((data) => {
+            if (data.files.length > 0){
+              const newProject = project
+              newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
+              newProject.nbFiles = data.nbFiles
+              const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), "days")
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
-              hasFiles = true
+              project = newProject
             }
-            //TODO: might be better done with a promise.all
-            projectCtr += 1
-            projectList.push(newProject)
-
-            if (projectCtr === projects.length)
-            {
-              resolve({projects: projectList, hasFiles: hasFiles, loading: false})
-            }
-          }).catch(error => {
-            reject("GetRecentProj Rejected: ", error)
-          });
-          return project;
+            return data
+          }))
+          return project
         });
-      });
-    })
+      Promise.all(promises).then(data => {
+        let hasFiles = false
+        projects.map(project => {
+          if (project.recentFile){
+            hasFiles = true
+          }
+        })
+        resolve({projects: projects, loading: false, hasFiles: hasFiles})
+      }).catch(err => {
+        reject(err)
+      })
+    });
+  })
 };
 
 export function getMaxUserRole(){
 
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
       return "admin"
@@ -225,7 +216,7 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + params.projectID,
+      MODELS.PROJECTS + '/' + params.projectID,
       queryParams
     )
       .then(response => {
@@ -255,10 +246,10 @@ export function getFolderFiles(
 
 export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
-    dataProvider(GET_LIST, Constants.models.DATASETS, {
+    dataProvider(GET_LIST, MODELS.DATASETS, {
       filter: { project: projectID, is_active: true },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: Constants.model_fields.TITLE, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.TITLE, order: 'DESC' },
     })
       .then(response => response.data)
       .then(assocDatasets => {
@@ -279,7 +270,7 @@ export function getRootPaths(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + projectID,
+      MODELS.PROJECTS + '/' + projectID,
       params
     )
       .then(response => {
@@ -327,7 +318,7 @@ export function getProjectData(params, folders = false) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      Constants.models.PROJECTS + '/' + params.id,
+      MODELS.PROJECTS + '/' + params.id,
       params
     )
       .then(response => {
@@ -344,7 +335,7 @@ export function getProjectData(params, folders = false) {
 export function getParentGroupList(group_id, groupList = []){
   return new Promise((resolve, reject) => {
     //resolve upon having all parent groups
-    dataProvider(GET_ONE, Constants.models.GROUPS, {id: group_id})
+    dataProvider(GET_ONE, MODELS.GROUPS, {id: group_id})
     .then(response => {
       groupList.push(response.data)
       if (response.data.parent_group === null){
@@ -366,7 +357,7 @@ export function getParentGroupList(group_id, groupList = []){
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
     //get this group's details, then ascend if it has a parent.
-    dataProvider(GET_ONE, Constants.models.GROUPS, { id: group_id })
+    dataProvider(GET_ONE, MODELS.GROUPS, { id: group_id })
       .then(response => {
         resolve(response.data);
       })
@@ -376,18 +367,29 @@ export function getGroupData(group_id) {
   });
 }
 
-export function getUserDetails() {
+//get a single user
+//TODO: merge into a greater `get one item` function
+export function getUserDetails(userID){
   return new Promise((resolve, reject) => {
-    dataProvider('CURRENT_USER', Constants.models.USERS)
+    dataProvider("GET_ONE", MODELS.USERS, {id: userID})
+    .then(response => {
+      resolve(response.data)
+    }).catch(err => reject(err))
+  })
+}
+
+export function getCurrentUserDetails() {
+  return new Promise((resolve, reject) => {
+    dataProvider('CURRENT_USER', MODELS.USERS)
       .then(response => {
-        const localID = JSON.parse(localStorage.getItem(Constants.ROLE_USER))
+        const localID = JSON.parse(localStorage.getItem(ROLE_USER))
           .id;
 
         if (response.data.id === localID) {
           resolve(response.data);
         } else {
           reject({ redirect: true });
-          toastErrors(Constants.warnings.NO_AUTH_TOKEN);
+          toastErrors(WARNINGS.NO_AUTH_TOKEN);
         }
       })
       .catch(err => {
@@ -396,17 +398,17 @@ export function getUserDetails() {
   });
 }
 
-//TODO: this can probably be consolidated with getGroupUsers
+//TODO: this can probably be consolidated with getGroupMembers
+//returns a list of users in said group
 export function getUsersInGroup(record) {
-  console.log('record called to getusersin group: ', record);
   return new Promise((resolve, reject) => {
     let groupUsers = [];
     const { id, is_active } = record;
 
-    dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+    dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
       filter: { group: id, is_active: is_active },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: Constants.model_fields.USER, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
     })
       .then(response => {
         
@@ -416,72 +418,60 @@ export function getUsersInGroup(record) {
         return response.data;
       })
       .then(groupMembers => {
+        const promises = []
         groupMembers.map(groupMember => {
-          dataProvider(GET_ONE, Constants.models.USERS, {
-            id: groupMember.user,
-          })
-            .then(response => {
-              return response.data;
-            })
-            .then(user => {
-              groupMember.user = user;
-              groupUsers = [...groupUsers, user];
-
-              if (groupUsers.length === groupMembers.length) {
-                resolve(groupUsers);
-              }
-            })
-            .catch(err => reject('error in attempt to get user: ', err));
-          return groupMember;
+          promises.push(getUserDetails(groupMember.user).then(user => {
+            groupMember.user = user
+            groupUsers.push(user)
+            return groupMember
+          }))
         });
+
+        Promise.all(promises).then(data => {
+          console.log("promise all data is: ", data)
+          resolve(groupUsers)
+          return data
+        })
+        .catch(err => reject(err))
+
         return groupMembers;
       })
       .catch(err => reject('error in attempt to fetch groupMembers: ', err));
   });
 }
 
-export function getGroupUsers(record) {
+//given a group, return a list of groupmembers with full User and Role data included.
+export function getGroupMembers(record) {
   return new Promise((resolve, reject) => {
-    let groupUsers = [];
-    dataProvider(GET_LIST, Constants.models.ROLES)
+    dataProvider(GET_LIST, MODELS.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
         const { id, is_active } = record;
 
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+        dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { group: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: Constants.model_fields.USER, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
         })
           .then(response => {
             return response.data;
           })
           .then(groupMembers => {
+
+            const promises = []
+
             groupMembers.map(groupMember => {
-              dataProvider(GET_ONE, Constants.models.USERS, {
-                id: groupMember.user,
-              })
-                .then(response => {
-                  return response.data;
-                })
-                .then(user => {
-                  groupMember.user = user;
-                  groupMember.group_role = groupRoles.filter(
-                    role => role.id === groupMember.group_role
-                  )[0];
-                  groupUsers = [...groupUsers, groupMember];
-                  if (groupUsers.length === groupMembers.length) {
-                    resolve(groupMembers);
-                  }
-                })
-                .catch(err =>
-                  reject(
-                    'error in attempt to get researchgroup with associated groupmember: ' +
-                      err
-                  )
-                );
-              return groupMember;
+              promises.push(getUserDetails(groupMember.user).then(user => {
+                groupMember.user = user
+                groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+                return user
+              }))
             });
+            Promise.all(promises).then(data => {
+              console.log("in promise all data is: ", data, "groupmembers is: ", groupMembers)
+              resolve(groupMembers)
+            }).catch(err => reject(err))
+
             return groupMembers;
           })
           .catch(err => {
@@ -492,57 +482,69 @@ export function getGroupUsers(record) {
   });
 }
 
+//given a user, return a list of groupmember entries containing the groups they are in along with their role within it.
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
-    let userGroupMembers = [];
-    dataProvider(GET_LIST, Constants.models.ROLES)
+    dataProvider(GET_LIST, MODELS.ROLES)
       .then(response => response.data)
       .then(groupRoles => {
         const { id, is_active } = record;
-
-        dataProvider(GET_LIST, Constants.models.GROUPMEMBERS, {
+        
+        dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { user: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: Constants.model_fields.GROUP, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.GROUP, order: 'DESC' },
         })
-          .then(response => {
-            return response.data;
-          })
-          .then(groupMembers => {
+        .then(response => {
+          return response.data;
+        })
+        .then(groupMembers => {
 
-            groupMembers.map(groupMember => {
-              dataProvider(GET_ONE, Constants.models.GROUPS, {
-                id: groupMember.group,
-              })
-                .then(response => {
-                  return response.data;
-                })
-                .then(researchgroup => {
-                  groupMember.group = researchgroup;
-                  groupMember.group_role = groupRoles.filter(
-                    role => role.id === groupMember.group_role
-                  )[0];
-                  userGroupMembers = [...userGroupMembers, groupMember];
-                  if (userGroupMembers.length === groupMembers.length) {
-                    resolve(groupMembers);
-                  }
-                })
-                .catch(err =>
-                  reject(
-                    'error in attempt to get researchgroup with associated groupmember: ' +
-                      err
-                  )
-                );
-              return groupMember;
-            });
-            return groupMembers;
-          })
-          .catch(err => {
-            reject('error in in get groupmembers: ', err);
+          const promises = []
+          groupMembers.map(groupMember => {
+
+            promises.push(getGroupData(groupMember.group).then(researchgroup => {
+              console.log("data returned from getgroupdata in getusergroups is: ", researchgroup)
+              groupMember.group = researchgroup
+              groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+              return researchgroup
+            }))
+            return groupMember
           });
+
+          Promise.all(promises).then(data => {
+            resolve(groupMembers)
+          }).catch(err => reject(err))
+          return groupMembers;
+        })
+        .catch(err => {
+          reject('error in in get groupmembers: ', err);
+        });
         return groupRoles;
       });
   });
+}
+
+//TODO: contact candidates have to be in a gross format to work with the existing drop down list system.
+export function getPrimaryContactCandidates(groupList) {
+  let contactCandidates = {}
+  return new Promise((resolve, reject) => {
+    const promises = []
+    groupList.map(group => {
+      promises.push(getUsersInGroup(group).then(data => {
+        data.map(item => {
+          contactCandidates[item.id] = item;
+          return item;
+        })
+      }))
+    })
+
+    Promise.all(promises).then(data => {
+      const candidateList = []
+      Object.keys(contactCandidates).map(key => candidateList.push(contactCandidates[key]))
+      resolve(candidateList)
+    }).catch(err => reject(err))
+  })
 }
 
 //TODO: convert to promise / callback system
@@ -550,7 +552,7 @@ export function submitObjectWithGeo(
   formData,
   geo,
   props,
-  redirect = Constants.resource_operations.LIST,
+  redirect = RESOURCE_OPERATIONS.LIST,
   inModal=false
 ) {
   console.log('formData heading into submitobjectwithgeo is: ', formData);
@@ -576,7 +578,7 @@ function updateObjectWithGeo(formData, geo, props) {
     };
   }
   if (props.save){
-    props.save(formData, Constants.resource_operations.LIST);
+    props.save(formData, RESOURCE_OPERATIONS.LIST);
   }
   else{
     putObjectWithoutSaveProp(formData, props.resource)
@@ -593,30 +595,28 @@ export function putObjectWithoutSaveProp(formData, resource){
     }).catch(err => {
         reject(err)
     })
-  }
-    )
+  })
 }
 
 //for the rare cases that we don't have the Save prop and want to POST some model item
 export function postObjectWithoutSaveProp(formData, resource){
   return new Promise((resolve, reject) => {
 
-  const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-  const params = { data: formData, resource:resource }
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = { data: formData, resource:resource }
 
-  dataProvider(CREATE, resource, params).then(response => {
-      resolve(response)
-  }).catch(err => {
-      reject(err)
+    dataProvider(CREATE, resource, params).then(response => {
+        resolve(response)
+    }).catch(err => {
+        reject(err)
+    })
   })
-}
-  )
 }
 
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
   let headers = new Headers({ 'Content-Type': 'application/json' });
-  const token = localStorage.getItem(Constants.WEBTOKEN);
+  const token = localStorage.getItem(WEBTOKEN);
 
   if (token) {
     const parsedToken = JSON.parse(token);
@@ -624,7 +624,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
 
     //POST the new object, then update it immediately afterwards with any geoJSON it carries.
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
-      method: Constants.methods.POST,
+      method: METHODS.POST,
       body: JSON.stringify({ ...formData }),
       headers: headers,
     });
@@ -660,7 +660,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
         const request = new Request(
           getAPIEndpoint() + `/${props.resource}/${data.id}/`,
           {
-            method: Constants.methods.PUT,
+            method: METHODS.PUT,
             body: JSON.stringify({ ...data }),
             headers: headers,
           }
@@ -685,7 +685,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
       ;
   } else {
     //TODO: logout the user.
-    toastErrors(Constants.warnings.NO_AUTH_TOKEN);
+    toastErrors(WARNINGS.NO_AUTH_TOKEN);
 
     if (props && props.history) {
       props.history.push(`/login`);
@@ -701,7 +701,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
 export function getTranslation(
   translate,
   item,
-  namespace = Constants.I18N_TLE
+  namespace = I18N_TLE
 ) {
   if (item !== translate(`${namespace}.${item}`)) {
     return translate(`${namespace}.${item}`);
@@ -749,11 +749,11 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     resource = resource.toUpperCase();
   }
 
-  if (resource in Constants.fk_fields) {
+  if (resource in FK_FIELDS) {
     //this other version is for non-nullable foreign keys.
     if (Array.isArray(data)) {
       data.map(item => {
-        Constants.fk_fields[resource].map(field => {
+        FK_FIELDS[resource].map(field => {
           //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
           if (item[field] && isObject(item[field])) {
             //TODO: something has to be done here, but I don't quite know what yet.
@@ -767,7 +767,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further on monday.
     else {
       if (direction !== 1) {
-        Constants.fk_fields[resource].map(field => {
+        FK_FIELDS[resource].map(field => {
           if (data[field]) {
             //currently this only holds single nested objects - the ID we want is in that URL.
             if (data[field] && isObject(data[field])) {
@@ -797,7 +797,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
           data.data_collection_method &&
           data.data_collection_method[0] &&
           !data.data_collection_method[0].hasOwnProperty(
-            Constants.model_fields.ID
+            MODEL_FIELDS.ID
           )
         ) {
           data.data_collection_method = data.data_collection_method.map(
@@ -812,7 +812,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
         if (
           data.sensitivity_level &&
           data.sensitivity_level[0] &&
-          !data.sensitivity_level[0].hasOwnProperty(Constants.model_fields.ID)
+          !data.sensitivity_level[0].hasOwnProperty(MODEL_FIELDS.ID)
         ) {
           data.sensitivity_level = data.sensitivity_level.map(sensitivity => {
             return {

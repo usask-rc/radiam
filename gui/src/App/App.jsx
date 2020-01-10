@@ -1,23 +1,21 @@
 //App.jsx
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import {
-  AddLocation,
-  AvTimer,
-  Fingerprint,
-  FlipToFront,
-  Group,
-  GroupAdd,
-  InsertChart,
-  Person,
-  PersonOutline,
-  Layers,
-  LocationCity,
-  Search,
-  Visibility,
-  VisibilityOff,
-  VpnKey,
-} from '@material-ui/icons';
+import AddLocation from "@material-ui/icons/AddLocation"
+import AvTimer from "@material-ui/icons/AvTimer"
+import Fingerprint from "@material-ui/icons/Fingerprint"
+import FlipToFront from "@material-ui/icons/FlipToFront"
+import Group from "@material-ui/icons/Group"
+import GroupAdd from "@material-ui/icons/GroupAdd"
+import InsertChart from "@material-ui/icons/InsertChart"
+import Person from "@material-ui/icons/Person"
+import PersonOutline from "@material-ui/icons/PersonOutline"
+import Layers from "@material-ui/icons/Layers"
+import LocationCity from "@material-ui/icons/LocationCity"
+import Search from "@material-ui/icons/Search"
+import Visibility from "@material-ui/icons/Visibility"
+import VisibilityOff from "@material-ui/icons/VisibilityOff"
+import VpnKey from "@material-ui/icons/VpnKey"
 import authProvider from '../_tools/authProvider';
 import radiamRestProvider from '../_tools/radiamRestProvider';
 import { getAPIEndpoint } from '../_tools/funcs';
@@ -91,7 +89,7 @@ import {
 import {Layout} from "../layout/index"
 import { httpClient } from '../_tools/httpClient';
 import englishMessages from '../_constants/i18n/en';
-import * as Constants from '../_constants/index';
+import { MODELS } from '../_constants/index';
 import customRoutes from '../_tools/customRoutes';
 import Login from '../layout/Login';
 import 'moment-timezone';
@@ -129,7 +127,7 @@ const App = props => {
         {permissions => { 
           return [
             <Resource
-            name={Constants.models.USERS}
+            name={MODELS.USERS}
             icon={Person}
             options={{ label: 'en.sidebar.users' }}
             list={UserList}
@@ -147,7 +145,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.GROUPS}
+            name={MODELS.GROUPS}
             icon={Group}
             options={{ label: 'en.sidebar.groups' }}
             list={GroupList}
@@ -166,7 +164,7 @@ const App = props => {
 
           //groupRoles are visible to all but only modifiable by admins.
           <Resource
-            name={Constants.models.ROLES}
+            name={MODELS.ROLES}
             icon={PersonOutline}
             options={{ label: 'en.sidebar.roles' }}
             list={permissions.is_admin ? GroupRoleList : null}
@@ -176,7 +174,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.GROUPMEMBERS}
+            name={MODELS.GROUPMEMBERS}
             icon={GroupAdd}
             options={{ label: 'en.sidebar.groupmembers' }}
             list={GroupMemberList}
@@ -194,7 +192,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.LOCATIONTYPES}
+            name={MODELS.LOCATIONTYPES}
             icon={LocationCity}
             options={{ label: 'en.sidebar.locationtypes' }}
             list={permissions.is_admin ? LocationTypeList : null}
@@ -204,7 +202,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.LOCATIONS}
+            name={MODELS.LOCATIONS}
             icon={AddLocation}
             options={{ label: 'en.sidebar.locations' }}
             list={LocationList}
@@ -214,7 +212,7 @@ const App = props => {
           />,
           
           <Resource
-            name={Constants.models.PROJECTS}
+            name={MODELS.PROJECTS}
             icon={Layers}
             options={{ label: 'en.sidebar.projects' }}
             list={ProjectList}
@@ -240,7 +238,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.PROJECTAVATARS}
+            name={MODELS.PROJECTAVATARS}
             icon={FlipToFront}
             options={{ label: 'en.sidebar.projectavatars' }}
             list={permissions.is_admin ? ProjectAvatarsList : null}
@@ -250,7 +248,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.DATA_COLLECTION_METHOD}
+            name={MODELS.DATA_COLLECTION_METHOD}
             icon={Search}
             options={{ label: 'en.sidebar.data_collection_method' }}
             list={permissions.is_admin ? DataCollectionMethodList : null}
@@ -260,7 +258,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.DATA_COLLECTION_STATUS}
+            name={MODELS.DATA_COLLECTION_STATUS}
             icon={AvTimer}
             options={{ label: 'en.sidebar.data_collection_status' }}
             list={permissions.is_admin ? DataCollectionStatusList : null}
@@ -270,7 +268,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.DISTRIBUTION_RESTRICTION}
+            name={MODELS.DISTRIBUTION_RESTRICTION}
             icon={VpnKey}
             options={{ label: 'en.sidebar.distribution_restriction' }}
             list={permissions.is_admin ? DistributionRestrictionList : null}
@@ -280,7 +278,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.SENSITIVITY_LEVEL}
+            name={MODELS.SENSITIVITY_LEVEL}
             icon={VisibilityOff}
             options={{ label: 'en.sidebar.sensitivity_level' }}
             list={permissions.is_admin ? SensitivityLevelList : null}
@@ -290,7 +288,7 @@ const App = props => {
           />,
           
           <Resource
-            name={Constants.models.GRANTS}
+            name={MODELS.GRANTS}
             icon={Visibility}
             options={{ label: 'en.sidebar.grants' }}
             list={
@@ -316,7 +314,7 @@ const App = props => {
           />,
 
           <Resource
-            name={Constants.models.AGENTS}
+            name={MODELS.AGENTS}
             icon={Fingerprint}
             options={{ label: 'en.sidebar.agents' }}
             list={UserAgentList}
@@ -325,9 +323,9 @@ const App = props => {
             edit={permissions.is_admin || permissions.is_group_admin ? UserAgentEdit : null} //users can only edit if they can also delete.
           />,
 
-          <Resource name={Constants.models.PROJECTDATACOLLECTIONMETHOD} />,
-          <Resource name={Constants.models.PROJECTSENSITIVITY} />,
-          <Resource name={Constants.models.PROJECTSTATISTICS} />,
+          <Resource name={MODELS.PROJECTDATACOLLECTIONMETHOD} />,
+          <Resource name={MODELS.PROJECTSENSITIVITY} />,
+          <Resource name={MODELS.PROJECTSTATISTICS} />,
         ]}}
       </Admin>
       <ToastContainer />

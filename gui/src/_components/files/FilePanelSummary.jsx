@@ -1,11 +1,13 @@
 import React from 'react';
-import * as Constants from '../../_constants/index';
+import {MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from '../../_constants/index';
 import { formatBytes } from '../../_tools/funcs';
-import { Grid, Typography } from '@material-ui/core';
+import Grid from "@material-ui/core/Grid"
+import Typography from "@material-ui/core/Typography"
 import { LocationShow } from '../_fields/LocationShow';
 import moment from 'moment';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
-import { Folder, Description, FolderOpen } from '@material-ui/icons';
+import Description from "@material-ui/icons/Description"
+import FolderOpen from "@material-ui/icons/FolderOpen"
 import { withStyles } from '@material-ui/styles';
 
 const styles = {
@@ -45,11 +47,11 @@ const FilePanelSummary = ({ classes, file, caller }) => (
       {caller !== 'browser' && (
         <ReferenceField
           label={'en.models.agents.location'}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
-          linkType={Constants.resource_operations.SHOW}
-          basePath={`/${Constants.models.PROJECTS}`}
-          resource={Constants.models.PROJECTS}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
+          linkType={RESOURCE_OPERATIONS.SHOW}
+          basePath={`/${MODELS.PROJECTS}`}
+          resource={MODELS.PROJECTS}
           record={file}
         >
           <LocationShow />

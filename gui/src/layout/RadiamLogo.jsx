@@ -9,8 +9,8 @@ const RadiamLogo = props => {
                 alt="Radiam"
                 height={70}
             />
-    </a>
-    
-)};
+        </a>
+        )
+    };
 
 export default RadiamLogo;

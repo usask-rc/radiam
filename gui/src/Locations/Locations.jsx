@@ -14,7 +14,7 @@ import {
   TextField,
   TextInput,
 } from 'react-admin';
-import * as Constants from '../_constants/index';
+import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from '../_components/CustomPagination';
 import LocationForm from './LocationForm';
 import MapView from '../_components/_fragments/MapView';
@@ -68,11 +68,11 @@ const LocationFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     />
     <ReferenceInput
       label={'en.models.locations.type'}
-      source={Constants.model_fk_fields.LOCATION_TYPE}
-      reference={Constants.models.LOCATIONTYPES}
+      source={MODEL_FK_FIELDS.LOCATION_TYPE}
+      reference={MODELS.LOCATIONTYPES}
       alwaysOn
     >
-      <TranslationSelect optionText={Constants.model_fields.LABEL} />
+      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
   </Filter>
 ));
@@ -91,29 +91,29 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
     }}
     exporter={false}
     filters={<LocationFilter />}
-    sort={{ field: Constants.model_fields.DATE_UPDATED, order: 'DESC' }}
+    sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: 'DESC' }}
     perPage={10}
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={Constants.resource_operations.SHOW} {...other}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} {...other}>
       <TextField
         label={'en.models.locations.display_name'}
-        source={Constants.model_fields.DISPLAY_NAME}
+        source={MODEL_FIELDS.DISPLAY_NAME}
       />
       <TextField
         label={'en.models.locations.host_name'}
-        source={Constants.model_fields.HOST_NAME}
+        source={MODEL_FIELDS.HOST_NAME}
       />
       <ReferenceField
         linkType={false}
         label={'en.models.locations.type'}
-        source={Constants.model_fk_fields.LOCATION_TYPE}
-        reference={Constants.models.LOCATIONTYPES}
+        source={MODEL_FK_FIELDS.LOCATION_TYPE}
+        reference={MODELS.LOCATIONTYPES}
       >
         <TranslationField
           label={'en.models.roles.label'}
-          source={Constants.model_fields.LABEL}
+          source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
       <TextField
@@ -173,21 +173,21 @@ export const LocationDisplay = props =>
     <LocationTitle prefix={"Viewing"} />
       <TextField
         label={'en.models.locations.display_name'}
-        source={Constants.model_fields.DISPLAY_NAME}
+        source={MODEL_FIELDS.DISPLAY_NAME}
       />
       <TextField
         label={'en.models.locations.host_name'}
-        source={Constants.model_fields.HOST_NAME}
+        source={MODEL_FIELDS.HOST_NAME}
       />
       <ReferenceField
         linkType={false}
         label={'en.models.locations.type'}
-        source={Constants.model_fk_fields.LOCATION_TYPE}
-        reference={Constants.models.LOCATIONTYPES}
+        source={MODEL_FK_FIELDS.LOCATION_TYPE}
+        reference={MODELS.LOCATIONTYPES}
       >
         <TranslationField
           label={'en.models.roles.label'}
-          source={Constants.model_fields.LABEL}
+          source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
       <GlobusEndpointShow />
@@ -215,7 +215,7 @@ export const LocationEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Edit submitOnEnter={false} {...props} >
-      <LocationForm {...other} mode={Constants.resource_operations.EDIT} />
+      <LocationForm {...other} mode={RESOURCE_OPERATIONS.EDIT} />
     </Edit>
   );
 };

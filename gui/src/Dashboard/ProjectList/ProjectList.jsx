@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import {PropTypes} from "prop-types";
-import * as Constants from "../../_constants/index"
+import {AVATAR_HEIGHT, MODELS, MODEL_FIELDS} from "../../_constants/index"
 import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel, Link, Typography } from '@material-ui/core';
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
@@ -24,11 +24,11 @@ const styles = {
     },
     iconCell: {
         verticalAlign: "middle",
-        width: `${Constants.AVATAR_HEIGHT}`,
+        width: `${AVATAR_HEIGHT}`,
     },
     image: {
-        height: `${Constants.AVATAR_HEIGHT}`,
-        width: `${Constants.AVATAR_HEIGHT}`,
+        height: `${AVATAR_HEIGHT}`,
+        width: `${AVATAR_HEIGHT}`,
     },
     nameCell: {
         fontSize: "1em",
@@ -61,7 +61,7 @@ const styles = {
         color: "LightGray",
     },
     projectRow: {
-        minHeight: `${Constants.AVATAR_HEIGHT}`,
+        minHeight: `${AVATAR_HEIGHT}`,
     },
     chipItem: {
         margin: "0.25em"
@@ -101,7 +101,7 @@ const styles = {
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
-        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
+        {id : "daysOld", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
         //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
     ]
 
@@ -269,16 +269,16 @@ const ProjectList = ({classes, projects}) => {
                         <TableCell className={classes.iconCell}>
                             <ReferenceField
                                 record={project}
-                                basePath={Constants.models.PROJECTS}
+                                basePath={MODELS.PROJECTS}
                                 linkType={false}
-                                source={Constants.model_fields.AVATAR}
-                                reference={Constants.models.PROJECTAVATARS}
+                                source={MODEL_FIELDS.AVATAR}
+                                reference={MODELS.PROJECTAVATARS}
                                 allowEmpty
                             >
 
                                 <ImageField
                                     classes={{ image: classes.image }}
-                                    source={Constants.model_fields.AVATAR_IMAGE}
+                                    source={MODEL_FIELDS.AVATAR_IMAGE}
                                 />
 
                             </ReferenceField>

@@ -5,7 +5,6 @@ import {
   BooleanInput,
   Create,
   Datagrid,
-  DateInput,
   Edit,
   Filter,
   List,
@@ -25,7 +24,7 @@ import {
 } from "react-admin";
 import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import * as Constants from "../_constants/index";
+import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
@@ -34,7 +33,7 @@ import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupUsers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupMembers } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
@@ -67,15 +66,15 @@ const GroupFilter = withStyles(filterStyles)(({ classes, ...props }) => (
     />
     <ReferenceInput
       label={"en.models.groups.parent_group"}
-      source={Constants.model_fk_fields.PARENT_GROUP}
-      reference={Constants.models.GROUPS}
+      source={MODEL_FK_FIELDS.PARENT_GROUP}
+      reference={MODELS.GROUPS}
     >
-      <SelectInput optionText={Constants.model_fields.NAME} />
+      <SelectInput optionText={MODEL_FIELDS.NAME} />
     </ReferenceInput>
     <BooleanInput
       label={"en.models.groups.active"}
       defaultValue={true}
-      source={Constants.model_fields.ACTIVE} />
+      source={MODEL_FIELDS.ACTIVE} />
   </Filter>
 ));
 
@@ -90,30 +89,30 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     }}
     exporter={false}
     filters={<GroupFilter />}
-    sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
+    sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: "DESC" }}
     perPage={10}
     pagination={<CustomPagination />}
     bulkActionButtons={false}>
 
-    <Datagrid rowClick={Constants.resource_operations.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <TextField
         label={"en.models.groups.name"}
-        source={Constants.model_fields.NAME}
+        source={MODEL_FIELDS.NAME}
       />
       <TextField
         label={"en.models.groups.description"}
-        source={Constants.model_fields.DESCRIPTION}
+        source={MODEL_FIELDS.DESCRIPTION}
       />
       <ReferenceField
         linkType={false}
         label={"en.models.groups.parent_group"}
-        source={Constants.model_fk_fields.PARENT_GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.PARENT_GROUP}
+        reference={MODELS.GROUPS}
         allowEmpty
       >
         <TextField
           label={"en.models.groups.name"}
-          source={Constants.model_fields.NAME}
+          source={MODEL_FIELDS.NAME}
         />
       </ReferenceField>
     </Datagrid>
@@ -131,7 +130,7 @@ const actionStyles = theme => ({
 
 //check if this user should have permission to access the edit page.
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
-  const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
   useEffect(() => {
@@ -142,13 +141,14 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...
     }
   }, [data])
 
+  const {hasCreate, hasShow, hasEdit, hasList, ...rest} = props
   console.log("GroupShowActions props: ", props)
 
   if (showEdit){
     console.log("in groupShowActions, data is: ", data)
     return(
     <Toolbar className={classes.toolbar}>
-      <EditButton basePath={basePath} id={props.id} record={data} {...props} />
+      <EditButton basePath={basePath} id={props.id} record={data} {...rest} />
     </Toolbar>
     )
   }
@@ -183,8 +183,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     
     if (props.id){
       const params={id: props.id, is_active: true}
-      getGroupUsers(params).then((data) => {
-        console.log("getgroupusers returned data: ", data)
+      getGroupMembers(params).then((data) => {
+        console.log("getGroupMembers returned data: ", data)
         if (_isMounted){
           setGroupMembers(data)
         }
@@ -205,26 +205,26 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
 
       <TextField
         label={"en.models.groups.name"}
-        source={Constants.model_fields.NAME}
+        source={MODEL_FIELDS.NAME}
       />
       <TextField
         label={"en.models.groups.description"}
-        source={Constants.model_fields.DESCRIPTION}
+        source={MODEL_FIELDS.DESCRIPTION}
       />
       <BooleanField
         label={"en.models.generic.active"}
-        source={Constants.model_fields.ACTIVE}
+        source={MODEL_FIELDS.ACTIVE}
       />
       <ReferenceField
         linkType={false}
         label={"en.models.groups.parent_group"}
-        source={Constants.model_fk_fields.PARENT_GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.PARENT_GROUP}
+        reference={MODELS.GROUPS}
         allowEmpty
       >
         <TextField
           label={"en.models.groups.name"}
-          source={Constants.model_fields.NAME}
+          source={MODEL_FIELDS.NAME}
         />
       </ReferenceField>
 
@@ -235,7 +235,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         return(
           <>
             <ShowMetadata
-              type={Constants.model_fk_fields.GROUP}
+              type={MODEL_FK_FIELDS.GROUP}
               translate={translate}
               record={controllerProps.record}
               basePath={controllerProps.basePath}
@@ -278,7 +278,7 @@ const validateParentGroup = (value, allValues) => {
   }
 }
 
-const asyncValidate = getAsyncValidateNotExists({id: Constants.model_fields.ID, name : Constants.model_fields.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, Constants.models.GROUPS);
+const asyncValidate = getAsyncValidateNotExists({id: MODEL_FIELDS.ID, name : MODEL_FIELDS.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, MODELS.GROUPS);
 
 const GroupForm = props => 
 {
@@ -306,34 +306,34 @@ const GroupForm = props =>
       {...props}
       toolbar={<EditToolbar />}
       asyncValidate={asyncValidate}
-      asyncBlurFields={[ Constants.model_fields.NAME ]}
+      asyncBlurFields={[ MODEL_FIELDS.NAME ]}
       onChange={handleChange}
       save={handleSubmit}
     >
       <GroupTitle prefix={"Creating Group"} />
       <TextInput
         label={"en.models.groups.name"}
-        source={Constants.model_fields.NAME}
+        source={MODEL_FIELDS.NAME}
         validate={validateName}
       />
       <LongTextInput
         label={"en.models.groups.description"}
-        source={Constants.model_fields.DESCRIPTION}
+        source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
       />
       <ReferenceInput
         label={"en.models.groups.parent_group"}
-        source={Constants.model_fk_fields.PARENT_GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.PARENT_GROUP}
+        reference={MODELS.GROUPS}
         validate={validateParentGroup}
         allowEmpty
       >
         <SelectInput
           label={"en.models.groups.name"}
-          optionText={Constants.model_fields.NAME}
+          optionText={MODEL_FIELDS.NAME}
         />
       </ReferenceInput>
-      <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+      <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
     </SimpleForm>
   )
 };
@@ -363,40 +363,40 @@ class BaseGroupEdit extends Component {
       <SimpleForm
         basePath={basePath}
         toolbar={<EditToolbar />}
-        redirect={Constants.resource_operations.LIST}
+        redirect={RESOURCE_OPERATIONS.LIST}
       >
       <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
-          source={Constants.model_fields.NAME}
+          source={MODEL_FIELDS.NAME}
           validate={validateName}
         />
         <LongTextInput
           label={"en.models.groups.description"}
-          source={Constants.model_fields.DESCRIPTION}
+          source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}
           style={{"max-width": "80%"}}
         />
         <BooleanInput
           label={"en.models.generic.active"}
           defaultValue={true}
-          source={Constants.model_fields.ACTIVE}
+          source={MODEL_FIELDS.ACTIVE}
         />
         <ReferenceInput
           label={"en.models.groups.parent_group"}
-          source={Constants.model_fk_fields.PARENT_GROUP}
-          reference={Constants.models.GROUPS}
+          source={MODEL_FK_FIELDS.PARENT_GROUP}
+          reference={MODELS.GROUPS}
           allowEmpty
         >
           <SelectInput
             label={"en.models.groups.name"}
-            optionText={Constants.model_fields.NAME}
+            optionText={MODEL_FIELDS.NAME}
           />
         </ReferenceInput>
         { id && (
           <>
-            <EditMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
-            <ConfigMetadata id={id} type={Constants.model_fk_fields.GROUP}/>
+            <EditMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
+            <ConfigMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
           </>
           )}
       </SimpleForm>

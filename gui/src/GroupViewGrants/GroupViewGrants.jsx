@@ -18,7 +18,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import * as Constants from "../_constants/index";
+import {RESOURCE_OPERATIONS, WARNINGS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
@@ -53,11 +53,11 @@ const GroupViewGrantFilter = withStyles(filterStyles)(
       />
       <ReferenceInput
         label={"en.models.grants.dataset"}
-        source={Constants.model_fk_fields.DATASET}
-        reference={Constants.models.DATASETS}
+        source={MODEL_FK_FIELDS.DATASET}
+        reference={MODELS.DATASETS}
         alwaysOn
       >
-        <SelectInput optionText={Constants.model_fields.TITLE} />
+        <SelectInput optionText={MODEL_FIELDS.TITLE} />
       </ReferenceInput>
     </Filter>
   )
@@ -73,7 +73,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       }}
       exporter={false}
       filters={<GroupViewGrantFilter />}
-      sort={{ field: Constants.model_fields.DATE_UPDATED, order: "DESC" }}
+      sort={{ field: MODEL_FIELDS.DATE_UPDATED, order: "DESC" }}
       perPage={10}
       bulkActionButtons={false}
       title={
@@ -81,31 +81,31 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       }
       pagination={<CustomPagination />}
     >
-      <Datagrid rowClick={Constants.resource_operations.SHOW}>
+      <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
         <ReferenceField
           linkType={false}
           label={"en.models.grants.group"}
-          source={Constants.model_fk_fields.GROUP}
-          reference={Constants.models.GROUPS}
+          source={MODEL_FK_FIELDS.GROUP}
+          reference={MODELS.GROUPS}
         >
-          <TextField source={Constants.model_fields.NAME} />
+          <TextField source={MODEL_FIELDS.NAME} />
         </ReferenceField>
         <ReferenceField
           linkType={false}
           label={"en.models.grants.dataset"}
-          source={Constants.model_fk_fields.DATASET}
-          reference={Constants.models.DATASETS}
+          source={MODEL_FK_FIELDS.DATASET}
+          reference={MODELS.DATASETS}
         >
-          <TextField source={Constants.model_fields.TITLE} />
+          <TextField source={MODEL_FIELDS.TITLE} />
         </ReferenceField>
-        <TextField source={Constants.model_fields.FIELDS} allowEmpty />
+        <TextField source={MODEL_FIELDS.FIELDS} allowEmpty />
         <DateField
-          source={Constants.model_fields.DATE_STARTS}
+          source={MODEL_FIELDS.DATE_STARTS}
           label={"en.models.generic.date_starts"}
           allowEmpty
         />
         <DateField
-          source={Constants.model_fields.DATE_EXPIRES}
+          source={MODEL_FIELDS.DATE_EXPIRES}
           label={"en.models.generic.date_expires"}
           allowEmpty
         />
@@ -121,27 +121,27 @@ export const GroupViewGrantShow = props => (
       <ReferenceField
         linkType={false}
         label={"en.models.grants.group"}
-        source={Constants.model_fk_fields.GROUP}
-        reference={Constants.models.GROUPS}
+        source={MODEL_FK_FIELDS.GROUP}
+        reference={MODELS.GROUPS}
       >
-        <TextField source={Constants.model_fields.NAME} />
+        <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <ReferenceField
         linkType={false}
         label={"en.models.grants.dataset"}
-        source={Constants.model_fk_fields.DATASET}
-        reference={Constants.models.DATASETS}
+        source={MODEL_FK_FIELDS.DATASET}
+        reference={MODELS.DATASETS}
       >
-        <TextField source={Constants.model_fields.TITLE} />
+        <TextField source={MODEL_FIELDS.TITLE} />
       </ReferenceField>
-      <TextField source={Constants.model_fields.FIELDS} allowEmpty />
+      <TextField source={MODEL_FIELDS.FIELDS} allowEmpty />
       <DateField
-        source={Constants.model_fields.DATE_STARTS}
+        source={MODEL_FIELDS.DATE_STARTS}
         label={"en.models.generic.date_starts"}
         allowEmpty
       />
       <DateField
-        source={Constants.model_fields.DATE_EXPIRES}
+        source={MODEL_FIELDS.DATE_EXPIRES}
         label={"en.models.generic.date_expires"}
         allowEmpty
       />
@@ -174,39 +174,39 @@ const GroupViewGrantForm = props => {
   console.log("props in groupviewgrantform: ", props)
   return(
   <SimpleForm {...props} 
-    redirect={Constants.resource_operations.LIST}
+    redirect={RESOURCE_OPERATIONS.LIST}
     onChange={handleChange}
     save={handleSubmit}>
     <GroupViewGrantTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating View Grant" : "Creating View Grant"} />
 
     <ReferenceInput
       label={"en.models.grants.group"}
-      source={Constants.model_fk_fields.GROUP}
-      reference={Constants.models.GROUPS}
+      source={MODEL_FK_FIELDS.GROUP}
+      reference={MODELS.GROUPS}
       validate={validateGroup}
     >
-      <SelectInput source={Constants.model_fields.NAME} />
+      <SelectInput source={MODEL_FIELDS.NAME} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.grants.dataset"}
-      source={Constants.model_fk_fields.DATASET}
-      reference={Constants.models.DATASETS}
+      source={MODEL_FK_FIELDS.DATASET}
+      reference={MODELS.DATASETS}
       validate={validateDataset}
     >
-      <SelectInput optionText={Constants.model_fields.TITLE} />
+      <SelectInput optionText={MODEL_FIELDS.TITLE} />
     </ReferenceInput>
-    <TextInput source={Constants.model_fields.FIELDS} allowEmpty />
+    <TextInput source={MODEL_FIELDS.FIELDS} allowEmpty />
     <DateInput
-      source={Constants.model_fields.DATE_STARTS}
+      source={MODEL_FIELDS.DATE_STARTS}
       label={"en.models.generic.date_starts"}
       allowEmpty
     />
     <DateInput
-      source={Constants.model_fields.DATE_EXPIRES}
+      source={MODEL_FIELDS.DATE_EXPIRES}
       label={"en.models.generic.date_expires"}
       allowEmpty
     />
-    <Prompt when={isFormDirty} message={Constants.warnings.UNSAVED_CHANGES}/>
+    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
 
   </SimpleForm>
 )};

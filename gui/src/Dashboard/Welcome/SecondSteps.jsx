@@ -1,14 +1,10 @@
 //SecondSteps.jsx
 import React from "react";
 import { CardContent, Card, Typography, Button } from "@material-ui/core";
-import HomeIcon from "@material-ui/icons/Home";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../../_constants/index"
-import GroupAddIcon from "@material-ui/icons/GroupAdd"
-import { PersonAdd } from "@material-ui/icons";
-
+import PersonAdd from "@material-ui/icons/PersonAdd";
 
 const styles = {
     headlineTop: {

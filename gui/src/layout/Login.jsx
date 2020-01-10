@@ -7,13 +7,14 @@ import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
 import Card from "@material-ui/core/Card";
 import TextField from "@material-ui/core/TextField";
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
-  MuiThemeProvider,
   createMuiTheme,
   withStyles
 } from "@material-ui/core/styles";
 import LockIcon from "@material-ui/icons/Lock";
-import { translate, userLogin } from "react-admin";
+import { translate } from "ra-core"
+import { userLogin } from "react-admin";
 import { lightTheme } from "./themes";
 import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
@@ -83,11 +84,7 @@ class Login extends Component {
   }
 
   handleChange = e => {
-    // If you are using babel, you can use ES 6 dictionary syntax
-    // let change = { [e.target.name] = e.target.value }
-    let change = {};
-    change[e.target.name] = e.target.value;
-    this.setState(change);
+    this.setState({ [e.target.name] : e.target.value});
   };
 
 
@@ -122,8 +119,6 @@ class Login extends Component {
   render() {
     const { classes, handleSubmit, isLoading } = this.props;
     const { forgotPassword } = this.state
-    console.log("Login.jsx rendered.  Props: ", this.props)
-
     return (
       <div className={classes.main}>
         <Card className={classes.card}>

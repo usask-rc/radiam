@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
-
-import * as Constants from '../_constants/index';
+import React from 'react';
 import '../_components/components.css';
-import { Chip, Typography } from '@material-ui/core';
-import { getRelatedDatasets } from '../_tools/funcs';
-import { Link } from  "react-router-dom";
+import Chip from "@material-ui/core/Chip";
 import { withStyles } from '@material-ui/styles';
-import { Edit } from '@material-ui/icons';
+import Edit from '@material-ui/icons/Edit';
 
 const styles = theme => ({
   chipDisplay: {
@@ -74,26 +70,3 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
   }
 
 export default withStyles(styles)(RelatedDatasets)
-
-/*
-href={`/#/${Constants.models.DATASETS}/${dataset.id}/${Constants.resource_operations.SHOW}`} component="a" 
-
-<Typography className={classes.groupRoleText}>{`Group Admins:`}</Typography>
-              {groupAdmins.map(groupMember => {
-                return(
-                  <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.id} avatar={
-                      <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
-                  }
-                  label={`${groupMember.user.username}`}
-                  clickable={inModal ? false : true}
-                  onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                  onClick={() => {if (!inModal) {
-                    setViewModal(groupMember)
-                  }}}
-                  deleteIcon={<Edit />}
-
-                  />
-                )
-              })}
-            </div>
-*/

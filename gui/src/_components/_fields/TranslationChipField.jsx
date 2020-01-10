@@ -1,5 +1,5 @@
 import React from "react";
-import { Chip } from "@material-ui/core";
+import Chip from "@material-ui/core/Chip";
 import { FunctionField } from "react-admin";
 import { getTranslation } from "../../_tools/funcs";
 import { translate } from "ra-core";

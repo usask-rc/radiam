@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import AgentInstall from './AgentInstall';
 import Welcome from './Welcome';
 import { Grid } from '@material-ui/core';
-import * as Constants from "../../_constants/index"
-import {  getUsersInGroup, getMaxUserRole, getGroupData } from '../../_tools/funcs';
+import {ROLE_USER} from "../../_constants/index"
+import { getUsersInGroup, getMaxUserRole, getGroupData } from '../../_tools/funcs';
 import SecondSteps from './SecondSteps';
 import FewUsers from './FewUsers';
 
 
 const WelcomeCards = ({loading, hasFiles}) => {
-    const user = JSON.parse(localStorage.getItem(Constants.ROLE_USER));
+    const user = JSON.parse(localStorage.getItem(ROLE_USER));
     let _isMounted = false
     const [userManagedGroups, setUserManagedGroups] = useState([])
 

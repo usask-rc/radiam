@@ -1,39 +1,24 @@
 //FolderView.jsx
 import React, { useState, useEffect } from 'react';
-import {
-  AddLocation,
-  FolderOpen,
-  Sort,
-  ArrowUpward,
-  ArrowDownward,
-  ArrowBack,
-  Description,
-  Folder,
-  Search,
-} from '@material-ui/icons';
+import AddLocation from "@material-ui/icons/AddLocation"
+import ArrowBack from "@material-ui/icons/ArrowBack"
+import Description from "@material-ui/icons/Description"
+import Folder from "@material-ui/icons/Folder"
+import Search from "@material-ui/icons/Search"
 import { compose } from 'recompose';
-import Constants from '../../_constants/index';
-import {
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
-  Select,
-  MenuItem,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableSortLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-} from '@material-ui/core';
-import FileSummary from '../../_components/files/FileSummary';
-import FolderDisplay from './FolderDisplay';
-import { translate } from 'ra-core';
+import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
+import Typography from "@material-ui/core/Typography"
+import Table from "@material-ui/core/Table"
+import TableHead from "@material-ui/core/TableHead"
+import TableBody from "@material-ui/core/TableBody"
+import TableRow from "@material-ui/core/TableRow"
+import TableCell from "@material-ui/core/TableCell"
+import TableSortLabel from "@material-ui/core/TableSortLabel"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import TextField from "@material-ui/core/TextField"
+import { translate } from "ra-core"
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
@@ -193,7 +178,7 @@ const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
-  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index Date"}
+  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
@@ -259,9 +244,9 @@ function EnhancedTableHead(props) {
                 <form className={classes.flex} onSubmit={handleSearch}>
 
                   <TextField
-                    id={Constants.paths.SEARCH}
-                    name={Constants.paths.SEARCH}
-                    type={Constants.paths.SEARCH}
+                    id={PATHS.SEARCH}
+                    name={PATHS.SEARCH}
+                    type={PATHS.SEARCH}
                     className={classes.textField}
                     value={search}
                     placeholder={`Search Files`}
@@ -292,7 +277,7 @@ function FolderView({ projectID, item, classes }) {
   const [perPage, setPerPage] = useState(10)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
-  const [order, setOrder] = useState("")
+  const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
@@ -499,11 +484,11 @@ function getJsonKeys(json) {
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
           label={'en.models.agents.location'}
-          source={Constants.model_fk_fields.LOCATION}
-          reference={Constants.models.LOCATIONS}
-          linkType={Constants.resource_operations.SHOW}
-          basePath={`/${Constants.models.PROJECTS}`}
-          resource={Constants.models.PROJECTS}
+          source={MODEL_FK_FIELDS.LOCATION}
+          reference={MODELS.LOCATIONS}
+          linkType={RESOURCE_OPERATIONS.SHOW}
+          basePath={`/${MODELS.PROJECTS}`}
+          resource={MODELS.PROJECTS}
           record={item}
         >
           <LocationShow />
@@ -523,7 +508,7 @@ function getJsonKeys(json) {
       {!loading && folders && folders.length > 0 && 
       <>
         {folders.map( folder => {
-          return <TableRow className={classes.folderRow} onClick={() => addParent(folder.path)}>
+          return <TableRow className={classes.folderRow} key={folder.id} onClick={() => addParent(folder.path)}>
             <TableCell className={classes.nameCell}>
               {folder.name}
             </TableCell>
@@ -551,7 +536,7 @@ function getJsonKeys(json) {
       }
       {!loading && files && files.length > 0 && 
         files.map( file => {
-          return <TableRow className={classes.fileRow} onClick={() => setFile(file)}>
+          return <TableRow className={classes.fileRow} key={file.id} onClick={() => setFile(file)}>
           <TableCell className={classes.nameCell}>
             {file.name}
           </TableCell>

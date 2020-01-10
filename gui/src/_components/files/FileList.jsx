@@ -1,6 +1,7 @@
 import React from 'react';
 import compose from 'recompose/compose';
-import { Divider, Grid } from '@material-ui/core';
+import Divider from "@material-ui/core/Divider"
+import Grid from "@material-ui/core/Grid"
 import FileSummary from './FileSummary';
 import { translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';

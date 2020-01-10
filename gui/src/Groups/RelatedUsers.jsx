@@ -1,13 +1,13 @@
 //RelatedUsers.jsx
 import React, { useState, useEffect } from 'react'
-import * as Constants from '../_constants/index';
+import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER, MODELS, RESOURCE_OPERATIONS } from "../_constants/index";
 import '../_components/components.css';
-import { Chip, Typography, Tooltip } from '@material-ui/core';
-import {  getGroupUsers } from '../_tools/funcs';
+import Chip from "@material-ui/core/Chip"
+import Tooltip from "@material-ui/core/Tooltip"
 import UserAvatar from "react-user-avatar";
 import { Link } from  "react-router-dom";
 import { withStyles } from '@material-ui/styles';
-import { Edit } from '@material-ui/icons';
+import Edit from '@material-ui/icons/Edit';
 
 
 const styles = theme => ({
@@ -52,13 +52,13 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
     let tempU = []
     //sort groupmembers into different categories
     groupMembers.map(groupMember => {
-      if (groupMember.group_role.id === Constants.ROLE_GROUP_ADMIN){
+      if (groupMember.group_role.id === ROLE_GROUP_ADMIN){
         tempGA.push(groupMember)
       }
-      else if (groupMember.group_role.id === Constants.ROLE_DATA_MANAGER){
+      else if (groupMember.group_role.id === ROLE_DATA_MANAGER){
         tempDM.push(groupMember)
       }
-      else if (groupMember.group_role.id === Constants.ROLE_MEMBER){
+      else if (groupMember.group_role.id === ROLE_MEMBER){
         tempM.push(groupMember)
       }
       else{
@@ -172,9 +172,3 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
   }
 
 export default withStyles(styles)(RelatedUsers)
-
-/*
-//previous chip line where we provided a link to the user's show page.
-//can restore this in future but would rather put in edit functionality for now
-href={`/#/${Constants.models.USERS}/${groupMember.user.id}/${Constants.resource_operations.SHOW}`} component="a" clickable
-*/
