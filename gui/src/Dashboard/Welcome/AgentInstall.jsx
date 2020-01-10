@@ -4,7 +4,6 @@ import AddToQueueIcon from "@material-ui/icons/AddToQueue";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import * as Constants from "../../_constants/index"
 const styles = {
   headlineTop: {
     backgroundColor: "#688db2",
