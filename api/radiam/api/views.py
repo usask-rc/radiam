@@ -279,6 +279,27 @@ class RadiamOrderingFilter(OrderingFilter):
     rest_parameter is the string value of the query string parameter to replace and
     replaced_by can be a list of query string parameters to add to the ordering instead
     """
+    STRING_ORDERING_FIELDS = ['name', 'display_name', '-name', '-display_name']
+
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+        if ordering:
+            case_insensitive_ordering = []
+
+            for field in ordering:
+                if field not in self.STRING_ORDERING_FIELDS:
+                    if field.startswith('-'):
+                        case_insensitive_ordering.append(F(field[1:]).desc())
+                    else:
+                        case_insensitive_ordering.append(F(field).asc())
+                elif field.startswith('-'):
+                    case_insensitive_ordering.append(Lower(field[1:]).desc())
+                else:
+                    case_insensitive_ordering.append(Lower(field).asc())
+            queryset = queryset.order_by(*case_insensitive_ordering)
+
+
+        return queryset
 
     def get_replacements(self):
         raise NotImplementedError(".get_replacements() must be overridden.")
@@ -460,7 +481,7 @@ class UserViewSet(RadiamViewSet):
     search_fields = ['username', 'first_name', 'last_name', 'email']
     filter_fields = ('username','first_name','last_name', 'id', 'email')
     ordering_fields = ('username','first_name','last_name', 'email', 'date_created', 'date_updated', 'notes')
-    ordering = ('last_name', 'first_name', 'username', )
+    ordering = ('first_name', 'last_name', 'username', )
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
     # permission_classes = (IsSuperuserOrSelf,)
@@ -839,6 +860,7 @@ class LocationViewSet(RadiamViewSet):
     search_fields = ['display_name', 'host_name']
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
+    ordering = ('display_name')
 
     def get_project_filter(self):
         return self.request.query_params.get("project")
