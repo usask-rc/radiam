@@ -60,7 +60,7 @@ def list_difference(list1,list2):
 def update_info(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id):
     global logger
 
-    logger.info("Crawling project %s" %project_name)
+    logger.info("Crawling project %s" % project_name)
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
     config_project_endpoint = host + "/api/projects/" + radiam_project_id + "/"
@@ -74,6 +74,13 @@ def update_info(osf_token, project_name, host, API, agent_id, location_id, radia
         id_list = [i['id'] for i in res if i['path'] in files_to_del]
         for id in id_list:
             API.delete_document(config_project_endpoint, id)
+
+
+def get_osf_endpoints():
+    """
+    Get the OSF endpoint data from the API
+    """
+    return requests.get("http://nginx/api/useragents/osf_configs")
 
 def main():
     if sys.version_info[0] < 3:
@@ -90,51 +97,35 @@ def main():
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
-    try:
-        host = 'http://radiamapi:8000'
-        db_config = ConfigObj(r"/code/config/db/db_env")
-        db_name = db_config['POSTGRES_DB']
-        db_user = db_config['POSTGRES_USER']
-        db_password = db_config['POSTGRES_PASSWORD']
-        if os.path.isdir('/run/secrets/'):
-            for filename in os.listdir('/run/secrets/'):
-                with open(os.path.join('/run/secrets/', filename), 'r') as secrets_file:
-                    os.environ[filename] = secrets_file.read()
-        if os.environ:
-            db_name = os.environ.get('POSTGRES_DB', db_name)
-            db_user = os.environ.get('POSTGRES_USER', db_user)
-            db_password = os.environ.get('POSTGRES_PASSWORD', db_password)
+    # Loop every hour checking OSF endpoints for updates
 
-        conn = psycopg2.connect(host='db', dbname=db_name, user=db_user, password=db_password)
-        cursor = conn.cursor(cursor_factory=None)
+    while True:
+        # TODO: Change host,  sleep time, and others to configurable values
+        resp = get_osf_endpoints()
+        host = "http://radiamapi:8000"
+    
+        data = json.loads(resp.text)
 
-        while True:
-            cursor.execute(
-                "select agents.id as user_agent_id, agents.remote_api_token, loc.id as loc_id, loc.osf_project, agent_config.project_id, agents.local_access_token, agents.local_refresh_token from rdm_locations loc join rdm_location_types loc_type on loc.location_type_id = loc_type.id join rdm_user_agents agents on agents.location_id = loc.id join rdm_user_agent_project_config agent_config on agent_config.agent_id = agents.id where loc_type.label = %(str)s;",
-                {'str': 'location.type.osf'})
-            for item in cursor:
-                agent_id = item[0]
-                osf_token = item[1]
-                location_id = item[2]
-                project_name = item[3]
-                radiam_project_id = item[4]
-                radiam_tokens["access"] = item[5]
-                radiam_tokens["refresh"] = item[6]
-                agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
-                API = RadiamAPI(**agent_config)
-                API.setLogger(logger)
-                p = multiprocessing.Process(
-                    target=update_info,
-                    args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
-                processes.append(p)
-                p.start()
-            for process in processes:
-                process.join()
-            time.sleep(3600)
+        for item in data:
+            agent_id = item['user_agent_id']
+            osf_token = item['remote_api_token']
+            location_id = item['loc_id']
+            project_name = item['osf_project']
+            radiam_project_id = item['project_id']
+            radiam_tokens["access"] = item['local_access_token']
+            radiam_tokens["refresh"] = item['local_refresh_token']
+            agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
+            API = RadiamAPI(**agent_config)
+            API.setLogger(logger)
+            p = multiprocessing.Process(
+                target=update_info,
+                args=(osf_token, project_name, host, API, agent_id, location_id, radiam_project_id))
+            processes.append(p)
+            p.start()
+        for process in processes:
+            process.join()
+        time.sleep(3600)
 
-    except psycopg2.Error as e:
-        print('Database Error %s' %e.pgerror)
-        sys.exit(1)
-
+    
 if __name__ == "__main__":
     main()

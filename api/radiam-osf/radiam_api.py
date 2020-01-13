@@ -88,7 +88,7 @@ class RadiamAPI(object):
                 if resp_obj["access"] != None:
                     self.authtokens["access"] = resp_obj["access"]
         else:
-            resp = requests.get(self.baseurl + '/api/useragents/' + self.useragent + '/token/new')
+            resp = requests.get(self.baseurl + '/api/useragents/' + self.useragent + '/tokens/new')
             if resp.status_code != 200:
                 self.log("Unable to refresh auth token {}:\n{}\n".format(resp.status_code, resp.text))
             else:
@@ -312,3 +312,5 @@ class RadiamAPI(object):
                 self.log("Unauthorized request {}:\n{}\n".format(resp.status_code, resp.text))
         else:
             return resp.status_code
+
+
