@@ -1173,7 +1173,7 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
 #         # if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
 #         #     data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
 #         #     return Response(data, status=status.HTTP_401_UNAUTHORIZED)
-        
+
 #         resp = self.osf_agent_token_query()
 
 #         data = []
@@ -1327,7 +1327,7 @@ class ProjectSearchViewSet(viewsets.ViewSet):
             raise ProjectNotFoundException()
 
     def get_cache_key(self, project_id, location, agent, path):
-        return "{}.{}.{}.{}".format(project_id, location, agent, path)
+        return "{}.{}.{}.{}".format(project_id, location, agent, path.replace(" ", "%20"))
 
     def create(self, request, project_id):
         """
