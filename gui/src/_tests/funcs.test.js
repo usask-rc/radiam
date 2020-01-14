@@ -3,6 +3,7 @@ import React from "react"
 import renderer from "react-test-renderer";
 import {API_ENDPOINT} from "../_constants/index"
 import {getAPIEndpoint, isAdminOfAParentGroup, getUserRoleInGroup, getMaxUserRole, getFirstCoordinate} from "../_tools/funcs";
+import {dummyPoint, dummyPolygon, dummyMultiLineString, dummyLineString, dummyMultiPoint, dummyMultiPolygon} from "./mocks/models"
 
 describe("Test", () => {
     test("test runs", () => {
@@ -62,32 +63,49 @@ describe("getmaxuserrole", () => {
 })
 
 describe("getFirstCoordinate", () => {
-    const dummyPoint = {feature: {
-        geometry: {
-            type: "Point",
-            coordinates: [0, 0]
-        }
-    }}
-    const dummyLineString = {feature: {
-        geometry: {
-            type: "LineString",
-            coordinates: [[2, 2],[0, 0],[1, 1]]
-        }
-    }}
-    const dummyPolygon = {feature: {
-        geometry: {
-            type: "Polygon",
-            coordinates: [[[3, 3], [2, 2], [1, 1], [0, 0]]]
-        }
-    }}
-    //TODO: dummy multi___ types
+    //NOTE: getfirstcoordinates returns a reversed list of the coordinates - this is required for leaflet to display in [lng, lat]
     test("returns coordinate of Point object", () => {
-        expect(getFirstCoordinate(dummyPoint)).toEqual(dummyPoint.feature.geometry.coordinates)
+        expect(getFirstCoordinate(dummyPoint)).toEqual(dummyPoint.feature.geometry.coordinates.reverse())
     })
     test("returns first coordinate of LineString object", () => {
-        expect(getFirstCoordinate(dummyLineString)).toEqual(dummyLineString.feature.geometry.coordinates[0])
+        expect(getFirstCoordinate(dummyLineString)).toEqual(dummyLineString.feature.geometry.coordinates[0].reverse())
     })
     test("returns first coordinate of Polygon object", () => {
-        expect(getFirstCoordinate(dummyPolygon)).toEqual(dummyPolygon.feature.geometry.coordinates[0][0])
+        expect(getFirstCoordinate(dummyPolygon)).toEqual(dummyPolygon.feature.geometry.coordinates[0][0].reverse())
+    })
+
+    test("returns first coordinate of MultiPoint object", () => {
+        expect(getFirstCoordinate(dummyMultiPoint)).toEqual(dummyMultiPoint.feature.geometry.coordinates[0].reverse())
+    })
+
+    test("returns first coordinate of MultiLineString object", () => {
+        expect(getFirstCoordinate(dummyMultiLineString)).toEqual(dummyMultiLineString.feature.geometry.coordinates[0][0].reverse())
+    }) 
+
+    test("returns first coordinate of MultiPolygon object", () => {
+        expect(getFirstCoordinate(dummyMultiPolygon)).toEqual(dummyMultiPolygon.feature.geometry.coordinates[0][0][0].reverse())
+    })
+    test("returns false if sent no object", () => {
+        expect(getFirstCoordinate()).toEqual(false)
+    })
+    test("returns false if sent an invalid object", () => {
+        expect(getFirstCoordinate({})).toEqual(false)
+    })
+    test("returns false if sent a layer with no type or coords", () => {
+        expect(getFirstCoordinate({feature: {}})).toEqual(false)
+    })
+    test("returns false if sent a layer with geometry but no type", () => {
+        expect(getFirstCoordinate({feature: {geometry: [5, 5]}})).toEqual(false)
+    })
+    test("returns false if sent a layer with type but no geometry", () => {
+        expect(getFirstCoordinate({feature: {type: "unknown"}})).toEqual(false)
+    })
+    test("returns false if sent an unknown object", () => {
+        expect(getFirstCoordinate({feature: {type: "unknown", geometry: [1, 1]}})).toEqual(false)
+    })
+    test("returns false if sent an invalid coordinates with type LineString", () => {
+        let badPoint = dummyPoint
+        badPoint.feature.geometry.type="LineString"
+        expect(getFirstCoordinate(badPoint)).toEqual(false)
     })
 })

@@ -13,6 +13,43 @@ module.exports = Object.freeze({
     date_updated: "2019-01-28T19:29:29.238000Z",
     notes: null
   },
+  dummyPoint :{feature: {
+    geometry: {
+        type: "Point",
+        coordinates: [1, 0]
+    }
+  }},
+  dummyLineString: {feature: {
+    geometry: {
+        type: "LineString",
+        coordinates: [[2, 3],[0, 0],[1, 1]]
+    }
+  }},
+  dummyPolygon: {feature: {
+    geometry: {
+        type: "Polygon",
+        coordinates: [[[2, 3], [2, 2], [1, 1], [0, 0]]]
+    }
+  }},
+  dummyMultiPoint: {feature: {
+    geometry: {
+        type: "MultiPoint",
+        coordinates: [[1,10], [2,2]]
+    }
+  }},
+  dummyMultiLineString: {feature: {
+    geometry: {
+        type: "MultiLineString",
+        coordinates: [[[3, 5], [2, 2], [1, 1], [0, 0]]]
+    }
+  }},
+
+  dummyMultiPolygon: {feature: {
+    geometry: {
+        type: "MultiPolygon",
+        coordinates: [[[[4, 8], [2, 2], [1, 1], [0, 0]]]]
+    }
+  }},
 
   userAgent: {
     id: "12785dfb-1791-4771-953e-09febcb8b103",

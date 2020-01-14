@@ -15,11 +15,9 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
 
-  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
-  */
   return `/${API_ENDPOINT}`;
 }
 
@@ -183,30 +181,44 @@ export function toastErrors(data) {
 
 //TODO: this can be reused elsewhere in the map views.
 export function getFirstCoordinate(layer) {
-  if (layer.feature) {
+  if (layer && layer.feature) {
     const layerGeo = layer.feature.geometry;
-    switch (layerGeo.type) {
-      case 'Point':
-        return [layerGeo.coordinates[1], layerGeo.coordinates[0]];
-      case 'MultiPoint':
-      case 'LineString':
-        return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]];
-      case 'MultiLineString':
-      case 'Polygon':
-        return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]];
-      case 'MultiPolygon':
-        return [
-          layerGeo.coordinates[0][0][0][1],
-          layerGeo.coordinates[0][0][0][0],
-        ];
-      default:
-        console.error(
-          'Invalid feature type sent to _getFirstCoordinate.  Layer: ',
-          layer
-        );
-        return [0, 0];
+    if (layerGeo && layerGeo.type && layerGeo.coordinates){
+      switch (layerGeo.type) {
+        case 'Point':
+          if (layerGeo.coordinates.length === 2){
+            return [layerGeo.coordinates[1], layerGeo.coordinates[0]];
+          }
+          break;
+        case 'MultiPoint':
+        case 'LineString':
+          if (layerGeo.coordinates[0].length === 2){
+            return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]];
+          }
+          break;
+        case 'MultiLineString':
+        case 'Polygon':
+          if (layerGeo.coordinates[0][0].length === 2){
+            return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]];
+          }
+          break;
+        case 'MultiPolygon':
+          if (layerGeo.coordinates[0][0][0].length === 2){
+            return [
+              layerGeo.coordinates[0][0][0][1],
+              layerGeo.coordinates[0][0][0][0],
+            ];
+          }
+          break;
+        default:
+          console.error(
+            'Invalid feature sent to getFirstCoordinate. Layer: ',
+            layer
+          );
+      }
     }
   }
+  return false
 }
 
 export function getFolderFiles(
