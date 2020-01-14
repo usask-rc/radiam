@@ -24,7 +24,6 @@ es
 lib
 node_modules/
 env/
-_tests/
 __tests__
 .babelrc
 

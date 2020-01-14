@@ -2,7 +2,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Layout } from "react-admin";
-import CustomAppBar from "./AppBar";
+import CustomAppBar from "./RadiamAppBar";
 import { darkTheme, lightTheme } from "./themes";
 import RadiamMenu from "../Dashboard/RadiamMenu";
 

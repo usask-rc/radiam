@@ -21,12 +21,24 @@ class Dashboard extends PureComponent {
 
   //when component mounts, get the data we need to display on the front page.
   componentDidMount() {
+    this.onMountAndRefresh()
+  }
+
+  onMountAndRefresh(){
     getRecentProjects().then(data => {
       this.setState(data)
     })
     .catch(err => {
       console.error("Error in getRecentProjects: ", err)
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log("prev, cur props: ", prevProps, this.props)
+    /*if (prevProps.views !== this.props.views) {
+      this.onMountAndRefresh();
+    }
+    */
   }
 
   render() {

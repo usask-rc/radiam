@@ -12,8 +12,9 @@ export function getAsyncValidateNotExists(checkField, endpoint_path) {
         let url = `${getAPIEndpoint()}/${endpoint_path}/?${param}=${data[checkField.name]}`;
         return httpClient(url, { "method": METHODS.GET }).then(response => {
           if (response.json && response.json.count && response.json.count > 0) {
-
+            console.log("asyncvalidatenotexists response: ", response)
             if (response.json.results[0].id && data.id && response.json.results[0].id === data.id){//check to ensure the value we found isn't just this one.
+            console.log("asyncvalidatenotexists resolving")
               resolve({})
             }
             else{

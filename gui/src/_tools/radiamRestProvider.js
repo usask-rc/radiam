@@ -22,6 +22,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     let sort = '';
     let formData = new FormData();
     const options = {};
+
     switch (type) {
 
       

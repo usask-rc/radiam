@@ -70,6 +70,10 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
     }
     return "user"
   }
+  //no cookie or group
+  else if (!user && !group){
+    return "anonymous"
+  }
   else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
@@ -152,6 +156,7 @@ export function getMaxUserRole(){
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
+    return "anonymous"
   }
 }
 

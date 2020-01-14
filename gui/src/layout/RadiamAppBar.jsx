@@ -1,4 +1,4 @@
-//Appbar.jsx
+//RadiamAppbar.jsx
 import React, { useState, useEffect } from "react";
 import {version} from "../version.json";
 import { AppBar, UserMenu, MenuItemLink, translate } from "react-admin";
