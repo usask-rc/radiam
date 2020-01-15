@@ -37,7 +37,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getUsersInGroup, getRelatedDatasets, getPrimaryContactCandidates } from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates } from "../_tools/funcs";
 import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -114,7 +114,6 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
         label={'en.models.projects.primary_contact_user'}
         source={MODEL_FIELDS.PRIMARY_CONTACT_USER}
         reference={MODELS.USERS}
-        allowEmpty
       >
         <UserShow />
       </ReferenceField>
@@ -260,7 +259,6 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                       <DatasetShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
                     </DialogContent>
                   </Dialog>}
-                  
                 </>
 
               )}
@@ -305,14 +303,14 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
   const [groupList, setGroupList] = useState([])
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
-  const [status, setStatus] = useState({error: false, loading: true})
+  const [loading, setLoading] = useState(true)
   let _isMounted = false
 
 
   const handleSelectChange = (e, value, prevValue, target) => {
     console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
     if (target === 'group' && value !== prevValue){
-      setStatus({loading: true})
+      setLoading(true)
       setGroupList([])
       setProjectGroup(value)
     }
@@ -330,6 +328,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   }, [projectGroup])
 
+  //TODO: extract to funcs.jsx
   //TODO: handle potential setstate on unmounted component
   const getAllParentGroups = group_id => {
     if (group_id !== null){
@@ -338,7 +337,6 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
 
           let tempGroupList = groupList
           tempGroupList.push(data)
-
           setGroupList(tempGroupList)
           getAllParentGroups(data.parent_group)
 
@@ -350,7 +348,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
     else{
       //now get a list of users in each group
-      getPrimaryContactCandidates(groupList).then(data => setGroupContactList(data))
+      getPrimaryContactCandidates(groupList).then(data => {
+        setLoading(false)
+        setGroupContactList(data)})
     }
   };
 
@@ -382,49 +382,54 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           label={"en.models.projects.keywords"}
           source={MODEL_FIELDS.KEYWORDS} />
       </div>
-      <div>
-        <ReferenceInput
-          resource="researchgroups"
-          className="input-small"
-          label={"en.models.projects.group"}
-          source={MODEL_FIELDS.GROUP}
-          reference={MODELS.GROUPS}
-          onChange={handleSelectChange}
-          validate={validateGroup}>
-          <SelectInput optionText={MODEL_FIELDS.NAME} />
-        </ReferenceInput>
-        { groupContactList.length > 0 ?
-          (<div>
-            <UserInput
-              required
-              label={"en.models.projects.primary_contact_user"}
-              placeholder={`Primary Contact`}
-              validate={validatePrimaryContactUser}
+        
+      <FormDataConsumer>
+        {({formData, ...rest}) => {
+          console.log("formData: ", formData)
+        return(
+          <div>
+            <ReferenceInput
+              resource="researchgroups"
               className="input-small"
-              users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-              />
-          </div>)
-          :
-          !status.loading && groupContactList.length === 0 ? 
-          (<div>
-          <Typography>{`No Eligible Users were found in the selected Group. Primary Contact will remain as the previously set user.`}</Typography>
-          </div>)
-          :
-          status.loading ? 
-          (<div>
-            <Typography>{`Loading Associated Users...`}</Typography>
-          </div>)
-          :
-          <div>
-            <Typography>{`Error loading users: ${status.error}`}</Typography>
+              label={"en.models.projects.group"}
+              source={MODEL_FIELDS.GROUP}
+              reference={MODELS.GROUPS}
+              onChange={handleSelectChange}
+              validate={validateGroup}>
+              <SelectInput optionText={MODEL_FIELDS.NAME} />
+            </ReferenceInput>
+            { !loading && groupContactList.length > 0 ?
+              (<div>
+                <UserInput
+                  required
+                  label={"en.models.projects.primary_contact_user"}
+                  placeholder={`Primary Contact`}
+                  validate={validatePrimaryContactUser}
+                  className="input-small"
+                  users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+                  />
+              </div>)
+              : !loading && groupContactList.length === 0 ? 
+              <div>
+                {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+              </div>
+              :
+              <div>
+                <Typography>{`Loading Associated Users...`}</Typography>
+              </div>
+              
+            }
+            { record.id && (
+              <div>
+                <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
+                <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
+              </div>
+            )}
           </div>
-        }
-        { record.id && (
-          <div>
-            <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-            <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-          </div>
-        )}
+        )}}
+
+        </FormDataConsumer>
+
 
         <FormDataConsumer>
           {({formData, ...rest} ) =>
@@ -442,8 +447,6 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           }
           }
         </FormDataConsumer>
-
-      </div>
       
     </CardContentInner>;
   }

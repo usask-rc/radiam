@@ -17,10 +17,12 @@ import {
   TextInput,
   Toolbar,
   translate,
+  FormDataConsumer,
 } from "react-admin";
 import { InputLabel, MenuItem, Select } from '@material-ui/core';
 import MapForm from './_forms/MapForm';
 import PropTypes from 'prop-types';
+import Typography from "@material-ui/core/Typography"
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
@@ -199,10 +201,11 @@ class PageThree extends Component {
   }
 }
 
+//TODO: extract to its own file / make into functional component
 class PageTwo extends Component {
   constructor(props) {
     super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, groupContactList: [], isMounted: false }
+    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, groupContactList: [], isMounted: false, loadingContactList: true }
   }
 
   handleChange = (event, index, id, value) => {
@@ -251,45 +254,70 @@ class PageTwo extends Component {
     else{
       const { groupList } = this.state
       //now get a list of users in each group
-      getPrimaryContactCandidates(groupList).then(data => this.setState({groupContactList: data}))
+      getPrimaryContactCandidates(groupList).then(data => this.setState({groupContactList: data, loadingContactList: false}))
     }
   };
 
   render() {
     const { handleBack, handleNext } = this.props
     const { group, primary_contact_user } = this.props.record
-    const { isFormDirty, groupContactList } = this.state
+    const { isFormDirty, groupContactList, loadingContactList } = this.state
 
     console.log("groupContactList is: ", groupContactList)
 
     return (
       <>
     <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
-      <div>
-        <ReferenceInput
-          className="input-small"
-          label={"en.models.projects.group"}
-          reference={MODELS.GROUPS}
-          resource={MODELS.GROUPS}
-          source={MODEL_FIELDS.GROUP}
-          validate={validateGroup}
-          onChange={this.handleChange}
-          defaultValue={group || ""}
-        >
-          <SelectInput optionText={MODEL_FIELDS.NAME} />
-        </ReferenceInput>
-      </div>
-      {groupContactList.length > 0 && <div>
-          <UserInput
-            required
-            label={"en.models.projects.primary_contact_user"}
-            placeholder={`Primary Contact`}
-            validate={validatePrimaryContactUser}
-            className="input-small"
-            users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-            defaultValue={primary_contact_user || ""} />
-      </div>
-      }
+      <FormDataConsumer>
+      {({formData, ...rest}) => {
+          console.log("formData: ", formData)
+          return(
+            <div>
+              <div>
+                <ReferenceInput
+                  className="input-small"
+                  label={"en.models.projects.group"}
+                  reference={MODELS.GROUPS}
+                  resource={MODELS.GROUPS}
+                  source={MODEL_FIELDS.GROUP}
+                  validate={validateGroup}
+                  onChange={this.handleChange}
+                  defaultValue={group || ""}
+                >
+                  <SelectInput optionText={MODEL_FIELDS.NAME} />
+                </ReferenceInput>
+              </div>
+              {!loadingContactList && groupContactList.length > 0 ?
+              <div>
+                <UserInput
+                  required
+                  label={"en.models.projects.primary_contact_user"}
+                  placeholder={`Primary Contact`}
+                  validate={validatePrimaryContactUser}
+                  className="input-small"
+                  users={groupContactList} 
+                  id={MODEL_FIELDS.PRIMARY_CONTACT_USER} 
+                  name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+                  defaultValue={primary_contact_user || ""} 
+                />
+              </div>
+              : formData && !formData.group ? 
+              <div>
+                {`Select a Research Group to associate with this Project`}
+              </div>
+              : !loadingContactList && groupContactList.length === 0 ?
+              <div>
+                {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+              </div>
+              :
+              <div>
+                {`Loading Associated Users...`}
+              </div>
+              }
+            </div>
+          )}}
+      </FormDataConsumer>
+
     </SimpleForm>
     <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
     </>
@@ -321,7 +349,8 @@ export class ProjectStepper extends React.Component {
     };
   }
 
-  handleNext = () => {
+  handleNext = (data) => {
+    console.log("handlenext data: ", data)
     this.setState(state => ({
       activeStep: state.activeStep + 1,
     }));
