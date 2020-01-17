@@ -53,6 +53,7 @@ router.register(r'selectedschemas', views.SelectedSchemaViewSet)
 router.register(r'sensitivitylevel', views.SensitivityLevelViewSet)
 router.register(r'useragents', views.UserAgentViewSet)
 router.register(r'users', views.UserViewSet)
+router.register(r'searchmodels', views.SearchModelViewSet)
 
 router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
                 views.UserAgentTokenViewSet,

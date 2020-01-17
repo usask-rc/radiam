@@ -56,7 +56,8 @@ from radiam.api.serializers import (
     SensitivityLevelSerializer,
     SuperuserUserSerializer,
     UserSerializer,
-    UserAgentSerializer)
+    UserAgentSerializer,
+    SearchModelSerializer)
 
 # from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
@@ -546,6 +547,19 @@ class UserAgentOrderingFilter(RadiamOrderingFilter):
         location = ('location', ['location__display_name', 'location__host_name'])
         user = ('user', ['user__last_name', 'user__first_name', 'user__username'])
         return [location, user]
+
+
+class SearchModelViewSet(viewsets.ViewSet):
+    """
+    SearchModel endpoint to define a dataset and a search query
+    """
+    queryset = SearchModel.objects.all().order_by('dataset')
+    serializer_class = SearchModelSerializer
+
+    filter_fields = ('dataset', 'id')
+    ordering_fields = ('dataset',)
+    ordering = ('dataset')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
 
 
 class UserAgentViewSet(RadiamViewSet):

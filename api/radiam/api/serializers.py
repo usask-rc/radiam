@@ -47,7 +47,7 @@ from .models import (
     SensitivityLevel,
     User,
     UserAgent,
-    UserAgentProjectConfig)
+    UserAgentProjectConfig, SearchModel)
 
 from .signals import radiam_user_created, radiam_user_updated, radiam_project_created
 
@@ -179,6 +179,14 @@ class ContentObjectNameForeignKey(serializers.RelatedField):
         except ContentType.DoesNotExist:
             raise serializers.ValidationError(msg, format(data))
 
+class SearchModelSerializer(serializers.Serializer):
+    search = serializers.JSONField(required=False)
+
+    class Meta:
+        model = SearchModel
+        fields = ('id',
+                  'dataset',
+                  'search')
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
