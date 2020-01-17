@@ -1,5 +1,5 @@
 //ProjectStepper.jsx
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import compose from "recompose/compose";
 import { connect } from 'react-redux';
@@ -27,7 +27,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getPrimaryContactCandidates } from '../_tools/funcs';
+import { submitObjectWithGeo, getGroupData, getPrimaryContactCandidates, getParentGroupList } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 import ProjectTitle from '../Projects/ProjectTitle';
@@ -63,7 +63,7 @@ class NextButtonView extends Component {
   }
 }
 
-const NextButton = connect(undefined, {})(NextButtonView);
+export const NextButton = connect(undefined, {})(NextButtonView);
 
 /**
  * A toolbar to show a next button if not on the last page, a back button if not on the first page
@@ -201,128 +201,91 @@ class PageThree extends Component {
   }
 }
 
-//TODO: extract to its own file / make into functional component
-class PageTwo extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { group: null, groupList: [], isFormDirty: false, groupContactCandidates: {}, groupContactList: [], isMounted: false, loadingContactList: true }
-  }
+const XPageTwo = ({ handleBack, handleNext }) => {
+  const [group, setGroup] = useState(null) //we will never have a group on entry
+  const [dirty, setDirty] = useState(false)
+  const [groupContactList, setGroupContactList] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  handleChange = (event, index, id, value) => {
-    this.setState({ group: index, groupList: [], isFormDirty: true, groupContactCandidates: {},  groupContactList: [] })
-    this.getAllParentGroups(index)
-  };
+  useEffect(() => {
 
-  componentDidMount() {
-    //I don't know why this can't use dot notation, but apparently group appears in prop and can only be accessed in Dict notation.
-    const { record } = this.props
-
-    this.setState({ groupList: [], isMounted: true })
-    //Accessing in Edit Mode
-    if (record.group) {
-      this.setState({ group: record.group, primary_contact_user: record.primary_contact_user})
-      this.getAllParentGroups(record.group)
+    if (group){
+      setLoading(true)
+      getParentGroupList(group).then(data => {
+          getPrimaryContactCandidates(data).then(contacts => {
+            setGroupContactList(contacts)
+            setLoading(false)
+          }).catch(err => {
+            console.error("in getprimarycontactcandidates, err: ", err)
+          })
+      }).catch(err => {
+        console.error("in pagetwo, err returned from getparentgrouplist: ", err)
+      })
     }
-    else {
-      //Accessing in Creation mode - is there anything extra needed here?
-    }
+  }, [group])
+
+  const handleChange = ({data, ...rest}) => {
+    console.log("XPageTwo handlechange data: ", data, rest)
   }
 
-  componentWillUnmount(){
-    this.setState({isMounted: false})
-  }
-
-  //TODO: this smells funny - there's a better way to do this.
-  getAllParentGroups = group_id => {
-    if (group_id !== null){
-      getGroupData(group_id).then(
-        data => {
-
-          const { isMounted, groupList } = this.state
-          groupList.push(data)
-
-          if (isMounted){
-            this.setState(groupList)
-            this.getAllParentGroups(data.parent_group)
-          }
-
-          return data
+  return (
+    <>
+  <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
+    <FormDataConsumer>
+    {({formData, ...rest}) => {
+        console.log("formData: ", formData)
+        if (formData && formData.group !== group){
+          setGroup(formData.group)
         }
-      ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)})
-    }
-    else{
-      const { groupList } = this.state
-      //now get a list of users in each group
-      getPrimaryContactCandidates(groupList).then(data => this.setState({groupContactList: data, loadingContactList: false}))
-    }
-  };
-
-  render() {
-    const { handleBack, handleNext } = this.props
-    const { group, primary_contact_user } = this.props.record
-    const { isFormDirty, groupContactList, loadingContactList } = this.state
-
-    console.log("groupContactList is: ", groupContactList)
-
-    return (
-      <>
-    <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
-      <FormDataConsumer>
-      {({formData, ...rest}) => {
-          console.log("formData: ", formData)
-          return(
+        return(
+          <div>
             <div>
-              <div>
-                <ReferenceInput
-                  className="input-small"
-                  label={"en.models.projects.group"}
-                  reference={MODELS.GROUPS}
-                  resource={MODELS.GROUPS}
-                  source={MODEL_FIELDS.GROUP}
-                  validate={validateGroup}
-                  onChange={this.handleChange}
-                  defaultValue={group || ""}
-                >
-                  <SelectInput optionText={MODEL_FIELDS.NAME} />
-                </ReferenceInput>
-              </div>
-              {!loadingContactList && groupContactList.length > 0 ?
-              <div>
-                <UserInput
-                  required
-                  label={"en.models.projects.primary_contact_user"}
-                  placeholder={`Primary Contact`}
-                  validate={validatePrimaryContactUser}
-                  className="input-small"
-                  users={groupContactList} 
-                  id={MODEL_FIELDS.PRIMARY_CONTACT_USER} 
-                  name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-                  defaultValue={primary_contact_user || ""} 
-                />
-              </div>
-              : formData && !formData.group ? 
-              <div>
-                {`Select a Research Group to associate with this Project`}
-              </div>
-              : !loadingContactList && groupContactList.length === 0 ?
-              <div>
-                {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
-              </div>
-              :
-              <div>
-                {`Loading Associated Users...`}
-              </div>
-              }
+              <ReferenceInput
+                className="input-small"
+                label={"en.models.projects.group"}
+                reference={MODELS.GROUPS}
+                resource={MODELS.GROUPS}
+                source={MODEL_FIELDS.GROUP}
+                validate={validateGroup}
+                onChange={handleChange}
+              >
+                <SelectInput optionText={MODEL_FIELDS.NAME} />
+              </ReferenceInput>
             </div>
-          )}}
-      </FormDataConsumer>
+            {!loading && groupContactList.length > 0 ?
+            <div>
+              <UserInput
+                required
+                label={"en.models.projects.primary_contact_user"}
+                placeholder={`Primary Contact`}
+                validate={validatePrimaryContactUser}
+                className="input-small"
+                users={groupContactList} 
+                id={MODEL_FIELDS.PRIMARY_CONTACT_USER} 
+                name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+              />
+            </div>
+            : !loading && !group ? 
+            <div>
+              {`Select a Research Group to manage this Project`}
+            </div>
+            : !loading && groupContactList.length === 0 ?
+            <div>
+              {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+            </div>
+            :
+            <div>
+              {`Loading Associated Users...`}
+            </div>
+            }
+          </div>
+        )}}
+    </FormDataConsumer>
 
-    </SimpleForm>
-    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
-    </>
-    )
-  }
+  </SimpleForm>
+  <Prompt when={dirty} message={WARNINGS.UNSAVED_CHANGES}/>
+  </>
+  )
 }
 
 const renderUserInput = ({ input, users }) => {
@@ -383,9 +346,9 @@ export class ProjectStepper extends React.Component {
             <StepLabel>{label}</StepLabel>
             <StepContent>
               {index === 0 ?
-                <PageOne classes={classes} handleNext={this.handleNext} {...this.props} /> :
+                <PageOne handleNext={this.handleNext} {...this.props} /> :
                 index === 1 ? 
-                <PageTwo classes={classes} handleNext={this.handleNext} handleBack={this.handleBack} {...this.props} />
+                <XPageTwo classes={classes} handleNext={this.handleNext} handleBack={this.handleBack} {...this.props} />
                 :
                 <PageThree classes={classes} handleBack={this.handleBack} mode={mode} save={save} {...this.props}/>
               }
