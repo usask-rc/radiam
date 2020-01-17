@@ -406,7 +406,7 @@ class MapForm extends Component {
         {location && location.length > 0 && (
           <>
             <Typography className={classes.mapTitle} component={'p'}>
-              {`Geolocation Map Input`}
+              {`Location Information`}
             </Typography>
             <Map
               ref={ref => {

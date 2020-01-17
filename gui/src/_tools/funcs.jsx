@@ -14,10 +14,11 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-
+/*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
+  */
   return `/${API_ENDPOINT}`;
 }
 
@@ -572,6 +573,7 @@ export function getPrimaryContactCandidates(groupList) {
 }
 
 //TODO: convert to promise / callback system
+//TODO: do the above
 export function submitObjectWithGeo(
   formData,
   geo,

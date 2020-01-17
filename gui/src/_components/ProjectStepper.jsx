@@ -27,7 +27,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo, getGroupData, getPrimaryContactCandidates, getParentGroupList } from '../_tools/funcs';
+import { submitObjectWithGeo,  getPrimaryContactCandidates, getParentGroupList } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 import ProjectTitle from '../Projects/ProjectTitle';
@@ -152,63 +152,12 @@ return(
   </>
 )};
 
-//NOTE: what if we use the source parameter like everything else?  will this work???!?
-class PageThree extends Component {
-  constructor(props){
-    super(props)
-    this.state = {geo: props.record.geo, isDirty: false }
-  }
-
-  geoDataCallback = callbackGeo => {
-    //send our geodata back up to the stepper, we don't have any reason to handle it here.
-    console.log("receiving geodata from map in gDC: ", callbackGeo)
-    const { geo } = this.state
-    if (callbackGeo !== geo){
-      this.setState({geo: callbackGeo})
-      this.setState({isFormDirty: true})
-    }
-  };
-
-  handleSubmit = (data, redirect) => {
-
-    console.log("data in handlesubmit is: ", data, this.state)
-      this.setState({isFormDirty: false}, () => {
-        const { geo } = this.state
-        submitObjectWithGeo(data, geo, this.props, redirect)
-      }
-    )
-  };
-
-  handleChange = data => {
-    if (data && data.timeStamp){
-      this.setState({isFormDirty: true})
-    }
-  }
-
-  render(){
-    const { handleBack, record } = this.props
-    const { isFormDirty } = this.state
-    return(
-      <>
-        <SimpleForm save={this.handleSubmit} redirect={RESOURCE_OPERATIONS.LIST} onChange={this.handleChange} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
-          {record && 
-            <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={this.geoDataCallback}/>
-          }
-        </SimpleForm>
-        <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
-      </>
-    )
-  }
-}
-
-const XPageTwo = ({ handleBack, handleNext }) => {
+const PageTwo = ({classes, translate, handleBack, handleNext }) => {
   const [group, setGroup] = useState(null) //we will never have a group on entry
-  const [dirty, setDirty] = useState(false)
   const [groupContactList, setGroupContactList] = useState([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-
     if (group){
       setLoading(true)
       getParentGroupList(group).then(data => {
@@ -224,16 +173,11 @@ const XPageTwo = ({ handleBack, handleNext }) => {
     }
   }, [group])
 
-  const handleChange = ({data, ...rest}) => {
-    console.log("XPageTwo handlechange data: ", data, rest)
-  }
-
   return (
     <>
   <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar handleNext={handleNext} handleBack={handleBack} />}>
     <FormDataConsumer>
     {({formData, ...rest}) => {
-        console.log("formData: ", formData)
         if (formData && formData.group !== group){
           setGroup(formData.group)
         }
@@ -247,7 +191,6 @@ const XPageTwo = ({ handleBack, handleNext }) => {
                 resource={MODELS.GROUPS}
                 source={MODEL_FIELDS.GROUP}
                 validate={validateGroup}
-                onChange={handleChange}
               >
                 <SelectInput optionText={MODEL_FIELDS.NAME} />
               </ReferenceInput>
@@ -281,10 +224,34 @@ const XPageTwo = ({ handleBack, handleNext }) => {
           </div>
         )}}
     </FormDataConsumer>
-
   </SimpleForm>
-  <Prompt when={dirty} message={WARNINGS.UNSAVED_CHANGES}/>
   </>
+  )
+}
+
+const PageThree = ({handleBack, record, classes, translate, ...props}) => {
+
+  const [geo, setGeo] = useState(null)
+
+  const geoDataCallback = callbackGeo => {
+    const pageGeo = geo
+    if (pageGeo !== callbackGeo){
+      setGeo(callbackGeo)
+    }
+  }
+
+  const handleSubmit = (data) => {
+    submitObjectWithGeo(data, geo, props)
+  };
+
+  return(
+    <>
+      <SimpleForm save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST} toolbar={<ProjectStepperToolbar doSave={true} handleBack={handleBack} />}>
+          {record && 
+            <MapForm content_type={'project'} recordGeo={geo} id={record.id} geoDataCallback={geoDataCallback}/>
+          }
+      </SimpleForm>
+    </>
   )
 }
 
@@ -348,7 +315,7 @@ export class ProjectStepper extends React.Component {
               {index === 0 ?
                 <PageOne handleNext={this.handleNext} {...this.props} /> :
                 index === 1 ? 
-                <XPageTwo classes={classes} handleNext={this.handleNext} handleBack={this.handleBack} {...this.props} />
+                <PageTwo classes={classes} translate={translate} handleNext={this.handleNext} handleBack={this.handleBack} {...this.props} />
                 :
                 <PageThree classes={classes} handleBack={this.handleBack} mode={mode} save={save} {...this.props}/>
               }
