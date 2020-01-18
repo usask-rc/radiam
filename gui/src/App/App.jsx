@@ -208,7 +208,7 @@ const App = props => {
             list={LocationList}
             show={LocationDisplay}
             create={LocationCreate}
-            edit={permissions.is_admin ? LocationEdit : null}
+            edit={LocationEdit}
           />,
           
           <Resource

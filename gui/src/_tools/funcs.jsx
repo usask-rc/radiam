@@ -14,7 +14,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-/*
+  /*
   if (window && window.location && window.location.port === '3000') {
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
   }
@@ -641,6 +641,7 @@ export function postObjectWithoutSaveProp(formData, resource){
 
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
+  console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
   let headers = new Headers({ 'Content-Type': 'application/json' });
   const token = localStorage.getItem(WEBTOKEN);
 
@@ -648,12 +649,13 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
     const parsedToken = JSON.parse(token);
     headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    //POST the new object, then update it immediately afterwards with any geoJSON it carries.
+    //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
     const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
       method: METHODS.POST,
       body: JSON.stringify({ ...formData }),
       headers: headers,
     });
+
     return fetch(request)
       .then(response => {
         if (response.status >= 200 && response.status < 300) {
