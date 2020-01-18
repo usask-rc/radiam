@@ -21,17 +21,15 @@ import {
 } from "react-admin";
 import { InputLabel, MenuItem, Select } from '@material-ui/core';
 import MapForm from './_forms/MapForm';
-import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography"
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
-import { submitObjectWithGeo,  getPrimaryContactCandidates, getParentGroupList } from '../_tools/funcs';
+import { submitObjectWithGeo,  getPrimaryContactCandidates, getParentGroupList, getUsersInGroup } from '../_tools/funcs';
 import "../_components/components.css";
 import { Prompt } from 'react-router';
 import ProjectTitle from '../Projects/ProjectTitle';
-
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
@@ -74,8 +72,8 @@ const ProjectStepperToolbar = ({ handleBack, handleNext, doSave, ...props }) => 
     <Toolbar {...props}>
       {handleBack ?
         <Button onClick={handleBack} >
-          Back
-          </Button>
+          {`Back`}
+        </Button>
         : null}
       {handleNext ?
         <NextButton
@@ -152,7 +150,7 @@ return(
   </>
 )};
 
-const PageTwo = ({classes, translate, handleBack, handleNext }) => {
+const PageTwo = ({ handleBack, handleNext }) => {
   const [group, setGroup] = useState(null) //we will never have a group on entry
   const [groupContactList, setGroupContactList] = useState([])
   const [loading, setLoading] = useState(false)
@@ -160,15 +158,12 @@ const PageTwo = ({classes, translate, handleBack, handleNext }) => {
   useEffect(() => {
     if (group){
       setLoading(true)
-      getParentGroupList(group).then(data => {
-          getPrimaryContactCandidates(data).then(contacts => {
-            setGroupContactList(contacts)
-            setLoading(false)
-          }).catch(err => {
-            console.error("in getprimarycontactcandidates, err: ", err)
-          })
+      getUsersInGroup({id: group, is_active: true}).then(contacts => {
+        console.log("getusersingroup result: ", contacts)
+        setGroupContactList(contacts)
+        setLoading(false)
       }).catch(err => {
-        console.error("in pagetwo, err returned from getparentgrouplist: ", err)
+        console.error("in getprimarycontactcandidates, err: ", err)
       })
     }
   }, [group])
@@ -241,6 +236,8 @@ const PageThree = ({handleBack, record, classes, translate, ...props}) => {
   }
 
   const handleSubmit = (data) => {
+    console.log("pagethree handlesubmit data is: ", data, geo, props)
+    props.resource = "projects"
     submitObjectWithGeo(data, geo, props)
   };
 
@@ -270,7 +267,55 @@ const renderUserInput = ({ input, users }) => {
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
 
-export class ProjectStepper extends React.Component {
+export const ProjectStepper = ({classes, translate, mode, save, ...props}) => {
+  const [step, setStep] = useState(0)
+
+  const handleNext = () => {
+    setStep(step + 1)
+  }
+  const handleBack = () => {
+    setStep(step - 1)
+  }
+
+  const handleReset = () => {
+    setStep(0)
+  }
+
+  const steps = [translate('en.models.projects.steps.name'), translate('en.models.projects.steps.researchgroup'), translate('en.models.projects.steps.map')];
+
+  console.log("projectstepper others: ", mode, save)
+  console.log("projectstepper props: ", props)
+  
+  return(
+    <>
+      
+        <ProjectTitle prefix={`Creating Project`} />
+        {save ? 
+        <Stepper activeStep={step} orientation="vertical">
+
+        {steps.map((label, index) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+            <StepContent>
+              {index === 0 ?
+                <PageOne classes={classes} handleNext={handleNext} {...props} /> :
+                index === 1 ? 
+                <PageTwo classes={classes} translate={translate} handleNext={handleNext} handleBack={handleBack} {...props} />
+                :
+                <PageThree classes={classes} handleBack={handleBack} mode={mode} save={save} {...props}/>
+              }
+            </StepContent>
+          </Step>
+        ))}
+      </Stepper>
+      : 
+      `Loading...`
+        }
+    </>
+  )
+}
+
+export class XProjectStepper extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -306,7 +351,7 @@ export class ProjectStepper extends React.Component {
     return (
       <>
         <ProjectTitle prefix={`Creating Project`} />
-      <Stepper activeStep={activeStep} orientation="vertical">
+        <Stepper activeStep={activeStep} orientation="vertical">
 
         {steps.map((label, index) => (
           <Step key={label}>
@@ -322,16 +367,11 @@ export class ProjectStepper extends React.Component {
             </StepContent>
           </Step>
         ))}
-      </Stepper>
+        </Stepper>
       </>
     );
   }
 }
-
-ProjectStepper.propTypes = {
-  translate: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-};
 
 const enhance = compose(
   translate,
