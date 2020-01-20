@@ -37,6 +37,7 @@ import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
+import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 
 const styles = {
   actions: {
@@ -73,6 +74,8 @@ const actionStyles = theme => ({
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
+  console.log("datasetshowactions data: ", data)
+
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
@@ -85,9 +88,10 @@ const actionStyles = theme => ({
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
     }
   })
-  if (showEdit){
+  if (showEdit && data){
     return(
     <Toolbar className={classes.toolbar}>
+      <ExportButton resource={`datasets/${data.id}/export`} />
       <EditButton basePath={basePath} record={data} />
     </Toolbar>
     )

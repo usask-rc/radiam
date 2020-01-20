@@ -23,6 +23,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     let formData = new FormData();
     const options = {};
 
+    console.log("data request is: ", type, resource, params)
     switch (type) {
 
       
