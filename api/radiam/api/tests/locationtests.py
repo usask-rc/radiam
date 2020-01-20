@@ -16,20 +16,20 @@ from radiam.api.views import LocationViewSet
 class TestLocationAPI(TestCase):
 
     fixtures = [
-        'users',
+        'grouphierarchy',
         'locationtypes',
         'locations']
 
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = User.objects.get(username='bobrobb')
+        self.user = User.objects.get(username='testuser1')
 
 
     def test_filter_fields_name(self):
         """
         Test the filter_fields values name
         """
-        display_name = 'Test Location'
+        display_name = 'Test Location 1'
         params = {
             'display_name': display_name
         }
@@ -49,7 +49,7 @@ class TestLocationAPI(TestCase):
         """
         Test the filter_fields values location_type
         """
-        location_type = LocationType.objects.get(id='dc010206-085d-4f9a-8c04-631a23325bce')
+        location_type = LocationType.objects.get(id='fd39b7e6-86f9-4b26-8563-32eb3cb88a22')
         params = {
             'location_type': str(location_type.id)
         }
@@ -62,4 +62,4 @@ class TestLocationAPI(TestCase):
 
         self.assertContains(response=response, text=location_type.id, status_code=200)
         self.assertEquals(response.data['results'][0]['location_type'], location_type.id)
-        self.assertEquals(response.data['count'], 2)
+        self.assertEquals(response.data['count'], 1)

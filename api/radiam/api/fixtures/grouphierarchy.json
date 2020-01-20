@@ -1273,6 +1273,19 @@
     }
 },
 {
+    "model": "api.location",
+    "pk": "a71edb52-6380-4a01-a06e-c6a714ed6e12",
+    "fields": {
+        "display_name": "Test Location 1",
+        "host_name": "localhost",
+        "location_type": "fd39b7e6-86f9-4b26-8563-32eb3cb88a22",
+        "is_active": true,
+        "date_created": "2019-08-17T17:53:49.918Z",
+        "date_updated": "2019-08-17T17:53:49.918Z",
+        "portal_url": null
+    }
+},
+{
     "model": "api.useragent",
     "pk": "12785dfb-1791-4771-953e-09febcb8b103",
     "fields": {
@@ -1281,6 +1294,26 @@
         "version": "0.0.1",
         "date_created": "2019-01-28T19:32:18.440Z",
         "date_updated": "2019-01-28T19:32:18.440Z"
+    }
+},
+{
+    "model": "api.useragent",
+    "pk": "47ccdf06-0ccf-4704-8348-b0875a178522",
+    "fields": {
+        "user": "a69a1271-1591-4db6-b310-720e43a5edcc",
+        "location": "a71edb52-6380-4a01-a06e-c6a714ed6e12",
+        "version": "0.0.1",
+        "date_created": "2019-02-28T19:32:18.440Z",
+        "date_updated": "2019-02-28T19:32:18.440Z"
+    }
+},
+{
+    "model": "api.useragentprojectconfig",
+    "pk": "b677b23b-e008-458e-843a-4c74f012ef1e",
+    "fields": {
+        "agent": "47ccdf06-0ccf-4704-8348-b0875a178522",
+        "project": "ef6db556-f6df-474f-9abb-640aa1736384",
+        "config": null
     }
 }
 ]
