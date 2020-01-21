@@ -179,7 +179,8 @@ class ContentObjectNameForeignKey(serializers.RelatedField):
         except ContentType.DoesNotExist:
             raise serializers.ValidationError(msg, format(data))
 
-class SearchModelSerializer(serializers.Serializer):
+class SearchModelSerializer(serializers.ModelSerializer):
+    dataset = DatasetPKRelatedField(required=True)
     search = serializers.JSONField(required=False)
 
     class Meta:

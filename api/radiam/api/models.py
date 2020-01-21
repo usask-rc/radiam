@@ -956,7 +956,7 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
         db_table = "rdm_data_project_statistics"
 
 
-class SearchModel(models.Model):
+class SearchModel(models.Model, SearchModelPermissionMixin):
     """
     SearchModel to hold JSONField representing Search object for persistent storage
     """

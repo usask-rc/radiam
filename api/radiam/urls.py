@@ -48,12 +48,12 @@ router.register(r'projectavatars', views.ProjectAvatarViewSet)
 router.register(r'projectstatistics', views.ProjectStatisticsViewSet)
 router.register(r'researchgroups', views.ResearchGroupViewSet)
 router.register(r'schemas', views.SchemaViewSet)
+router.register(r'searchmodels', views.SearchModelViewSet)
 router.register(r'selectedfields', views.SelectedFieldViewSet)
 router.register(r'selectedschemas', views.SelectedSchemaViewSet)
 router.register(r'sensitivitylevel', views.SensitivityLevelViewSet)
 router.register(r'useragents', views.UserAgentViewSet)
 router.register(r'users', views.UserViewSet)
-router.register(r'searchmodels', views.SearchModelViewSet)
 
 router.register(r'useragents/(?P<useragent_id>[-\w]+)/tokens/(?P<action>[\w]+)',
                 views.UserAgentTokenViewSet,

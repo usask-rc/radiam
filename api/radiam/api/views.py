@@ -549,7 +549,7 @@ class UserAgentOrderingFilter(RadiamOrderingFilter):
         return [location, user]
 
 
-class SearchModelViewSet(viewsets.ViewSet):
+class SearchModelViewSet(RadiamViewSet):
     """
     SearchModel endpoint to define a dataset and a search query
     """
