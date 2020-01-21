@@ -4,11 +4,11 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import {withStyles} from '@material-ui/core/styles'
 import { translate } from "ra-core"
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import CardActions from 'material-ui/Card/CardActions';
-import CircularProgress from "material-ui/CircularProgress"
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import CardActions from '@material-ui/core/CardActions';
+import CircularProgress from "@material-ui/core/CircularProgress"
 import ToggleForgot from './ToggleForgot';
 import compose from "recompose/compose"
 

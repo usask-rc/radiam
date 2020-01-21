@@ -1,13 +1,12 @@
 //Login.jsx
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { propTypes, reduxForm } from "redux-form";
 import { connect } from "react-redux";
 import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
 import Card from "@material-ui/core/Card";
 import TextField from "@material-ui/core/TextField";
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import {
   createMuiTheme,
   withStyles
@@ -20,6 +19,9 @@ import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginForm from "./LoginForm"
+import { Form } from "react-final-form"
+
+
 import ForgotForm from "./ForgotForm";
 
 const styles = theme => ({
@@ -45,6 +47,11 @@ const styles = theme => ({
     backgroundSize: "cover"
   },
 });
+
+//TODO: refactor this out https://final-form.org/docs/react-final-form/migration/redux-form
+const reactFinalForm = ({form, ...config } ) => component => props => (
+  <Form {...config} {...props } component={component} />
+)
 
 // see http://redux-form.com/6.4.3/examples/material-ui/
 const renderInput = ({
@@ -142,7 +149,6 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  ...propTypes,
   authProvider: PropTypes.func,
   classes: PropTypes.object,
   previousRoute: PropTypes.string,
@@ -154,7 +160,7 @@ const mapStateToProps = state => ({ isLoading: state.admin.loading > 0 });
 
 const enhance = compose(
   translate,
-  reduxForm({
+  reactFinalForm({
     form: "signIn",
     validate: (values, props) => {
       const errors = {};

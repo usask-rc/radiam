@@ -91,7 +91,7 @@ import { httpClient } from '../_tools/httpClient';
 import englishMessages from '../_constants/i18n/en';
 import { MODELS } from '../_constants/index';
 import customRoutes from '../_tools/customRoutes';
-import Login from '../layout/Login';
+import Login from '../layout/Login.jsx';
 import 'moment-timezone';
 import { ToastContainer } from 'react-toastify';
 import datasets from "../Datasets"
@@ -99,10 +99,14 @@ import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
 import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
+import polyglotI18nProvider from "ra-i18n-polyglot";
 
-const i18nProvider = locale => {
-  return englishMessages;
-};
+
+const messages = {
+  en: englishMessages,
+}
+
+const i18nProvider = polyglotI18nProvider((locale) => messages[locale], 'en');
 
 const styles = {
   div: {

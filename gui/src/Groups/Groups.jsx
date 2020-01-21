@@ -8,7 +8,7 @@ import {
   Edit,
   Filter,
   List,
-  LongTextInput,
+  TextInput,
   ReferenceField,
   ReferenceInput,
   required,
@@ -18,7 +18,6 @@ import {
   SimpleForm,
   SimpleShowLayout,
   TextField,
-  TextInput,
   translate,
   withTranslate,
 } from "react-admin";
@@ -316,7 +315,7 @@ const GroupForm = props =>
         source={MODEL_FIELDS.NAME}
         validate={validateName}
       />
-      <LongTextInput
+      <TextInput
         label={"en.models.groups.description"}
         source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
@@ -371,7 +370,7 @@ class BaseGroupEdit extends Component {
           source={MODEL_FIELDS.NAME}
           validate={validateName}
         />
-        <LongTextInput
+        <TextInput
           label={"en.models.groups.description"}
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}

@@ -22,7 +22,7 @@ import {
   withTranslate,
 } from 'react-admin';
 
-import { Field } from 'redux-form'
+import { Field } from 'react-final-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";

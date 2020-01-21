@@ -12,7 +12,7 @@ import { ConfigMetadata, EditMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import ProjectName from "../_components/_fields/ProjectName";
-import { Prompt } from "react-router"
+import { Prompt } from "react-router-dom"
 import { submitObjectWithGeo } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";

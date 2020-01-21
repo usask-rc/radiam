@@ -5,7 +5,7 @@ import compose from "recompose/compose";
 import { connect } from 'react-redux';
 import {MODEL_FIELDS, MODELS, WARNINGS, RESOURCE_OPERATIONS} from "../_constants/index";
 import { DisabledInput } from 'ra-ui-materialui/lib/input';
-import { Field } from 'redux-form'
+import { Field } from 'react-final-form'
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import {
   ImageField,

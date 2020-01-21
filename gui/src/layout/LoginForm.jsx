@@ -1,14 +1,14 @@
 //LoginForm.jsx
 import React from 'react'
-import { Field } from 'redux-form'
+import { Field } from 'react-final-form'
 import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
 import compose from "recompose/compose"
 import { translate } from "ra-core";
 import { withStyles } from '@material-ui/core/styles';
 import Button from "@material-ui/core/Button"
 import CardActions from "@material-ui/core/CardActions"
-import CircularProgress from "material-ui/CircularProgress"
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import CircularProgress from "@material-ui/core/CircularProgress"
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import ToggleForgot from './ToggleForgot';
 
 const styles = () => ({
