@@ -19,7 +19,6 @@ import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginForm from "./LoginForm"
-import { Form } from "react-final-form"
 
 
 import ForgotForm from "./ForgotForm";
@@ -48,10 +47,6 @@ const styles = theme => ({
   },
 });
 
-//TODO: refactor this out https://final-form.org/docs/react-final-form/migration/redux-form
-const reactFinalForm = ({form, ...config } ) => component => props => (
-  <Form {...config} {...props } component={component} />
-)
 
 // see http://redux-form.com/6.4.3/examples/material-ui/
 const renderInput = ({
@@ -79,15 +74,24 @@ class Login extends Component {
       token: "",
       reset_password: ""
     };
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
   componentDidMount(){
     localStorage.clear()
     sessionStorage.clear()
   }
 
-  handleSubmit(event) {
-    this.submitForm();
-    event.preventDefault();
+  handleSubmit(data) {
+    //TODO: call api
+    console.log("handleSubmit data: ", data)
+    console.log("this props: ", this.props)
+
+    const ret = this.login({username: data.username, password: data.password})
+
+    console.log("ret in hs is:", ret)
+    //this.props.userLogin({username: data.username, password: data.password})
+    //this.submitForm();
+    //event.preventDefault();
   }
 
   handleChange = e => {
@@ -118,10 +122,12 @@ class Login extends Component {
 
   login = auth =>{
     const {userLogin, location} = this.props
+    console.log("login props: ", this.props)
     return userLogin(
       auth,
       location.state ? location.state.nextPathname : "/"
-    )};
+    )
+  };
 
   render() {
     const { classes, handleSubmit, isLoading } = this.props;
@@ -136,7 +142,7 @@ class Login extends Component {
           </div>
 
           {!forgotPassword ? (
-            <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
+            <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( 
             <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
             handleChange={this.handleChange} isLoading={isLoading}/>
@@ -160,10 +166,12 @@ const mapStateToProps = state => ({ isLoading: state.admin.loading > 0 });
 
 const enhance = compose(
   translate,
+  /*
   reactFinalForm({
     form: "signIn",
     validate: (values, props) => {
       const errors = {};
+      console.log("values, props in rff: ", values, props)
       const { translate } = props;
       if (props.anyTouched){
         if (!values.username) {
@@ -173,10 +181,11 @@ const enhance = compose(
           errors.password = translate("ra.validation.required");
         }
       }
-
       return errors;
     }
   }),
+    */
+
   connect(
     mapStateToProps,
     { userLogin }

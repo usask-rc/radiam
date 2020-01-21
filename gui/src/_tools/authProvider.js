@@ -225,6 +225,10 @@ function getGroups(user) {
 
 export default (type, params, ...rest) => {
   if (type === AUTH_LOGIN) {
+
+    return new Promise((resolve, reject) => 
+    {
+
     const { username, password } = params;
     console.log("params are: ", params)
     localStorage.setItem(LOGIN_DETAILS.USERNAME, username);
@@ -243,34 +247,40 @@ export default (type, params, ...rest) => {
         console.log("response statustext is: ", response.statusText);
 
         return response.json();
-      }).catch(function (error) {
-        console.log("Error thrown from response is: ", error)
-        toast.error("Could not log in.  Please ensure your credentials are correct.")
       })
       .then(curTok => {
         var token = JSON.stringify(curTok);
         localStorage.setItem(WEBTOKEN, token);
         Promise.resolve(curTok);
       })
+      .then(getGroupRoles)
+      .then(groupRoles => getUser(groupRoles))
+      .then(user => getGroupMemberships(user))
+      .then(user => getGroups(user)).then(data => resolve(data))
+
+      .catch(function (error) {
+        console.log("Error thrown from response is: ", error)
+        toast.error("Could not log in.  Please ensure your credentials are correct.")
+        reject(error)
+      })
+      /*
       .catch(function (error) {
         console.log("Couldn't get token", error)
       })
-      .then(getGroupRoles)
       .catch(function (error) {
         console.log("Couldn't get group roles", error)
       })
-      .then(groupRoles => getUser(groupRoles))
       .catch(function (error) {
         console.log("Couldn't get user", error)
       })
-      .then(user => getGroupMemberships(user))
       .catch(function (error) {
         console.log("Couldn't get group memberships", error)
       })
-      .then(user => getGroups(user))
       .catch(function (error) {
         console.log("Couldn't get groups", error)
       });
+      */
+    })
   }
   if (type === AUTH_LOGOUT) {
     localStorage.removeItem(MODELS.ROLES);
@@ -296,6 +306,12 @@ export default (type, params, ...rest) => {
   }
   if (type === AUTH_CHECK) {
     const getToken = localStorage.getItem(WEBTOKEN);
+
+    if (!getToken || getToken.length === 0){
+      return Promise.reject()
+    }
+
+    console.log("getToken in authcheck: ", getToken)
 
     //I'm confident that the same thing can be achieved with withRouter from react-router
     //get the model and ID from the URL and check for user authorization on this page.
