@@ -311,8 +311,6 @@ export default (type, params, ...rest) => {
       return Promise.reject()
     }
 
-    console.log("getToken in authcheck: ", getToken)
-
     //I'm confident that the same thing can be achieved with withRouter from react-router
     //get the model and ID from the URL and check for user authorization on this page.
 
