@@ -144,7 +144,7 @@ class Login extends Component {
           {!forgotPassword ? (
             <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( 
-            <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
+            <ForgotForm handleSubmit={this.handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
             handleChange={this.handleChange} isLoading={isLoading}/>
           )}
         </Card>
