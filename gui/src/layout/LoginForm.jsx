@@ -9,7 +9,7 @@ import CardActions from "@material-ui/core/CardActions"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import ToggleForgot from './ToggleForgot';
-import { translate } from "react-admin"
+import { translate } from "ra-core"
 
 const styles = () => ({
     actions: {
@@ -27,7 +27,7 @@ const styles = () => ({
 })
 
 
-const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotPassword, login}) => {
+const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, toggleForgotPassword, login}) => {
 
     return(
         <MuiThemeProvider>
@@ -57,7 +57,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                                 autoFocus
                                 name={LOGIN_DETAILS.USERNAME}
                                 component={renderInput}
-                                label="en.auth.username"
+                                label={translate("en.auth.username")}
                                 disabled={isLoading}
                             />
                         </div>
@@ -65,7 +65,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                             <Field
                                 name={LOGIN_DETAILS.PASSWORD}
                                 component={renderInput}
-                                label={"en.auth.password"}
+                                label={translate("en.auth.password")}
                                 type={FIELDS.PASSWORD}
                                 disabled={isLoading}
                             />
@@ -81,7 +81,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                             fullWidth
                         >
                             {isLoading && <CircularProgress size={25} thickness={2} />}
-                            {"en.auth.sign_in"}
+                            {translate("en.auth.sign_in")}
                         </Button>
                     </CardActions>
                     <ToggleForgot forgotText={"en.auth.forgot"} toggleForgotPassword={toggleForgotPassword} />
