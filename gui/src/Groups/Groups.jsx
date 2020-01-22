@@ -103,7 +103,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
         source={MODEL_FIELDS.DESCRIPTION}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groups.parent_group"}
         source={MODEL_FK_FIELDS.PARENT_GROUP}
         reference={MODELS.GROUPS}
@@ -215,7 +215,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         source={MODEL_FIELDS.ACTIVE}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groups.parent_group"}
         source={MODEL_FK_FIELDS.PARENT_GROUP}
         reference={MODELS.GROUPS}

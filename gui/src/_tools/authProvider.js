@@ -328,7 +328,7 @@ export default (type, params, ...rest) => {
   if (type === AUTH_GET_PERMISSIONS) {
 
     const user = JSON.parse(localStorage.getItem(ROLE_USER));
-    return user ? Promise.resolve(user) : Promise.resolve({ role: ROLE_ANONYMOUS, is_admin: false });
+    return user ? Promise.resolve(user) : Promise.reject({ role: ROLE_ANONYMOUS, is_admin: false });
 
   }
   return Promise.reject("Unknown method");

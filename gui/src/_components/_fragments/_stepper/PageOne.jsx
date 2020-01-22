@@ -4,7 +4,7 @@ import { translate } from "ra-core"
 import { required } from "react-admin"
 import { withStyles } from '@material-ui/core/styles';
 import { getAsyncValidateNotExists } from '../../../_tools/asyncChecker';
-import { SimpleForm, SaveButton, TextInput, Toolbar,  ReferenceInput, SelectInput, DisabledInput } from "react-admin"
+import { SimpleForm, SaveButton, TextInput, Toolbar,  ReferenceInput, SelectInput } from "react-admin"
 import { MODELS, WARNINGS, MODEL_FIELDS } from "../../../_constants/index"
 import { Prompt } from 'react-router';
 import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
@@ -63,7 +63,7 @@ return(
     asyncValidate={props.record.id ? null : asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
     asyncBlurFields={[MODEL_FIELDS.NAME]}
     >
-    {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={MODEL_FIELDS.ID} defaultValue={props.record.id} />}
+    {props.record.id && <TextInput className="input-small" label={"en.models.projects.id"} source={MODEL_FIELDS.ID} defaultValue={props.record.id} disabled />}
     <TextInput
         className="input-small"
         label={"en.models.projects.name"}

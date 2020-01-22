@@ -269,7 +269,7 @@ const ProjectList = ({classes, projects}) => {
                             <ReferenceField
                                 record={project}
                                 basePath={MODELS.PROJECTS}
-                                linkType={false}
+                                link={false}
                                 source={MODEL_FIELDS.AVATAR}
                                 reference={MODELS.PROJECTAVATARS}
                                 allowEmpty

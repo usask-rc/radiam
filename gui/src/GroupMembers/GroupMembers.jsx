@@ -95,7 +95,7 @@ export const GroupMemberList = withStyles(listStyles)(
         <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
 
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.user"}
             source={MODEL_FK_FIELDS.USER}
             reference={MODELS.USERS}
@@ -104,14 +104,14 @@ export const GroupMemberList = withStyles(listStyles)(
             <UserShow />
           </ReferenceField>
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.group"}
             source={MODEL_FK_FIELDS.GROUP}
             reference={MODELS.GROUPS}>
             <TextField source={MODEL_FIELDS.NAME}  />
           </ReferenceField>
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.role"}
             source={MODEL_FK_FIELDS.GROUP_ROLE}
             reference={MODELS.ROLES}
@@ -173,7 +173,7 @@ export const GroupMemberShow = props => (
     <SimpleShowLayout>
     <GroupMemberTitle prefix="Viewing" />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -181,7 +181,7 @@ export const GroupMemberShow = props => (
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.group"}
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}
@@ -189,7 +189,7 @@ export const GroupMemberShow = props => (
         <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.role"}
         source={MODEL_FK_FIELDS.GROUP_ROLE}
         reference={MODELS.ROLES}
@@ -254,6 +254,7 @@ const asyncValidate = getAsyncValidateDuplicateNotExists(
   MODELS.GROUPMEMBERS
 );
 
+//TODO: make date_expires_at required - it is currently a required field, for some reason.
 export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
@@ -291,6 +292,8 @@ export const GroupMemberForm = props => {
   }, [data])
 
   function handleSubmit(formData) {
+
+    console.log("handleSubmit in groupmembers is submitting formData: ", formData)
     setIsFormDirty(false)
     setData(formData)
   }

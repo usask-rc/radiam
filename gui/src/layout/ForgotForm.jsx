@@ -31,7 +31,7 @@ const styles = () => ({
 const validateEmail = value =>
 value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
 'Invalid email address' : undefined
-const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, isLoading }) => {
+const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, loading }) => {
     return(
         <MuiThemeProvider>
             <Form onSubmit={(values) => handleSubmit(values)}>
@@ -46,7 +46,7 @@ const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleFor
                             component={renderInput}
                             onChange={handleChange}
                             label={translate("en.auth.email")}
-                            disabled={isLoading}
+                            disabled={loading}
                             validate={validateEmail}
                             />
                         </div>
@@ -56,11 +56,11 @@ const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleFor
                             variant="outlined"
                             type={FIELDS.SUBMIT}
                             color="primary"
-                            disabled={isLoading}
+                            disabled={loading}
                             className={classes.button}
                             fullWidth
                         >
-                            {isLoading && <CircularProgress size={25} thickness={2} />}
+                            {loading && <CircularProgress size={25} thickness={2} />}
                             {translate("en.auth.send_email")}
                         </Button>
                     </CardActions>

@@ -110,7 +110,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ProjectName label={'en.models.projects.name'} />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={'en.models.projects.primary_contact_user'}
         source={MODEL_FIELDS.PRIMARY_CONTACT_USER}
         reference={MODELS.USERS}
@@ -118,7 +118,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={'en.models.projects.group'}
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}

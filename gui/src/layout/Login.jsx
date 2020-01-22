@@ -130,7 +130,7 @@ class Login extends Component {
   };
 
   render() {
-    const { classes, handleSubmit, isLoading } = this.props;
+    const { classes, handleSubmit, loading } = this.props;
     const { forgotPassword } = this.state
     return (
       <div className={classes.main}>
@@ -142,10 +142,10 @@ class Login extends Component {
           </div>
 
           {!forgotPassword ? (
-            <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
+            <LoginForm loading={loading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( 
             <ForgotForm handleSubmit={this.handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
-            handleChange={this.handleChange} isLoading={isLoading}/>
+            handleChange={this.handleChange} loading={loading}/>
           )}
         </Card>
         <ToastContainer />
@@ -162,7 +162,7 @@ Login.propTypes = {
   userLogin: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({ isLoading: state.admin.loading > 0 });
+const mapStateToProps = state => ({ loading: state.admin.loading > 0 });
 
 const enhance = compose(
   translate,

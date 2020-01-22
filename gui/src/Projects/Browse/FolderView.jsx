@@ -391,7 +391,7 @@ function getJsonKeys(json) {
           label={'en.models.agents.location'}
           source={MODEL_FK_FIELDS.LOCATION}
           reference={MODELS.LOCATIONS}
-          linkType={RESOURCE_OPERATIONS.SHOW}
+          link={RESOURCE_OPERATIONS.SHOW}
           basePath={`/${MODELS.PROJECTS}`}
           resource={MODELS.PROJECTS}
           record={item}

@@ -1,7 +1,10 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import { useTranslate } from "react-admin"
 
-const FileListColumnHeaders = ({ classes, translate }) => (
+const FileListColumnHeaders = ({ classes }) => {
+    const translate = useTranslate()
+    return(
     <>
         <Grid item className={classes.heading} xs={5} md={4}>
             {translate('en.dashboard.file_name')}
@@ -17,5 +20,5 @@ const FileListColumnHeaders = ({ classes, translate }) => (
         </Grid>
         <Grid item className={classes.heading} xs={1} />
     </>
-)
+)}
 export default FileListColumnHeaders

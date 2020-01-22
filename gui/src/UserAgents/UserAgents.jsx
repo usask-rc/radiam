@@ -90,7 +90,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   >
     <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -99,7 +99,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.location"}
         source={MODEL_FK_FIELDS.LOCATION}
         reference={MODELS.LOCATIONS}
@@ -159,7 +159,7 @@ return(
       <UserAgentTitle prefix={"Viewing Agent"} />
     
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -167,7 +167,7 @@ return(
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.location"}
         source={MODEL_FK_FIELDS.LOCATION}
         reference={MODELS.LOCATIONS}
@@ -177,7 +177,7 @@ return(
      {controllerProps.record && controllerProps.record.project_config_list && 
       <ArrayField source={MODEL_FIELDS.PROJECT_CONFIG_LIST} label={"Target Projects"}>
         <SingleFieldList>
-          <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} linkType="show">
+          <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} link="show">
             <ChipField source={MODEL_FIELDS.NAME} />
           </ReferenceField>
         </SingleFieldList>
@@ -293,7 +293,7 @@ export const UserAgentEdit = props => {
       <SimpleForm>
         <UserAgentTitle prefix={"Editing Agent"} />
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.agents.location"}
           source={MODEL_FK_FIELDS.LOCATION}
           reference={MODELS.LOCATIONS}
@@ -301,7 +301,7 @@ export const UserAgentEdit = props => {
           <LocationShow/>
         </ReferenceField>
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.agents.user"}
           source={MODEL_FK_FIELDS.USER}
           reference={MODELS.USERS}

@@ -27,18 +27,16 @@ const styles = () => ({
 })
 
 
-const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, toggleForgotPassword, login}) => {
+const LoginForm = ({classes, translate, loading, handleSubmit, renderInput, toggleForgotPassword, login}) => {
 
     return(
         <MuiThemeProvider>
             <Form onSubmit={(values) => handleSubmit(values)}
             
-            /*
             validate = {(values, props) => {
             const errors = {};
-            console.log("values, props in rff: ", values, props)
-            const { translate } = props;
-            if (props.anyTouched){
+            //TODO: reimplement this validation
+            if (props && props.anyTouched){
                 if (!values.username) {
                 errors.username = translate("ra.validation.required");
                 }
@@ -48,7 +46,7 @@ const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, to
             }
             return errors;
             }}
-            */>
+            >
             { ( {handleSubmit, pristine, reset, submitting, login }) => (
                 <form onSubmit={handleSubmit}>
                     <div className={classes.form}>
@@ -58,7 +56,7 @@ const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, to
                                 name={LOGIN_DETAILS.USERNAME}
                                 component={renderInput}
                                 label={translate("en.auth.username")}
-                                disabled={isLoading}
+                                disabled={loading}
                             />
                         </div>
                         <div className={classes.input}>
@@ -67,7 +65,7 @@ const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, to
                                 component={renderInput}
                                 label={translate("en.auth.password")}
                                 type={FIELDS.PASSWORD}
-                                disabled={isLoading}
+                                disabled={loading}
                             />
                         </div>
                     </div>
@@ -76,11 +74,11 @@ const LoginForm = ({classes, translate, isLoading, handleSubmit, renderInput, to
                             variant="outlined"
                             type={FIELDS.SUBMIT}
                             color="primary"
-                            disabled={isLoading}
+                            disabled={loading}
                             className={classes.button}
                             fullWidth
                         >
-                            {isLoading && <CircularProgress size={25} thickness={2} />}
+                            {loading && <CircularProgress size={25} thickness={2} />}
                             {translate("en.auth.sign_in")}
                         </Button>
                     </CardActions>

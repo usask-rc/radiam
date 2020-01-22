@@ -47,7 +47,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                         label={'en.models.projects.location'}
                         source={MODEL_FK_FIELDS.LOCATION}
                         reference={MODELS.LOCATIONS}
-                        linkType={RESOURCE_OPERATIONS.SHOW}
+                        link={RESOURCE_OPERATIONS.SHOW}
                         basePath={`/${MODELS.PROJECTS}`}
                         resource={MODELS.PROJECTS}
                         record={item}
@@ -59,7 +59,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
                         label={'en.models.projects.agent'}
                         source={MODEL_FK_FIELDS.AGENT}
                         reference={MODELS.AGENTS}
-                        linkType={RESOURCE_OPERATIONS.SHOW}
+                        link={RESOURCE_OPERATIONS.SHOW}
                         basePath={`/${MODELS.PROJECTS}`}
                         resource={MODELS.PROJECTS}
                         record={item}

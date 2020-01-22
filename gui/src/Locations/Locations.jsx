@@ -106,7 +106,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         source={MODEL_FIELDS.HOST_NAME}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={'en.models.locations.type'}
         source={MODEL_FK_FIELDS.LOCATION_TYPE}
         reference={MODELS.LOCATIONTYPES}
@@ -180,7 +180,7 @@ export const LocationDisplay = props =>
         source={MODEL_FIELDS.HOST_NAME}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={'en.models.locations.type'}
         source={MODEL_FK_FIELDS.LOCATION_TYPE}
         reference={MODELS.LOCATIONTYPES}

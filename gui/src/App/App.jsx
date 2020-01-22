@@ -125,28 +125,28 @@ const App = props => {
         styles={styles}
         authProvider={authProvider}
         dataProvider={radiamRestProvider(getAPIEndpoint(), httpClient)}
-        appLayout={Layout}
+        layout={Layout}
         i18nProvider={i18nProvider}
       >
         {permissions => { 
           return [
             <Resource
-            name={MODELS.USERS}
-            icon={Person}
-            options={{ label: 'en.sidebar.users' }}
-            list={UserList}
-            show={UserShow}
-            create={
-              permissions.is_admin || permissions.is_group_admin
-                ? UserCreate
-                : null
-            }
-            edit={
-              permissions.is_admin
-                ? UserEditWithDeletion
-                : null
-            }
-          />,
+              name={MODELS.USERS}
+              icon={Person}
+              options={{ label: 'en.sidebar.users' }}
+              list={UserList}
+              show={UserShow}
+              create={
+                permissions.is_admin || permissions.is_group_admin
+                  ? UserCreate
+                  : null
+              }
+              edit={
+                permissions.is_admin
+                  ? UserEditWithDeletion
+                  : null
+              }
+            />,
 
           <Resource
             name={MODELS.GROUPS}

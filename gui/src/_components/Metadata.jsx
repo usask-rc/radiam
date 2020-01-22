@@ -8,7 +8,7 @@ import RelatedUsers from "../Groups/RelatedUsers";
 import {
   ArrayInput,
   BooleanField,
-  CardActions,
+  TopToolbar,
   CREATE,
   DateField,
   DateInput,
@@ -1482,7 +1482,7 @@ class BaseMetadataEditActions extends Component {
   render() {
     const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
     const { groupMembers } = this.state
-    return <CardActions>
+    return <TopToolbar>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
             filterValues,
@@ -1503,7 +1503,7 @@ class BaseMetadataEditActions extends Component {
         { data && <ShowButton basePath={basePath} label="Cancel" icon={<Cancel />} record={data} /> }
         <RefreshButton />
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
-    </CardActions>
+    </TopToolbar>
   }
 };
 

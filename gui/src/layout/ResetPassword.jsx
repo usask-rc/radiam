@@ -77,7 +77,7 @@ class ResetPassword extends Component {
       password: "",
       confirmPassword: "",
       update: false,
-      isLoading: true,
+      loading: true,
       error: false,
       token: null
     };
@@ -92,7 +92,7 @@ class ResetPassword extends Component {
     else {
       this.setState({
         update: false,
-        isLoading: false,
+        loading: false,
         error: true,
         completed: false
       });

@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import compose from "recompose/compose";
 import { connect } from 'react-redux';
 import {MODEL_FIELDS, MODELS, WARNINGS, RESOURCE_OPERATIONS} from "../_constants/index";
-import { DisabledInput } from 'ra-ui-materialui/lib/input';
 import { Field } from 'react-final-form'
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import {
@@ -113,7 +112,7 @@ return(
     asyncBlurFields={[MODEL_FIELDS.NAME]}
     
   >
-    {props.record.id && <DisabledInput className="input-small" label={"en.models.projects.id"} source={MODEL_FIELDS.ID} defaultValue={props.record.id} />}
+    {props.record.id && <TextInput className="input-small" label={"en.models.projects.id"} source={MODEL_FIELDS.ID} defaultValue={props.record.id} disabled />}
     <TextInput
       className="input-small"
       label={"en.models.projects.name"}
