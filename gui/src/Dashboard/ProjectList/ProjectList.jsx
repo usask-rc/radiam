@@ -7,8 +7,7 @@ import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
-import { ImageField } from 'ra-ui-materialui/lib/field/ImageField';
-
+import { ImageField } from "react-admin"
 const styles = {
     headlineTop: {
         backgroundColor: '#688db2',
@@ -275,10 +274,11 @@ const ProjectList = ({classes, projects}) => {
                                 reference={MODELS.PROJECTAVATARS}
                                 allowEmpty
                             >
-
                                 <ImageField
                                     classes={{ image: classes.image }}
+                                    title={project.name}
                                     source={MODEL_FIELDS.AVATAR_IMAGE}
+                                    allowEmpty
                                 />
 
                             </ReferenceField>

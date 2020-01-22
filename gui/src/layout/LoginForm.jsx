@@ -57,7 +57,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                                 autoFocus
                                 name={LOGIN_DETAILS.USERNAME}
                                 component={renderInput}
-                                label="auth.username"
+                                label="en.auth.username"
                                 disabled={isLoading}
                             />
                         </div>
@@ -65,7 +65,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                             <Field
                                 name={LOGIN_DETAILS.PASSWORD}
                                 component={renderInput}
-                                label={"auth.password"}
+                                label={"en.auth.password"}
                                 type={FIELDS.PASSWORD}
                                 disabled={isLoading}
                             />
@@ -81,7 +81,7 @@ const LoginForm = ({classes, isLoading, handleSubmit, renderInput, toggleForgotP
                             fullWidth
                         >
                             {isLoading && <CircularProgress size={25} thickness={2} />}
-                            {"auth.sign_in"}
+                            {"en.auth.sign_in"}
                         </Button>
                     </CardActions>
                     <ToggleForgot forgotText={"en.auth.forgot"} toggleForgotPassword={toggleForgotPassword} />

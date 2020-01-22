@@ -27,6 +27,7 @@ class Dashboard extends PureComponent {
   onMountAndRefresh(){
     getRecentProjects().then(data => {
       this.setState(data)
+      return data
     })
     .catch(err => {
       console.error("Error in getRecentProjects: ", err)
