@@ -25,7 +25,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
     console.log("data request is: ", type, resource, params)
     switch (type) {
-
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.

@@ -37,13 +37,14 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
+import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
+import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 
 const styles = {
   actions: {
@@ -299,7 +300,7 @@ const renderUserInput = ({ input, users }) => {
 
 const UserInput = ({ source, ...props }) => <Field name={source} component={renderUserInput} {...props} />
 
-export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state }) => {
+export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state, ...props }) => {
   const [groupList, setGroupList] = useState([])
   const [projectGroup, setProjectGroup] = useState(null)
   const [groupContactList, setGroupContactList] = useState([])
@@ -354,103 +355,238 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
     }
   };
 
-  if (record && isAdminOfAParentGroup(record.group)) {
+  if (record && record.group && isAdminOfAParentGroup(record.group)) {
     if (projectGroup === null){
       setProjectGroup(record.group)
     }
 
-    return <CardContentInner>
-      <div>
-        <TextInput
-          className="input-small"
-          label={"en.models.projects.name"}
-          source={MODEL_FIELDS.NAME}
-          validate={validateName} />
-      </div>
-        <ReferenceInput
-          resource={MODELS.PROJECTAVATARS}
-          className="input-small"
-          perPage={1000}
+    return (
+    <CardContentInner>
+        <div>
+          <TextInput
+            className="input-small"
+            label={"en.models.projects.name"}
+            source={MODEL_FIELDS.NAME}
+            validate={validateName} />
+        </div>
+          <ReferenceInput
+            resource={MODELS.PROJECTAVATARS}
+            className="input-small"
+            perPage={1000}
 
-          label={MODEL_FIELDS.AVATAR} 
-          source={MODEL_FIELDS.AVATAR}  reference={MODELS.PROJECTAVATARS}>
-            <SelectInput source={MODEL_FIELDS.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}/>
-        </ReferenceInput>
-      <div>
-        <TextInput
-          className="input-small"
-          label={"en.models.projects.keywords"}
-          source={MODEL_FIELDS.KEYWORDS} />
-      </div>
-        
-      <FormDataConsumer>
-        {({formData, ...rest}) => {
-          console.log("formData: ", formData)
-        return(
-          <div>
-            <ReferenceInput
-              resource="researchgroups"
-              className="input-small"
-              label={"en.models.projects.group"}
-              source={MODEL_FIELDS.GROUP}
-              reference={MODELS.GROUPS}
-              onChange={handleSelectChange}
-              validate={validateGroup}>
-              <SelectInput optionText={MODEL_FIELDS.NAME} />
-            </ReferenceInput>
-            { !loading && groupContactList.length > 0 ?
-              (<div>
-                <UserInput
-                  required
-                  label={"en.models.projects.primary_contact_user"}
-                  placeholder={`Primary Contact`}
-                  validate={validatePrimaryContactUser}
-                  className="input-small"
-                  users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-                  />
-              </div>)
-              : !loading && groupContactList.length === 0 ? 
-              <div>
-                {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
-              </div>
-              :
-              <div>
-                <Typography>{`Loading Associated Users...`}</Typography>
-              </div>
-              
-            }
-            { record.id && (
-              <div>
-                <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-                <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-              </div>
-            )}
-          </div>
-        )}}
-
-        </FormDataConsumer>
-
-
+            label={MODEL_FIELDS.AVATAR} 
+            source={MODEL_FIELDS.AVATAR}  reference={MODELS.PROJECTAVATARS}>
+              <SelectInput source={MODEL_FIELDS.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}/>
+          </ReferenceInput>
+        <div>
+          <TextInput
+            className="input-small"
+            label={"en.models.projects.keywords"}
+            source={MODEL_FIELDS.KEYWORDS} />
+        </div>
+          
         <FormDataConsumer>
-          {({formData, ...rest} ) =>
-          {
-            //NOTE: This FormDataConsumer area is required for the map implementation.
-            const geoDataCallback = geo => {
-              formData.geo = geo
-            };
+          {({formData, ...rest}) => {
+            console.log("formData: ", formData)
+              return(
+                <div>
+                  <ReferenceInput
+                    resource="researchgroups"
+                    className="input-small"
+                    label={"en.models.projects.group"}
+                    source={MODEL_FIELDS.GROUP}
+                    reference={MODELS.GROUPS}
+                    onChange={handleSelectChange}
+                    validate={validateGroup}>
+                    <SelectInput optionText={MODEL_FIELDS.NAME} />
+                  </ReferenceInput>
+                  { !loading && groupContactList.length > 0 ?
+                    (<div>
+                      <UserInput
+                        required
+                        label={"en.models.projects.primary_contact_user"}
+                        placeholder={`Primary Contact`}
+                        validate={validatePrimaryContactUser}
+                        className="input-small"
+                        users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+                        />
+                    </div>)
+                    : !loading && groupContactList.length === 0 ? 
+                    <div>
+                      {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+                    </div>
+                    :
+                    <div>
+                      <Typography>{`Loading Associated Users...`}</Typography>
+                    </div>
+                    
+                  }
+                  { record && record.id && (
+                    <div>
+                      <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
+                      <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
+                    </div>
+                  )}
+                </div>
+              )
+          }
+        }
+      </FormDataConsumer>
+      <FormDataConsumer>
+        {({formData, ...rest} ) =>
+        {
+          //NOTE: This FormDataConsumer area is required for the map implementation.
+          const geoDataCallback = geo => {
+            formData.geo = geo
+          };
 
-            return(
-              <div>
-                <MapForm content_type={'project'} recordGeo={record.geo} id={record.id} geoDataCallback={geoDataCallback}/>
-              </div>
-            )
-          }
-          }
-        </FormDataConsumer>
-      
-    </CardContentInner>;
+          return(
+            <div>
+              <MapForm content_type={'project'} recordGeo={record ? record.geo : null} id={record ? record.id : null} geoDataCallback={geoDataCallback}/>
+            </div>
+          )
+        }
+        }
+      </FormDataConsumer>
+    </CardContentInner>);
   }
 });
+
+const validateAvatar = required('en.validate.project.avatar');
+
+
+export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) => {
+  const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
+
+  const [groupContactList, setGroupContactList] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [group, setGroup] = useState(null)
+
+  const handleSelectChange = ({...event}) => {
+    console.log("HSC event: ", event)
+  }
+
+  const handleSubmit=(data) => {
+    console.log("handleSubmit data is: ", data)
+    props.resource = "projects"
+    data.number = null
+    data.metadata = null
+    const dataGeo = data.geo //this must be excised from dataGeo to prevent a 400 error on submission for a project
+    delete data.geo
+    submitObjectWithGeo(data, dataGeo, props)
+  }
+
+
+  useEffect(() => {
+    if (group){
+      setLoading(true)
+      getUsersInGroup({id: group, is_active: true}).then(contacts => {
+        console.log("getusersingroup result: ", contacts)
+        setGroupContactList(contacts)
+        setLoading(false)
+      }).catch(err => {
+        console.error("in getprimarycontactcandidates, err: ", err)
+      })
+    }
+  }, [group])
+
+  return(
+    <SimpleForm
+    asyncValidate={asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
+    asyncBlurFields={[MODEL_FIELDS.NAME]}
+    save={handleSubmit}
+    >
+      <TextInput
+        className="input-small"
+        label={"en.models.projects.name"}
+        source={MODEL_FIELDS.NAME}
+        validate={validateName}
+      />
+      <ReferenceInput
+        resource={MODELS.PROJECTAVATARS}
+        className="input-small"
+        label="en.models.projects.avatar"
+        validate={validateAvatar}
+        allowEmpty={false}
+        perPage={1000}
+        sort={{ field: 'random', order: 'ASC' }}
+        source={MODEL_FIELDS.AVATAR} reference={MODELS.PROJECTAVATARS}
+      >
+        <SelectInput
+          source={MODEL_FIELDS.AVATAR_IMAGE}
+          optionText={<ImageField className={{height: `${AVATAR_HEIGHT}`}} source={MODEL_FIELDS.AVATAR_IMAGE} />}
+        />
+      </ReferenceInput>
+      <TextInput
+        className="input-medium"
+        label={"en.models.projects.keywords"}
+        source={MODEL_FIELDS.KEYWORDS}
+      />
+
+      <FormDataConsumer>
+          {({formData, ...rest}) => {
+            console.log("formData: ", formData)
+            if (formData && formData.group !== group){
+              setGroup(formData.group)
+            }
+              return(
+                <div>
+                  <ReferenceInput
+                    resource="researchgroups"
+                    className="input-small"
+                    label={"en.models.projects.group"}
+                    source={MODEL_FIELDS.GROUP}
+                    reference={MODELS.GROUPS}
+                    onChange={handleSelectChange}
+                    validate={validateGroup}>
+                    <SelectInput optionText={MODEL_FIELDS.NAME} />
+                  </ReferenceInput>
+                  { !loading && groupContactList && groupContactList.length > 0 ?
+                    (<div>
+                      <UserInput
+                        required
+                        label={"en.models.projects.primary_contact_user"}
+                        placeholder={`Primary Contact`}
+                        validate={validatePrimaryContactUser}
+                        className="input-small"
+                        users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
+                        />
+                    </div>)
+                    : !loading && groupContactList &&  groupContactList.length === 0 ? 
+                    <div>
+                      {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+                    </div>
+                    :
+                    <div>
+                      <Typography>{`Loading Associated Users...`}</Typography>
+                    </div>
+                    
+                  }
+                </div>
+              )
+          }
+        }
+      </FormDataConsumer>
+      <FormDataConsumer>
+        {({formData, ...rest} ) =>
+        {
+          //NOTE: This FormDataConsumer area is required for the map implementation.
+          const geoDataCallback = geo => {
+            formData.geo = geo
+          };
+
+          return(
+            <div>
+              <MapForm content_type={'project'} recordGeo={null} id={null} geoDataCallback={geoDataCallback}/>
+            </div>
+          )
+        }
+        }
+      </FormDataConsumer>
+    </SimpleForm>
+  )
+}
+//optionText={<ImageField classes={{ image: classes.image }} source={MODEL_FIELDS.AVATAR_IMAGE} />}
 
 //TODO: geojson object does not properly update afterwards.
 //it doesn't send in the appropriate geojson in the PUT - it either doesn't get it from the map, or it doesnt send it properly in the update function.

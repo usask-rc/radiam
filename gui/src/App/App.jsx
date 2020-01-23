@@ -67,6 +67,7 @@ import {
   ProjectShow,
   ProjectEdit,
   ProjectCreate,
+  ProjectCreateForm,
 } from '../Projects/Projects';
 import {
   SensitivityLevelList,
@@ -223,7 +224,7 @@ const App = props => {
             show={ProjectShow}
             create={
               permissions.is_admin || permissions.is_group_admin
-                ? ProjectCreate
+                ? ProjectCreateForm
                 : null
             }
             edit={
