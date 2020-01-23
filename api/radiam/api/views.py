@@ -782,6 +782,66 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
         else:
             return super().update(request, pk, **kwargs)
 
+    @action(methods=['post'],
+            detail=True,
+            url_name='search',
+            permission_classes=(IsAuthenticated,))
+    def search(self, request, pk=None):
+        """
+        Elasticsearch Search within a specific dataset's index
+        """
+
+        dataset_id = pk
+
+        query = request.data
+
+        # any more validation that needs to be done?
+        dataset = Dataset.objects.get(id=dataset_id)
+
+        # radiam_service = RadiamService(str(dataset.id))
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        # Are the Service classes needed anymore?
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key, value in request.query_params.items():
+            if key in ['page_size', 'page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     search_service.add_match(key, value)
+            else:
+                pass
+
+        # Is it possible for a Dataset to be the entire contents of a project index?
+        # In that case, create another code path that doesn't apply a filter
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+
+        self.queryset = search_service.search
+        if not sort:
+            self.queryset = self.queryset.sort()
+        else:
+            self.queryset = self.queryset.sort(sort)
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
     def destroy(self, request, pk, *args, **kwargs):
         dataset = Dataset.objects.get(id=pk)
         # TODO Need to delete the elastic search record
@@ -1537,54 +1597,20 @@ class DatasetSearchViewSet(viewsets.GenericViewSet):
         Test some basic ES search
         """
 
-        query = request.data
-
-        # any more validation that needs to be done?
-        dataset = Dataset.objects.get(id=dataset_id)
-
-        # radiam_service = RadiamService(str(dataset.id))
-        dataset = Dataset.objects.get(id=dataset_id)
-        project = Project.objects.get(dataset__id=dataset_id)
-        search_model = SearchModel.objects.get(dataset__id=dataset.id)
-
-        search = Search.from_dict(query)
-        search = search.index(str(project.id))
-
-        # Are the Service classes needed anymore?
+        radiam_service = RadiamService(dataset_id)
+        search = Search(index=dataset_id)
         search_service = _SearchService(search)
 
-        sort = None
-        order = None
+        if radiam_service.index_exists(dataset_id):
+            # TODO: Do any queries need to be added here for auth?
 
-        for key,value in request.query_params.items():
-            if key in ['page_size','page']:
-                continue
-            elif key == 'ordering':
-                sort = value
-            # elif key != 'q':
-            #     # squeeze Windows double-backslashes in path/path_parent
-            #     if key in ['path', 'path_parent']:
-            #         value = value.replace("\\\\", "\\")
-            #
-            #     search_service.add_match(key, value)
-            else:
-                pass
+            rawresponse = search_service.execute()
+            data = rawresponse.to_dict()
 
-        # Is it possible for a Dataset to be the entire contents of a project index?
-        # In that case, create another code path that doesn't apply a filter
-        if search_model.search:
-            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+            return Response(data)
 
-        self.queryset = search_service.search
-        if not sort:
-            self.queryset = self.queryset.sort()
         else:
-            self.queryset = self.queryset.sort(sort)
-
-        page = self.paginate_queryset(self.queryset)
-        serializer = self.get_serializer(page, many=True)
-
-        return self.get_paginated_response(serializer.data)
+            raise ProjectNotFoundException()
 
 
 class MetadataUITypeViewSet(RadiamViewSet):
