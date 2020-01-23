@@ -42,6 +42,7 @@ class NextButtonView extends Component {
 
   handleClick = () => {
     const { handleNext, handleSubmit } = this.props;
+    console.log("handleSubmit is: ", handleSubmit)
 
     return handleSubmit(values => {
       handleNext();
@@ -52,10 +53,13 @@ class NextButtonView extends Component {
     const { handleBack, handleNext, handleSubmit, handleSubmitWithRedirect, ...props } = this.props;
     console.log("handleclick render props are: ", this.props)
     return (
-      <SaveButton
-        handleSubmitWithRedirect={this.handleClick}
-        {...props}
-      />
+      <Button
+        variant="contained"
+        onClick={handleNext}
+        color="primary"
+      >
+      {`Next`}
+      </Button>
     );
   }
 }
@@ -94,20 +98,37 @@ const ProjectStepperToolbar = ({ handleBack, handleNext, doSave, ...props }) => 
  */
 const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
 
-const PageOne = ({ classes, values, handleNext, ...props }) => 
+const PageOne = ({ classes, values, setName, setAvatar, setKeywords, handleNext, ...props }) => 
 {
   const [dirty, setDirty] = useState(false)
 
   //TODO: make the `on dirty` thing work here.  For some reason, this page gets marked as dirty on entry as handleChange is instantly triggered.  Weird.
-  const handleChange=(data) => {
-    setDirty(true)
+  const handleChange=(event) => {
+    const name = event.target.name
+    const value = event.target.value
+    if (name === "name")
+    {
+      setName(value)
+    }
+    else if (name === "projectavatar"){
+      setAvatar(value)
+    }
+    else if (name === "keywords"){
+      setKeywords(value)
+    }
+    console.log("pageone handlechange data: ", name, value)
+  }
+
+  const handleSelectChange = ({...event}) => {
+    setAvatar(event.target.value)
+    console.log("handleselectchange props:", event)
   }
 
 return(
   <>
   <SimpleForm
     toolbar={<ProjectStepperToolbar
-      handleNext={handleNext} />}
+      handleNext={(data) => handleNext(data)} />}
     asyncValidate={props.record.id ? null : asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
     asyncBlurFields={[MODEL_FIELDS.NAME]}
     
@@ -131,11 +152,14 @@ return(
       sort={{ field: 'random', order: 'ASC' }}
       source={MODEL_FIELDS.AVATAR} reference={MODELS.PROJECTAVATARS}
       defaultValue={props.record.avatar || ""}
+      onChange={handleSelectChange}
     >
       <SelectInput
         source={MODEL_FIELDS.AVATAR_IMAGE}
         optionText={<ImageField classes={{ image: classes.image }} source={MODEL_FIELDS.AVATAR_IMAGE} />}
-        onChange={handleChange}/>
+        onChange={handleSelectChange}
+
+      />
     </ReferenceInput>
     <TextInput
       className="input-medium"
@@ -149,7 +173,7 @@ return(
   </>
 )};
 
-const PageTwo = ({ handleBack, handleNext }) => {
+const PageTwo = ({ handleBack, handleNext, setStepperGroup, setContactUser }) => {
   const [group, setGroup] = useState(null) //we will never have a group on entry
   const [groupContactList, setGroupContactList] = useState([])
   const [loading, setLoading] = useState(false)
@@ -268,8 +292,14 @@ const UserInput = ({ source, ...props }) => <Field name={source} component={rend
 
 export const ProjectStepper = ({classes, translate, mode, save, ...props}) => {
   const [step, setStep] = useState(0)
+  const [name, setName] = useState(null)
+  const [avatar, setAvatar] = useState(null)
+  const [keywords, setKeywords] = useState(null)
+  const [group, setGroup] = useState(null)
+  const [contactUser, setContactUser] = useState(null)
 
-  const handleNext = () => {
+  const handleNext = (data) => {
+    console.log("handlenext name, avatar: ", name, avatar, keywords, group, contactUser)
     setStep(step + 1)
   }
   const handleBack = () => {
@@ -280,6 +310,10 @@ export const ProjectStepper = ({classes, translate, mode, save, ...props}) => {
     setStep(0)
   }
 
+  const handleSubmit = (data) => {
+    console.log("handleSubmit data in ProjctStepper is: ", data)
+  }
+
   const steps = [translate('en.models.projects.steps.name'), translate('en.models.projects.steps.researchgroup'), translate('en.models.projects.steps.map')];
 
   console.log("projectstepper others: ", mode, save)
@@ -287,7 +321,6 @@ export const ProjectStepper = ({classes, translate, mode, save, ...props}) => {
   
   return(
     <>
-      
         <ProjectTitle prefix={`Creating Project`} />
         {save ? 
         <Stepper activeStep={step} orientation="vertical">
@@ -297,11 +330,11 @@ export const ProjectStepper = ({classes, translate, mode, save, ...props}) => {
             <StepLabel>{label}</StepLabel>
             <StepContent>
               {index === 0 ?
-                <PageOne classes={classes} handleNext={handleNext} {...props} /> :
+                <PageOne classes={classes} handleNext={handleNext} setName={setName} setAvatar={setAvatar} setKeywords={setKeywords} {...props} /> :
                 index === 1 ? 
-                <PageTwo classes={classes} translate={translate} handleNext={handleNext} handleBack={handleBack} {...props} />
+                <PageTwo classes={classes} translate={translate} handleNext={handleNext} setStepperGroup={setGroup} setContactUser={setContactUser} handleBack={handleBack} {...props} />
                 :
-                <PageThree classes={classes} handleBack={handleBack} mode={mode} save={save} {...props}/>
+                <PageThree classes={classes} data={{name:name, avatar:avatar, group:group}} handleBack={handleBack} handleSubmit={handleSubmit} mode={mode} save={save} {...props}/>
               }
             </StepContent>
           </Step>

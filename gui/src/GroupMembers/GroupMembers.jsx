@@ -319,7 +319,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.USER}
       reference={MODELS.USERS}
       resource={MODELS.USERS}
-      defaultValue={props.user ? props.user : (() => setIsFormDirty(false))}
+      defaultValue={props.user ? props.user : null}
       disabled={props.record && props.record.user ? true : false}
       validate={validateUser}
     >
@@ -330,7 +330,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP}
       reference={MODELS.GROUPS}
       resource={MODELS.GROUPS}
-      defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
+      defaultValue={props.group ? props.group : null}
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
@@ -341,7 +341,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP_ROLE}
       reference={MODELS.ROLES}
       resource={MODELS.ROLES}
-      defaultValue={props.group_role ? props.group_role : (() => setIsFormDirty(false))}
+      defaultValue={props.group_role ? props.group_role  : null}
       validate={validateRole}
     >
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
@@ -349,7 +349,7 @@ export const GroupMemberForm = props => {
     <DateInput
       label={"en.models.generic.date_expires"}
       source={MODEL_FIELDS.DATE_EXPIRES}
-      defaultValue={props.date_expires ? props.date_expires : (() => setIsFormDirty(false))}
+      defaultValue={props.date_expires ? props.date_expires : null}
       allowEmpty
     />
     <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
