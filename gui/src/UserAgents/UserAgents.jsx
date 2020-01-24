@@ -78,7 +78,6 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     {...props}
     classes={{
       root: classes.root,
-      header: classes.header,
       actions: classes.actions
     }}
     exporter={false}

@@ -83,7 +83,6 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     {...props}
     classes={{
       root: classes.root,
-      header: classes.header,
       actions: classes.actions
     }}
     exporter={false}

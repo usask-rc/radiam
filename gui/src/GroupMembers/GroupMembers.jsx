@@ -82,7 +82,6 @@ export const GroupMemberList = withStyles(listStyles)(
         {...props}
         classes={{
           root: classes.root,
-          header: classes.header,
           actions: classes.actions
         }}
         exporter={false}
