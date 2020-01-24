@@ -13,6 +13,9 @@ import UserAvatar from "react-user-avatar"
 import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
+  appBar: {
+    height: 'auto',
+  },
   appBarText: {
     color: "black",
     textTransform: 'uppercase',
@@ -81,7 +84,7 @@ const CustomAppBar = ({ classes, ...props }) => {
   }, [])
 
   return(
-  <AppBar {...props} userMenu={<CustomUserMenu user={user} />}>
+  <AppBar className={classes.appBar} position="static" {...props} userMenu={<CustomUserMenu user={user} />}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />

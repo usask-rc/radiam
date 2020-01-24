@@ -21,7 +21,6 @@ import {
   translate,
   withTranslate,
 } from 'react-admin';
-
 import { Field } from 'react-final-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
@@ -31,7 +30,6 @@ import FilesTab from "./Files/FilesTab";
 import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
-import { ProjectStepper } from "../_components/ProjectStepper.jsx";
 import { UserShow } from "../_components/_fields/UserShow";
 import "../_components/components.css";
 import compose from "recompose/compose";
@@ -387,7 +385,6 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           
         <FormDataConsumer>
           {({formData, ...rest}) => {
-            console.log("formData: ", formData)
               return(
                 <div>
                   <ReferenceInput
@@ -525,7 +522,6 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
 
       <FormDataConsumer>
           {({formData, ...rest}) => {
-            console.log("formData: ", formData)
             if (formData && formData.group !== group){
               setGroup(formData.group)
             }
@@ -594,7 +590,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
     <Create submitOnEnter={false} {...props}>
-      <ProjectStepper classes={classes} translate={translate} {...props} />
+      <ProjectCreateForm classes={classes} translate={translate} {...props} />
     </Create>
   ))
 );

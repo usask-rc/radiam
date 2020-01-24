@@ -310,38 +310,45 @@ export const UserAgentEdit = props => {
           <UserShow />
         </ReferenceField>
         <FormDataConsumer>
-        {({formData, ...rest}) => 
+        {formDataProps  => 
         {
-          if (formData && formData.remote_api_token && formData.remote_api_username){
+          const formData = formDataProps.formData
+          console.log("in fdc, formData is: ", formDataProps)
+          if (formData && formData.remote_api_token && formData.remote_api_username && formData.project_config_list && formData.project_config_list.length > 0){
             formData.project_config_list.map(project => {
               const newProj = project
               delete newProj.config
               return newProj
             })
           }
-
-          return(
-            <>
-            <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
-            <SimpleFormIterator disableRemove disableAdd>
-              <ReferenceInput
-              label={"en.models.agents.projects"}
-              source={MODEL_FK_FIELDS.PROJECT}
-              reference={MODELS.PROJECTS}>
-                <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
-              </ReferenceInput>
-              {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
-            </SimpleFormIterator>
-          </ArrayInput>
-            <Grid container direction="row">
-            <Grid xs={12}>
-              <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
-            </Grid>
-            <Grid xs={12}>
-              <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-            </Grid>
-          </Grid>
-          </>)
+          console.log("before returning component, printing")
+          if (formData && formData.length > 0){
+            return(
+              <>
+                <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
+                  <SimpleFormIterator disableRemove disableAdd>
+                    <ReferenceInput
+                    label={"en.models.agents.projects"}
+                    source={MODEL_FK_FIELDS.PROJECT}
+                    reference={MODELS.PROJECTS}>
+                      <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
+                    </ReferenceInput>
+                    {formData.project_config_list && formData.project_config_list.length > 0 && formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+                  </SimpleFormIterator>
+                </ArrayInput>
+                <Grid container direction="row">
+                <Grid xs={12}>
+                  <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
+                </Grid>
+                <Grid xs={12}>
+                  <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+                </Grid>
+                </Grid>
+              </>)
+          }
+          else{
+            return <div>{`Loading...`}</div>
+          }
         }
         }
         </FormDataConsumer>

@@ -224,7 +224,7 @@ const App = props => {
             show={ProjectShow}
             create={
               permissions.is_admin || permissions.is_group_admin
-                ? ProjectCreateForm
+                ? ProjectCreate
                 : null
             }
             edit={
