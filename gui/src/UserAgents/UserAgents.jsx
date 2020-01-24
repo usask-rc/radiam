@@ -343,9 +343,6 @@ export const UserAgentEdit = props => {
           <Grid item xs={12}>
             <TextInput disabled source="version" label={"en.models.agents.version"} validate={validateVersion} />
           </Grid>
-          <Grid item xs={12}>
-            <BooleanInput disabled source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-          </Grid>
         </Grid>
       </SimpleForm>
     </Edit>

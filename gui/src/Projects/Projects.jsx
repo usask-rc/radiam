@@ -511,7 +511,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       >
         <SelectInput
           source={MODEL_FIELDS.AVATAR_IMAGE}
-          optionText={<ImageField className={{height: `${AVATAR_HEIGHT}`}} source={MODEL_FIELDS.AVATAR_IMAGE} />}
+          optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}
         />
       </ReferenceInput>
       <TextInput
