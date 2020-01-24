@@ -14,7 +14,7 @@ import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
   appBar: {
-    height: 'auto',
+    marginTop: "-48px", //position static creates this unsightly top bar that we have to remove manually
   },
   appBarText: {
     color: "black",
