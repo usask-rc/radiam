@@ -6,7 +6,7 @@ import {withStyles} from '@material-ui/core/styles'
 import { translate } from "ra-core"
 import { Field, Form } from 'react-final-form';
 import {LOGIN_DETAILS, FIELDS} from "../_constants/index"
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import CardActions from '@material-ui/core/CardActions';
 import CircularProgress from "@material-ui/core/CircularProgress"
 import ToggleForgot from './ToggleForgot';
@@ -28,26 +28,22 @@ const styles = () => ({
 });
 
 
-const validateEmail = value =>
-value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
-'Invalid email address' : undefined
+const validateEmail = value => value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ? 'Invalid email address' : undefined
 const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleForgotPassword, renderInput, handleChange, loading }) => {
     return(
         <MuiThemeProvider>
             <Form onSubmit={(values) => handleSubmit(values)}>
-            { ( {handleSubmit, pristine, reset, submitting, login }) => (
-
-                <form onSubmit={handleSubmit(forgotPassword)}>
+            { ( {handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
                     <div className={classes.form}>
                         <div className={classes.input}>
                             <Field
-                            autoFocus
-                            name={LOGIN_DETAILS.EMAIL}
-                            component={renderInput}
-                            onChange={handleChange}
-                            label={translate("en.auth.email")}
-                            disabled={loading}
-                            validate={validateEmail}
+                                autoFocus
+                                name={LOGIN_DETAILS.EMAIL}
+                                component={renderInput}
+                                label={translate("en.auth.email")}
+                                disabled={loading}
+                                validate={validateEmail}
                             />
                         </div>
                     </div>
@@ -71,7 +67,6 @@ const ForgotForm = ({classes, translate, handleSubmit, forgotPassword, toggleFor
         </MuiThemeProvider>
     )
 }
-
 
 const enhance = compose(
     translate,

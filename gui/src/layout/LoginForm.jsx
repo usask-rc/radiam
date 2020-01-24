@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from "@material-ui/core/Button"
 import CardActions from "@material-ui/core/CardActions"
 import CircularProgress from "@material-ui/core/CircularProgress"
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import ToggleForgot from './ToggleForgot';
 import { translate } from "ra-core"
 

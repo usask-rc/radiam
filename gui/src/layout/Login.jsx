@@ -6,7 +6,7 @@ import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
 import Card from "@material-ui/core/Card";
 import TextField from "@material-ui/core/TextField";
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import {ThemeProvider as MuiThemeProvider} from '@material-ui/core/styles';
 import {
   createMuiTheme,
   withStyles
@@ -82,17 +82,13 @@ class Login extends Component {
   }
 
   handleSubmit(data) {
-    //TODO: call api
-    console.log("handleSubmit data: ", data)
-    console.log("this props: ", this.props)
-
     const ret = this.login({username: data.username, password: data.password})
-
-    console.log("ret in hs is:", ret)
-    //this.props.userLogin({username: data.username, password: data.password})
-    //this.submitForm();
-    //event.preventDefault();
   }
+
+  handleSubmitEmail(data){
+    console.log("handlesubmitemail: ", data)
+  }
+
 
   handleChange = e => {
     this.setState({ [e.target.name] : e.target.value});
@@ -100,14 +96,16 @@ class Login extends Component {
 
 
   //TODO: the below Toasts need to be put in the Constants or the Translation file.
-  forgotPassword = (e) => {
+  forgotPassword = ({email}) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    const { email } = this.state
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: email
     })
       .then(() =>
-        toast.success("Please check your email for a password reset link.")
+        {
+          toast.success("Please check your email for a password reset link.")
+          this.toggleForgotPassword()
+        }
       )
       .catch(err =>
         toast.error("Error: ", err)
@@ -116,7 +114,9 @@ class Login extends Component {
 
   toggleForgotPassword = (e) => {
     const { forgotPassword } = this.state
-    e.preventDefault()
+    if (e){
+      e.preventDefault()
+    }
     this.setState({forgotPassword: !forgotPassword });
   };
 
@@ -144,8 +144,7 @@ class Login extends Component {
           {!forgotPassword ? (
             <LoginForm loading={loading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( 
-            <ForgotForm handleSubmit={this.handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
-            handleChange={this.handleChange} loading={loading}/>
+            <ForgotForm handleSubmit={this.forgotPassword} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} loading={loading}/>
           )}
         </Card>
         <ToastContainer />
