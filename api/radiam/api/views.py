@@ -793,6 +793,8 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
 
         dataset_id = pk
 
+        self.serializer_class = ESDatasetSerializer
+
         query = request.data
 
         # any more validation that needs to be done?
@@ -1574,13 +1576,13 @@ class DatasetDocsViewSet(viewsets.ViewSet):
         project = Project.objects.get(dataset__id=dataset_id)
         search_model = SearchModel.objects.get(dataset__id=dataset.id)
 
-        search = Search.from_dict(search_model.search)
+        search = Search()
         search = search.index(str(project.id))
-
         search_service = _SearchService(search)
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
         rawresponse = search_service.execute()
         data = rawresponse.to_dict()
-
         return Response(data)
 
 
