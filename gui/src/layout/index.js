@@ -1,4 +1,4 @@
-import CustomAppBar from "./RadiamAppBar";
+import CustomAppBar from "./CustomAppBar";
 import Layout from "./Layout"
 
 export { CustomAppBar, Layout };

@@ -13,6 +13,7 @@ import {MenuItemLink, Responsive} from "react-admin"
 
 const styles = createStyles({
     main: {
+        marginTop: "0.5em",
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -46,7 +47,7 @@ const RadiamMenu = ({
 }) => {
     console.log("radiammenu ...rest is: ", rest)
     return(
-    <div className={classnames(classes.main, className)} {...rest}>
+    <div className={classnames(classes.main)} {...rest}>
         <CustomDashboardMenuItem onClick={onMenuClick} />
         {resources
             .filter(r => r.hasList)

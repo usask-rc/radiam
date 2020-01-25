@@ -137,7 +137,7 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...
         setShowEdit(data)
       })
     }
-  }, [data])
+  }, [data, showEdit])
 
   const {hasCreate, hasShow, hasEdit, hasList, ...rest} = props
   console.log("GroupShowActions props: ", props)
