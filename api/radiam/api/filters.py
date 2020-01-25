@@ -2,7 +2,7 @@
 from django.db.models import Q
 
 from rest_framework.filters import BaseFilterBackend
-from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics
+from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics, Location, UserAgent, UserAgentProjectConfig
 
 from rest_framework.exceptions import APIException
 
@@ -250,3 +250,27 @@ class RadiamAuthProjectStatisticsFilter(BaseFilterBackend):
             return projectstatistics
         else:
             return projectsstatistics_queryset
+
+
+class RadiamAuthLocationFilter(BaseFilterBackend):
+    """
+    Return the queryset if superuser, else if a user is a member of a group associated with a project that is
+    referenced in a useragent's project list then that user will be able to see that useragent's location
+    """
+
+    def filter_queryset(self, request, location_queryset, view):
+
+        user = request.user
+
+        if not user.is_superuser:
+
+            user_groupmembers = GroupMember.objects.filter(user=user)
+            user_groups = ResearchGroup.objects.filter(groupmember__in=user_groupmembers)
+            user_projects = Project.objects.filter(group__in=user_groups)
+            user_agentprojectconfigs = UserAgentProjectConfig.objects.filter(project__in=user_projects)
+            user_agents = UserAgent.objects.filter(useragentprojectconfig__in=user_agentprojectconfigs)
+            user_locations = Location.objects.filter(useragent__in=user_agents)
+
+            return user_locations
+        else:
+            return location_queryset
