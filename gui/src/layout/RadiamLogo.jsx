@@ -7,7 +7,6 @@ const RadiamLogo = props => {
                 id="radiamlogo"
                 src={require("../_assets/RadiamLogoClear_NoBorder.png")}
                 alt="Radiam"
-                height={70}
             />
         </a>
         )

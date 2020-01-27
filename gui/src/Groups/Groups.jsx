@@ -8,7 +8,7 @@ import {
   Edit,
   Filter,
   List,
-  LongTextInput,
+  TextInput,
   ReferenceField,
   ReferenceInput,
   required,
@@ -18,7 +18,6 @@ import {
   SimpleForm,
   SimpleShowLayout,
   TextField,
-  TextInput,
   translate,
   withTranslate,
 } from "react-admin";
@@ -84,7 +83,6 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     {...props}
     classes={{
       root: classes.root,
-      header: classes.header,
       actions: classes.actions
     }}
     exporter={false}
@@ -104,7 +102,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
         source={MODEL_FIELDS.DESCRIPTION}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groups.parent_group"}
         source={MODEL_FK_FIELDS.PARENT_GROUP}
         reference={MODELS.GROUPS}
@@ -139,7 +137,7 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...
         setShowEdit(data)
       })
     }
-  }, [data])
+  }, [data, showEdit])
 
   const {hasCreate, hasShow, hasEdit, hasList, ...rest} = props
   console.log("GroupShowActions props: ", props)
@@ -216,7 +214,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
         source={MODEL_FIELDS.ACTIVE}
       />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groups.parent_group"}
         source={MODEL_FK_FIELDS.PARENT_GROUP}
         reference={MODELS.GROUPS}
@@ -316,7 +314,7 @@ const GroupForm = props =>
         source={MODEL_FIELDS.NAME}
         validate={validateName}
       />
-      <LongTextInput
+      <TextInput
         label={"en.models.groups.description"}
         source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
@@ -371,7 +369,7 @@ class BaseGroupEdit extends Component {
           source={MODEL_FIELDS.NAME}
           validate={validateName}
         />
-        <LongTextInput
+        <TextInput
           label={"en.models.groups.description"}
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}

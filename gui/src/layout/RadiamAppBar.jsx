@@ -13,6 +13,9 @@ import UserAvatar from "react-user-avatar"
 import { getCurrentUserDetails } from "../_tools/funcs.jsx";
 
 const styles = {
+  appBar: {
+    marginTop: "-48px", //position static creates this unsightly top bar that we have to remove manually
+  },
   appBarText: {
     color: "black",
     textTransform: 'uppercase',
@@ -36,7 +39,7 @@ const styles = {
 };
 
 // "Menu" is the drop-down that you get when you click the Profile button.
-const CustomUserMenu = translate(({ translate, user, ...props }) => (
+export const CustomUserMenu = translate(({ translate, user, ...props }) => (
   <UserMenu  {...props} icon={
     user && user.first_name && user.last_name ? 
     <UserAvatar size="36" name={`${user.first_name} ${user.last_name}`} />
@@ -81,7 +84,7 @@ const CustomAppBar = ({ classes, ...props }) => {
   }, [])
 
   return(
-  <AppBar {...props} userMenu={<CustomUserMenu user={user} />}>
+  <AppBar className={classes.appBar} position="static" userMenu={<CustomUserMenu user={user} />} {...props}>
     <RadiamLogo className={classes.logo} />
     <Typography className={classes.versionText}>{`V${version}`}</Typography>
     <span className={classes.spacer} />

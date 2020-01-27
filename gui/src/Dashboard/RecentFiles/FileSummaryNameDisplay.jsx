@@ -11,7 +11,7 @@ const FileSummaryNameDisplay = ({ classes, avatar, name, id }) => (
             <Link href={`/#/${MODELS.PROJECTS}/${id}/${RESOURCE_OPERATIONS.SHOW}`}>
                 <ReferenceField
                     basePath={MODELS.PROJECTS}
-                    linkType={false}
+                    link={false}
                     source={MODEL_FIELDS.AVATAR}
                     reference={MODELS.PROJECTAVATARS}
                     record={{ avatar: avatar }}

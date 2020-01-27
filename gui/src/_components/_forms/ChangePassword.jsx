@@ -5,7 +5,7 @@ import ConfirmPassword from "../_fragments/ConfirmPassword";
 import { MODELS, PATHS, METHODS, FIELDS, WEBTOKEN, ROLE_USER, WARNINGS, } from "../../_constants/index";
 import { getAPIEndpoint, toastErrors } from "../../_tools/funcs";
 import RequestPassword from "../_fragments/RequestPassword";
-import {Redirect} from "react-router"
+import {Redirect} from "react-router-dom"
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast } from "react-toastify";
 import { withStyles } from "@material-ui/styles";

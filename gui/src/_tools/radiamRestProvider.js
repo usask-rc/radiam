@@ -23,8 +23,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     let formData = new FormData();
     const options = {};
 
+    console.log("data request is: ", type, resource, params)
     switch (type) {
-
       
       case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
@@ -278,6 +278,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case CREATE:
         console.log("formdata in create: ", formData)
+
+        console.log("CREATE type, resource, params: ", type, resource, params)
         url = `${apiUrl}/${resource}/`;
         options.method = METHODS.POST;
         if (

@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
 import { Card, CardActions, Button, Avatar } from "@material-ui/core";
 import { Link } from "ra-ui-materialui";
-import { withRouter } from "react-router";
+import { withRouter } from "react-router-dom";
 import LockIcon from "@material-ui/icons/Lock";
 import { getAPIEndpoint } from "../_tools";
 import { toast, ToastContainer } from "react-toastify";
@@ -77,7 +77,7 @@ class ResetPassword extends Component {
       password: "",
       confirmPassword: "",
       update: false,
-      isLoading: true,
+      loading: true,
       error: false,
       token: null
     };
@@ -92,7 +92,7 @@ class ResetPassword extends Component {
     else {
       this.setState({
         update: false,
-        isLoading: false,
+        loading: false,
         error: true,
         completed: false
       });

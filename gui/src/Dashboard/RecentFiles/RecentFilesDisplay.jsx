@@ -116,7 +116,7 @@ function RecentFilesDisplay({ projects, translate, classes }) {
                   <Tab label={<><ReferenceField
                     record={item}
                     basePath={MODELS.PROJECTS}
-                    linkType={false}
+                    link={false}
                     source={MODEL_FIELDS.AVATAR}
                     reference={MODELS.PROJECTAVATARS}
                     className={classes.projectName}

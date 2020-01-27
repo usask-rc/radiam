@@ -1,12 +1,11 @@
 //LocationForm.jsx
 import React, { Component } from 'react';
 import {
-  LongTextInput,
+  TextInput,
   ReferenceInput,
   regex,
   required,
   SimpleForm,
-  TextInput,
 } from 'react-admin';
 
 import { compose } from 'recompose';
@@ -209,7 +208,7 @@ class LocationForm extends Component {
                 />
               </Grid>
               <Grid item xs={12}>
-                <LongTextInput
+                <TextInput
                   label={'en.models.locations.globus_path'}
                   source="globus_path"
                 />
@@ -221,13 +220,13 @@ class LocationForm extends Component {
               </Grid>
             }
             <Grid item xs={12}>
-              <LongTextInput
+              <TextInput
                 label={'en.models.locations.portal_url'}
                 source="portal_url"
               />
             </Grid>
             <Grid item xs={12}>
-              <LongTextInput label={'en.models.locations.notes'} source={MODEL_FIELDS.NOTES} />
+              <TextInput label={'en.models.locations.notes'} source={MODEL_FIELDS.NOTES} />
             </Grid>
 
             <Grid item xs={12} key={mapFormKey}>

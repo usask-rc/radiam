@@ -1,13 +1,12 @@
 //Login.jsx
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { propTypes, reduxForm } from "redux-form";
 import { connect } from "react-redux";
 import compose from "recompose/compose";
 import Avatar from "@material-ui/core/Avatar";
 import Card from "@material-ui/core/Card";
 import TextField from "@material-ui/core/TextField";
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import {ThemeProvider as MuiThemeProvider} from '@material-ui/core/styles';
 import {
   createMuiTheme,
   withStyles
@@ -20,6 +19,8 @@ import { radiamRestProvider, getAPIEndpoint, httpClient } from "../_tools";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginForm from "./LoginForm"
+
+
 import ForgotForm from "./ForgotForm";
 
 const styles = theme => ({
@@ -45,6 +46,7 @@ const styles = theme => ({
     backgroundSize: "cover"
   },
 });
+
 
 // see http://redux-form.com/6.4.3/examples/material-ui/
 const renderInput = ({
@@ -72,16 +74,21 @@ class Login extends Component {
       token: "",
       reset_password: ""
     };
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
   componentDidMount(){
     localStorage.clear()
     sessionStorage.clear()
   }
 
-  handleSubmit(event) {
-    this.submitForm();
-    event.preventDefault();
+  handleSubmit(data) {
+    const ret = this.login({username: data.username, password: data.password})
   }
+
+  handleSubmitEmail(data){
+    console.log("handlesubmitemail: ", data)
+  }
+
 
   handleChange = e => {
     this.setState({ [e.target.name] : e.target.value});
@@ -89,14 +96,16 @@ class Login extends Component {
 
 
   //TODO: the below Toasts need to be put in the Constants or the Translation file.
-  forgotPassword = (e) => {
+  forgotPassword = ({email}) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
-    const { email } = this.state
     dataProvider("PASSWORD_RESET_EMAIL", "password_reset", {
       email: email
     })
       .then(() =>
-        toast.success("Please check your email for a password reset link.")
+        {
+          toast.success("Please check your email for a password reset link.")
+          this.toggleForgotPassword()
+        }
       )
       .catch(err =>
         toast.error("Error: ", err)
@@ -105,19 +114,23 @@ class Login extends Component {
 
   toggleForgotPassword = (e) => {
     const { forgotPassword } = this.state
-    e.preventDefault()
+    if (e){
+      e.preventDefault()
+    }
     this.setState({forgotPassword: !forgotPassword });
   };
 
   login = auth =>{
     const {userLogin, location} = this.props
+    console.log("login props: ", this.props)
     return userLogin(
       auth,
       location.state ? location.state.nextPathname : "/"
-    )};
+    )
+  };
 
   render() {
-    const { classes, handleSubmit, isLoading } = this.props;
+    const { classes, handleSubmit, loading } = this.props;
     const { forgotPassword } = this.state
     return (
       <div className={classes.main}>
@@ -129,10 +142,9 @@ class Login extends Component {
           </div>
 
           {!forgotPassword ? (
-            <LoginForm isLoading={isLoading} renderInput={renderInput} handleSubmit={handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
+            <LoginForm loading={loading} renderInput={renderInput} handleSubmit={this.handleSubmit} toggleForgotPassword={this.toggleForgotPassword} login={this.login} />
           ) : ( 
-            <ForgotForm handleSubmit={handleSubmit} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} 
-            handleChange={this.handleChange} isLoading={isLoading}/>
+            <ForgotForm handleSubmit={this.forgotPassword} forgotPassword={this.forgotPassword} toggleForgotPassword={this.toggleForgotPassword} renderInput={renderInput} loading={loading}/>
           )}
         </Card>
         <ToastContainer />
@@ -142,7 +154,6 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  ...propTypes,
   authProvider: PropTypes.func,
   classes: PropTypes.object,
   previousRoute: PropTypes.string,
@@ -150,14 +161,16 @@ Login.propTypes = {
   userLogin: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({ isLoading: state.admin.loading > 0 });
+const mapStateToProps = state => ({ loading: state.admin.loading > 0 });
 
 const enhance = compose(
   translate,
-  reduxForm({
+  /*
+  reactFinalForm({
     form: "signIn",
     validate: (values, props) => {
       const errors = {};
+      console.log("values, props in rff: ", values, props)
       const { translate } = props;
       if (props.anyTouched){
         if (!values.username) {
@@ -167,10 +180,11 @@ const enhance = compose(
           errors.password = translate("ra.validation.required");
         }
       }
-
       return errors;
     }
   }),
+    */
+
   connect(
     mapStateToProps,
     { userLogin }

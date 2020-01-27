@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/styles';
 
 const styles = theme => ({
   root: {
-
+    marginTop: "1em",
   }
 })
 
@@ -27,6 +27,7 @@ class Dashboard extends PureComponent {
   onMountAndRefresh(){
     getRecentProjects().then(data => {
       this.setState(data)
+      return data
     })
     .catch(err => {
       console.error("Error in getRecentProjects: ", err)

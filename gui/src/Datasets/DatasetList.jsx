@@ -64,7 +64,6 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         {...props}
         classes={{
           root: classes.root,
-          header: classes.header,
           actions: classes.actions,
         }}
         exporter={false}
@@ -80,7 +79,7 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
             source={MODEL_FIELDS.TITLE}
           />
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.datasets.project"}
             source={MODEL_FK_FIELDS.PROJECT}
             reference={MODELS.PROJECTS}

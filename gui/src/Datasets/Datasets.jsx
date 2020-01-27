@@ -37,6 +37,7 @@ import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
+import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 
 const styles = {
   actions: {
@@ -73,6 +74,8 @@ const actionStyles = theme => ({
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
 
+  console.log("datasetshowactions data: ", data)
+
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
   useEffect(() => {
     if (data && !showEdit){
@@ -85,9 +88,10 @@ const actionStyles = theme => ({
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
     }
   })
-  if (showEdit){
+  if (showEdit && data){
     return(
     <Toolbar className={classes.toolbar}>
+      <ExportButton resource={`datasets/${data.id}/export`} />
       <EditButton basePath={basePath} record={data} />
     </Toolbar>
     )
@@ -109,7 +113,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         />
 
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.grants.project"}
           source={MODEL_FK_FIELDS.PROJECT}
           reference={MODELS.PROJECTS}
@@ -131,7 +135,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           label={"en.models.datasets.data_collection_status"}
           source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
           reference={MODELS.DATA_COLLECTION_STATUS}
-          linkType={false}
+          link={false}
         >
           <TranslationField
             label={"en.models.roles.label"}
@@ -140,7 +144,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
-          <SingleFieldList linkType={"show"}>
+          <SingleFieldList link={"show"}>
             <TranslationChipField source={MODEL_FIELDS.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
@@ -149,7 +153,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           label={"en.models.datasets.distribution_restriction"}
           source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
           reference={MODELS.DISTRIBUTION_RESTRICTION}
-          linkType={false}
+          link={false}
         >
           <TranslationField
             label={"en.models.roles.label"}
@@ -158,7 +162,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
-          <SingleFieldList linkType={"show"}>
+          <SingleFieldList link={"show"}>
             <TranslationChipField source={MODEL_FIELDS.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>

@@ -10,7 +10,7 @@ import {
   SimpleForm,
   TextInput
 } from "react-admin";
-import {MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
+import {MODEL_FIELDS, RESOURCE_OPERATIONS} from "../_constants/index";
 import TranslationField from "../_components/_fields/TranslationField";
 import CustomPagination from "../_components/CustomPagination";
 

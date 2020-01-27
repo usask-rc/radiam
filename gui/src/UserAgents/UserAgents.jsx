@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import CustomPagination from "../_components/CustomPagination";
 import {
   ArrayField,
+  ArrayInput,
   BooleanField,
   BooleanInput,
   ChipField,
@@ -28,7 +29,6 @@ import { locationSelect, LocationShow } from "../_components/_fields/LocationSho
 import { userSelect, UserShow } from "../_components/_fields/UserShow";
 import { regex, FormDataConsumer, ShowController } from "ra-core";
 import { Grid, Toolbar } from "@material-ui/core";
-import { ArrayInput } from "ra-ui-materialui/lib/input/ArrayInput";
 import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import UserAgentTitle from "./UserAgentTitle";
@@ -78,7 +78,6 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     {...props}
     classes={{
       root: classes.root,
-      header: classes.header,
       actions: classes.actions
     }}
     exporter={false}
@@ -90,7 +89,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   >
     <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -99,7 +98,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.location"}
         source={MODEL_FK_FIELDS.LOCATION}
         reference={MODELS.LOCATIONS}
@@ -159,7 +158,7 @@ return(
       <UserAgentTitle prefix={"Viewing Agent"} />
     
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -167,7 +166,7 @@ return(
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.agents.location"}
         source={MODEL_FK_FIELDS.LOCATION}
         reference={MODELS.LOCATIONS}
@@ -177,7 +176,7 @@ return(
      {controllerProps.record && controllerProps.record.project_config_list && 
       <ArrayField source={MODEL_FIELDS.PROJECT_CONFIG_LIST} label={"Target Projects"}>
         <SingleFieldList>
-          <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} linkType="show">
+          <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} link="show">
             <ChipField source={MODEL_FIELDS.NAME} />
           </ReferenceField>
         </SingleFieldList>
@@ -223,64 +222,57 @@ export const UserAgentCreate = props => {
     <Create {...other}>
       <SimpleForm {...other} redirect={RESOURCE_OPERATIONS.LIST}>
       <UserAgentTitle prefix={"Creating Agent"} />
-
-      <FormDataConsumer>
-
-      {({formData, ...rest}) => 
-      {
-        return(
         <Grid container direction="row">
-        <Grid xs={12}>  
-        <ReferenceInput
-        label={"en.models.agents.user"}
-        source={MODEL_FK_FIELDS.USER}
-        reference={MODELS.USERS}
-        validate={validateUser}
-        >
-          <SelectInput source={MODEL_FIELDS.USERNAME} optionText={userSelect} />
-        </ReferenceInput>
-        </Grid>
-        <Grid xs={12}>
-        <ReferenceInput
-          label={"en.models.agents.location"}
-          source={MODEL_FK_FIELDS.LOCATION}
-          reference={MODELS.LOCATIONS}
-          filter={{location_type: LOCATIONTYPE_OSF}}
-          validate={validateLocation}
-        >
-          <SelectInput optionText={locationSelect} source={MODEL_FIELDS.DISPLAY_NAME} />
-        </ReferenceInput>
-        </Grid>
-        <Grid xs={12}>
-        <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST} required>
-          <SimpleFormIterator>
+          <Grid item xs={12}>  
+          <ReferenceInput
+          label={"en.models.agents.user"}
+          source={MODEL_FK_FIELDS.USER}
+          reference={MODELS.USERS}
+          validate={validateUser}
+          >
+            <SelectInput source={MODEL_FIELDS.USERNAME} optionText={userSelect} />
+          </ReferenceInput>
+          </Grid>
+          <Grid item xs={12}>
             <ReferenceInput
-            label={"en.models.agents.projects"}
-            source={MODEL_FK_FIELDS.PROJECT}
-            reference={MODELS.PROJECTS}>
-              <SelectInput optionText={MODEL_FIELDS.NAME}/>
+              label={"en.models.agents.location"}
+              source={MODEL_FK_FIELDS.LOCATION}
+              reference={MODELS.LOCATIONS}
+              filter={{location_type: LOCATIONTYPE_OSF}}
+              validate={validateLocation}
+            >
+              <SelectInput optionText={locationSelect} source={MODEL_FIELDS.DISPLAY_NAME} />
             </ReferenceInput>
-          </SimpleFormIterator>
-        </ArrayInput>
+          </Grid>
+          
+          <Grid item xs={12}>
+
+            <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
+              <SimpleFormIterator>
+                <ReferenceInput
+                label={"en.models.agents.projects"}
+                source={MODEL_FK_FIELDS.PROJECT}
+                reference={MODELS.PROJECTS}>
+                  <SelectInput optionText={MODEL_FIELDS.NAME}/>
+                </ReferenceInput>
+              </SimpleFormIterator>
+            </ArrayInput>
+          </Grid>
+          
+          <Grid item xs={12}>
+            <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
+          </Grid>
+          <Grid item xs={12}>
+            <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
+          </Grid>
+          <Grid item xs={12}>
+            <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
+          </Grid>
+          <Grid item xs={12}>
+            <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
+          </Grid>
         </Grid>
-        <Grid xs={12}>
-        <TextInput source="remote_api_username" label={"en.models.agents.remoteapiusername"} required />
-        </Grid>
-        <Grid xs={12}>
-        <TextInput source="remote_api_token" label={"en.models.agents.remoteapitoken"} required />
-        </Grid>
-        <Grid xs={12}>
-        <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} defaultValue={`0.0.1`} />
-        </Grid>
-        <Grid xs={12}>
-        <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-        </Grid>
-        </Grid>
-        )
-      }
-      }
-        </FormDataConsumer>
-      </SimpleForm>
+        </SimpleForm>
     </Create>
   )
 };
@@ -293,7 +285,7 @@ export const UserAgentEdit = props => {
       <SimpleForm>
         <UserAgentTitle prefix={"Editing Agent"} />
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.agents.location"}
           source={MODEL_FK_FIELDS.LOCATION}
           reference={MODELS.LOCATIONS}
@@ -301,7 +293,7 @@ export const UserAgentEdit = props => {
           <LocationShow/>
         </ReferenceField>
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.agents.user"}
           source={MODEL_FK_FIELDS.USER}
           reference={MODELS.USERS}
@@ -310,41 +302,47 @@ export const UserAgentEdit = props => {
           <UserShow />
         </ReferenceField>
         <FormDataConsumer>
-        {({formData, ...rest}) => 
+        {formDataProps  => 
         {
-          if (formData && formData.remote_api_token && formData.remote_api_username){
-            formData.project_config_list.map(project => {
+          const record = formDataProps.record
+          console.log("in fdc, formData is: ", record)
+          //if record has an api token and username, it is an OSF agent and we want to allow modification of this
+          if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
+            record.project_config_list.map(project => {
+              //delete config for this prior to display, it's not relevant
               const newProj = project
               delete newProj.config
               return newProj
             })
+            return(
+              <>
+                <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
+                  <SimpleFormIterator disableRemove disableAdd>
+                    <ReferenceInput
+                    label={"en.models.agents.projects"}
+                    source={MODEL_FK_FIELDS.PROJECT}
+                    reference={MODELS.PROJECTS}>
+                      <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
+                    </ReferenceInput>
+                    {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+                  </SimpleFormIterator>
+                </ArrayInput>
+              </>)
           }
-
-          return(
-            <>
-            <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
-            <SimpleFormIterator disableRemove disableAdd>
-              <ReferenceInput
-              label={"en.models.agents.projects"}
-              source={MODEL_FK_FIELDS.PROJECT}
-              reference={MODELS.PROJECTS}>
-                <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
-              </ReferenceInput>
-              {formData.project_config_list[0] && formData.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
-            </SimpleFormIterator>
-          </ArrayInput>
-            <Grid container direction="row">
-            <Grid xs={12}>
-              <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
-            </Grid>
-            <Grid xs={12}>
-              <BooleanInput source={MODEL_FIELDS.ACTIVE} label={"en.models.agents.active"} defaultValue={true} />
-            </Grid>
-          </Grid>
-          </>)
+          else{
+            //need something returned here or RA will complain - but we want nothing returned for non-OSF agents here.
+              return <></>
+            
+          }
         }
         }
         </FormDataConsumer>
+        
+        <Grid container direction="row">
+          <Grid item xs={12}>
+            <TextInput disabled source="version" label={"en.models.agents.version"} validate={validateVersion} />
+          </Grid>
+        </Grid>
       </SimpleForm>
     </Edit>
 

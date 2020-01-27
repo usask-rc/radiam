@@ -40,7 +40,7 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
     <div className={classes.imageContainer}>
       <ReferenceField
         basePath={basePath}
-        linkType={false}
+        link={false}
         record={record}
         source={MODEL_FIELDS.AVATAR}
         reference={MODELS.PROJECTAVATARS}

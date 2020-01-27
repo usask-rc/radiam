@@ -82,7 +82,6 @@ export const GroupMemberList = withStyles(listStyles)(
         {...props}
         classes={{
           root: classes.root,
-          header: classes.header,
           actions: classes.actions
         }}
         exporter={false}
@@ -95,7 +94,7 @@ export const GroupMemberList = withStyles(listStyles)(
         <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
 
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.user"}
             source={MODEL_FK_FIELDS.USER}
             reference={MODELS.USERS}
@@ -104,14 +103,14 @@ export const GroupMemberList = withStyles(listStyles)(
             <UserShow />
           </ReferenceField>
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.group"}
             source={MODEL_FK_FIELDS.GROUP}
             reference={MODELS.GROUPS}>
             <TextField source={MODEL_FIELDS.NAME}  />
           </ReferenceField>
           <ReferenceField
-            linkType={false}
+            link={false}
             label={"en.models.groupmembers.role"}
             source={MODEL_FK_FIELDS.GROUP_ROLE}
             reference={MODELS.ROLES}
@@ -173,7 +172,7 @@ export const GroupMemberShow = props => (
     <SimpleShowLayout>
     <GroupMemberTitle prefix="Viewing" />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.user"}
         source={MODEL_FK_FIELDS.USER}
         reference={MODELS.USERS}
@@ -181,7 +180,7 @@ export const GroupMemberShow = props => (
         <UserShow />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.group"}
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}
@@ -189,7 +188,7 @@ export const GroupMemberShow = props => (
         <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.groupmembers.role"}
         source={MODEL_FK_FIELDS.GROUP_ROLE}
         reference={MODELS.ROLES}
@@ -254,6 +253,7 @@ const asyncValidate = getAsyncValidateDuplicateNotExists(
   MODELS.GROUPMEMBERS
 );
 
+//TODO: make date_expires_at required - it is currently a required field, for some reason.
 export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
@@ -291,6 +291,8 @@ export const GroupMemberForm = props => {
   }, [data])
 
   function handleSubmit(formData) {
+
+    console.log("handleSubmit in groupmembers is submitting formData: ", formData)
     setIsFormDirty(false)
     setData(formData)
   }
@@ -316,7 +318,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.USER}
       reference={MODELS.USERS}
       resource={MODELS.USERS}
-      defaultValue={props.user ? props.user : (() => setIsFormDirty(false))}
+      defaultValue={props.user ? props.user : null}
       disabled={props.record && props.record.user ? true : false}
       validate={validateUser}
     >
@@ -327,7 +329,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP}
       reference={MODELS.GROUPS}
       resource={MODELS.GROUPS}
-      defaultValue={props.group ? props.group : (() => setIsFormDirty(false))}
+      defaultValue={props.group ? props.group : null}
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
@@ -338,7 +340,7 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP_ROLE}
       reference={MODELS.ROLES}
       resource={MODELS.ROLES}
-      defaultValue={props.group_role ? props.group_role : (() => setIsFormDirty(false))}
+      defaultValue={props.group_role ? props.group_role  : null}
       validate={validateRole}
     >
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
@@ -346,7 +348,7 @@ export const GroupMemberForm = props => {
     <DateInput
       label={"en.models.generic.date_expires"}
       source={MODEL_FIELDS.DATE_EXPIRES}
-      defaultValue={props.date_expires ? props.date_expires : (() => setIsFormDirty(false))}
+      defaultValue={props.date_expires ? props.date_expires : null}
       allowEmpty
     />
     <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>

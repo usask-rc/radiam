@@ -54,7 +54,6 @@ const Settings = ({ translate }) => (
 
 const mapStateToProps = state => ({
   theme: state.theme,
-  locale: state.i18n.locale
 });
 
 const enhance = compose(

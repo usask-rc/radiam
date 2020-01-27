@@ -980,6 +980,7 @@ class LocationViewSet(RadiamViewSet):
         filters.SearchFilter,
         DjangoFilterBackend,
         ActiveModelFilter,
+        RadiamAuthLocationFilter,
         LocationOrderingFilter,
     )
 

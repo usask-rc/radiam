@@ -68,7 +68,6 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       {...props}
       classes={{
         root: classes.root,
-        header: classes.header,
         actions: classes.actions
       }}
       exporter={false}
@@ -83,7 +82,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
     >
       <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.grants.group"}
           source={MODEL_FK_FIELDS.GROUP}
           reference={MODELS.GROUPS}
@@ -91,7 +90,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
           <TextField source={MODEL_FIELDS.NAME} />
         </ReferenceField>
         <ReferenceField
-          linkType={false}
+          link={false}
           label={"en.models.grants.dataset"}
           source={MODEL_FK_FIELDS.DATASET}
           reference={MODELS.DATASETS}
@@ -119,7 +118,7 @@ export const GroupViewGrantShow = props => (
     <SimpleShowLayout>
       <GroupViewGrantTitle prefix="Showing View Grant" />
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.grants.group"}
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}
@@ -127,7 +126,7 @@ export const GroupViewGrantShow = props => (
         <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
       <ReferenceField
-        linkType={false}
+        link={false}
         label={"en.models.grants.dataset"}
         source={MODEL_FK_FIELDS.DATASET}
         reference={MODELS.DATASETS}

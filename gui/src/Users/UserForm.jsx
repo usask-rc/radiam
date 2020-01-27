@@ -243,7 +243,7 @@ class UserForm extends Component {
             </SimpleForm>
             <Toolbar>
                 <SaveButton
-                    onClick={this.handleSubmit}
+                    handleSubmitWithRedirect={this.handleSubmit}
                 />
             </Toolbar>
             <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
