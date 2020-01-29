@@ -913,6 +913,17 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
             return None
         return geo_data
 
+    def get_search_model(self):
+
+        try:
+            search_model = SearchModel.objects.get(dataset_id=self.id)
+            return search_model
+        except SearchModel.DoesNotExist:
+            print('SearchModel does not exist')
+            #TODO: should this fail entirely?
+            return None 
+
+
     def delete_data_collection_methods(self):
         for dcm in DatasetDataCollectionMethod.objects.filter(dataset=self):
             dcm.delete()
