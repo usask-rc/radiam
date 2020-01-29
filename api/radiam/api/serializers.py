@@ -42,12 +42,13 @@ from .models import (
     ProjectStatistics,
     ResearchGroup,
     Schema,
+    SearchModel,
     SelectedField,
     SelectedSchema,
     SensitivityLevel,
     User,
     UserAgent,
-    UserAgentProjectConfig, SearchModel)
+    UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_user_updated, radiam_project_created
 
@@ -190,8 +191,6 @@ class SearchModelSerializer(serializers.ModelSerializer):
                   'search')
 
     def validate(self, data):
-        print('SearchModelSerializer')
-        print(data)
         return data
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -1172,6 +1171,13 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
         except KeyError:
             pass
 
+        try:
+            search_model = validated_data.pop("get_search_model")
+            if (search_model is not None):
+                self._save_search_model(search_model, instance)
+        except KeyError:
+            pass
+
         instance.project = validated_data.get('project', instance.project)
         instance.title = validated_data.get('title', instance.title)
         instance.abstract = validated_data.get('abstract', instance.abstract)
@@ -1249,7 +1255,7 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
         try:
             sm_obj = SearchModel.objects.get(dataset_id=instance.id)
-            sm_obj.search = search_model.search
+            sm_obj.search = search_model['search']
             sm_obj.save()
         except SearchModel.DoesNotExist:
             sm_obj = SearchModel.objects.create(search=search_model['search'], dataset_id=instance.id)

@@ -51,13 +51,13 @@ from radiam.api.serializers import (
     ProjectUserAgentSerializer,
     ResearchGroupSerializer,
     SchemaSerializer,
+    SearchModelSerializer,
     SelectedFieldSerializer,
     SelectedSchemaSerializer,
     SensitivityLevelSerializer,
     SuperuserUserSerializer,
     UserSerializer,
-    UserAgentSerializer,
-    SearchModelSerializer)
+    UserAgentSerializer,)
 
 # from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
