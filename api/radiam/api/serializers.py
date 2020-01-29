@@ -1124,6 +1124,9 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
         self._save_dataset_datacollectionmethods(data_collection_methods_list, dataset)
         self._save_dataset_sensitivitylevels(sensitivity_list, dataset)
+
+        SearchModel.objects.create(dataset=dataset, search={})
+
         try:
             self._save_geodata(geodata, dataset)
         except NameError:
