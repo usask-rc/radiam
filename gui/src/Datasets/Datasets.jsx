@@ -272,6 +272,12 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
 
+    <TextInput
+      className="input-small"
+      label={"Project Search Query"}
+      source={"search_model[search]"}
+    />
+
     <ReferenceInput
       resource={MODELS.DATA_COLLECTION_STATUS}
       className="input-small"

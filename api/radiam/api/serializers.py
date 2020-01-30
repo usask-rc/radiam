@@ -52,6 +52,8 @@ from .models import (
 
 from .signals import radiam_user_created, radiam_user_updated, radiam_project_created
 
+import json
+
 class MetadataSerializer():
     def to_representation(self, instance, ret):
         try:
@@ -1256,6 +1258,7 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
         try:
             sm_obj = SearchModel.objects.get(dataset_id=instance.id)
             sm_obj.search = search_model['search']
+            sm_obj.search = json.loads(sm_obj.search)
             sm_obj.save()
         except SearchModel.DoesNotExist:
             sm_obj = SearchModel.objects.create(search=search_model['search'], dataset_id=instance.id)
