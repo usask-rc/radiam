@@ -169,7 +169,7 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes }) {
+function FolderView({ projectID, item, classes, dataType="projects" }) {
 
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
@@ -268,7 +268,7 @@ function getJsonKeys(json) {
         q: search
       }
 
-      getFolderFiles(fileParams, "file").then((data) => {
+      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
         console.log("search files data: ", data)
         if (_isMounted){
           setFiles(data.files)
@@ -277,7 +277,7 @@ function getJsonKeys(json) {
       }).catch((err => {console.error("error in getFiles is: ", err)}))
 
       
-      getFolderFiles(fileParams, "directory").then((data) => {
+      getFolderFiles(fileParams, "directory", dataType=dataType).then((data) => {
         console.log("search files data: ", data)
         if (_isMounted){
           setFolders(data.files)
@@ -321,7 +321,7 @@ function getJsonKeys(json) {
 
     if (!search){ //TODO: there is a better way to separate this out
 
-      getFolderFiles(folderParams, "directory").then((data) => {
+      getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
         console.log("folder files data: ", data.files)
         if (_isMounted){
           //TODO:will have to change when pagination comes
@@ -345,7 +345,7 @@ function getJsonKeys(json) {
       })
       .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-      getFolderFiles(fileParams, "file").then((data) => {
+      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
         console.log("files data: ", data)
         if (_isMounted){
           setFileTotal(data.total)

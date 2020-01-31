@@ -28,7 +28,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects" }) {
     _isMounted = true
     setStatus({loading: true})
     
-    getRootPaths(projectID, dataType=dataType).then(data => {
+    getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
         const params = {
@@ -87,6 +87,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects" }) {
             item={item}
             projectID={projectID}
             key={item.key}
+            dataType={dataType}
           />
         }
       )
