@@ -913,6 +913,14 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
             return None
         return geo_data
 
+    def get_search_model(self):
+        try:
+            search_model = SearchModel.objects.get(dataset_id=self.id)
+            return search_model
+        except SearchModel.DoesNotExist:
+            return None 
+
+
     def delete_data_collection_methods(self):
         for dcm in DatasetDataCollectionMethod.objects.filter(dataset=self):
             dcm.delete()
@@ -921,12 +929,17 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
         for dss in DatasetSensitivity.objects.filter(dataset=self):
             dss.delete()
 
+    def delete_search_model(self):
+        sm_obj = SearchModel.objects.filter(dataset=self)
+        sm_obj.delete()
+
     def delete(self, *args, **kwargs):
         """
         Delete any joint relationships between dataset and sensitivity or data collection model
         """
         self.delete_data_collection_methods()
         self.delete_sensitivities()
+        self.delete_search_model()
         try:
             entity = Entity.objects.get(dataset=self.id)
             entity.delete()
