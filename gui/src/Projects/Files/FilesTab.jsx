@@ -82,7 +82,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
       sort: { field: sort, order: order },
     };
 
-    getProjectData(params, dataType="projects").then(data => {
+    getProjectData(params, dataType=dataType).then(data => {
       if (_isMounted){
         setData(data)
         setStatus({loading: false})
