@@ -12,8 +12,9 @@ import {
   Show,
   ShowController,
   SimpleForm,
-  SimpleShowLayout,
   SingleFieldList,
+  Tab,
+  TabbedShowLayout,
   TextField,
   TextInput,
   translate,
@@ -38,6 +39,8 @@ import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
+import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
+import FilesTab from '../Projects/Files/FilesTab.jsx';
 
 const styles = {
   actions: {
@@ -105,7 +108,8 @@ const actionStyles = theme => ({
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show actions={<DatasetShowActions/>} {...props}>
-    <SimpleShowLayout>
+    <TabbedShowLayout>
+      <Tab label={'Summary'}>
         <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
@@ -182,7 +186,14 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           )}
         </ShowController>
         <MapView/>
-    </SimpleShowLayout>
+      </Tab>
+      <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
+        <FilesTab projectID={props.id} dataType="datasets" />
+      </Tab>
+      <Tab label={'Browse'}>
+        <BrowseTab projectID={props.id} dataType="datasets" />
+      </Tab>
+    </TabbedShowLayout>
   </Show>
 ));
 

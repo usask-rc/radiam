@@ -14,11 +14,14 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-  /*
   if (window && window.location && window.location.port === '3000') {
+    /*
     return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
+    */
+    //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
+    //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }
-  */
+  
   return `/${API_ENDPOINT}`;
 }
 
@@ -285,7 +288,7 @@ export function getRelatedDatasets(projectID) {
 }
 
 //gets the root folder paths for a given project
-export function getRootPaths(projectID) {
+export function getRootPaths(projectID, dataType="projects") {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: '' },
@@ -295,7 +298,7 @@ export function getRootPaths(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + projectID,
+      dataType + '/' + projectID,
       params
     )
       .then(response => {
@@ -337,24 +340,23 @@ export function getRootPaths(projectID) {
   });
 }
 
-export function getProjectData(params, folders = false) {
+export function getProjectData(params, dataType="projects") {
   //get only folders if true, otherwise get only files
   
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.id,
+      dataType + '/' + params.id,
       params
     )
       .then(response => {
         resolve({ files: response.data, nbFiles: response.total });
       })
       .catch(err => {
-        reject({ loading: false, error: err });
+        reject(err);
       });
   });
 }
-
 
 //given some group, return all of its parent groups.
 export function getParentGroupList(group_id, groupList = []){

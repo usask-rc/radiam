@@ -45,7 +45,7 @@ const styles = theme => ({
   }
 });
 //TODO: indexed_date is currently the default display method, but should be passed into the files display as a parameter if coming from the button on the front page.
-function FilesTab({ projectID, classes, translate, ...props }) {
+function FilesTab({ projectID, classes, translate, dataType="projects", ...props }) {
   const [status, setStatus] = useState({ loading: true });
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
@@ -82,7 +82,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
       sort: { field: sort, order: order },
     };
 
-    getProjectData(params).then(data => {
+    getProjectData(params, dataType="datasets").then(data => {
       if (_isMounted){
         setData(data)
         setStatus({loading: false})
@@ -97,6 +97,9 @@ function FilesTab({ projectID, classes, translate, ...props }) {
     }
     
   }, [search, page, perPage, sort, order]);
+
+
+  console.log("status: ", status)
 
   //TODO: this is a mess - is there a way to slim this down?  I hate it.
   return (
@@ -138,8 +141,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
         <Typography className={classes.loading}>{translate('en.loading')}</Typography>
       ) : status.error ? (
         <div className={classes.loading}>
-        <Typography>{translate('en.loadingError')}</Typography>
-        <Typography>{`${status.error}`}</Typography>
+          <Typography>{`${status.error}`}</Typography>
         </div>
       ) : data && data.files && data.files.length > 0 ? (
         <>
