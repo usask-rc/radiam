@@ -210,6 +210,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
+  const [searchModel, setSearchModel] = useState({search: {}})
 
 
   function geoDataCallback(geo){
@@ -250,6 +251,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   };
 
   console.log("props record after editmodal transofmration: ", props.record)
+
+
+  //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
 
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}>

@@ -15,9 +15,8 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
-    /*
-    return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-    */
+    
+    //return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
     //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
     //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }

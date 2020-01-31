@@ -82,7 +82,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
       sort: { field: sort, order: order },
     };
 
-    getProjectData(params, dataType="datasets").then(data => {
+    getProjectData(params, dataType="projects").then(data => {
       if (_isMounted){
         setData(data)
         setStatus({loading: false})
@@ -141,6 +141,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
         <Typography className={classes.loading}>{translate('en.loading')}</Typography>
       ) : status.error ? (
         <div className={classes.loading}>
+          <Typography>{translate('en.metadata.loadingError')}</Typography>
           <Typography>{`${status.error}`}</Typography>
         </div>
       ) : data && data.files && data.files.length > 0 ? (
