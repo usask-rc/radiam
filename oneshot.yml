@@ -1,0 +1,13 @@
+version: '3.6'
+
+services:
+# Create Django admin user.
+  create_admin_user:
+    build: .
+    command: python /code/manage.py createsuperuser
+    volumes:
+      - .:/code
+    stdin_open: true
+    tty: true
+    depends_on:
+      - radiamapi

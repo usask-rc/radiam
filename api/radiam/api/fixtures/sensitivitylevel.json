@@ -1,0 +1,23 @@
+[
+{
+    "model": "api.projectsensitivity",
+    "pk": "52723147-3796-428f-899e-2865ab676a0f",
+    "fields": {
+        "label": "sensitivity.level.none"
+    }
+},
+{
+    "model": "api.projectsensitivity",
+    "pk": "595d06b2-d05e-4d63-a842-bbfe205134c7",
+    "fields": {
+        "label": "sensitivity.level.humansubjects"
+    }
+},
+{
+    "model": "api.projectsensitivity",
+    "pk": "3365e6c7-5ada-4357-a3e7-42bd9ba1a9a6",
+    "fields": {
+        "label": "sensitivity.level.intellectualproperty"
+    }
+}
+]

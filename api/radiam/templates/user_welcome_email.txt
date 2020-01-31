@@ -1,0 +1,10 @@
+Hello {{ user.first_name }},
+
+Welcome to Radiam. Your username is {{ user.username }}.
+
+To activate your account, you'll need to set a password.
+
+Please visit: {{ scheme }}://{{ host }}/{{ reset_password_url }} to complete this process
+
+Thanks,
+Radiam Admin

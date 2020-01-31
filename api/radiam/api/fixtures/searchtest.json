@@ -1,0 +1,72 @@
+[
+{
+    "model": "api.project",
+    "pk": "094ee941-3c2b-4e73-953b-85cf1585dab5",
+    "fields": {
+        "group": "16e10068-f802-494b-b15d-19f90085a70b",
+        "name": "searchtest",
+        "date_created": "2019-01-28T20:57:15.925Z",
+        "date_updated": "2019-01-28T20:57:15.925Z"
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "16e10068-f802-494b-b15d-19f90085a70b",
+    "fields": {
+        "parent_group": null,
+        "name": "searchtest",
+        "description": "Search Test Group",
+        "date_created": "2019-01-28T19:33:13.903Z",
+        "date_updated": "2019-01-28T19:33:13.903Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 1,
+        "level": 0
+    }
+},
+{
+    "model": "api.grouprole",
+    "pk": "d9ba1fc5-606f-4f16-81b1-8816095e5041",
+    "fields": {
+        "label": "testlabel",
+        "description": "this is a test label"
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "c0f59353-2edb-4b9c-bee8-62a998472bff",
+    "fields": {
+        "group": "16e10068-f802-494b-b15d-19f90085a70b",
+        "group_role": "d9ba1fc5-606f-4f16-81b1-8816095e5041",
+        "user": "b9d7096b-c1df-4a94-bab8-fc2489b86710",
+        "is_active": true,
+        "date_created": "2019-03-13T19:18:55.910Z",
+        "date_updated": "2019-03-13T21:47:31.054Z",
+        "date_expires": "2019-03-13T21:47:09.577Z"
+    }
+},
+{
+    "model": "api.user",
+    "pk": "b9d7096b-c1df-4a94-bab8-fc2489b86710",
+    "fields": {
+        "password": "pbkdf2_sha256$120000$6xg0a0o5QZN6$xMPZ0ZDNU5YGT2J4GXWA+PYXUpMopm7oOGn4OKTmJ/g=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "bobrobb",
+        "first_name": "Bobb",
+        "last_name": "Robb",
+        "email": "bob.robb@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-01-28T19:30:54.467Z",
+        "user_uuid": "c7be46ef-5914-4e0e-9a6e-f2efa445673e",
+        "time_zone_id": "",
+        "date_created": "2019-01-28T19:30:54.467Z",
+        "date_updated": "2019-01-28T19:30:54.467Z",
+        "notes": "",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]

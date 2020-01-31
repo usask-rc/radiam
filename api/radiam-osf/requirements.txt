@@ -1,0 +1,6 @@
+six
+requests
+tqdm
+configparser
+configobj
+psycopg2

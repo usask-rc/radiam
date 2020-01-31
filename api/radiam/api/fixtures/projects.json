@@ -1,0 +1,15 @@
+[
+{
+    "model": "api.project",
+    "pk": "100235d2-c388-4abe-9c6d-73f528f38144",
+    "fields": {
+        "group": "4182bcdb-98ae-40be-bcff-00584558d46f",
+        "name": "Test Research",
+        "number": "8675309-J",
+        "keywords": "big, data, research",
+        "primary_contact_user": "41c3fc25-2ad5-4b8e-9ec4-be45df40ed55",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+}
+]

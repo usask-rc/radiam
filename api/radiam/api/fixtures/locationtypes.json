@@ -1,0 +1,16 @@
+[
+{
+    "model": "api.locationtype",
+    "pk": "ab5a0c17-cd79-4b91-b1f7-7bbc2cdcea12",
+    "fields": {
+        "label": "Type2"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "dc010206-085d-4f9a-8c04-631a23325bce",
+    "fields": {
+        "label": "Type1"
+    }
+}
+]

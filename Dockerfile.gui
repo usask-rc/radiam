@@ -1,0 +1,31 @@
+FROM node:8.15
+
+# set working directory
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+
+# Set node.js upper memory limits (in GB)
+ENV NODE_OPTIONS=--max_old_space_size=4096
+
+# install and cache app dependencies
+COPY gui/package.json /usr/src/app/package.json
+
+RUN npm install
+RUN npm install react-scripts@1.1.1 -g
+
+COPY ./gui /usr/src/app
+
+# Add version file to container filesystem
+COPY VERSION /etc/version
+
+# Create a copy of the container version file as a JSON file in the React app root 
+RUN VER=`cat /etc/version` && echo "{\"version\":\"$VER\"}" > /usr/src/app/src/version.json
+
+RUN npm run build
+
+# start app
+CMD ["npm", "start"]
+EXPOSE 3000

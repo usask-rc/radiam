@@ -1,0 +1,41 @@
+[
+{
+    "model": "api.location",
+    "pk": "0f76fa01-5d62-4d4d-9fad-c09e44271016",
+    "fields": {
+        "display_name": "Test Location",
+        "host_name": "localhost",
+        "location_type": "dc010206-085d-4f9a-8c04-631a23325bce",
+        "is_active": true,
+        "date_created": "2019-03-13T15:43:20.953Z",
+        "date_updated": "2019-03-13T15:43:20.953Z",
+        "globus_endpoint": "18b48748-b559-4921-8a13-d55923ac655c",
+        "globus_path": "/1/published/publication_31/data/"
+    }
+},
+{
+    "model": "api.location",
+    "pk": "156185ab-b1f4-4fe8-a351-a6bd2ea27f1c",
+    "fields": {
+        "display_name": "Test Location Inactive",
+        "host_name": "localhost",
+        "location_type": "dc010206-085d-4f9a-8c04-631a23325bce",
+        "is_active": false,
+        "date_created": "2019-03-13T15:45:03.950Z",
+        "date_updated": "2019-03-13T16:09:41.127Z"
+    }
+},
+{
+    "model": "api.location",
+    "pk": "9fc371a8-6eba-41d2-a0b0-a9782cf61166",
+    "fields": {
+        "display_name": "Location 1",
+        "host_name": "localhost",
+        "location_type": "dc010206-085d-4f9a-8c04-631a23325bce",
+        "is_active": true,
+        "date_created": "2019-01-28T19:35:10.738Z",
+        "date_updated": "2019-03-13T17:56:10.902Z",
+        "portal_url": "https://www.frdr.ca/repo/handle/doi:10.20383/101.010"
+    }
+}
+]

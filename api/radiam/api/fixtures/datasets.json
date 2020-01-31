@@ -1,0 +1,44 @@
+[
+{
+    "model": "api.dataset",
+    "pk": "7492d321-10c7-4cba-9891-e5db63b20bce",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "title": "Research Is Fun",
+        "abstract": "A bunch of people will be doing things. And stuff.",
+        "study_site": "Saskatoon, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "6739882a-4bc5-4e1b-9159-18109c6b4464",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "title": "Even more research",
+        "abstract": "More research, more stuff",
+        "study_site": "Regina, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "630bb6cb-a06a-49b8-8c02-21f4564c7b62",
+    "fields": {
+        "project": "100235d2-c388-4abe-9c6d-73f528f38144",
+        "title": "Dataset for more tests",
+        "abstract": "None",
+        "study_site": "Regina, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+}
+]

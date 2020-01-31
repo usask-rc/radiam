@@ -1,0 +1,15 @@
+[
+{
+    "model": "api.groupmember",
+    "pk": "c0f59353-2edb-4b9c-bee8-62a998472bff",
+    "fields": {
+        "group": "4182bcdb-98ae-40be-bcff-00584558d46f",
+        "group_role": "d9ba1fc5-606f-4f16-81b1-8816095e5041",
+        "user": "41c3fc25-2ad5-4b8e-9ec4-be45df40ed55",
+        "is_active": true,
+        "date_created": "2019-03-13T19:18:55.910Z",
+        "date_updated": "2019-03-13T21:47:31.054Z",
+        "date_expires": "2019-03-13T21:47:09.577Z"
+    }
+}
+]

@@ -1,0 +1,1319 @@
+[
+{
+    "model": "api.user",
+    "pk": "0d9e7e2e-ae91-4825-8ce6-eb729338b4a6",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$WsZBph9ZvCvX$8MsqxdqctdweyH8iFYUq0wPD6eh2DhEg1OI3ZUNPpos=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "childuser2",
+        "first_name": "Child",
+        "last_name": "User 2",
+        "email": "childuser2@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-15T14:24:08.076Z",
+        "user_uuid": "10643c52-7778-4899-b0c7-ea2156f550f3",
+        "time_zone_id": "",
+        "date_created": "2019-05-15T14:24:08.076Z",
+        "date_updated": "2019-05-15T14:24:08.076Z",
+        "notes": "Child user 2 for Group hierarchy tests",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "169c6cfa-ee4d-437d-bb76-39930493c1e3",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$rn6pnueW996T$ESpARpEb9ZeJgUlmyQ6goBo4eNxU/qffm+Xo3Sv53/k=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "testuser4",
+        "first_name": "Test",
+        "last_name": "User4",
+        "email": "testuser4@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-25T16:47:23.341Z",
+        "user_uuid": "95fad358-e891-4ad7-9a7c-689ba26093c1",
+        "time_zone_id": "",
+        "date_created": "2019-04-25T16:47:23.341Z",
+        "date_updated": "2019-04-25T16:47:23.341Z",
+        "notes": "Test user 4 for use with project 2",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "16d6c45e-dccc-4c62-8963-45289a408783",
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "gchilduser2",
+        "first_name": "Grandchild",
+        "last_name": "User 2",
+        "email": "grandchilduser2@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-15T14:25:03.182Z",
+        "user_uuid": "586ae757-d984-4508-88bc-24d478b4d44b",
+        "time_zone_id": "",
+        "date_created": "2019-05-15T14:25:03.182Z",
+        "date_updated": "2019-05-15T19:19:52.836Z",
+        "notes": "Grandchild user 2 for Group hierarchy tests",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "3448421c-84f7-4e65-81c0-151db811ee27",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$Iihdv5b1tr5S$UgySbvvLiuKiDHK5L2GYXZNBW8spg5uYvJBctm5j/IM=",
+        "last_login": "2019-05-16T14:20:50.028Z",
+        "is_superuser": false,
+        "username": "parentuser1",
+        "first_name": "Parent",
+        "last_name": "User 1",
+        "email": "parentuser1@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-15T14:23:24.712Z",
+        "user_uuid": "48fcde42-1f1d-4604-aa61-30fa039782e6",
+        "time_zone_id": "",
+        "date_created": "2019-05-15T14:23:24.712Z",
+        "date_updated": "2019-05-15T14:23:24.712Z",
+        "notes": "Parent user 1 for Group hierarchy tests",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "546cdbf4-c30c-4566-9195-087b7876c660",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$xun0yOr6qdcp$OUwLkIJ2rUPmio35+WxPsRGIZlIO+q2JFdDZpy05z2Y=",
+        "last_login": "2019-05-15T21:58:09.666Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@example.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2019-04-09T20:57:33.125Z",
+        "user_uuid": "334afead-f6ce-422f-aa28-bedfba0e15e1",
+        "time_zone_id": null,
+        "date_created": "2019-04-09T20:57:33.125Z",
+        "date_updated": "2019-04-09T20:57:33.125Z",
+        "notes": null,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "7bfc4a4a-6aaf-469d-a3e4-83c40371dd5c",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$NK1xGZpTZWrS$JCmiKl45UieD4WjMoii43HDnv7OlCvUMSfSgvnMUT/4=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "childuser1",
+        "first_name": "Chile",
+        "last_name": "User 1",
+        "email": "childtuser1@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-15T14:23:45.820Z",
+        "user_uuid": "4f17409b-8eb7-4b65-a6c1-ff0fa7222eda",
+        "time_zone_id": "",
+        "date_created": "2019-05-15T14:23:45.820Z",
+        "date_updated": "2019-05-15T14:23:45.820Z",
+        "notes": "Child user 1 for Group hierarchy tests",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "8152d921-e6fb-4ccc-b5ae-26dc2f0b2bc9",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$Wec75m6KTBZV$flEKOjqdgUmJyd384KLdTxpf7622blBIFl9TBtMVEy0=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "parentmemb1",
+        "first_name": "Parent",
+        "last_name": "Member1",
+        "email": "parentmember1@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-16T19:39:34.099Z",
+        "user_uuid": "76510636-2f7b-4e8d-bf3e-e451d55ada2f",
+        "time_zone_id": null,
+        "date_created": "2019-05-16T19:39:34.099Z",
+        "date_updated": "2019-05-16T19:39:34.099Z",
+        "notes": "Member user for parent group testing",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "82d0770c-be1a-4748-a1f9-e5f3712809c2",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$rDTYeukAmc45$NXztm+v4UDDI70czJQFms0im0xtzVUQ03USHVb0hwOE=",
+        "last_login": "2019-04-24T19:46:18.424Z",
+        "is_superuser": false,
+        "username": "testuser2",
+        "first_name": "Test",
+        "last_name": "User2",
+        "email": "testuser2@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-10T15:39:37.447Z",
+        "user_uuid": "9caa942b-b55b-40d2-abe8-91be254bbdec",
+        "time_zone_id": "",
+        "date_created": "2019-04-10T15:39:37.447Z",
+        "date_updated": "2019-04-10T15:39:37.447Z",
+        "notes": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "91048ba0-3ea4-4287-8f08-dca141db1fa9",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$A1aRgUyEKKF1$wmkvCCxlEjia0UF/8q+na7ssnSGJgGh0isZwcEbElRA=",
+        "last_login": "2019-04-16T18:04:30.446Z",
+        "is_superuser": false,
+        "username": "testuser3",
+        "first_name": "Test",
+        "last_name": "User3",
+        "email": "testuser3@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-10T15:43:16.628Z",
+        "user_uuid": "9c40c123-b8cf-4f2f-8b42-baf69dd94dbe",
+        "time_zone_id": "",
+        "date_created": "2019-04-10T15:43:16.628Z",
+        "date_updated": "2019-04-10T15:43:16.628Z",
+        "notes": "",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "a69a1271-1591-4db6-b310-720e43a5edcc",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$TAwyGpLAF8BV$b9FZJe+M1PfLAw2d7KqLOCGRwSGylCgKNwwZYSRj/4c=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "testuser5",
+        "first_name": "Test",
+        "last_name": "User5",
+        "email": "testuser5@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-25T16:48:10.628Z",
+        "user_uuid": "d5d74d20-fa8b-4a69-a6f8-fe830c9837ee",
+        "time_zone_id": "",
+        "date_created": "2019-04-25T16:48:10.628Z",
+        "date_updated": "2019-04-25T16:48:10.628Z",
+        "notes": "Test user 5 for use with project 2",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "b98db4be-6ef6-4f68-b01b-9ac8d6b35e90",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$quED6ZsD0sVg$T/RLk5xTtwf9pcuSUM3NgfMGZ4y02ll1PA79ffq8YQQ=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "gchilduser1",
+        "first_name": "Grandchild",
+        "last_name": "User 1",
+        "email": "grandchilduser1@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-15T14:24:51.652Z",
+        "user_uuid": "1cf0bff8-ce0c-4b16-886b-a1a9e842d025",
+        "time_zone_id": "",
+        "date_created": "2019-05-15T14:24:51.652Z",
+        "date_updated": "2019-05-15T19:19:45.114Z",
+        "notes": "Grandchild user 1 for Group hierarchy tests",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "cd201695-afc2-4ffa-b11d-72d78105fc47",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$u41hx733NtBJ$CtjFLsDDm1TvQrp/yOXrrtSO+Lbq+7xk+9CpAX9og+g=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "testmailanch",
+        "first_name": "Test",
+        "last_name": "Email",
+        "email": "testanchor@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-05-16T20:56:59.538Z",
+        "user_uuid": "d1871d61-70dd-464e-8180-782169be1bb6",
+        "time_zone_id": null,
+        "date_created": "2019-05-16T20:56:59.538Z",
+        "date_updated": "2019-05-16T20:56:59.538Z",
+        "notes": "test the email anchor",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "d21c9ee8-1c16-4915-a55f-ded4267b1c86",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$f0793Ayryrpr$Z9nI6FS6PG3Z8M9wzQZODF7y+GquelSzXmQmmHkVeIA=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "testuser6",
+        "first_name": "Test",
+        "last_name": "User6",
+        "email": "testuser6@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-25T16:48:33.324Z",
+        "user_uuid": "f74a5b32-bebb-4834-bb90-82ec908af8cb",
+        "time_zone_id": "",
+        "date_created": "2019-04-25T16:48:33.324Z",
+        "date_updated": "2019-04-25T16:48:33.324Z",
+        "notes": "Test user 6 for use with project 2",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.user",
+    "pk": "f04443a7-7b40-4642-9f39-996311f03f4b",
+    "fields": {
+        "password": "pbkdf2_sha256$150000$TN7W89Kbgtx7$lSpe5f4rw2KNp+cZgbblJaWh4VPpyj1Cp8/M7VUkURU=",
+        "last_login": "2019-05-15T22:00:32.519Z",
+        "is_superuser": false,
+        "username": "testuser1",
+        "first_name": "Test",
+        "last_name": "User1",
+        "email": "testuser1@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2019-04-10T15:36:49.854Z",
+        "user_uuid": "40c9b054-984c-4f59-bbc8-80b37470d3fd",
+        "time_zone_id": "",
+        "date_created": "2019-04-10T15:36:49.854Z",
+        "date_updated": "2019-04-12T16:09:09.712Z",
+        "notes": "some notes",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+    "fields": {
+        "parent_group": null,
+        "name": "Parent Group 1",
+        "description": "Parent Group",
+        "date_created": "2019-05-14T20:26:31.352Z",
+        "date_updated": "2019-05-14T21:06:11.846Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 8,
+        "tree_id": 2,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+    "fields": {
+        "parent_group": null,
+        "name": "Test Research Group 2",
+        "description": "Test Research Group 2",
+        "date_created": "2019-05-14T20:39:29.318Z",
+        "date_updated": "2019-05-14T20:40:36.633Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 4,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+    "fields": {
+        "parent_group": null,
+        "name": "Test Research Group 1",
+        "description": "Test Research Group 1",
+        "date_created": "2019-04-10T15:50:43.865Z",
+        "date_updated": "2019-04-10T15:51:54.744Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 3,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "9f9c5261-4167-4e77-9110-b3206b594091",
+    "fields": {
+        "parent_group": null,
+        "name": "Test Research Group 3",
+        "description": "Test Research Group 3",
+        "date_created": "2019-04-10T15:51:00Z",
+        "date_updated": "2019-04-10T15:52:20.345Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 2,
+        "tree_id": 5,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "a63adce6-2902-4eb0-a187-7f2bbfcd080e",
+    "fields": {
+        "parent_group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "name": "Child Group 1",
+        "description": "Child Group 1",
+        "date_created": "2019-05-14T20:30:12.399Z",
+        "date_updated": "2019-05-14T20:30:12.399Z",
+        "is_active": true,
+        "lft": 2,
+        "rght": 5,
+        "tree_id": 2,
+        "level": 1
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "afafb869-fe30-4988-b458-865430c9dc5a",
+    "fields": {
+        "parent_group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "name": "Child Group 2",
+        "description": "Child Group 2",
+        "date_created": "2019-05-14T20:30:54.119Z",
+        "date_updated": "2019-05-14T20:30:54.119Z",
+        "is_active": true,
+        "lft": 6,
+        "rght": 7,
+        "tree_id": 2,
+        "level": 1
+    }
+},
+{
+    "model": "api.researchgroup",
+    "pk": "cedae8c6-c30f-41a4-9b6f-8c1adb87f98a",
+    "fields": {
+        "parent_group": "a63adce6-2902-4eb0-a187-7f2bbfcd080e",
+        "name": "Grandchild Group 1",
+        "description": "Grandchild Group 1",
+        "date_created": "2019-05-14T20:30:30.019Z",
+        "date_updated": "2019-05-14T20:30:30.019Z",
+        "is_active": true,
+        "lft": 3,
+        "rght": 4,
+        "tree_id": 2,
+        "level": 2
+    }
+},
+{
+    "model": "api.grouprole",
+    "pk": "a59be619-fd9b-462b-8643-486e68f38613",
+    "fields": {
+        "label": "group.role.admin",
+        "description": "group.role.admin.description"
+    }
+},
+{
+    "model": "api.grouprole",
+    "pk": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+    "fields": {
+        "label": "group.role.member",
+        "description": "group.role.member.description"
+    }
+},
+{
+    "model": "api.grouprole",
+    "pk": "c4e21cc8-a446-4b38-9879-f2af71c227c3",
+    "fields": {
+        "label": "group.role.datamanager",
+        "description": "group.role.datamanager.description"
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "0047c391-7eeb-4a0d-8030-1958eb450a7b",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "0d9e7e2e-ae91-4825-8ce6-eb729338b4a6",
+        "is_active": true,
+        "date_created": "2019-05-15T14:24:08.087Z",
+        "date_updated": "2019-05-15T14:24:08.087Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "1fe656e0-8343-4038-836d-3d5ea0be3743",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "16d6c45e-dccc-4c62-8963-45289a408783",
+        "is_active": true,
+        "date_created": "2019-05-15T14:25:03.193Z",
+        "date_updated": "2019-05-15T14:25:03.193Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "21e37f9a-886d-4ca0-822f-823c4fbcd66a",
+    "fields": {
+        "group": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+        "group_role": "c4e21cc8-a446-4b38-9879-f2af71c227c3",
+        "user": "82d0770c-be1a-4748-a1f9-e5f3712809c2",
+        "is_active": true,
+        "date_created": "2019-04-12T15:17:04.287Z",
+        "date_updated": "2019-04-16T16:15:15.399Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "24ff6ad0-fe7b-4547-b16b-377eadf91c93",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "b98db4be-6ef6-4f68-b01b-9ac8d6b35e90",
+        "is_active": true,
+        "date_created": "2019-05-15T14:24:51.664Z",
+        "date_updated": "2019-05-15T14:24:51.664Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "2f8d76fb-161d-4ce9-8957-1899e1f4abc2",
+    "fields": {
+        "group": "cedae8c6-c30f-41a4-9b6f-8c1adb87f98a",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "16d6c45e-dccc-4c62-8963-45289a408783",
+        "is_active": true,
+        "date_created": "2019-05-15T14:27:09.378Z",
+        "date_updated": "2019-05-15T14:27:09.378Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "51866384-c67d-4f56-994a-71539c00794c",
+    "fields": {
+        "group": "9f9c5261-4167-4e77-9110-b3206b594091",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "f04443a7-7b40-4642-9f39-996311f03f4b",
+        "is_active": true,
+        "date_created": "2019-04-30T16:20:02.768Z",
+        "date_updated": "2019-04-30T16:20:02.768Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "5510d88d-d867-49bb-a4c2-da7846ad5580",
+    "fields": {
+        "group": "a63adce6-2902-4eb0-a187-7f2bbfcd080e",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "7bfc4a4a-6aaf-469d-a3e4-83c40371dd5c",
+        "is_active": true,
+        "date_created": "2019-05-15T14:26:16.813Z",
+        "date_updated": "2019-05-15T14:26:16.813Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "55cbb0f8-e19f-4ea0-a90e-37ed9ab250f0",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "f04443a7-7b40-4642-9f39-996311f03f4b",
+        "is_active": true,
+        "date_created": "2019-04-29T19:46:03.993Z",
+        "date_updated": "2019-04-29T19:46:03.993Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "59c7e9b8-f609-48d3-94a6-5360de9b8a43",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "group_role": "c4e21cc8-a446-4b38-9879-f2af71c227c3",
+        "user": "a69a1271-1591-4db6-b310-720e43a5edcc",
+        "is_active": true,
+        "date_created": "2019-04-25T16:50:35.343Z",
+        "date_updated": "2019-04-25T16:50:35.343Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "6a5e54b9-aac4-4742-b120-67cdee70069b",
+    "fields": {
+        "group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "3448421c-84f7-4e65-81c0-151db811ee27",
+        "is_active": true,
+        "date_created": "2019-05-15T14:25:54.206Z",
+        "date_updated": "2019-05-15T14:25:54.206Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "7b73d286-f9e5-491d-85a5-e228af0d94ee",
+    "fields": {
+        "group": "cedae8c6-c30f-41a4-9b6f-8c1adb87f98a",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "b98db4be-6ef6-4f68-b01b-9ac8d6b35e90",
+        "is_active": true,
+        "date_created": "2019-05-15T14:26:59.825Z",
+        "date_updated": "2019-05-15T14:26:59.825Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "7f022286-13b5-42c8-b44c-9be47baafb03",
+    "fields": {
+        "group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "8152d921-e6fb-4ccc-b5ae-26dc2f0b2bc9",
+        "is_active": true,
+        "date_created": "2019-05-16T19:42:54.044Z",
+        "date_updated": "2019-05-16T19:42:54.044Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "81656c95-3c0d-4ddd-8575-fdacacc5c21b",
+    "fields": {
+        "group": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "91048ba0-3ea4-4287-8f08-dca141db1fa9",
+        "is_active": true,
+        "date_created": "2019-04-16T16:17:20.078Z",
+        "date_updated": "2019-04-16T16:17:20.078Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "831d6dd0-769a-4cc4-9e34-dbf4553aaf4d",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "7bfc4a4a-6aaf-469d-a3e4-83c40371dd5c",
+        "is_active": true,
+        "date_created": "2019-05-15T14:23:45.832Z",
+        "date_updated": "2019-05-15T14:23:45.832Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "8b8895aa-437f-4af5-95d7-e16cff14eb03",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "169c6cfa-ee4d-437d-bb76-39930493c1e3",
+        "is_active": true,
+        "date_created": "2019-04-25T16:49:07.357Z",
+        "date_updated": "2019-04-25T16:49:07.357Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "9ab52216-650a-453c-9219-3136dd439d71",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "3448421c-84f7-4e65-81c0-151db811ee27",
+        "is_active": true,
+        "date_created": "2019-05-15T14:23:24.746Z",
+        "date_updated": "2019-05-15T14:23:24.746Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "b56abbd6-34b4-4cbe-a88c-e44735318b09",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "d21c9ee8-1c16-4915-a55f-ded4267b1c86",
+        "is_active": true,
+        "date_created": "2019-04-25T16:50:44.449Z",
+        "date_updated": "2019-04-25T16:50:44.449Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "d01fdd40-dec2-4016-a673-afd7e4c26354",
+    "fields": {
+        "group": "afafb869-fe30-4988-b458-865430c9dc5a",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "0d9e7e2e-ae91-4825-8ce6-eb729338b4a6",
+        "is_active": true,
+        "date_created": "2019-05-15T14:26:26.241Z",
+        "date_updated": "2019-05-15T14:26:26.241Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "d246ea39-192a-4848-a003-493598f6f38e",
+    "fields": {
+        "group": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+        "group_role": "a59be619-fd9b-462b-8643-486e68f38613",
+        "user": "f04443a7-7b40-4642-9f39-996311f03f4b",
+        "is_active": true,
+        "date_created": "2019-04-11T22:26:43.789Z",
+        "date_updated": "2019-04-11T22:26:43.789Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupmember",
+    "pk": "e35901a8-6c6d-4b09-9a27-beb7f3273526",
+    "fields": {
+        "group": "cb03b55d-873f-4a0e-8208-07f960fa5032",
+        "group_role": "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+        "user": "8152d921-e6fb-4ccc-b5ae-26dc2f0b2bc9",
+        "is_active": true,
+        "date_created": "2019-05-16T19:39:34.127Z",
+        "date_updated": "2019-05-16T19:39:34.127Z",
+        "date_expires": null
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "7492d321-10c7-4cba-9891-e5db63b20bce",
+    "fields": {
+        "project": "a750cbe5-c5a6-42d0-97c8-285404001166",
+        "title": "Dataset for child group 1",
+        "abstract": "A bunch of people will be doing things. And stuff.",
+        "study_site": "Saskatoon, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "46e686c6-551a-4b31-a0e5-6a862d43bfce",
+    "fields": {
+        "project": "41ee7d02-28be-449f-912f-06fe3590b210",
+        "title": "Dataset for 41ee7d02",
+        "abstract": "A bunch of people will be doing things. And stuff.",
+        "study_site": "Saskatoon, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "6739882a-4bc5-4e1b-9159-18109c6b4464",
+    "fields": {
+        "project": "b83b2519-7647-47a2-a130-1fd22ef556bb",
+        "title": "Grandchild Group 1 Dataset",
+        "abstract": "More research, more stuff",
+        "study_site": "Regina, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "bf23ef1c-e9fd-4289-99fe-8e22b9e4d393",
+    "fields": {
+        "project": "b83b2519-7647-47a2-a130-1fd22ef556bb",
+        "title": "Dataset for b83b2519",
+        "abstract": "More research, more stuff",
+        "study_site": "Regina, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.dataset",
+    "pk": "7e061b23-f059-4e6f-a70f-4688a43ccc74",
+    "fields": {
+        "project": "41ee7d02-28be-449f-912f-06fe3590b210",
+        "title": "Parent Group Dataset",
+        "abstract": "More research, more stuff",
+        "study_site": "Regina, SK",
+        "distribution_restriction": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+        "data_collection_status": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+        "date_created": "2019-01-28T19:36:53.448Z",
+        "date_updated": "2019-01-28T19:36:53.448Z"
+    }
+},
+{
+    "model": "api.groupviewgrant",
+    "pk": "07398deb-2746-447b-a9b9-1dd085aa4df0",
+    "fields": {
+        "group": "a63adce6-2902-4eb0-a187-7f2bbfcd080e",
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "fields": "fields",
+        "date_created": "2019-05-17T16:15:34.015Z",
+        "date_updated": "2019-05-17T16:15:34.015Z",
+        "date_starts": null,
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupviewgrant",
+    "pk": "a2d0a0e8-74b3-408a-bff0-20de29253f59",
+    "fields": {
+        "group": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+        "dataset": "46e686c6-551a-4b31-a0e5-6a862d43bfce",
+        "fields": "test fields",
+        "date_created": "2019-04-30T19:53:01.839Z",
+        "date_updated": "2019-04-30T19:53:01.839Z",
+        "date_starts": null,
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupviewgrant",
+    "pk": "c31cf6dc-6b33-433e-bf7d-00d69d1897ff",
+    "fields": {
+        "group": "cedae8c6-c30f-41a4-9b6f-8c1adb87f98a",
+        "dataset": "6739882a-4bc5-4e1b-9159-18109c6b4464",
+        "fields": "fields",
+        "date_created": "2019-05-17T16:15:46.812Z",
+        "date_updated": "2019-05-17T16:15:46.812Z",
+        "date_starts": null,
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupviewgrant",
+    "pk": "e2e2e7b1-3e27-470c-9cf3-6ccbd82f8ec6",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "dataset": "bf23ef1c-e9fd-4289-99fe-8e22b9e4d393",
+        "fields": "test fields",
+        "date_created": "2019-04-30T19:58:16.961Z",
+        "date_updated": "2019-04-30T19:58:16.961Z",
+        "date_starts": null,
+        "date_expires": null
+    }
+},
+{
+    "model": "api.groupviewgrant",
+    "pk": "efa502ac-a06a-458e-8f3b-4fe85e1ffd3d",
+    "fields": {
+        "group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "dataset": "7e061b23-f059-4e6f-a70f-4688a43ccc74",
+        "fields": "fields",
+        "date_created": "2019-05-17T16:15:22.142Z",
+        "date_updated": "2019-05-17T16:15:22.142Z",
+        "date_starts": null,
+        "date_expires": null
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "3a16f0c7-7be9-4fb8-9ee8-7248395e06e7",
+    "fields": {
+        "label": "location.type.database"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "4acec0b3-d1e3-48d7-848b-b724b56cdb2b",
+    "fields": {
+        "label": "location.type.portal"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "4ef2bf5a-ee68-4e5a-911f-31bb04058627",
+    "fields": {
+        "label": "location.type.server"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "8851d904-c6e7-4d95-b189-c06b85bfb8d9",
+    "fields": {
+        "label": "location.type.other"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "cb856b59-0a7a-4f47-891f-7632ee3fec16",
+    "fields": {
+        "label": "location.type.instrument"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "faaaed1d-dc31-4047-ae08-9571b93b0e2f",
+    "fields": {
+        "label": "location.type.laptop"
+    }
+},
+{
+    "model": "api.locationtype",
+    "pk": "fd39b7e6-86f9-4b26-8563-32eb3cb88a22",
+    "fields": {
+        "label": "location.type.desktop"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "1f096e8e-0ba5-48ca-93f4-a84b8286b04d",
+    "fields": {
+        "label": "sensitivity.level.preexisting"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "3365e6c7-5ada-4357-a3e7-42bd9ba1a9a6",
+    "fields": {
+        "label": "sensitivity.level.intellectualproperty"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "52723147-3796-428f-899e-2865ab676a0f",
+    "fields": {
+        "label": "sensitivity.level.none"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "595d06b2-d05e-4d63-a842-bbfe205134c7",
+    "fields": {
+        "label": "sensitivity.level.humansubjects"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "72d5242a-75b4-461f-9c19-ce84495a4ca7",
+    "fields": {
+        "label": "sensitivity.level.governmentpartnership"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "ad724976-f8c9-4cda-9e04-72773071f2d4",
+    "fields": {
+        "label": "sensitivity.level.harmtopublic"
+    }
+},
+{
+    "model": "api.sensitivitylevel",
+    "pk": "d4808bdd-dc33-4f92-aaaf-e7fd19180789",
+    "fields": {
+        "label": "sensitivity.level.industrypartnership"
+    }
+},
+{
+    "model": "api.datasetsensitivity",
+    "pk": "01d60005-5429-43b9-b6af-c4a77ee541b4",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "sensitivity": "52723147-3796-428f-899e-2865ab676a0f"
+    }
+},
+{
+    "model": "api.datasetsensitivity",
+    "pk": "3041236c-762f-495a-a601-0261d3e199b7",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "sensitivity": "52723147-3796-428f-899e-2865ab676a0f"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "1a27ea05-d56a-492b-a05b-21f9877ad674",
+    "fields": {
+        "label": "datacollection.method.modelling"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "25590403-1b2c-46fd-96e8-09151a129d76",
+    "fields": {
+        "label": "datacollection.method.focusgroup"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "37ca2eb7-a6ed-4724-a33d-dc9674316aee",
+    "fields": {
+        "label": "datacollection.method.labwork"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "6c744133-ac64-447b-9153-6b470a7dcdc3",
+    "fields": {
+        "label": "datacollection.method.interview"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "9c035ae8-7f18-41f3-b493-7fc786559140",
+    "fields": {
+        "label": "datacollection.method.survey"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "a99a3a24-da63-4e46-94e9-c1e3a8c46fee",
+    "fields": {
+        "label": "datacollection.method.census"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "b5917e5d-919a-4f92-9d0f-3defdff85dc4",
+    "fields": {
+        "label": "datacollection.method.fieldwork"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894",
+    "fields": {
+        "label": "datacollection.method.other"
+    }
+},
+{
+    "model": "api.datacollectionmethod",
+    "pk": "f653a6ea-1262-4e0b-9524-1d5a822efee0",
+    "fields": {
+        "label": "datacollection.method.simulation"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "65eb074e-d0ac-4b93-8981-1b78cb0a2598",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "data_collection_method": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "a92b6c9e-b761-4499-9c70-b5f430606d9d",
+    "fields": {
+        "dataset": "46e686c6-551a-4b31-a0e5-6a862d43bfce",
+        "data_collection_method": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "ea851fdf-6b79-4d6e-8070-48dcb04d09e0",
+    "fields": {
+        "dataset": "6739882a-4bc5-4e1b-9159-18109c6b4464",
+        "data_collection_method": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "f9d1402a-2301-4bf8-b4cd-70590e3ca4b7",
+    "fields": {
+        "dataset": "bf23ef1c-e9fd-4289-99fe-8e22b9e4d393",
+        "data_collection_method": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "f9d1402a-2301-4bf8-b4cd-70590e3ca4b7",
+    "fields": {
+        "dataset": "7e061b23-f059-4e6f-a70f-4688a43ccc74",
+        "data_collection_method": "b6c7f018-4aaf-48ae-9b6f-a090e6c73894"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "365f998e-d525-4505-8728-90fb5c99d598",
+    "fields": {
+        "label": "distribution.restriction.embargo"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "5334f652-45bf-49cd-bc7f-a529847cbe7c",
+    "fields": {
+        "label": "distribution.restriction.needpermissionfromindustry"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "8e9e49ff-a307-4373-98fc-d8fac1c22859",
+    "fields": {
+        "label": "distribution.restriction.none"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "9a0164ea-3c1e-4355-8c9b-283aeed9c036",
+    "fields": {
+        "label": "distribution.restriction.projectmembersonly"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "a4e124cd-e2c5-4938-aaa5-c43fd6eef09e",
+    "fields": {
+        "label": "distribution.restriction.needpermissionfromgovernment"
+    }
+},
+{
+    "model": "api.distributionrestriction",
+    "pk": "f0776576-bb4a-418f-9559-1f82239fb3ce",
+    "fields": {
+        "label": "distribution.restriction.needpermissionfromprincipal"
+    }
+},
+{
+    "model": "api.datacollectionstatus",
+    "pk": "144a7ee6-3b14-46e1-adbb-5f1034b31fd1",
+    "fields": {
+        "label": "datacollection.status.planned"
+    }
+},
+{
+    "model": "api.datacollectionstatus",
+    "pk": "ad06a00e-21d9-4e65-8453-61f35befd9bb",
+    "fields": {
+        "label": "datacollection.status.complete"
+    }
+},
+{
+    "model": "api.datacollectionstatus",
+    "pk": "db4dec28-85cb-4511-a938-1484e2f639f7",
+    "fields": {
+        "label": "datacollection.status.inprogress"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "41ee7d02-28be-449f-912f-06fe3590b210",
+    "fields": {
+        "group": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
+        "name": "parent project",
+        "number": "PRJ-0999",
+        "keywords": "parent project",
+        "primary_contact_user": "3448421c-84f7-4e65-81c0-151db811ee27",
+        "date_created": "2019-05-16T17:06:51.386Z",
+        "date_updated": "2019-05-16T17:06:51.386Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "69c35620-cca7-4fd6-a84e-35ff3b34b24a",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "name": "test",
+        "number": "PRJ-1000",
+        "keywords": "new new keywords",
+        "primary_contact_user": "91048ba0-3ea4-4287-8f08-dca141db1fa9",
+        "date_created": "2019-04-15T22:00:57.096Z",
+        "date_updated": "2019-04-15T22:00:57.096Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "6cc2a207-12f4-41c6-9eff-6d5d67ef0691",
+    "fields": {
+        "group": "718aaa07-0891-4931-8c73-1304f4a21d0d",
+        "name": "project 1",
+        "number": "PRJ-1001",
+        "keywords": "",
+        "primary_contact_user": null,
+        "date_created": "2019-04-11T14:59:05.649Z",
+        "date_updated": "2019-04-11T14:59:05.649Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "a750cbe5-c5a6-42d0-97c8-285404001166",
+    "fields": {
+        "group": "a63adce6-2902-4eb0-a187-7f2bbfcd080e",
+        "name": "child group 1 project",
+        "number": "PRJ-1101",
+        "keywords": "child group 1 project",
+        "primary_contact_user": "7bfc4a4a-6aaf-469d-a3e4-83c40371dd5c",
+        "date_created": "2019-05-16T17:08:01.067Z",
+        "date_updated": "2019-05-16T17:08:01.067Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "b83b2519-7647-47a2-a130-1fd22ef556bb",
+    "fields": {
+        "group": "cedae8c6-c30f-41a4-9b6f-8c1adb87f98a",
+        "name": "grandchild group 1 project 1",
+        "number": "PRJ-1110",
+        "keywords": "grandchild group project",
+        "primary_contact_user": "0d9e7e2e-ae91-4825-8ce6-eb729338b4a6",
+        "date_created": "2019-05-16T17:09:10.217Z",
+        "date_updated": "2019-05-16T17:09:26.874Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "bb36c1df-cf62-45e5-bbb1-54ec3a36e9f4",
+    "fields": {
+        "group": "9f9c5261-4167-4e77-9110-b3206b594091",
+        "name": "project 3",
+        "number": "PRJ-1003",
+        "keywords": "",
+        "primary_contact_user": null,
+        "date_created": "2019-04-11T14:59:19.466Z",
+        "date_updated": "2019-04-11T14:59:19.466Z"
+    }
+},
+{
+    "model": "api.project",
+    "pk": "ef6db556-f6df-474f-9abb-640aa1736384",
+    "fields": {
+        "group": "1cc80efd-83c6-488d-a722-73abdd4e5ce7",
+        "name": "project 2",
+        "number": "PRJ-1002",
+        "keywords": "",
+        "primary_contact_user": null,
+        "date_created": "2019-04-11T14:59:12.145Z",
+        "date_updated": "2019-04-11T14:59:12.145Z"
+    }
+},
+{
+    "model": "api.projectstatistics",
+    "pk": "4533201c-3878-42fd-93ca-695421824896",
+    "fields": {
+        "project": "69c35620-cca7-4fd6-a84e-35ff3b34b24a",
+        "stat_date": "2019-05-13T00:00:00Z",
+        "stat_key": "key",
+        "stat_qualifier": "qualifer",
+        "stat_value": "value"
+    }
+},
+{
+    "model": "api.projectstatistics",
+    "pk": "a44ae383-113a-4221-98b5-fa9304d1a2b1",
+    "fields": {
+        "project": "ef6db556-f6df-474f-9abb-640aa1736384",
+        "stat_date": "2019-05-01T22:12:48.973Z",
+        "stat_key": "key",
+        "stat_qualifier": "qualifier",
+        "stat_value": "value"
+    }
+},
+{
+    "model": "api.projectstatistics",
+    "pk": "cccb46ac-d998-4933-b85c-78543cf8b044",
+    "fields": {
+        "project": "6cc2a207-12f4-41c6-9eff-6d5d67ef0691",
+        "stat_date": "2019-05-01T22:12:48.973Z",
+        "stat_key": "key",
+        "stat_qualifier": "qualifier",
+        "stat_value": "value"
+    }
+},
+{
+    "model": "api.location",
+    "pk": "0ae20ca5-87d1-4cdf-9d56-84943e14898e",
+    "fields": {
+        "display_name": "ubuntu-xenial",
+        "host_name": "ubuntu-xenial",
+        "location_type": "4ef2bf5a-ee68-4e5a-911f-31bb04058627",
+        "is_active": true,
+        "date_created": "2019-07-17T17:53:49.918Z",
+        "date_updated": "2019-07-17T17:53:49.918Z",
+        "globus_endpoint": null,
+        "globus_path": null,
+        "notes": "",
+        "portal_url": null
+    }
+},
+{
+    "model": "api.location",
+    "pk": "a71edb52-6380-4a01-a06e-c6a714ed6e12",
+    "fields": {
+        "display_name": "Test Location 1",
+        "host_name": "localhost",
+        "location_type": "fd39b7e6-86f9-4b26-8563-32eb3cb88a22",
+        "is_active": true,
+        "date_created": "2019-08-17T17:53:49.918Z",
+        "date_updated": "2019-08-17T17:53:49.918Z",
+        "portal_url": null
+    }
+},
+{
+    "model": "api.useragent",
+    "pk": "12785dfb-1791-4771-953e-09febcb8b103",
+    "fields": {
+        "user": "546cdbf4-c30c-4566-9195-087b7876c660",
+        "location": "0ae20ca5-87d1-4cdf-9d56-84943e14898e",
+        "version": "0.0.1",
+        "date_created": "2019-01-28T19:32:18.440Z",
+        "date_updated": "2019-01-28T19:32:18.440Z"
+    }
+},
+{
+    "model": "api.useragent",
+    "pk": "47ccdf06-0ccf-4704-8348-b0875a178522",
+    "fields": {
+        "user": "a69a1271-1591-4db6-b310-720e43a5edcc",
+        "location": "a71edb52-6380-4a01-a06e-c6a714ed6e12",
+        "version": "0.0.1",
+        "date_created": "2019-02-28T19:32:18.440Z",
+        "date_updated": "2019-02-28T19:32:18.440Z"
+    }
+},
+{
+    "model": "api.useragentprojectconfig",
+    "pk": "b677b23b-e008-458e-843a-4c74f012ef1e",
+    "fields": {
+        "agent": "47ccdf06-0ccf-4704-8348-b0875a178522",
+        "project": "ef6db556-f6df-474f-9abb-640aa1736384",
+        "config": null
+    }
+}
+]

@@ -1,0 +1,26 @@
+[
+{
+    "model": "api.geodata",
+    "pk": "92c6e59b-0654-4ec0-8729-8888f6116c70",
+    "fields": {
+        "geojson": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -106.63330078125006,
+                  52.14697334064471
+                ]
+              }
+            }
+          ]
+        },
+        "content_type": 20,
+        "object_id": "bf23ef1c-e9fd-4289-99fe-8e22b9e4d393"
+    }
+}
+]

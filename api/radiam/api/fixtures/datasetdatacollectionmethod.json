@@ -1,0 +1,18 @@
+[
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "4ff16420-7c41-43f9-adbf-57076336c05f",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "data_collection_method": "a99a3a24-da63-4e46-94e9-c1e3a8c46fee"
+    }
+},
+{
+    "model": "api.datasetdatacollectionmethod",
+    "pk": "e79f2bae-f185-4438-aa5b-ddaf81894afe",
+    "fields": {
+        "dataset": "7492d321-10c7-4cba-9891-e5db63b20bce",
+        "data_collection_method": "b5917e5d-919a-4f92-9d0f-3defdff85dc4"
+    }
+}
+]

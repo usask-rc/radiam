@@ -1,0 +1,5 @@
+FROM nginx
+
+COPY ./config/nginx/conf.d/deploy/ /etc/nginx/conf.d
+
+COPY ./uploads/ /django/uploads
