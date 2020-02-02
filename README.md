@@ -144,8 +144,10 @@ Project Team:
 * Yang Zhou
 
 
-This project was funded by CANARIE, and also received computing and storage in kind from Compute Canada.
+This project was funded by [CANARIE](https://www.canarie.ca/rdm/), and also received computing and storage in kind from [Compute Canada](https://www.computecanada.ca/).
 
 Default project avatars are courtesy https://www.swifticons.com
+
+Copyright 2019-2020 University of Saskatchewan and Simon Fraser University
 
 
