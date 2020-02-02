@@ -121,7 +121,7 @@ https://github.com/usask-rc/radiam-deploy/
 
 ## Radiam Agent
 
-The Radiam agent is needed to crawl research data and submit metadata to the Radiam service.  Please see this repositories:
+The Radiam agent is needed to crawl research data and submit metadata to the Radiam service.  Please see these repositories:
 
 * Precompiled binaries: https://github.com/usask-rc/radiam-agent-releases
 * Source code: https://github.com/usask-rc/radiam-agent
@@ -136,6 +136,8 @@ Project Team:
 * Jin Zhang
 * Joel Farthing
 * Jonathan Loewen
+* Justin Pointer
+* Lee Wilson
 * Mike Winter
 * Rama Periasamy
 * Todd Trann
