@@ -119,7 +119,30 @@ The instructions and code for using Ansible to deploy Radiam via docker stack ar
 
 https://github.com/usask-rc/radiam-deploy/
 
+## Radiam Agent
+
+The Radiam agent is needed to crawl research data and submit metadata to the Radiam service.  Please see this repositories:
+
+* Precompiled binaries: https://github.com/usask-rc/radiam-agent-releases
+* Source code: https://github.com/usask-rc/radiam-agent
+
 ### Credits
+
+Project Team:
+
+* Adam McKenzie
+* Alex Garnett
+* Jason Hlady
+* Jin Zhang
+* Joel Farthing
+* Jonathan Loewen
+* Mike Winter
+* Rama Periasamy
+* Todd Trann
+* Yang Zhou
+
+
+This project was funded by CANARIE, and also received computing and storage in kind from Compute Canada.
 
 Default project avatars are courtesy https://www.swifticons.com
 
