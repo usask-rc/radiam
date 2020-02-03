@@ -71,7 +71,7 @@ const MapView = ({classes, record }) => {
                 let localFeatures = {}
                 let output = {}
                 record.geo.geojson.features.map(feature => {
-                    let leafletGeoJSON = L.GeoJSON(feature);
+                    let leafletGeoJSON = new L.GeoJSON(feature);
                     let leafletFG = _editableFG.leafletElement
                 
                     leafletGeoJSON.eachLayer(layer => 
