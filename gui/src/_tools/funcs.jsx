@@ -20,7 +20,10 @@ export function getAPIEndpoint() {
     //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
     //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
   return `/${API_ENDPOINT}`;
 }
 
@@ -69,7 +72,7 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
         return "data_manager"
       }
     }
-    return "user"
+    return ROLE_USER
   }
   //no cookie or group
   else if (!user && !group){
@@ -152,7 +155,7 @@ export function getMaxUserRole(){
     else if (user.is_data_manager){
       return "data_manager" 
     }
-    return "user"
+    return ROLE_USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
