@@ -16,7 +16,7 @@ export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
   if (window && window.location && window.location.port === '3000') {
     
-    //return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
+    return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
     //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
     return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }
@@ -227,6 +227,7 @@ export function getFirstCoordinate(layer) {
 export function getFolderFiles(
   params,
   type,
+  dataType="projects"
 ) {
 
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
@@ -243,7 +244,7 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.projectID,
+      dataType + '/' + params.projectID,
       queryParams
     )
       .then(response => {
