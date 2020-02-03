@@ -14,7 +14,7 @@ module.exports = Object.freeze({
   RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",
   RADIAMAGENTREADMEURL: "https://github.com/usask-rc/radiam",
   WEBTOKEN: "token",
-  SUPPORTEMAIL: "support@radiam.ca",
+  SUPPORTEMAIL: "developers@frdr.ca",
   USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
   USERMANUALFILENAME: "Radiam_user_manual.pdf",
   FIELDS: {
