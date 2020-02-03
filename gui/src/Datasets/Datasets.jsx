@@ -135,6 +135,11 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           source={MODEL_FIELDS.STUDY_SITE}
         />
 
+        <TextField multiline
+        label={"en.models.datasets.search_model"}
+        source={"search_model.search"}
+        />
+
         <ReferenceField
           label={"en.models.datasets.data_collection_status"}
           source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
@@ -240,6 +245,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     props.resource = "datasets"
 
     //if (props.save){
+    if (!geo){
+
+    }
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false)
 
     if (props.setCreateModal){

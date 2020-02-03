@@ -18,7 +18,7 @@ export function getAPIEndpoint() {
     
     //return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
     //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
-    //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
+    return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }
   
   return `/${API_ENDPOINT}`;

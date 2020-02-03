@@ -63,7 +63,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
       props.location &&
       props.location.state &&
       props.location.state.sortType) ||
-    'path.agnostic.keyword'
+      "path.keyword" //NOTE: the `agnostic` portion was wrong
   );
 
   const handleSubmit = e => {
@@ -123,7 +123,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
           >
             {/* TODO: Translate has troubles with this component.  How to fix?  Probably through HOC*/}
             <MenuItem value={"name.keyword"}>{`File Name`}</MenuItem>
-            <MenuItem value={"path.agnostic.keyword"}>{`File Path`}</MenuItem>
+            <MenuItem value={"path.keyword"}>{`File Path`}</MenuItem>
             <MenuItem value={MODEL_FIELDS.INDEXED_DATE}>{`Indexed On`}</MenuItem>
             <MenuItem value={MODEL_FIELDS.LAST_MODIFIED}>{`Last Modified`}</MenuItem>
             <MenuItem value={MODEL_FIELDS.FILESIZE}>{`Filesize`}</MenuItem>
