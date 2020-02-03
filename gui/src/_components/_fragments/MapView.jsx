@@ -6,7 +6,7 @@ import L from "leaflet";
 import Typography from "@material-ui/core/Typography"
 import Divider from "@material-ui/core/Divider"
 import withStyles from '@material-ui/core/styles/withStyles';
-import {OSMTILEURL} from "../../_constants/index"
+import {LINKS} from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -29,7 +29,7 @@ const styles = {
   };
 
 //display map data, but prevent any interaction.
-const MapView = ({ classes, record }) => {
+const MapView = ({classes, record }) => {
     const [popup, setPopup] = useState({active: false, for: ""})
     const [location, setLocation] = useState([])
     const [mapLoading, setMapLoading] = useState(true)
@@ -71,7 +71,7 @@ const MapView = ({ classes, record }) => {
                 let localFeatures = {}
                 let output = {}
                 record.geo.geojson.features.map(feature => {
-                    let leafletGeoJSON = new L.GeoJSON(feature);
+                    let leafletGeoJSON = L.GeoJSON(feature);
                     let leafletFG = _editableFG.leafletElement
                 
                     leafletGeoJSON.eachLayer(layer => 
@@ -136,10 +136,12 @@ const MapView = ({ classes, record }) => {
 
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
+
             if (_isMounted){
                 setLocation(latLng)
-                setMapLoading(false)}
+                setMapLoading(false)
             }
+        }
 
     }
 
@@ -174,7 +176,7 @@ const MapView = ({ classes, record }) => {
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
-                        url={OSMTILEURL}
+                        url={LINKS.OSMTILEURL}
                         //url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
                     />
 
