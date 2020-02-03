@@ -126,6 +126,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
       <TextField
         label={'en.models.projects.keywords'}
         source={MODEL_FIELDS.KEYWORDS}
+        multiline
       />
     </Datagrid>
   </List>
@@ -206,6 +207,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <TextField
               label={'en.models.projects.keywords'}
               source={MODEL_FIELDS.KEYWORDS}
+              multiline
             />
             <ReferenceField
               label={'en.models.projects.primary_contact_user'}
@@ -379,6 +381,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           <TextInput
             className="input-small"
             label={"en.models.projects.keywords"}
+            multiline
             source={MODEL_FIELDS.KEYWORDS} />
         </div>
           
@@ -516,6 +519,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       <TextInput
         className="input-medium"
         label={"en.models.projects.keywords"}
+        multiline
         source={MODEL_FIELDS.KEYWORDS}
       />
 

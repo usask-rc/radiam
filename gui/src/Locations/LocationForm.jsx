@@ -211,6 +211,7 @@ class LocationForm extends Component {
                 <TextInput
                   label={'en.models.locations.globus_path'}
                   source="globus_path"
+                  multiline
                 />
               </Grid>
             </>
@@ -223,10 +224,11 @@ class LocationForm extends Component {
               <TextInput
                 label={'en.models.locations.portal_url'}
                 source="portal_url"
+                multiline
               />
             </Grid>
             <Grid item xs={12}>
-              <TextInput label={'en.models.locations.notes'} source={MODEL_FIELDS.NOTES} />
+              <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES} />
             </Grid>
 
             <Grid item xs={12} key={mapFormKey}>
