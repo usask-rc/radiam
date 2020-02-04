@@ -433,6 +433,9 @@ class MetadataComponent extends Component {
         case MODEL_FK_FIELDS.DATASET:
           this.getDatasetParentEntitySchemaFields(id);
           break;
+        case MODEL_FK_FIELDS.FILE:
+          this.getFileParentEntitySchemaFields(id);
+          break;
         default:
           console.log("Unhandled parents for type " + type);
       }
@@ -516,6 +519,36 @@ class MetadataComponent extends Component {
     }
     fetchData();
   };
+
+  getFileParentEntitySchemaFields = (id) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const { projectID } = this.props;
+    if (!projectID)
+    {
+      return;
+    }
+    let params = {
+      id: projectID,
+    };
+    const fetchData = async () => {
+      await dataProvider(
+        GET_ONE,
+        MODELS.PROJECTS,
+        params
+      ).then(response => {
+        if (response && response.data && response.data.project) {
+          this.getEntitySchemasFields(response.data, MODEL_FK_FIELDS.PROJECT, true);
+        } else {
+          // There are no more parents to check.
+          console.error("Every file should have a project, how did we not find one with " + projectID);
+        }
+      }).catch(error => {
+        console.error(error);
+        this.setState({ error: error});
+      });
+    }
+    fetchData();
+  }
 
   createEntity = (fromParent) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
