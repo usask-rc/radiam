@@ -10,8 +10,14 @@ import Typography from "@material-ui/core/Typography"
 import { ReferenceField, translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { isObject } from 'util';
+import { EditMetadata, ConfigMetadata, ShowMetadata } from "../Metadata.jsx";
 
 const styles = theme => ({
+  additionalMetadata: {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    paddingTop: '40px',
+  },
   card: {
     textAlign: 'left',
     display: 'flex',
@@ -29,8 +35,9 @@ const styles = theme => ({
   },
 });
 
-const FileDetails = ({ classes, item, getJsonKeys, projectID }) => {
+const FileDetails = ({ classes, item, getJsonKeys, projectID, translate }) => {
   return (
+  <>
     <Grid className={classes.card} container spacing={2} direction="row">
       {getJsonKeys(item).map(key => {
       return(
@@ -91,6 +98,15 @@ const FileDetails = ({ classes, item, getJsonKeys, projectID }) => {
         </React.Fragment>
       )})}
     </Grid>
+    <div className={classes.additionalMetadata}>
+        <ShowMetadata
+            type={MODEL_FK_FIELDS.FILE}
+            translate={translate}
+            id={item.entity}
+            projectID={projectID}
+        />
+    </div>
+  </>
   );
 };
 
