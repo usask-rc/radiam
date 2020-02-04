@@ -68,7 +68,7 @@ class RecentFilesSummary extends React.Component {
               <Collapse in={true}>
                 <CardContent>
                   {files && files.length > 0 ? (
-                    <FileList data={files} />
+                    <FileList data={files} projectID={id} />
                   ) : (
                       <Typography>No available project files.</Typography>
                     )}

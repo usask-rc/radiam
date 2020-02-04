@@ -474,7 +474,7 @@ function getJsonKeys(json) {
       {file.name}
       </DialogTitle>
       <DialogContent className={classes.fileDialogContent}>
-        <FileDetails item={file} getJsonKeys={getJsonKeys} />
+        <FileDetails item={file} getJsonKeys={getJsonKeys} projectID={projectID} />
       </DialogContent>
     </Dialog>}
 

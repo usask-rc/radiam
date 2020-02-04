@@ -29,7 +29,7 @@ const styles = theme => ({
   },
 });
 
-const FileDetails = ({ classes, item, getJsonKeys }) => {
+const FileDetails = ({ classes, item, getJsonKeys, projectID }) => {
   return (
     <Grid className={classes.card} container spacing={2} direction="row">
       {getJsonKeys(item).map(key => {
@@ -83,6 +83,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
             item={item[key]}
             getJsonKeys={getJsonKeys}
             classes={classes}
+            projectID={projectID}
           />
         </> :
         null

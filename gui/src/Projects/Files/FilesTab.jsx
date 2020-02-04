@@ -143,7 +143,7 @@ function FilesTab({ projectID, classes, translate, ...props }) {
         </div>
       ) : data && data.files && data.files.length > 0 ? (
         <>
-          <FileList data={data.files} />
+          <FileList data={data.files} projectID={projectID} />
           <Pagination
             page={page}
             perPage={perPage}
