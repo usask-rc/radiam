@@ -287,6 +287,11 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
+//given json, format into something elasticsearch wants
+export function makeElasticQuery(query){
+
+}
+
 //gets the root folder paths for a given project
 export function getRootPaths(projectID, dataType="projects") {
   const params = {

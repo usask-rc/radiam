@@ -33,7 +33,7 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import { GET_ONE } from 'ra-core';
+import { GET_ONE, FormDataConsumer } from 'ra-core';
 import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
@@ -41,6 +41,7 @@ import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
 import FilesTab from '../Projects/Files/FilesTab.jsx';
+import { Field } from 'react-final-form';
 
 const styles = {
   actions: {
@@ -62,6 +63,8 @@ const styles = {
   },
   hint: {
   fontSize: '2em',
+  },
+  searchModel: {
   }
 };
 
@@ -207,16 +210,41 @@ const validateProject = required('A project is required for a dataset');
 const validateTitle = required('en.validate.dataset.title');
 
 
+/*
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
+
+*/
+
+const validateSearchModel = (value) => {
+  console.log("validateSearchModel value: ", value)
+  if (!value){
+    return `Enter a search model in valid JSON`
+  }
+
+  //TODO: there is a bug here that if there is valid json already loaded into the form, you will have to modify it to get it to work again.
+  try {
+    let result = JSON.parse(value)
+
+    //check here for invalid elasticsearch values
+  }
+  catch(e){
+    console.log("json parse error e: ", e)
+    return `Entry is not valid JSON`
+  }
+
+}
+
 const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
+
+  console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
-  const [searchModel, setSearchModel] = useState({search: {}})
-
+  const [searchModel, setSearchModel] = useState(props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
 
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
@@ -224,15 +252,40 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       setIsDirty(true)
     }
   } 
+  function handleChange(e){
+    if (e.target && e.target.name === "search_model"){
+      console.log("handlechange setsearchmodel to value: ", e.target.value)
+      setSearchModel(e.target.value)
+    }
+  }
 
   function handleSubmit(data) {
     //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
 
+    console.log("datasetform handleSubmit sent data: ", data)
     setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
+    newData.search_model = {}
+
+    if (props.record && props.record.search_model){
+      newData.search_model.search = props.record.search_model.search
+      try{
+        let parseJSON = JSON.parse(searchModel)
+        newData.search_model.search = JSON.stringify(parseJSON)
+      }
+      catch(e){
+        console.log("error in parsing json:" , e)
+            }
+    }
+    else{
+      //if new creation
+    }
+
+    //TODO: refactor this shit
+    
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
@@ -256,6 +309,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     else if (props.setEditModal){
       props.setEditModal(false)
     }
+
   };
 
   console.log("props record after editmodal transofmration: ", props.record)
@@ -295,10 +349,15 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
 
-    <TextInput
-      className="input-small"
-      label={"Project Search Query"}
-      source={"search_model[search]"}
+      <TextInput
+      className={classes.searchModel}
+      id={"search_model"}
+      name={"search_model"}
+      label={"Search Model"}
+      multiline
+      validate={validateSearchModel}
+      value={searchModel}
+      onChange={(e) => handleChange(e)}
     />
 
     <ReferenceInput
