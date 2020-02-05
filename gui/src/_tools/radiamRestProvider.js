@@ -116,6 +116,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         if (params)
         {
+          let query = {};
+          if (params.hasOwnProperty("query")) {
+            query = params["query"];
+          }
           if (
             params.filter &&
             params.sort && //new - adding this might have broken things.
@@ -131,7 +135,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               order = ""
             }
 
-            let query = {
+            query.push = {
               ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
               ordering: `${order}${field}`,
 
@@ -146,7 +150,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
             let { page, perPage } = params.pagination;
-            
+
+            let query = {};
+            if (params.hasOwnProperty("query")) {
+              query = params["query"];
+            }
             if (!perPage){
               perPage = 10
             }
@@ -163,7 +171,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               ordering = `&ordering=${order}${field}`
             }
             
-            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
+            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}&${stringify(query)}`;
 
             /*
             if (page && sort) {
