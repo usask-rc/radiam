@@ -228,11 +228,25 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     let dcmList = []
     let slList = []
     let newData = {...data}
+    newData.search_model = {search: searchModel}
+    try{
+      let parseJSON = JSON.parse(searchModel)
+      newData.search_model.search = JSON.stringify(parseJSON)
+    }
+    catch(e){
+      console.log(`error parsing data to json: ${searchModel}` , e)
+    }
+
+    //TODO: refactor this shit
+    
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
+
+    //TODO: there must be a better way to submit than this, even despite the isDirty flag.
     setData(newData) //will prompt the call in useEffect.
+
     
     console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
