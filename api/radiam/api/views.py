@@ -600,8 +600,11 @@ class UserAgentViewSet(RadiamViewSet):
     def osf_configs(self, request):
 
         # Restricted to internal Docker network requests
-        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("10")):
-            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+        request_addr = request.META["REMOTE_ADDR"]
+        if not (request_addr.startswith("172") or request_addr.startswith("192.168") or request_addr.startswith("10")):
+            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("REMOTE_ADDR")}       
+        #if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("10")):
+        #    data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         resp = self.osf_agent_token_query()
@@ -1218,22 +1221,26 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
 
     def list(self, request, useragent_id, action):
         # Restricted to internal Docker network requests
-        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
-            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+        request_addr = request.META.get("REMOTE_ADDR")
+        if not (request_addr.startswith("172") or request_addr.startswith("192.168") or request_addr.startswith("10")):
+            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("REMOTE_ADDR")}       
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         useragent = UserAgent.objects.get(id=useragent_id)
 
         if (action and action == "new") or (useragent.local_refresh_token is None):
+            print("Generating new tokens for OSF agent")
             useragent.generate_tokens()
             useragent.save()
+        else:
+            print("Sending existing tokens to OSF agent")
 
         data = {
             "id": useragent_id,
             "user_id": useragent.user_id,
             "access_token": useragent.local_access_token,
             "refresh_token": useragent.local_refresh_token,
-            "host": request.META.get('HTTP_X_FORWARDED_FOR')
+            "host": request.META.get('REMOTE_ADDR')
         }
 
         return Response(data)

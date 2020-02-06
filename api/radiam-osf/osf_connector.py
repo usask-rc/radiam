@@ -80,7 +80,7 @@ def get_osf_endpoints():
     """
     Get the OSF endpoint data from the API
     """
-    return requests.get("http://nginx/api/useragents/osf_configs")
+    return requests.get("http://radiamapi:8000/api/useragents/osf_configs/")
 
 def main():
     if sys.version_info[0] < 3:
