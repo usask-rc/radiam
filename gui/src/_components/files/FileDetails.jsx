@@ -1,5 +1,6 @@
 //FileDetails.jsx
 import React, {Component} from 'react';
+import { Edit, EditController, TopToolbar } from 'react-admin';
 import { AgentShow } from '../_fields/AgentShow';
 import compose from 'recompose/compose';
 import {MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from '../../_constants/index';
@@ -10,7 +11,7 @@ import Typography from "@material-ui/core/Typography"
 import { ReferenceField, translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { isObject } from 'util';
-import { EditMetadata, ConfigMetadata, ShowMetadata } from "../Metadata.jsx";
+import { ConfigMetadata, ConfigMetadataToolbar, EditMetadata, EditConfigMetadataForm, MetadataEditActions, ShowMetadata } from "../Metadata.jsx";
 import Button from '@material-ui/core/Button';
 import ContentCreate from '@material-ui/icons/Create';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -116,29 +117,47 @@ class FileDetails extends Component {
         )})}
       </Grid>
       <div className={classes.additionalMetadata}>
-          <Button
-            className={classes.button}
-            onClick={() => {
-              this.setState(prevState => (
-                { show: !prevState.show,
-                  edit: !prevState.edit}));}
-            }
-          >
-            {translate('en.metadata.edit.title')}<ContentCreate/>
-          </Button>
-              { this.state.show ?
-                <ShowMetadata
-                  type={MODEL_FK_FIELDS.FILE}
-                  translate={translate}
-                  id={item.entity}
-                  projectID={projectID}
-                />
-                : null
-              }
-              { this.state.edit ?
-                  <Typography>Editing</Typography>
-                : null
-              }
+        { this.state.show ?
+            <>
+              <TopToolbar>
+                <Button
+                  className={classes.button}
+                  onClick={() => {
+                    this.setState(prevState => (
+                      { show: !prevState.show,
+                        edit: !prevState.edit}));}
+                  }
+                >
+                  {translate('en.metadata.edit.title')}<ContentCreate/>
+                </Button>
+              </TopToolbar>
+              <ShowMetadata
+                type={MODEL_FK_FIELDS.FILE}
+                translate={translate}
+                id={item.entity}
+                projectID={projectID}
+              />
+            </>
+            : null
+          }
+          { this.state.edit ?
+            <>
+              <MetadataEditActions cancel={
+                <Button
+                  className={classes.button}
+                  onClick={() => {
+                    this.setState(prevState => (
+                      { show: !prevState.show,
+                        edit: !prevState.edit}));}
+                  }
+                >
+                  {translate('ra.action.cancel')}
+                </Button>
+              } />
+              <EditConfigMetadataForm id={item.entity} translate={translate} />
+            </>
+            : null
+          }
       </div>
     </>
   );

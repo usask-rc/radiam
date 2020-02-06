@@ -4,6 +4,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import React, { Component } from "react";
+import arrayMutators from 'final-form-arrays';
+import { Form } from 'react-final-form';
 import RelatedUsers from "../Groups/RelatedUsers";
 import {
   ArrayInput,
@@ -1513,8 +1515,14 @@ class BaseMetadataEditActions extends Component {
   };
   
   render() {
-    const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
+    const { basePath, bulkActions, cancel, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
     const { groupMembers } = this.state
+    let cancelButton = null;
+    if (cancel) {
+      cancelButton = cancel;
+    } else if (data && !cancel) {
+      cancelButton = <ShowButton basePath={basePath} label="Cancel" icon={<Cancel/>} record={data} />
+    }
     return <TopToolbar>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1533,8 +1541,7 @@ class BaseMetadataEditActions extends Component {
         { showRelatedUsers && groupMembers &&
           <RelatedUsers groupMembers={groupMembers} />
         }
-        { data && <ShowButton basePath={basePath} label="Cancel" icon={<Cancel />} record={data} /> }
-        <RefreshButton />
+        { cancelButton }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </TopToolbar>
   }
@@ -1941,6 +1948,43 @@ BaseShowMetadata.propTypes = {
   resource: PropTypes.string,
 };
 
+class BaseEditConfigMetadataForm extends MetadataComponent {
+  constructor (props) {
+    super(props);
+  }
+
+  onSubmit = async values => {
+      console.log("onSubmit");
+      console.log(values);
+  };
+
+  render() {
+    const { id, translate } = this.props;
+    return (
+      <Form
+        onSubmit={this.onSubmit}
+        mutators={arrayMutators}
+        render={({ handleSubmit, form, submitting, pristine, values }) => (
+        <form>
+        <React.Fragment>
+          <EditMetadata
+            type={MODEL_FK_FIELDS.FILE}
+            translate={translate}
+            id={id}
+          />
+          <ConfigMetadata
+            type={MODEL_FK_FIELDS.FILE}
+            translate={translate}
+            id={id}
+          />
+        </React.Fragment>
+        </form>
+        )}/>
+    );
+  };
+};
+
+export const EditConfigMetadataForm = enhanceEdit(BaseEditConfigMetadataForm);
 export const ConfigMetadata = enhanceConfig(BaseConfigMetadata);
 export const EditMetadata = enhanceEdit(BaseEditMetadata);
 export const MetadataEditActions = enhanceEdit(BaseMetadataEditActions);
