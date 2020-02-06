@@ -18,7 +18,7 @@ const styles = theme => ({
   },
 });
 
-function BrowseTab({ projectID, classes, translate, dataType="projects" }) {
+function BrowseTab({ projectID, classes, translate, dataType="projects", projectName }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
@@ -85,6 +85,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects" }) {
           return <FolderView
             expanded={"true"}
             item={item}
+            projectName={projectName}
             projectID={projectID}
             key={item.key}
             dataType={dataType}

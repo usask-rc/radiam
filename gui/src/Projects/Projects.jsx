@@ -171,10 +171,11 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEdi
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-
+    console.log("ProjectShow props: ", props)
     //select all datasets where project = project id
 
     const [projectDatasets, setProjectDatasets] = useState([])
+    const [projectName, setProjectName] = useState("")
     const [createModal, setCreateModal] = useState(false)
     const [viewModal, setViewModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
@@ -270,8 +271,8 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <FilesTab projectID={props.id} />
           </Tab>
           <Tab label={'browse'} path={'browse'}>
-            <ProjectName label={'en.models.projects.name'} />
-            <BrowseTab projectID={props.id} />
+            <ProjectName label={'en.models.projects.name'} setProjectName={setProjectName} />
+            <BrowseTab projectID={props.id} projectName={projectName} />
           </Tab>
         </TabbedShowLayout>
       </Show>

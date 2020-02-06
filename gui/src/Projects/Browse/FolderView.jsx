@@ -178,8 +178,8 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects" }) {
-
+function FolderView({ projectID, item, classes, dataType="projects", projectName, ...props }) {
+  console.log("FolderView projectName: ", projectName, "props: ", props)
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);
@@ -434,7 +434,7 @@ function getJsonKeys(json) {
               {folder.indexed_date}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
-              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, project: projectID, search_model: {term: {path_parent: folder.path_parent}}}}>
+              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path_parent}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path_parent}*`}}}}>
                 <Chip icon={<InsertChart />} clickable variant="outlined" key={`newDataset_${folder.id}`}/>
               </Link>
             </TableCell>

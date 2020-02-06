@@ -199,7 +199,9 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         <FilesTab projectID={props.id} dataType="datasets" />
       </Tab>
       <Tab label={'Browse'}>
-        <BrowseTab projectID={props.id} dataType="datasets" />
+        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`}
+        //TODO: get the project name from the referenced project and insert it here into projectName
+         />
       </Tab>
     </TabbedShowLayout>
   </Show>
@@ -319,6 +321,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"
+      defaultValue={props.location && props.location.title || ""}
       source={MODEL_FIELDS.TITLE}
       validate={validateTitle}
       
