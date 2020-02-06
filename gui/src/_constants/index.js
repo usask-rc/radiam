@@ -10,9 +10,6 @@ module.exports = Object.freeze({
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
   ROLE_USER: "user", //TODO: this is wrong - it should sit under something called `roles`, not sit here in global
   WEBTOKEN: "token",
-  SUPPORTEMAIL: "developers@frdr.ca",
-  USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
-  USERMANUALFILENAME: "Radiam_user_manual.pdf",
   FIELDS: {
     PASSWORD: "password",
     SUBMIT: "submit"
