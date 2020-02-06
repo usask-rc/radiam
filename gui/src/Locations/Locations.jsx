@@ -119,6 +119,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         className={classes.showBreaks}
         label={'en.models.locations.notes'}
         source={'notes'}
+        multiline
       />
     </Datagrid>
   </List>
@@ -157,7 +158,7 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
   record && record.notes
     ? (
       <Labeled label={'en.models.locations.notes'}>
-        <TextField className={classes.showBreaks} record={record} source={'notes'} {...rest} />
+        <TextField className={classes.showBreaks} multiline record={record} source={'notes'} {...rest} />
       </Labeled>
     )
     : null

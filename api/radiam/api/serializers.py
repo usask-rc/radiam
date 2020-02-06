@@ -43,6 +43,7 @@ from .models import (
     ProjectStatistics,
     ResearchGroup,
     Schema,
+    SearchModel,
     SelectedField,
     SelectedSchema,
     SensitivityLevel,
@@ -51,6 +52,8 @@ from .models import (
     UserAgentProjectConfig)
 
 from .signals import radiam_user_created, radiam_user_updated, radiam_project_created
+
+import json
 
 class MetadataSerializer():
     def to_representation(self, instance, ret):
@@ -180,6 +183,18 @@ class ContentObjectNameForeignKey(serializers.RelatedField):
         except ContentType.DoesNotExist:
             raise serializers.ValidationError(msg, format(data))
 
+class SearchModelSerializer(serializers.ModelSerializer):
+    dataset = DatasetPKRelatedField(required=False)
+    search = serializers.JSONField(required=False)
+
+    class Meta:
+        model = SearchModel
+        fields = ('id',
+                  'dataset',
+                  'search')
+
+    def validate(self, data):
+        return data
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
@@ -1121,6 +1136,7 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
     date_updated = serializers.DateTimeField(read_only=True)
 
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
+    search_model = SearchModelSerializer(many=False, source="get_search_model")
 
     MetadataDoc = DatasetMetadataDoc
 
@@ -1137,12 +1153,14 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
                   'sensitivity_level',
                   'date_created',
                   'date_updated',
-                  'geo')
+                  'geo',
+                  'search_model')
 
     def create(self, validated_data):
         """
         Create a Dataset instance.
         """
+
         data_collection_methods_list = validated_data.pop("get_data_collection_methods")
         sensitivity_list = validated_data.pop("get_sensitivity_levels")
         try:
@@ -1150,11 +1168,16 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
         except KeyError:
             pass
 
+        search_model = validated_data.pop("get_search_model")
+            
         dataset = Dataset.objects.create(**validated_data)
         dataset.date_created = now()
 
         self._save_dataset_datacollectionmethods(data_collection_methods_list, dataset)
         self._save_dataset_sensitivitylevels(sensitivity_list, dataset)
+
+        self._save_search_model(search_model, dataset)
+
         try:
             self._save_geodata(geodata, dataset)
         except NameError:
@@ -1187,6 +1210,13 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
             geodata = validated_data.pop("get_geo_data")
             if (geodata is not None):
                 self._save_geodata(geodata, instance)
+        except KeyError:
+            pass
+
+        try:
+            search_model = validated_data.pop("get_search_model")
+            if (search_model is not None):
+                self._save_search_model(search_model, instance)
         except KeyError:
             pass
 
@@ -1262,6 +1292,17 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
         except GeoData.DoesNotExist:
             geodata = GeoData.objects.create(geojson=geojson_geometry, object_id=instance.id, content_type=ctype)
             geodata.save()
+
+    def _save_search_model(self, search_model, instance):
+
+        try:
+            sm_obj = SearchModel.objects.get(dataset_id=instance.id)
+            sm_obj.search = search_model['search']
+            sm_obj.search = json.loads(sm_obj.search)
+            sm_obj.save()
+        except SearchModel.DoesNotExist:
+            sm_obj = SearchModel.objects.create(search=search_model['search'], dataset_id=instance.id)
+            sm_obj.save()
 
 
 class ProjectStatisticsSerializer(serializers.ModelSerializer):

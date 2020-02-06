@@ -460,3 +460,40 @@ class MetadataSchemaPermissionMixin(object):
             return True
         else:
             return False
+
+class SearchModelPermissionMixin(object):
+    """
+    Permission mixin object to be used with the SearchModel model
+    """
+
+    @staticmethod
+    def has_read_permission(request):
+        """
+        Global 'Model' permission. All users can read the searchmodel lists
+        """
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        Global 'Model' permission. Superuser and Admin user can create new searches.
+        """
+        if request.user.is_superuser or request.user.is_admin():
+            return True
+        else:
+            return False
+
+    def has_object_read_permission(self, request):
+        """
+        Object 'Instance' permission. All user can read instances
+        """
+        return True
+
+    def has_object_write_permission(self, request):
+        """
+        Object 'Instance' permission:
+        """
+        if request.user.is_superuser or request.user.is_admin():
+            return True
+        else:
+            return False

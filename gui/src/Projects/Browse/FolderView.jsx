@@ -5,6 +5,7 @@ import ArrowBack from "@material-ui/icons/ArrowBack"
 import Description from "@material-ui/icons/Description"
 import Folder from "@material-ui/icons/Folder"
 import Search from "@material-ui/icons/Search"
+import InsertChart from "@material-ui/icons/InsertChart"
 import { compose } from 'recompose';
 import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
 import Typography from "@material-ui/core/Typography"
@@ -25,11 +26,18 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
+import { Chip } from '@material-ui/core';
+import { Link } from  "react-router-dom";
+
 
 const styles = theme => ({
   backCell: {
     verticalAlign: "middle",
     display: "flex",
+  },
+  createDatasetCell: {
+    margin: "0px",
+    padding: "0px"
   },
   displayFileIcons: {
     display: "flex",
@@ -85,7 +93,8 @@ const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
-  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Index"}
+  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed At"},
+  {id : "create_dataset", numeric: false, disablePadding: true, canOrder: false, label: ""} //a column for an icon to create a dataset out of this folder on click
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
@@ -169,8 +178,8 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes }) {
-
+function FolderView({ projectID, item, classes, dataType="projects", projectName, ...props }) {
+  console.log("FolderView projectName: ", projectName, "props: ", props)
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
   const [files, setFiles] = useState([]);
@@ -268,7 +277,7 @@ function getJsonKeys(json) {
         q: search
       }
 
-      getFolderFiles(fileParams, "file").then((data) => {
+      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
         console.log("search files data: ", data)
         if (_isMounted){
           setFiles(data.files)
@@ -277,7 +286,7 @@ function getJsonKeys(json) {
       }).catch((err => {console.error("error in getFiles is: ", err)}))
 
       
-      getFolderFiles(fileParams, "directory").then((data) => {
+      getFolderFiles(fileParams, "directory", dataType=dataType).then((data) => {
         console.log("search files data: ", data)
         if (_isMounted){
           setFolders(data.files)
@@ -321,7 +330,7 @@ function getJsonKeys(json) {
 
     if (!search){ //TODO: there is a better way to separate this out
 
-      getFolderFiles(folderParams, "directory").then((data) => {
+      getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
         console.log("folder files data: ", data.files)
         if (_isMounted){
           //TODO:will have to change when pagination comes
@@ -345,7 +354,7 @@ function getJsonKeys(json) {
       })
       .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
-      getFolderFiles(fileParams, "file").then((data) => {
+      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
         console.log("files data: ", data)
         if (_isMounted){
           setFileTotal(data.total)
@@ -366,7 +375,6 @@ function getJsonKeys(json) {
         }
       }
       ).catch((err => {console.error("error in getFiles is: ", err)}))
-
     }
 
     //if we unmount, lock out the component from being able to use the state
@@ -374,7 +382,6 @@ function getJsonKeys(json) {
       _isMounted = false;
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
-
 
   console.log("FolderView with PID: ", projectID)
   return(
@@ -413,8 +420,8 @@ function getJsonKeys(json) {
       {!loading && folders && folders.length > 0 && 
       <>
         {folders.map( folder => {
-          return <TableRow className={classes.folderRow} key={folder.id} onClick={() => addParent(folder.path)}>
-            <TableCell className={classes.nameCell}>
+          return <TableRow className={classes.folderRow} key={folder.id}>
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
               {folder.name}
             </TableCell>
             <TableCell className={classes.fileCountCell}>
@@ -426,8 +433,13 @@ function getJsonKeys(json) {
             <TableCell className={classes.nameCell}>
               {folder.indexed_date}
             </TableCell>
+            <TableCell className={classes.createDatasetCell}>
+              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path_parent}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path_parent}*`}}}}>
+                <Chip icon={<InsertChart />} clickable variant="outlined" key={`newDataset_${folder.id}`}/>
+              </Link>
+            </TableCell>
           </TableRow>
-        })
+        })//<Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable onClick={() => setCreateModal(true)}/>
         }
       </>
       }

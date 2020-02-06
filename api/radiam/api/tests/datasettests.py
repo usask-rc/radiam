@@ -62,6 +62,13 @@ class TestDatasetAPI(BaseSearchTestCase):
             'data_collection_status': str(data_collection_status.id),
             'sensitivity_level': [],
             'data_collection_method': [],
+            'search_model': {
+                'search': {
+                    'term':{
+                        'extension':'txt'
+                    }
+                }
+            }
         }
 
         request = self.factory.post(

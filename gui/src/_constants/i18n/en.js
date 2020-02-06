@@ -15,6 +15,7 @@ export default {
       },
       fields: "Choose Metadata Fields",
       loading: "Loading additional metadata.",
+      loadingError: "Error loading data",
       no: "No Additional Metadata",
       off: "Off",
       on: "On",

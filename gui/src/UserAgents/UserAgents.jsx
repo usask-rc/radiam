@@ -302,40 +302,40 @@ export const UserAgentEdit = props => {
           <UserShow />
         </ReferenceField>
         <FormDataConsumer>
-        {formDataProps  => 
-        {
-          const record = formDataProps.record
-          console.log("in fdc, formData is: ", record)
-          //if record has an api token and username, it is an OSF agent and we want to allow modification of this
-          if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
-            record.project_config_list.map(project => {
-              //delete config for this prior to display, it's not relevant
-              const newProj = project
-              delete newProj.config
-              return newProj
-            })
-            return(
-              <>
-                <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
-                  <SimpleFormIterator disableRemove disableAdd>
-                    <ReferenceInput
-                    label={"en.models.agents.projects"}
-                    source={MODEL_FK_FIELDS.PROJECT}
-                    reference={MODELS.PROJECTS}>
-                      <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
-                    </ReferenceInput>
-                    {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
-                  </SimpleFormIterator>
-                </ArrayInput>
-              </>)
+          {formDataProps => 
+            {
+              const record = formDataProps.record
+              console.log("in fdc, formData is: ", record)
+              //if record has an api token and username, it is an OSF agent and we want to allow modification of this
+              if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
+                record.project_config_list.map(project => {
+                  //delete config for this prior to display, it's not relevant
+                  const newProj = project
+                  delete newProj.config
+                  return newProj
+                })
+                return(
+                  <>
+                    <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
+                      <SimpleFormIterator disableRemove disableAdd>
+                        <ReferenceInput
+                        label={"en.models.agents.projects"}
+                        source={MODEL_FK_FIELDS.PROJECT}
+                        reference={MODELS.PROJECTS}>
+                          <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
+                        </ReferenceInput>
+                        {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+                      </SimpleFormIterator>
+                    </ArrayInput>
+                  </>)
+              }
+              else{
+                //need something returned here or RA will complain - but we want nothing returned for non-OSF agents here.
+                  return <></>
+                
+              }
+            }
           }
-          else{
-            //need something returned here or RA will complain - but we want nothing returned for non-OSF agents here.
-              return <></>
-            
-          }
-        }
-        }
         </FormDataConsumer>
         
         <Grid container direction="row">

@@ -318,6 +318,7 @@ const GroupForm = props =>
         label={"en.models.groups.description"}
         source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
+        multiline
       />
       <ReferenceInput
         label={"en.models.groups.parent_group"}
@@ -374,6 +375,7 @@ class BaseGroupEdit extends Component {
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}
           style={{"max-width": "80%"}}
+          multiline
         />
         <BooleanInput
           label={"en.models.generic.active"}

@@ -126,6 +126,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
       <TextField
         label={'en.models.projects.keywords'}
         source={MODEL_FIELDS.KEYWORDS}
+        multiline
       />
     </Datagrid>
   </List>
@@ -170,10 +171,11 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEdi
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-
+    console.log("ProjectShow props: ", props)
     //select all datasets where project = project id
 
     const [projectDatasets, setProjectDatasets] = useState([])
+    const [projectName, setProjectName] = useState("")
     const [createModal, setCreateModal] = useState(false)
     const [viewModal, setViewModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
@@ -206,6 +208,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <TextField
               label={'en.models.projects.keywords'}
               source={MODEL_FIELDS.KEYWORDS}
+              multiline
             />
             <ReferenceField
               label={'en.models.projects.primary_contact_user'}
@@ -268,8 +271,8 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <FilesTab projectID={props.id} />
           </Tab>
           <Tab label={'browse'} path={'browse'}>
-            <ProjectName label={'en.models.projects.name'} />
-            <BrowseTab projectID={props.id} />
+            <ProjectName label={'en.models.projects.name'} setProjectName={setProjectName} />
+            <BrowseTab projectID={props.id} projectName={projectName} />
           </Tab>
         </TabbedShowLayout>
       </Show>
@@ -379,6 +382,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           <TextInput
             className="input-small"
             label={"en.models.projects.keywords"}
+            multiline
             source={MODEL_FIELDS.KEYWORDS} />
         </div>
           
@@ -516,6 +520,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       <TextInput
         className="input-medium"
         label={"en.models.projects.keywords"}
+        multiline
         source={MODEL_FIELDS.KEYWORDS}
       />
 

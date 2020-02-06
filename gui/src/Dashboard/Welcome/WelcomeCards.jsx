@@ -58,7 +58,7 @@ const WelcomeCards = ({loading, hasFiles}) => {
         
         if (user){
             let userRole = getMaxUserRole()
-            if (userRole === "user"){
+            if (userRole === ROLE_USER){
                 //do not query for groups
             }
             else{
