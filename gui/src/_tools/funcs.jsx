@@ -69,7 +69,7 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
         return "data_manager"
       }
     }
-    return "user"
+    return ROLE_USER
   }
   //no cookie or group
   else if (!user && !group){
@@ -152,7 +152,7 @@ export function getMaxUserRole(){
     else if (user.is_data_manager){
       return "data_manager" 
     }
-    return "user"
+    return ROLE_USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
@@ -285,6 +285,11 @@ export function getRelatedDatasets(projectID) {
       })
       .catch(err => reject(err));
   });
+}
+
+//given json, format into something elasticsearch wants
+export function makeElasticQuery(query){
+
 }
 
 //gets the root folder paths for a given project
