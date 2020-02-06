@@ -244,7 +244,8 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
-  const [searchModel, setSearchModel] = useState(props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
+  //TODO: refactor this
+  const [searchModel, setSearchModel] = useState(props.location && props.location.search_model ? JSON.stringify(props.location.search_model) : props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
 
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
@@ -339,7 +340,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       source={MODEL_FK_FIELDS.PROJECT}
       reference={MODELS.PROJECTS}
       validate={validateProject}
-      defaultValue={props.project ? props.project : null}
+      defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
       disabled={props.project ? true : false}
     >
       <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>

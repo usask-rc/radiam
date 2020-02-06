@@ -27,6 +27,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip } from '@material-ui/core';
+import { Link } from  "react-router-dom";
 
 
 const styles = theme => ({
@@ -382,14 +383,6 @@ function getJsonKeys(json) {
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
 
-  function createDataset(data){
-    console.log("createDataset called with data: ", data)
-    //create a dataset rooted at this folder
-    //params = { path_parent: folder.path}
-
-    
-  }
-
   console.log("FolderView with PID: ", projectID)
   return(
   <div>
@@ -441,7 +434,9 @@ function getJsonKeys(json) {
               {folder.indexed_date}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
-              <Chip icon={<InsertChart />} clickable variant="outlined" key={`newDataset_${folder.id}`} onClick={() => createDataset(folder)}/>
+              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, project: projectID, search_model: {term: {path_parent: folder.path_parent}}}}>
+                <Chip icon={<InsertChart />} clickable variant="outlined" key={`newDataset_${folder.id}`}/>
+              </Link>
             </TableCell>
           </TableRow>
         })//<Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable onClick={() => setCreateModal(true)}/>
