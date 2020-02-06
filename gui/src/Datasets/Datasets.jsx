@@ -268,20 +268,13 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     let dcmList = []
     let slList = []
     let newData = {...data}
-    newData.search_model = {}
-
-    if (props.record && props.record.search_model){
-      newData.search_model.search = props.record.search_model.search
-      try{
-        let parseJSON = JSON.parse(searchModel)
-        newData.search_model.search = JSON.stringify(parseJSON)
-      }
-      catch(e){
-        console.log("error in parsing json:" , e)
-            }
+    newData.search_model = {search: searchModel}
+    try{
+      let parseJSON = JSON.parse(searchModel)
+      newData.search_model.search = JSON.stringify(parseJSON)
     }
-    else{
-      //if new creation
+    catch(e){
+      console.log("error in parsing json:" , e)
     }
 
     //TODO: refactor this shit
