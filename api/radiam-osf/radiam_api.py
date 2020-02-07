@@ -8,6 +8,7 @@ import logging
 class RadiamAPI(object):
     def __init__(self, **kwargs):
         self.logger = None
+        self.osf = False
         self.baseurl = "http://radiamapi:8000"  # Docker API container
         self.headers = {
             "Content-Type": "application/json",
@@ -26,6 +27,7 @@ class RadiamAPI(object):
                 "locationtypes": self.baseurl + "/api/locationtypes/",
                 "useragents": self.baseurl + "/api/useragents/"
             }
+        self.refresh_token()
 
     def setLogger(self, logger):
         self.logger = logger
@@ -73,7 +75,10 @@ class RadiamAPI(object):
             return None
         get_headers = self.headers
         get_headers["Authorization"] = "Bearer " + self.get_bearer_token()
-        resp = requests.get(url, headers=get_headers)
+        try:
+            resp = requests.get(url, headers=get_headers)
+        except:
+            resp = { "status_code": 0 }
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
             if response_json["code"] == "token_not_valid":
@@ -98,7 +103,10 @@ class RadiamAPI(object):
             return None
         post_headers = self.headers
         post_headers["Authorization"] = "Bearer " + self.get_bearer_token()
-        resp = requests.post(url, headers=post_headers, data=body)
+        try:
+            resp = requests.post(url, headers=post_headers, data=body)
+        except:
+            resp = { "status_code": 0 }
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
             if response_json["code"] == "token_not_valid":
@@ -124,7 +132,10 @@ class RadiamAPI(object):
             return None, False
         post_headers = self.headers
         post_headers["Authorization"] = "Bearer " + self.get_bearer_token()
-        resp = requests.post(url, headers=post_headers, json=body)
+        try:
+            resp = requests.post(url, headers=post_headers, json=body)
+        except:
+            resp = { "status_code": 0 }
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
             if response_json["code"] == "token_not_valid":
@@ -145,7 +156,10 @@ class RadiamAPI(object):
             return None
         delete_headers = self.headers
         delete_headers["Authorization"] = "Bearer " + self.get_bearer_token()
-        resp = requests.delete(url, headers=delete_headers)
+        try:
+            resp = requests.delete(url, headers=delete_headers)
+        except:
+            resp = { "status_code": 0 }            
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
             if response_json["code"] == "token_not_valid":

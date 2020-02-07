@@ -59,7 +59,7 @@ def list_difference(list1,list2):
 
 def update_info(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id):
     global logger
-    logger.info("Crawling project %s" % project_name)
+    logger.info("Crawling OSF project %s" % project_name)
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
     config_project_endpoint = AgentAPI.get_project_endpoint(radiam_project_id)
@@ -89,11 +89,10 @@ def main():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
+    ConfigAPI = RadiamAPI()
 
     # Loop every hour checking OSF endpoints for updates
-
     while True:
-        ConfigAPI = RadiamAPI()
         osf_projects_list = ConfigAPI.get_osf_useragents()
 
         for osf_project in osf_projects_list:
