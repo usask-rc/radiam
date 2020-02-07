@@ -39,17 +39,19 @@ class RadiamAPI(object):
         if self.osf:
             resp = requests.get(self.endpoints.get("useragents") + self.useragent + '/tokens/new/')
             if resp.status_code != 200:
-                self.log("Unable to refresh auth token {}:\n{}\n".format(resp.status_code, resp.text))
+                self.log("Unable to refresh auth tokens {}:\n{}\n".format(resp.status_code, resp.text))
             else:
                 resp_obj = json.loads(resp.text)
-                if resp_obj.get("access", None) != None:
-                    self.log("New access token: {}".format(resp_obj["access"]))
-                    self.authtokens["access"] = resp_obj["access"]
+                if resp_obj.get("access_token", None) != None:
+                    self.log("New access token: {}".format(resp_obj["access_token"]))
+                    self.authtokens["access"] = resp_obj["access_token"]
                 else:
-                    self.log("Attempted to refresh auth token, but got: {}".format(resp.text))
-                if resp_obj.get("refresh", None) != None:
-                    self.log("New refresh token: {}".format(resp_obj["refresh"]))
-                    self.authtokens["refresh"] = resp_obj["refresh"]
+                    self.log("Unable to obtain access token {}:\n{}\n".format(resp.status_code, resp.text))
+                if resp_obj.get("refresh_token", None) != None:
+                    self.log("New refresh token: {}".format(resp_obj["refresh_token"]))
+                    self.authtokens["refresh"] = resp_obj["refresh_token"]
+                else:
+                    self.log("Unable to obtain refresh token {}:\n{}\n".format(resp.status_code, resp.text))
 
     def get_bearer_token(self):
         if self.authtokens.get("access", None) and self.authtokens.get("access") != "":
