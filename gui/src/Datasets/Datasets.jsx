@@ -219,18 +219,24 @@ const validateUsername = [required('en.validate.user.username'), minLength(3), m
 
 const validateSearchModel = (value) => {
   console.log("validateSearchModel value: ", value)
+  
   if (!value){
+    //we've been sent no value
     return `Enter a search model in valid JSON`
   }
 
-  //TODO: there is a bug here that if there is valid json already loaded into the form, you will have to modify it to get it to work again.
   try {
-    let result = JSON.parse(value)
-
-    //check here for invalid elasticsearch values
+    let result
+    if (value.search){
+      result = JSON.stringify(value.search)
+    }
+    else{
+      result = JSON.parse(value)
+    }
+    //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
-    console.log("json parse error e: ", e)
+    console.log("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
 
