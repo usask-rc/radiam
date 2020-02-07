@@ -125,7 +125,7 @@ export const GroupViewGrantShow = props => (
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}
       >
-<GroupShow />
+        <GroupShow />
       </ReferenceField>
       <ReferenceField
         link={false}
