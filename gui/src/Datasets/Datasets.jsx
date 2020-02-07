@@ -210,7 +210,10 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
 
 const validateProject = required('A project is required for a dataset');
 const validateTitle = required('en.validate.dataset.title');
-
+const validatedcm = required("A Data Collection Method is required")
+const validatedcs = required("A Data Collection Status is required")
+const validatedr = required("A Distribution Restriction must be specified")
+const validatesl = required("A Sensitivity Level must be specified")
 
 /*
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
@@ -219,18 +222,24 @@ const validateUsername = [required('en.validate.user.username'), minLength(3), m
 
 const validateSearchModel = (value) => {
   console.log("validateSearchModel value: ", value)
+  
   if (!value){
+    //we've been sent no value
     return `Enter a search model in valid JSON`
   }
 
-  //TODO: there is a bug here that if there is valid json already loaded into the form, you will have to modify it to get it to work again.
   try {
-    let result = JSON.parse(value)
-
-    //check here for invalid elasticsearch values
+    let result
+    if (value.search){
+      result = JSON.stringify(value.search)
+    }
+    else{
+      result = JSON.parse(value)
+    }
+    //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
-    console.log("json parse error e: ", e)
+    console.log("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
 
@@ -281,7 +290,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     }
 
     //TODO: refactor this shit
-    
+
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
@@ -345,6 +354,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       validate={validateProject}
       defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
       disabled={props.project ? true : false}
+      required
     >
       <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
@@ -357,6 +367,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       multiline
       validate={validateSearchModel}
       value={searchModel}
+      required
       onChange={(e) => handleChange(e)}
     />
 
@@ -366,6 +377,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_status"}
       source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
       reference={MODELS.DATA_COLLECTION_STATUS}
+      validate={validatedcs}
       required>
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
@@ -376,6 +388,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.distribution_restriction"}
       source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
       reference={MODELS.DISTRIBUTION_RESTRICTION}
+      validate={validatedr}
       required>
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
@@ -387,6 +400,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_method"}
       source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
       reference={MODELS.DATA_COLLECTION_METHOD}
+      validate={validatedcm}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
@@ -397,6 +411,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.sensitivity_level"}
       source={MODEL_FIELDS.SENSITIVITY_LEVEL}
       reference={MODELS.SENSITIVITY_LEVEL}
+      validate={validatesl}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>

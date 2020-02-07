@@ -135,8 +135,9 @@ const UserDetailsActions = ({permissions, basePath, data, resource, classes}) =>
   if (permissions && permissions.is_admin){
     return(<Toolbar className={classes.root}>
           <EditButton basePath={basePath} record={data} />
-          {permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
       </Toolbar>)
+    //there was a deletebutton here, i've restricted deleting users to the API only.
+    //{permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
   }
   else{
       return null
