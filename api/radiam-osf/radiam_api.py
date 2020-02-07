@@ -8,7 +8,7 @@ import logging
 class RadiamAPI(object):
     def __init__(self, **kwargs):
         self.logger = None
-        self.baseurl = "http://radiamapi:8000"
+        self.baseurl = "http://radiamapi:8000"  # Docker API container
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -20,6 +20,7 @@ class RadiamAPI(object):
             if not self.baseurl.startswith('http'):
                 self.baseurl = "http://" + self.baseurl
             self.endpoints = {
+                "osfconfigs": self.baseurl + "/api/useragents/osf_configs/",
                 "projects": self.baseurl + "/api/projects/",
                 "locations": self.baseurl + "/api/locations/",
                 "locationtypes": self.baseurl + "/api/locationtypes/",
@@ -41,16 +42,35 @@ class RadiamAPI(object):
                 self.log("Unable to refresh auth token {}:\n{}\n".format(resp.status_code, resp.text))
             else:
                 resp_obj = json.loads(resp.text)
-                if resp_obj["access"] != None:
+                if resp_obj.get("access", None) != None:
+                    self.log("New access token: {}".format(resp_obj["access"]))
                     self.authtokens["access"] = resp_obj["access"]
+                else:
+                    self.log("Attempted to refresh auth token, but got: {}".format(resp.text))
+                if resp_obj.get("refresh", None) != None:
+                    self.log("New refresh token: {}".format(resp_obj["refresh"]))
+                    self.authtokens["refresh"] = resp_obj["refresh"]
+
+    def get_bearer_token(self):
+        if self.authtokens.get("access", None) and self.authtokens.get("access") != "":
+                return self.authtokens.get("access")
+        return "novalidtoken"
+
+    def get_osf_useragents(self):
+        """ Get the OSF endpoint data from the Radiam API """
+        resp = requests.get(self.endpoints.get("osfconfigs"))
+        if resp.status_code != 200:
+            self.log("Unable to get list of OSF user agents {}:\n{}\n".format(resp.status_code, resp.text))
+            return None
+        else:
+            return json.loads(resp.text)
 
     def api_get(self, url, retries=1):
         if retries <= 0:
             self.log("Ran out of retries to connect to Radiam API")
             return None
         get_headers = self.headers
-        if self.authtokens.get("access"):
-            get_headers["Authorization"] = "Bearer " + self.authtokens.get("access")
+        get_headers["Authorization"] = "Bearer " + self.get_bearer_token()
         resp = requests.get(url, headers=get_headers)
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
@@ -75,8 +95,7 @@ class RadiamAPI(object):
             self.log("Ran out of retries to connect to Radiam API")
             return None
         post_headers = self.headers
-        if self.authtokens.get("access"):
-            post_headers["Authorization"] = "Bearer " + self.authtokens.get("access")
+        post_headers["Authorization"] = "Bearer " + self.get_bearer_token()
         resp = requests.post(url, headers=post_headers, data=body)
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
@@ -102,8 +121,7 @@ class RadiamAPI(object):
             self.log("Ran out of retries to connect to Radiam API")
             return None, False
         post_headers = self.headers
-        if self.authtokens.get("access"):
-            post_headers["Authorization"] = "Bearer " + self.authtokens.get("access")
+        post_headers["Authorization"] = "Bearer " + self.get_bearer_token()
         resp = requests.post(url, headers=post_headers, json=body)
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
@@ -124,8 +142,7 @@ class RadiamAPI(object):
             self.log("Ran out of retries to connect to Radiam API")
             return None
         delete_headers = self.headers
-        if self.authtokens.get("access"):
-            delete_headers["Authorization"] = "Bearer " + self.authtokens.get("access")
+        delete_headers["Authorization"] = "Bearer " + self.get_bearer_token()
         resp = requests.delete(url, headers=delete_headers)
         if resp.status_code == 403:
             response_json = json.loads(resp.text)
@@ -172,7 +189,7 @@ class RadiamAPI(object):
         return self.api_delete(index_url)
 
     def get_project_endpoint(self, project_id):
-        return self.endpoints.get("projects") + radiam_project_id + "/"
+        return self.endpoints.get("projects") + project_id + "/"
 
     def search_endpoint_by_path(self, index_url, path):
         return self.search_endpoint_by_fieldname(index_url, path, "path.keyword")

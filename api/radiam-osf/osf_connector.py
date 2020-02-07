@@ -57,30 +57,24 @@ def list_(osf_token, project_name, agent_id, location_id):
 def list_difference(list1,list2):
     return list(set(list1)-set(list2)), list(set(list2)-set(list1))
 
-def update_info(osf_token, project_name, API, agent_id, location_id, radiam_project_id):
+def update_info(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id):
     global logger
-
     logger.info("Crawling project %s" % project_name)
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
-    config_project_endpoint = API.get_project_endpoint()
-    res = API.search_endpoint_by_fieldname(config_project_endpoint, 'osf', 'plugin')['results']
-    res_path_list = [i['path'] for i in res]
-    files_to_add, files_to_del = list_difference(path_list, res_path_list)
-    if files_to_add:
-        API.create_document_bulk(config_project_endpoint,
-                                 [i for i in metadata if i['path'] in files_to_add])
-    if files_to_del:
-        id_list = [i['id'] for i in res if i['path'] in files_to_del]
-        for id in id_list:
-            API.delete_document(config_project_endpoint, id)
-
-
-def get_osf_endpoints():
-    """
-    Get the OSF endpoint data from the API
-    """
-    return requests.get("http://radiamapi:8000/api/useragents/osf_configs/")
+    config_project_endpoint = AgentAPI.get_project_endpoint(radiam_project_id)
+    res_obj = AgentAPI.search_endpoint_by_fieldname(config_project_endpoint, 'osf', 'plugin')
+    if res_obj:
+        res = res_obj['results']
+        res_path_list = [i['path'] for i in res]
+        files_to_add, files_to_del = list_difference(path_list, res_path_list)
+        if files_to_add:
+            AgentAPI.create_document_bulk(config_project_endpoint,
+                                     [i for i in metadata if i['path'] in files_to_add])
+        if files_to_del:
+            id_list = [i['id'] for i in res if i['path'] in files_to_del]
+            for id in id_list:
+                AgentAPI.delete_document(config_project_endpoint, id)
 
 def main():
     if sys.version_info[0] < 3:
@@ -99,9 +93,8 @@ def main():
     # Loop every hour checking OSF endpoints for updates
 
     while True:
-        # TODO: Change sleep time to configurable value
-        resp = get_osf_endpoints()
-        osf_projects_list = json.loads(resp.text)
+        ConfigAPI = RadiamAPI()
+        osf_projects_list = ConfigAPI.get_osf_useragents()
 
         for osf_project in osf_projects_list:
             agent_id = osf_project['user_agent_id']
@@ -112,11 +105,11 @@ def main():
             radiam_tokens["access"] = osf_project['local_access_token']
             radiam_tokens["refresh"] = osf_project['local_refresh_token']
             agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
-            API = RadiamAPI(**agent_config)
-            API.setLogger(logger)
+            AgentAPI = RadiamAPI(**agent_config)
+            AgentAPI.setLogger(logger)
             p = multiprocessing.Process(
                 target=update_info,
-                args=(osf_token, project_name, API, agent_id, location_id, radiam_project_id))
+                args=(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id))
             processes.append(p)
             p.start()
         for process in processes:
