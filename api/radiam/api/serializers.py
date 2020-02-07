@@ -34,6 +34,7 @@ from .models import (
     GroupRole,
     GroupViewGrant,
     Location,
+    LocationProject,
     LocationType,
     MetadataUIType,
     MetadataValueType,
@@ -788,6 +789,15 @@ class GeoDataSerializer(serializers.ModelSerializer):
 
         return value
 
+class NestedProjectSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+    name = serializers.CharField(required=False)
+
+    class Meta:
+        model = Project
+        fields = ('id',
+                  'name')
+
 class LocationSerializer(serializers.ModelSerializer):
     location_type = serializers.PrimaryKeyRelatedField(
         queryset=LocationType.objects.all()
@@ -795,6 +805,7 @@ class LocationSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
+    projects = NestedProjectSerializer(many=True, source="get_projects")
 
     class Meta:
         model = Location
@@ -810,12 +821,14 @@ class LocationSerializer(serializers.ModelSerializer):
                   'notes',
                   'portal_url',
                   'osf_project',
-                  'geo')
+                  'geo',
+                  'projects')
 
     def create(self, validated_data):
         """
         Create a Location instance
         """
+        projects_list = validated_data.pop("get_projects")
         try:
             geodata = validated_data.pop("get_geo_data")
         except KeyError:
@@ -823,6 +836,8 @@ class LocationSerializer(serializers.ModelSerializer):
 
         location = Location.objects.create(**validated_data)
         location.date_created = now()
+
+        self._save_location_projects(projects_list, location)
         try:
             self._save_geodata(geodata, location)
         except NameError:
@@ -834,6 +849,12 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         Update a Location instance
         """
+        try:
+            projects_list = validated_data.pop("get_projects")
+            self._save_location_projects(projects_list, instance)
+        except KeyError:
+            pass
+
         try:
             geodata = validated_data.pop("get_geo_data")
             self._save_geodata(geodata, instance)
@@ -872,6 +893,25 @@ class LocationSerializer(serializers.ModelSerializer):
         except GeoData.DoesNotExist:
             geodata = GeoData.objects.create(geojson=geojson_geometry, object_id=instance.id, content_type=ctype)
             geodata.save()
+
+    def _save_location_projects(self, projects_list, instance):
+        """
+        Loop through the projects list and create corresponding
+        LocationProject objects for this location instance.
+        """
+        for project_input in projects_list:
+            if isinstance(project_input, dict):
+                for project_data in project_input.items():
+                    if (project_data[0] == "id"):
+                        project_id = project_data[1]
+
+            if isinstance(project_input, str):
+                project_id = project_input
+
+            if project_id:
+                project = Project.objects.get(id=project_id)
+                location_project = LocationProject.objects.create(project=project, location=instance)
+                location_project.save()
 
 
 class LocationTypeSerializer(serializers.ModelSerializer):

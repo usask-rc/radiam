@@ -611,6 +611,12 @@ class Location(models.Model):
             return None
         return geo_data
 
+    def get_projects(self):
+        projects = []
+        for prj in LocationProject.objects.filter(location=self):
+           projects.append(prj.project.id)
+        return Project.objects.filter(id__in=projects)
+
     class Meta:
         db_table = "rdm_locations"
 
@@ -829,6 +835,18 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
     def __str__(self):
         return self.name
 
+
+class LocationProject(models.Model):
+    """
+    The LocationProject
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, help_text="The location this project applies to")
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text="The project")
+
+    class Meta:
+        db_table = "rdm_location_projects"
 
 class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
     """
