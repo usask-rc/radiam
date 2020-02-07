@@ -23,6 +23,8 @@ import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
 import GroupViewGrantTitle from "./GroupViewGrantTitle";
+import { DatasetShow } from "../_components/_fields/DatasetShow";
+import { GroupShow } from "../_components/_fields/GroupShow";
 
 const styles = {
   actions: {
@@ -123,7 +125,7 @@ export const GroupViewGrantShow = props => (
         source={MODEL_FK_FIELDS.GROUP}
         reference={MODELS.GROUPS}
       >
-        <TextField source={MODEL_FIELDS.NAME} />
+<GroupShow />
       </ReferenceField>
       <ReferenceField
         link={false}
@@ -131,7 +133,7 @@ export const GroupViewGrantShow = props => (
         source={MODEL_FK_FIELDS.DATASET}
         reference={MODELS.DATASETS}
       >
-        <TextField source={MODEL_FIELDS.TITLE} />
+        <DatasetShow />
       </ReferenceField>
       <TextField source={MODEL_FIELDS.FIELDS} allowEmpty />
       <DateField
