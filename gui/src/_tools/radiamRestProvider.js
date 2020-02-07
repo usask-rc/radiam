@@ -26,7 +26,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     console.log("data request is: ", type, resource, params)
     switch (type) {
       
-      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+      case "GET_FILES": {
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
@@ -63,7 +63,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
           //TODO: there must be a way to do this in-line above.
           Object.keys(matches).map(match => {
-            query.query.bool.filter.push({"term": {[match]:matches[match]}})
+            query.query.bool.filter.push({"wildcard": {[match]:matches[match]}})
             return match
           })
         }
@@ -74,20 +74,16 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           if (!query.query){
             query.query = {
               bool: {
-                must: {
-
+                should: {
+                  
                 }
               }
             }
           }
           
-          query.query.bool.must = {
-          multi_match:{
-            "query": `${params.q}`,
-            "fields": ["*"],
-            "lenient": "true"
+          query.query.bool.should = {
+            "query": {"wildcard":`${params.q}*`},
           }
-        }
       }
       
 
