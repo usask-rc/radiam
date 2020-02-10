@@ -805,7 +805,7 @@ class LocationSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
-    projects = NestedProjectSerializer(many=True, source="get_projects")
+    projects = NestedProjectSerializer(required=False, many=True, source="get_projects")
 
     class Meta:
         model = Location
@@ -828,7 +828,10 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         Create a Location instance
         """
-        projects_list = validated_data.pop("get_projects")
+        try:
+            projects_list = validated_data.pop("get_projects")
+        except KeyError:
+            pass
         try:
             geodata = validated_data.pop("get_geo_data")
         except KeyError:
@@ -837,7 +840,10 @@ class LocationSerializer(serializers.ModelSerializer):
         location = Location.objects.create(**validated_data)
         location.date_created = now()
 
-        self._save_location_projects(projects_list, location)
+        try:
+            self._save_location_projects(projects_list, location)
+        except NameError:
+            pass
         try:
             self._save_geodata(geodata, location)
         except NameError:

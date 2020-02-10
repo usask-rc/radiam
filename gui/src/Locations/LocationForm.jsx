@@ -239,7 +239,7 @@ class LocationForm extends Component {
                 geoDataCallback={this.geoDataCallback}
               />
             </Grid>
-          
+
           </Grid>
         )
       }
