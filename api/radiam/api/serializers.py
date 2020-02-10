@@ -805,7 +805,7 @@ class LocationSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
-    projects = NestedProjectSerializer(required=False, many=True, source="get_projects")
+    projects = NestedProjectSerializer(many=True, source="get_projects")
 
     class Meta:
         model = Location

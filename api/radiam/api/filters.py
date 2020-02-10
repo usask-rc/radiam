@@ -2,7 +2,7 @@
 from django.db.models import Q
 
 from rest_framework.filters import BaseFilterBackend
-from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics, Location, UserAgent, UserAgentProjectConfig
+from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics, Location, UserAgent, UserAgentProjectConfig, LocationProject
 
 from rest_framework.exceptions import APIException
 
@@ -267,9 +267,8 @@ class RadiamAuthLocationFilter(BaseFilterBackend):
             user_groupmembers = GroupMember.objects.filter(user=user)
             user_groups = ResearchGroup.objects.filter(groupmember__in=user_groupmembers)
             user_projects = Project.objects.filter(group__in=user_groups)
-            user_agentprojectconfigs = UserAgentProjectConfig.objects.filter(project__in=user_projects)
-            user_agents = UserAgent.objects.filter(useragentprojectconfig__in=user_agentprojectconfigs)
-            user_locations = Location.objects.filter(useragent__in=user_agents)
+            user_locationprojects = LocationProject.objects.filter(project__in=user_projects)
+            user_locations = Location.objects.filter(locationproject__in=user_locationprojects)
 
             return user_locations
         else:
