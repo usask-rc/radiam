@@ -15,6 +15,7 @@ export default {
       },
       fields: "Choose Metadata Fields",
       loading: "Loading additional metadata.",
+      loadingError: "Error loading data",
       no: "No Additional Metadata",
       off: "Off",
       on: "On",
@@ -311,10 +312,10 @@ export default {
     dashboard: {
       agents: 'Agents',
       agent: {
-        available_at: 'Download the Radiam agent for ',
+        available_at: 'Download the Radiam agent ',
         description:
           'Start adding files to Radiam by installing the Radiam Agent anywhere you would like to start tracking files.',
-        link_text: 'Windows, Mac or Linux',
+        link_text: 'here',
         subtitle: 'Install Agent',
       },
       projectCards: {
@@ -439,6 +440,7 @@ export default {
         osf_project: 'OSF Project ID',
         portal_url: 'Portal Url',
         type: 'Location Type',
+        projects: "Projects",
       },
       locationtypes: {
         label: 'Type of Location',

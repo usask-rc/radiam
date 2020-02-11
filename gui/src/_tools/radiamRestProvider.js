@@ -26,7 +26,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     console.log("data request is: ", type, resource, params)
     switch (type) {
       
-      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+      case "GET_FILES": {
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
@@ -63,7 +63,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
           //TODO: there must be a way to do this in-line above.
           Object.keys(matches).map(match => {
-            query.query.bool.filter.push({"term": {[match]:matches[match]}})
+            query.query.bool.filter.push({"wildcard": {[match]:matches[match]}})
             return match
           })
         }
@@ -74,20 +74,16 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           if (!query.query){
             query.query = {
               bool: {
-                must: {
-
+                should: {
+                  
                 }
               }
             }
           }
           
-          query.query.bool.must = {
-          multi_match:{
-            "query": `${params.q}`,
-            "fields": ["*"],
-            "lenient": "true"
+          query.query.bool.should = {
+            "query": {"wildcard":`${params.q}*`},
           }
-        }
       }
       
 
@@ -303,6 +299,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case GET_MANY:
+        console.log("GET_MANY request params: ", params)
         // Map a sub object that has '{ id: "theid"}' to just 'theid' e.g. project sensitivity level
         params.ids = params.ids.map(item => (item.id ? item.id : item));
         
@@ -347,6 +344,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return ret;
 
       case GET_LIST:
+        console.log("GET_LIST request being sent: ", params)
+
         json.results = translateResource(resource, json.results);
 
         ret = {
@@ -355,6 +354,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           next: json.next,
           previous: json.previous,
         };
+
+        console.log("GET_LIST returning:", ret.data)
         ret.data.map(item => (item.key = item.id));
 
         return ret;
@@ -373,6 +374,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       //"Get_Many" is a bit of a misnomer.  We're looking for a value matching an ID from Many that we're searching for in params.ids[0].  This returns one value.
       case GET_MANY:
+        console.log("GET_MANY request received: ", json)
         let many;
         // Handle results being in a paged results object or raw
 

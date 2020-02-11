@@ -440,6 +440,7 @@ export default {
         osf_project: 'OSF Project ID',
         portal_url: 'Portal Url',
         type: 'Location Type',
+        projects: "Projects",
       },
       locationtypes: {
         label: 'Type of Location',
