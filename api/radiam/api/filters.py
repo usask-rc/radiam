@@ -268,7 +268,7 @@ class RadiamAuthLocationFilter(BaseFilterBackend):
             user_groups = ResearchGroup.objects.filter(groupmember__in=user_groupmembers)
             user_projects = Project.objects.filter(group__in=user_groups)
             user_locationprojects = LocationProject.objects.filter(project__in=user_projects)
-            user_locations = Location.objects.filter(locationproject__in=user_locationprojects)
+            user_locations = Location.objects.filter(locationproject__in=user_locationprojects).distinct()
 
             return user_locations
         else:
