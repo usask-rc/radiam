@@ -13,6 +13,7 @@ import {
   SimpleShowLayout,
   TextField,
   TextInput,
+  ChipField,
 } from 'react-admin';
 import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from '../_components/CustomPagination';
@@ -22,6 +23,9 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
 import LocationTitle from './LocationTitle';
+import ReferenceArrayField from 'ra-ui-materialui/lib/field/ReferenceArrayField';
+import { SingleFieldList } from 'ra-ui-materialui/lib/list';
+import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
 
 
 const listStyles = {
@@ -121,6 +125,13 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         source={'notes'}
         multiline
       />
+       <ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
     </Datagrid>
   </List>
 )});
@@ -167,6 +178,7 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 
 export const LocationDisplay = props => 
   {
+    console.log("LocationDisplay data: ", props)
   return(
   <Show {...props}>
     <SimpleShowLayout>
@@ -190,6 +202,15 @@ export const LocationDisplay = props =>
           source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
+      
+      <ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+
       <GlobusEndpointShow />
       <GlobusPathShow />
       <PortalUrlShow />

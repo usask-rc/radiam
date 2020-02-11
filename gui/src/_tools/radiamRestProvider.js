@@ -299,6 +299,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case GET_MANY:
+        console.log("GET_MANY request params: ", params)
         // Map a sub object that has '{ id: "theid"}' to just 'theid' e.g. project sensitivity level
         params.ids = params.ids.map(item => (item.id ? item.id : item));
         
@@ -343,6 +344,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return ret;
 
       case GET_LIST:
+        console.log("GET_LIST request being sent: ", params)
+
         json.results = translateResource(resource, json.results);
 
         ret = {
@@ -351,6 +354,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           next: json.next,
           previous: json.previous,
         };
+
+        console.log("GET_LIST returning:", ret.data)
         ret.data.map(item => (item.key = item.id));
 
         return ret;
@@ -369,6 +374,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       //"Get_Many" is a bit of a misnomer.  We're looking for a value matching an ID from Many that we're searching for in params.ids[0].  This returns one value.
       case GET_MANY:
+        console.log("GET_MANY request received: ", json)
         let many;
         // Handle results being in a paged results object or raw
 

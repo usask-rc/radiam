@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {
   TextInput,
   ReferenceInput,
+  ReferenceArrayInput,
   regex,
   required,
   SimpleForm,
@@ -18,6 +19,8 @@ import { withStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
 import LocationTitle from './LocationTitle';
+import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
+import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -74,7 +77,14 @@ class LocationForm extends Component {
 
   //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
   handleSubmit = (data) => {
-    const { geo } = this.state    
+    const { geo } = this.state  
+    const projList = []
+    
+    data.projects.map(project => {
+      projList.push({id: project})
+      return project
+    })
+    data.projects = projList
     this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`);
     })
@@ -198,6 +208,20 @@ class LocationForm extends Component {
               >
                 <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
               </ReferenceInput>
+            </Grid>
+
+            <Grid item xs={12}>
+              
+              <ReferenceArrayInput
+              //this works like sensitivity level, ie, the format is garbage and wants each ID in its own object instead of just being a list.  This data is translated in handlesubmit.
+                resource={MODELS.PROJECTS}
+                className="input-medium"
+                label={"en.models.locations.projects"}
+                source={"projects"}
+                reference={"projects"}
+                required>
+                <SelectArrayInput optionText="name" />
+              </ReferenceArrayInput>
             </Grid>
             <>
               <Grid item xs={12}>
