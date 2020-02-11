@@ -617,6 +617,14 @@ class Location(models.Model):
            projects.append(prj.project.id)
         return Project.objects.filter(id__in=projects)
 
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(location=self):
+            locprj.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_locationprojects()
+        models.Model.delete(self, *args, **kwargs)
+
     class Meta:
         db_table = "rdm_locations"
 
