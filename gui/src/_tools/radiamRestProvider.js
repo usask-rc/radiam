@@ -84,54 +84,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           
           //this worked for exact matches on any given field
           query.query.bool.must = {
-
-              query_string: {
-                query: `${params.q}*`,
-                fields: ['*']
-              }
-          }
-            /*
-          multi_match:{
+            multi_match:{
               "query": `${params.q}`,
               "fields": ["*"],
               "lenient": "true"
             }
           }
-          */
-
-          //TODO: if i am searching, I am NOT including the filter.
-          /*
-          query.query.bool.must = [
-            {
-              bool: {
-                should: [
-                  {
-                    query: {
-                      wildcard: {
-                        path: {
-                          value: `${params.q}*`,
-                        }
-                      }
-                    },
-                    query: {
-                      wildcard: {
-                        owner: {
-                          value: `${params.q}*`
-                        }
-                      }
-                    },
-                    query: {
-                      wildcard: {
-                        indexed_by: {
-                          value: `${params.q}*`
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]*/
+            
         }
       
       
