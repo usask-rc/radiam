@@ -28,6 +28,7 @@ import { getFolderFiles, formatBytes } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip } from '@material-ui/core';
 import { Link } from  "react-router-dom";
+import useDebounce from "../../_hooks/useDebounce"
 
 
 const styles = theme => ({
@@ -238,13 +239,15 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     setParents(tempParents)
   }
 
-function getJsonKeys(json) {
-  const keys = [];
-  Object.keys(json).forEach(function (key) {
-    keys.push(key);
-  });
-  return keys;
-}
+  function getJsonKeys(json) {
+    const keys = [];
+    Object.keys(json).forEach(function (key) {
+      keys.push(key);
+    });
+    return keys;
+  }
+
+  
 
   const handleSearch = (e) => {
     console.log("handlesearch: ", e.target.elements.search.value)
@@ -259,6 +262,9 @@ function getJsonKeys(json) {
     e.preventDefault()
 
   }
+
+  //TODO: honestly i just dont really feel like doing this rn
+  //const debouncedSearch = useDebounce()
 
   useEffect(() => {
     //search the given project with the appropriate location and search param
