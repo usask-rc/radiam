@@ -184,8 +184,8 @@ class ContentObjectNameForeignKey(serializers.RelatedField):
             raise serializers.ValidationError(msg, format(data))
 
 class SearchModelSerializer(serializers.ModelSerializer):
-    dataset = DatasetPKRelatedField(required=False)
-    search = serializers.JSONField(required=False)
+    dataset = DatasetPKRelatedField(required=False, help_text="The dataset associated with this search")
+    search = serializers.JSONField(required=False, help_text="The search query")
 
     class Meta:
         model = SearchModel
@@ -392,17 +392,19 @@ class NestedUserAgentProjectConfigSerializer(serializers.ModelSerializer):
 
 class UserAgentSerializer(serializers.ModelSerializer):
 
-    id = serializers.UUIDField(required=False)
+    id = serializers.UUIDField(required=False, help_text="A UUID string identifying this agent")
 
     # Do these need to be protected via auth model?
     user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
+        queryset=User.objects.all(),
+        help_text="The user this agent is running as"
     )
     location = serializers.PrimaryKeyRelatedField(
-        queryset=Location.objects.all()
+        queryset=Location.objects.all(),
+        help_text="The location where this agent is running"
     )
-    version = serializers.CharField(required=True)
-    project_config_list = NestedUserAgentProjectConfigSerializer(many=True, required=True, source="get_project_config_list")
+    version = serializers.CharField(required=True, help_text="The version of the Agent")
+    project_config_list = NestedUserAgentProjectConfigSerializer(many=True, required=True, source="get_project_config_list", help_text="This useragent's list of project configs")
 
     class Meta:
         model = UserAgent
@@ -557,7 +559,8 @@ class ProjectUserAgentSerializer(serializers.ModelSerializer):
 class ResearchGroupSerializer(serializers.ModelSerializer, MetadataSerializer):
     parent_group = ResearchGroupPKRelatedField(
         required=False,
-        allow_null=True
+        allow_null=True,
+        help_text="This groups parent group"
     )
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
@@ -604,11 +607,13 @@ class GroupRoleSerializer(serializers.ModelSerializer):
 
 class GroupMemberSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
+        queryset=User.objects.all(),
+        help_text="The user"
     )
-    group = ResearchGroupPKRelatedField()
+    group = ResearchGroupPKRelatedField(help_text="The group")
     group_role = serializers.PrimaryKeyRelatedField(
-        queryset=GroupRole.objects.all()
+        queryset=GroupRole.objects.all(),
+        help_text="The users role within this group"
     )
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
@@ -657,9 +662,10 @@ class GroupMemberSerializer(serializers.ModelSerializer):
 
 
 class DatasetDataCollectionMethodSerializer(serializers.ModelSerializer):
-    dataset = DatasetPKRelatedField()
+    dataset = DatasetPKRelatedField(help_text="The dataset this collection method applies to")
     data_collection_method = serializers.PrimaryKeyRelatedField(
-        queryset=DataCollectionMethod.objects.all()
+        queryset=DataCollectionMethod.objects.all(),
+        help_text="The data collection method"
     )
 
     class Meta:
@@ -670,8 +676,8 @@ class DatasetDataCollectionMethodSerializer(serializers.ModelSerializer):
 
 
 class GroupViewGrantSerializer(serializers.ModelSerializer):
-    group = ResearchGroupPKRelatedField()
-    dataset = DatasetPKRelatedField()
+    group = ResearchGroupPKRelatedField(help_text="The group that the grant is applied to")
+    dataset = DatasetPKRelatedField(help_text="The dataset this grant is applied to")
 
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
@@ -800,12 +806,13 @@ class NestedProjectSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     location_type = serializers.PrimaryKeyRelatedField(
-        queryset=LocationType.objects.all()
+        queryset=LocationType.objects.all(),
+        help_text="The location type"
     )
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
-    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
-    projects = NestedProjectSerializer(required=False, many=True, source="get_projects")
+    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data", help_text="Geographic data of this location")
+    projects = NestedProjectSerializer(required=False, many=True, source="get_projects", help_text="The list of projects of this location")
 
     class Meta:
         model = Location
@@ -941,7 +948,7 @@ class DataCollectionMethodSerializer(serializers.ModelSerializer):
                   'label')
 
 class ProjectAvatarSerializer(serializers.ModelSerializer):
-    avatar_image = serializers.ImageField(max_length=None, allow_empty_file=False, use_url=False)
+    avatar_image = serializers.ImageField(max_length=None, allow_empty_file=False, use_url=False, help_text="The avatar binary image data")
 
     class Meta:
         model = ProjectAvatar
@@ -993,9 +1000,10 @@ class NestedSensitivityLevelSerializer(serializers.ModelSerializer):
 
 
 class DatasetSensitivitySerializer(serializers.ModelSerializer):
-    dataset = DatasetPKRelatedField()
+    dataset = DatasetPKRelatedField(help_text="The dataset this sensitivity applies to")
     sensitivity = serializers.PrimaryKeyRelatedField(
-        queryset=SensitivityLevel.objects.all()
+        queryset=SensitivityLevel.objects.all(),
+        help_text="The sensitivity level"
     )
     class Meta:
         model = DatasetSensitivity
@@ -1005,14 +1013,15 @@ class DatasetSensitivitySerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer, MetadataSerializer):
-    group = ResearchGroupPKRelatedField()
+    group = ResearchGroupPKRelatedField(help_text="The group this project belongs to")
     avatar = serializers.PrimaryKeyRelatedField(
         queryset=ProjectAvatar.objects.all(),
-        allow_null=True
+        allow_null=True,
+        help_text="The avatar for this project (optional)"
     )
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
-    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
+    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data", help_text="Geographic data of this project")
 
     MetadataDoc = ProjectMetadataDoc
 
@@ -1129,20 +1138,22 @@ class ESDatasetSerializer(serializers.Serializer):
 
 class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
-    project = ProjectPKRelatedField()
+    project = ProjectPKRelatedField(help_text="The project this dataset belongs to")
     data_collection_status = serializers.PrimaryKeyRelatedField(
-        queryset=DataCollectionStatus.objects.all()
+        queryset=DataCollectionStatus.objects.all(),
+        help_text="Status of data collection for this dataset"
     )
     distribution_restriction = serializers.PrimaryKeyRelatedField(
-        queryset=DistributionRestriction.objects.all()
+        queryset=DistributionRestriction.objects.all(),
+        help_text="Distribution restriction for this dataset"
     )
-    data_collection_method = NestedDataCollectionMethodSerializer(many=True, source="get_data_collection_methods")
-    sensitivity_level = NestedSensitivityLevelSerializer(many=True, source="get_sensitivity_levels")
+    data_collection_method = NestedDataCollectionMethodSerializer(many=True, source="get_data_collection_methods", help_text="Data collection method for this dataset")
+    sensitivity_level = NestedSensitivityLevelSerializer(many=True, source="get_sensitivity_levels", help_text="Sensitivity level for this dataset")
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
 
-    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data")
-    search_model = SearchModelSerializer(many=False, source="get_search_model")
+    geo = GeoDataSerializer(required=False, allow_null=True, source="get_geo_data", help_text="Geographic data of this dataset")
+    search_model = SearchModelSerializer(many=False, source="get_search_model", help_text="The search restriction of this dataset")
 
     MetadataDoc = DatasetMetadataDoc
 
@@ -1312,7 +1323,7 @@ class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
 
 class ProjectStatisticsSerializer(serializers.ModelSerializer):
-    project = ProjectPKRelatedField()
+    project = ProjectPKRelatedField(help_text="The project for this statistic")
 
     class Meta:
         model = ProjectStatistics
@@ -1473,15 +1484,18 @@ class EntitySerializer(serializers.ModelSerializer):
 
     group = serializers.PrimaryKeyRelatedField(queryset=ResearchGroup.objects.all(),
             allow_null=True,
-            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this group.")])
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this group.")],
+            help_text="The group represented by this entity")
 
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(),
             allow_null=True,
-            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this project.")])
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this project.")],
+            help_text="The project represented by this entity")
 
     dataset = serializers.PrimaryKeyRelatedField(queryset=Dataset.objects.all(),
             allow_null=True,
-            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this dataset.")])
+            validators=[UniqueValidator(queryset=Entity.objects.all(), message="There is already an entity with this dataset.")],
+            help_text="The dataset represented by this entity")
 
 class SelectedSchemaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1531,17 +1545,17 @@ class EntitySchemaFieldSerializer (serializers.Serializer):
                   'choice_lists',
                   'choice_list_values')
 
-    id = serializers.CharField()
-    group = serializers.CharField()
-    project = serializers.CharField()
-    dataset = serializers.CharField()
-    file = serializers.CharField()
-    folder = serializers.CharField()
-    selected_schemas = SelectedSchemaSerializer(many=True, source="get_selected_schemas")
-    selected_fields = SelectedFieldSerializer(many=True, source="get_selected_fields")
-    schemas = SchemaSerializer(many=True, source="get_schemas")
-    fields = FieldSerializer(many=True, source="get_fields")
-    metadata_ui_types = MetadataUITypeSerializer(many=True, source="get_metadata_ui_types")
-    metadata_value_types = MetadataValueTypeSerializer(many=True, source="get_metadata_value_types")
-    choice_lists = ChoiceListSerializer(many=True, source="get_choice_lists")
-    choice_list_values = ChoiceListValueSerializer(many=True, source="get_choice_list_values")
+    id = serializers.CharField(help_text="A UUID string identifying this entity schema field")
+    group = serializers.CharField(help_text="The group of this entity schema field")
+    project = serializers.CharField(help_text="The project of this entity schema field")
+    dataset = serializers.CharField(help_text="The dataset of this entity schema field")
+    file = serializers.CharField(help_text="The file of this entity schema field")
+    folder = serializers.CharField(help_text="The folder of this entity schema field")
+    selected_schemas = SelectedSchemaSerializer(many=True, source="get_selected_schemas", help_text="The selected schemas of this entity schema field")
+    selected_fields = SelectedFieldSerializer(many=True, source="get_selected_fields", help_text="The selected fields of this entity schema field")
+    schemas = SchemaSerializer(many=True, source="get_schemas", help_text="The schemas of this entity schema field")
+    fields = FieldSerializer(many=True, source="get_fields", help_text="The fields of this entity schema field")
+    metadata_ui_types = MetadataUITypeSerializer(many=True, source="get_metadata_ui_types", help_text="The types of metadata UI of this entity schema field")
+    metadata_value_types = MetadataValueTypeSerializer(many=True, source="get_metadata_value_types", help_text="The types of metadata value of this entity schema field")
+    choice_lists = ChoiceListSerializer(many=True, source="get_choice_lists", help_text="The choice lists of this entity schema field")
+    choice_list_values = ChoiceListValueSerializer(many=True, source="get_choice_list_values", help_text="The values of the choice list of this entity schema field")
