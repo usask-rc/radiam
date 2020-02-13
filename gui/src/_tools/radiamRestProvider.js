@@ -33,112 +33,95 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
         options.method = METHODS.POST
 
-        let query = {}
-        let matches = {}
-
-        //create kvp for any filters.
-        if (params.filter){
-          Object.keys(params.filter).map(key => {
-              //for any value where there are slashes, we need exact matches
-              if (key === "path_parent" && !params.q){
-                matches[`${key}.keyword`] = params.filter[key]
-              }
-              else if (key === "path_parent" && params.q){
-                //want to search in this folder and all descending folders
-                //for now a search will just search all folders which should suffice.
-              }
-              else{
-                matches[key] = params.filter[key]
-              }
-            }
-          )
-        }
-
-        if (matches && Object.keys(matches).length > 0){
-          query.query = {
-            "bool" : {
-              "filter" : [
-              ],
+        let query = {
+          query: {
+            bool: {
+              filter:[]
             }
           }
+        }
+        let matches = {}
+        const {filter} = params
 
-          //TODO: there must be a way to do this in-line above.
-          Object.keys(matches).map(match => {
-            query.query.bool.filter.push({"term": {[match]:matches[match]}})
-            return match
-          })
+        console.log("params.filter in get_files are: ", params.filter)
+
+        //`filter` can only hold path_parent or type right now, so its probably not necessary to loop this
+        if (filter){
+          if (filter.path_parent && !params.q){ //no search item?  Then we only want the current folder.
+            query.query.bool.filter.push({"term": {"path_parent.keyword":filter.path_parent}})
+          }
+
+          if (filter.type){
+            query.query.bool.filter.push({"term": {"type":filter.type}})
+          }
+
+          //add here as needed
+          if (filter.length > 2){
+            //then my assumption is wrong
+            console.log("more than 2 Param Filters found: ", filter)
+          }
         }
 
-        console.log("get_files params.q ? ", params)
         if (params.q){
+          //specify what fields we're searching on
+          //certain fields like `type` used to delineate between files and folders will have to be treated differently
 
-          if (!query.query){
-            query.query = {
-              bool: {
-                must: {
+          //a list of fields not searched on due to them being IDs.  May be able to search on them in future
+          const unusedIDMetadataSearchFields = [
+            'id', //file id
+            'agent', //agent id
+            'location', //location id
+            'entity', //i dont know what this is
+          ]
+          //fields that are known but unused
+          const unusedMetadataSearchFields = [
+            'extension', //this is already searched on when we search path
+            'path_parent', 
+            'path_parent_keyword',
+            'path_keyword',
+            'path_agnostic',
+            'path_agnostic_keyword', //all are the same as above - already covered by `path`
+            'type', //i don't want to have people search subsets of the words 'file' and 'directory' and get all files/dirs
+            //it can be fixed by doing an exact match when searching 'file' or 'directory' and not partial
 
+            //Elasticsearch throws a 500 when including the following fields in a wildcard search
+            'last_access',
+            'last_modified', 
+            'last_change', //i don't know what the difference between these are
+            'indexing_date', //when indexing starts
+            'indexed_date', //when indexing ends (i assume)
+            'filesize',
+            'size',
+          ]
+          const metadataSearchFields = [
+            'path',
+            'indexed_by',
+            'owner',
+            'type', //i don't want to have people search subsets of the words 'file' and 'directory' and get all files/dirs
+            'group', //note that this is the group as specified by the crawler
+          ]
+
+          query.query.bool.should = []
+          metadataSearchFields.map(searchField => {
+            query.query.bool.should.push({
+              'wildcard': {
+                [searchField]: {
+                  'value': `*${params.q}*`
                 }
               }
-            }
-          }
-          
-          //this worked for exact matches on any given field
-          query.query.bool.must = {
+            })
+            return searchField;
+          })
 
-              query_string: {
-                query: `${params.q}*`,
-                fields: ['*']
-              }
-          }
-            /*
-          multi_match:{
-              "query": `${params.q}`,
-              "fields": ["*"],
-              "lenient": "true"
-            }
-          }
-          */
-
-          //TODO: if i am searching, I am NOT including the filter.
-          /*
-          query.query.bool.must = [
-            {
-              bool: {
-                should: [
-                  {
-                    query: {
-                      wildcard: {
-                        path: {
-                          value: `${params.q}*`,
-                        }
-                      }
-                    },
-                    query: {
-                      wildcard: {
-                        owner: {
-                          value: `${params.q}*`
-                        }
-                      }
-                    },
-                    query: {
-                      wildcard: {
-                        indexed_by: {
-                          value: `${params.q}*`
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]*/
+          query.query.bool.minimum_should_match = 1
         }
-      
-      
 
-        console.log("query before stringify get_files: ", query)
+        //change filter parameter to include all beneath this
+
         //TODO: ordering and pagination do not yet exist satisfactorily
         options.body = JSON.stringify(query);
+
+        console.log("stringified query: ", options.body)
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort && params.sort.field && params.sort.field.length > 0){
