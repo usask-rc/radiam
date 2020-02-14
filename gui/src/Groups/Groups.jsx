@@ -364,7 +364,7 @@ class BaseGroupEdit extends Component {
         toolbar={<EditToolbar />}
         redirect={RESOURCE_OPERATIONS.LIST}
       >
-      <GroupTitle prefix={"Updating"} />
+        <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
           source={MODEL_FIELDS.NAME}

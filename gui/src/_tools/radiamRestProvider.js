@@ -33,71 +33,52 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
         options.method = METHODS.POST
 
-        let query = {}
-        let matches = {}
-
-        //create kvp for any filters.
-        if (params.filter){
-          Object.keys(params.filter).map(key => {
-              //for any value where there are slashes, we need exact matches
-              if (key === "path_parent" && !params.q){
-                matches[`${key}.keyword`] = params.filter[key]
-              }
-              else if (key === "path_parent" && params.q){
-                //want to search in this folder and all descending folders
-                //for now a search will just search all folders which should suffice.
-              }
-              else{
-                matches[key] = params.filter[key]
-              }
-            }
-          )
-        }
-
-        if (matches && Object.keys(matches).length > 0){
-          query.query = {
-            "bool" : {
-              "filter" : [
-              ],
+        let query = {
+          query: {
+            bool: {
+              filter:[]
             }
           }
+        }
+        const {filter} = params
 
-          //TODO: there must be a way to do this in-line above.
-          Object.keys(matches).map(match => {
-            query.query.bool.filter.push({"term": {[match]:matches[match]}})
-            return match
-          })
+        console.log("params.filter in get_files are: ", params.filter)
+
+        //`filter` can only hold path_parent or type right now, so its probably not necessary to loop this
+        if (filter){
+          if (filter.path_parent && !params.q){ //no search item?  Then we only want the current folder.
+            query.query.bool.filter.push({"term": {"path_parent.keyword":filter.path_parent}})
+          }
+
+          if (filter.type){
+            query.query.bool.filter.push({"term": {"type":filter.type}})
+          }
+
+          //add here as needed
+          if (filter.length > 2){
+            //then my assumption is wrong
+            console.log("more than 2 Param Filters found: ", filter)
+          }
         }
 
-        console.log("get_files params.q ? ", params)
+        //if we're searching, throw in our query into a SHOULD match
         if (params.q){
-
-          if (!query.query){
-            query.query = {
-              bool: {
-                must: {
-
-                }
-              }
-            }
-          }
+          //specify what fields we're searching on
+          //certain fields like `type` used to delineate between files and folders will have to be treated differently
           
-          //this worked for exact matches on any given field
-          query.query.bool.must = {
-            multi_match:{
-              "query": `${params.q}`,
-              "fields": ["*"],
-              "lenient": "true"
+          //query string search on all searchable fields (no numbers/dates)
+          query.query.bool.should = [{
+            'query_string': {
+              'query': `*${params.q}*`
             }
-          }
-            
+          }] 
+          query.query.bool.minimum_should_match = 1
         }
-      
-      
 
-        console.log("query before stringify get_files: ", query)
-        //TODO: ordering and pagination do not yet exist satisfactorily
+        //TODO: ordering and pagination do not yet exist satisfactorily (everything is a single page dump)
         options.body = JSON.stringify(query);
+
+        console.log("stringified query: ", options.body)
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort && params.sort.field && params.sort.field.length > 0){
@@ -168,31 +149,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             }
             
             url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
-
-            /*
-            if (page && sort) {
-              url = `${url}${page}&${sort}`;
-            } else if (page) {
-              url = `${url}${page}`;
-            } else if (sort) {
-              url = `${url}${sort}`;
-            }
-            */
             
-            /*
-            const { page, perPage } = params.pagination;
-            const { sortField, sortOrder } = params.sort;
-
-            let query = {
-              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
-              _sort: sortField ? sortField : null,
-              _order: sortOrder ? sortOrder : null,
-              _start: (page - 1) * perPage,
-              _end: page * perPage,
-              page: page,
-              perPage: perPage,
-            };*/
-            //url = url + `?${stringify(query)}`;
           }
         }
 

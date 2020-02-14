@@ -16,7 +16,6 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
 import LocationTitle from './LocationTitle';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
@@ -93,6 +92,7 @@ class LocationForm extends Component {
 
   handleChange = data => {
     //start marking form as dirty only when the user makes changes.  This property is case sensitive.
+    console.log("handlechange data: ", data)
     if (data && data.timeStamp){
     this.setState({isFormDirty: true})
     }
@@ -166,7 +166,16 @@ class LocationForm extends Component {
 
   render() {
     //const {isformdirty, rest} = {...this.props}
-    const { staticContext, id, ...rest } = this.props;
+    const { staticContext, id, record, mode, ...rest } = this.props;
+    const projList = []
+    if (mode === "edit"){
+      record.projects.map(project => {
+        projList.push(project.id)
+      })
+    }
+    
+    console.log("record is: ", record)
+
     const { isFormDirty, geo, mapFormKey } = this.state;
     return (
       <SimpleForm
@@ -176,28 +185,18 @@ class LocationForm extends Component {
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
-      <FormDataConsumer>
-      {({formData, ...rest}) => 
-      {
-        return(
-          <Grid container>
-            {formData && formData.display_name ? <LocationTitle record={formData} prefix={"Updating"} /> : <LocationTitle prefix={"Creating Location"} />}
-
-            <Grid item xs={12}>
+              <LocationTitle record={record || null} prefix={mode === "create" ? `Creating Location` : `Updating `} />
               <TextInput
                 label={'en.models.locations.display_name'}
                 source={MODEL_FIELDS.DISPLAY_NAME}
+                defaultValue={record ? record.display_name : ""}
               />
-            </Grid>
-            <Grid item xs={12}>
               <TextInput
                 label={'en.models.locations.host_name'}
                 source={MODEL_FIELDS.HOST_NAME}
                 validate={validateHostname}
-                defaultValue={formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF ? "osf.io" : ""}
+                defaultValue={record ? record.host_name : "osf.io"}
               />
-            </Grid>
-            <Grid item xs={12}>
               <ReferenceInput
                 label={'en.models.locations.type'}
                 resource={MODELS.LOCATIONTYPES}
@@ -208,10 +207,7 @@ class LocationForm extends Component {
               >
                 <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
               </ReferenceInput>
-            </Grid>
 
-            <Grid item xs={12}>
-              
               <ReferenceArrayInput
               //this works like sensitivity level, ie, the format is garbage and wants each ID in its own object instead of just being a list.  This data is translated in handlesubmit.
                 resource={MODELS.PROJECTS}
@@ -219,58 +215,39 @@ class LocationForm extends Component {
                 label={"en.models.locations.projects"}
                 source={"projects"}
                 reference={"projects"}
+                defaultValue={projList} 
                 required>
-                <SelectArrayInput optionText="name" />
+                <SelectArrayInput optionText="name" {...this.props}/>
               </ReferenceArrayInput>
-            </Grid>
-            <>
-              <Grid item xs={12}>
+
                 <TextInput
                   label={'en.models.locations.globus_endpoint'}
                   source="globus_endpoint"
                   validate={validateGlobusEndpoint}
+                  defaultValue={record && record.globus_endpoint}
                 />
-              </Grid>
-              <Grid item xs={12}>
                 <TextInput
                   label={'en.models.locations.globus_path'}
                   source="globus_path"
+                  defaultValue={record && record.globus_path}
                   multiline
                 />
-              </Grid>
-            </>
-            {formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF &&
-              <Grid item xs={12}>
-                <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
-              </Grid>
-            }
-            <Grid item xs={12}>
+                <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record && record.osf_project || ""} required />
               <TextInput
                 label={'en.models.locations.portal_url'}
                 source="portal_url"
+                defaultValue={record && record.portal_url || ""}
                 multiline
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES} />
-            </Grid>
+              <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
+              defaultValue={record && record.notes || ""} />
 
-            <Grid item xs={12} key={mapFormKey}>
               <MapForm
                 content_type={MODEL_FK_FIELDS.LOCATION}
                 recordGeo={geo}
                 id={id}
                 geoDataCallback={this.geoDataCallback}
               />
-            </Grid>
-
-          </Grid>
-        )
-      }
-      }
-      </FormDataConsumer>
-
-        <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
       </SimpleForm>
     );
   }

@@ -116,12 +116,12 @@ class UserEditForm extends Component {
                 save={this.handleSubmit}
                 resource={MODELS.USERS}
                 asyncValidate={asyncValidate}
-                asyncBlurFields={[MODEL_FIELDS.USERNAME]} >
+                asyncBlurFields={[MODEL_FIELDS.USERNAME]} {...this.props}>
                 
                 <FormDataConsumer>
                     {({formData }) => 
                     {
-                        return(<UserTitle prefix={"Updating"} record={formData} />)}
+                        return(<UserTitle prefix={"Updating"} />)}
                     }
                 </FormDataConsumer>
 
