@@ -255,26 +255,43 @@ console.log("record is: ", record)
                   projList = temp
                 }
 
-                console.log("projList being rendered: ", projList)
-                if (projList){
-                  
+                /* this is how material-ui does it.
+                <Select
+                  labelId="demo-mutiple-chip-label"
+                  id="demo-mutiple-chip"
+                  multiple
+                  value={personName}
+                  onChange={handleChange}
+                  input={<Input id="select-multiple-chip" />}
+                  renderValue={selected => (
+                    <div className={classes.chips}>
+                      {selected.map(value => (
+                        <Chip key={value} label={value} className={classes.chip} />
+                      ))}
+                    </div>
+                  )}
+                  MenuProps={MenuProps}
+                >
+                  {names.map(name => (
+                    <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                */
 
+                console.log("projList being rendered: ", projList)
                   return(<ReferenceArrayInput
                     resource={"projects"}
                     className="input-medium"
                     label={"en.models.locations.projects"}
-                    source={"projects.ids"}
+                    source={"projects"}
                     reference={"projects"}
-                    defaultValue={projList}
                     required>
                     <SelectArrayInput 
                     defaultValue={projList}
                     optionText="name" />
                   </ReferenceArrayInput>)
-                }
-                else{
-                  return `Loading...`
-                }
               }
               }
               </FormDataConsumer>
