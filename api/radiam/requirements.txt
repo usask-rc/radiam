@@ -1,7 +1,7 @@
 configobj
 coverage
 cryptography
-django==2.2.9
+django==2.2.10
 django-cors-headers
 django-oauth-toolkit
 djangorestframework==3.9.1
