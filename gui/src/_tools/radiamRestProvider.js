@@ -40,7 +40,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             }
           }
         }
-        let matches = {}
         const {filter} = params
 
         console.log("params.filter in get_files are: ", params.filter)
@@ -81,8 +80,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             'path_keyword',
             'path_agnostic',
             'path_agnostic_keyword', //all are the same as above - already covered by `path`
-            'type', //i don't want to have people search subsets of the words 'file' and 'directory' and get all files/dirs
-            //it can be fixed by doing an exact match when searching 'file' or 'directory' and not partial
 
             //Elasticsearch throws a 500 when including the following fields in a wildcard search
             'last_access',
@@ -99,20 +96,16 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             'owner',
             'type', //i don't want to have people search subsets of the words 'file' and 'directory' and get all files/dirs
             'group', //note that this is the group as specified by the crawler
+            'type', //might want to remove this to prevent people from getting all files/dirs when searching substrings of those
+
           ]
-
-          query.query.bool.should = []
-          metadataSearchFields.map(searchField => {
-            query.query.bool.should.push({
-              'wildcard': {
-                [searchField]: {
-                  'value': `*${params.q}*`
-                }
-              }
-            })
-            return searchField;
-          })
-
+          
+          //query string search on all searchable fields (no numbers/dates)
+          query.query.bool.should = [{
+            'query_string': {
+              'query': `*${params.q}*`
+          }
+          }] 
           query.query.bool.minimum_should_match = 1
         }
 
