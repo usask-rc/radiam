@@ -874,6 +874,24 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       }
     }
   }
+/*
+  //Locations suffers the same stupid field issue that Datasets does and requires a similar transformation on Projects
+  if (resource === 'LOCATIONS'){
+    if (!Array.isArray(data)){ //no transformation needed upstream
+      if (direction === 0){
+        if (data.projects && data.projects.length > 0){
+          const projList = []
+
+          data.projects.map(project => {
+            projList.push(project.id)
+          })
+          data.projects = projList
+        }
+      }
+    }
+    console.log("LOCATIONS translated data: ", data)
+  }
+  */
 
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.

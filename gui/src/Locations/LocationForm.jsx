@@ -49,13 +49,31 @@ class LocationForm extends Component {
       mapFormKey: 0,
       jsonTextFormKey: 1000,
     };
+    if (props.record && props.record.projects){
+      props.record.projects = this.fixProjectList(props.record.projects)
+    }
+
+    console.log("props.record.projects in locationform is: ", props.record.projects)
   }
 
   componentDidMount() {
     const { geo } = this.state
     this.setState({ geoText: geo && geo.geojson ? JSON.stringify(geo.geojson.features, null, 2) : '[]' });
+
   }
 
+  fixProjectList(projects) {
+    const projList = []
+
+    projects.map(project => {
+      projList.push(project.id)
+      return project
+    })
+    return projList
+
+  }
+
+  
   geoDataCallback = callbackGeo => {
 
     const {record} = this.props
@@ -167,6 +185,7 @@ class LocationForm extends Component {
   render() {
     //const {isformdirty, rest} = {...this.props}
     const { staticContext, id, record, mode, ...rest } = this.props;
+    /*
     const projList = []
     if (mode === "edit"){
       record.projects.map(project => {
@@ -174,9 +193,12 @@ class LocationForm extends Component {
       })
     }
     
-    console.log("record is: ", record)
+*/
+console.log("record is: ", record)
 
     const { isFormDirty, geo, mapFormKey } = this.state;
+
+
     return (
       <SimpleForm
         {...rest}
@@ -207,32 +229,70 @@ class LocationForm extends Component {
               >
                 <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
               </ReferenceInput>
+              <FormDataConsumer>
+              {formDataProps => {
 
-              <ReferenceArrayInput
-              //this works like sensitivity level, ie, the format is garbage and wants each ID in its own object instead of just being a list.  This data is translated in handlesubmit.
-                resource={MODELS.PROJECTS}
-                className="input-medium"
-                label={"en.models.locations.projects"}
-                source={"projects"}
-                reference={"projects"}
-                defaultValue={projList} 
-                required>
-                <SelectArrayInput optionText="name" {...this.props}/>
-              </ReferenceArrayInput>
+                console.log("formDataProps in locform is: ", formDataProps)
+                
+                const formData = {formDataProps}
 
-                <TextInput
-                  label={'en.models.locations.globus_endpoint'}
-                  source="globus_endpoint"
-                  validate={validateGlobusEndpoint}
-                  defaultValue={record && record.globus_endpoint}
-                />
-                <TextInput
-                  label={'en.models.locations.globus_path'}
-                  source="globus_path"
-                  defaultValue={record && record.globus_path}
-                  multiline
-                />
-                <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record && record.osf_project || ""} required />
+                let projList = []
+
+                if (formData.projects && formData.projects.length > 0){
+                  projList = formData.projects
+                }
+                else if (record.projects && record.projects.length > 0){
+                  projList = record.projects
+                }
+
+                //somehow still need to translate this shit
+                if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
+                  console.log("translating projlist into a list: ", projList)
+                  const temp = []
+                  projList.map(item => {
+                    temp.push(item.id)
+                  })
+                  projList = temp
+                }
+
+                console.log("projList being rendered: ", projList)
+                if (projList){
+                  
+
+                  return(<ReferenceArrayInput
+                    resource={"projects"}
+                    className="input-medium"
+                    label={"en.models.locations.projects"}
+                    source={"projects.ids"}
+                    reference={"projects"}
+                    defaultValue={projList}
+                    required>
+                    <SelectArrayInput 
+                    defaultValue={projList}
+                    optionText="name" />
+                  </ReferenceArrayInput>)
+                }
+                else{
+                  return `Loading...`
+                }
+              }
+              }
+              </FormDataConsumer>
+
+              <TextInput
+                label={'en.models.locations.globus_endpoint'}
+                source="globus_endpoint"
+                validate={validateGlobusEndpoint}
+                defaultValue={record && record.globus_endpoint}
+              />
+              <TextInput
+                label={'en.models.locations.globus_path'}
+                source="globus_path"
+                defaultValue={record && record.globus_path}
+                multiline
+              />
+              <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record && record.osf_project || ""} required />
+
               <TextInput
                 label={'en.models.locations.portal_url'}
                 source="portal_url"

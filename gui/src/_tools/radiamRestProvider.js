@@ -149,7 +149,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             }
             
             url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
-            
+
           }
         }
 
@@ -317,6 +317,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
         ret.data.map(item => (item.key = item.id));
+
+        console.log("ret in get_list is: ", ret)
 
         return ret;
 
