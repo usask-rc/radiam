@@ -34,7 +34,7 @@ const FileDetails = ({ classes, item, getJsonKeys }) => {
     <Grid className={classes.card} container spacing={2} direction="row">
       {getJsonKeys(item).map(key => {
       return(
-        <React.Fragment>
+        <React.Fragment key={key}>
         {!isObject(item[key]) && 
             key !== MODEL_FIELDS.NAME &&
             key !== 'key' &&

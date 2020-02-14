@@ -61,57 +61,21 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
         }
 
+        //if we're searching, throw in our query into a SHOULD match
         if (params.q){
           //specify what fields we're searching on
           //certain fields like `type` used to delineate between files and folders will have to be treated differently
-
-          //a list of fields not searched on due to them being IDs.  May be able to search on them in future
-          const unusedIDMetadataSearchFields = [
-            'id', //file id
-            'agent', //agent id
-            'location', //location id
-            'entity', //i dont know what this is
-          ]
-          //fields that are known but unused
-          const unusedMetadataSearchFields = [
-            'extension', //this is already searched on when we search path
-            'path_parent', 
-            'path_parent_keyword',
-            'path_keyword',
-            'path_agnostic',
-            'path_agnostic_keyword', //all are the same as above - already covered by `path`
-
-            //Elasticsearch throws a 500 when including the following fields in a wildcard search
-            'last_access',
-            'last_modified', 
-            'last_change', //i don't know what the difference between these are
-            'indexing_date', //when indexing starts
-            'indexed_date', //when indexing ends (i assume)
-            'filesize',
-            'size',
-          ]
-          const metadataSearchFields = [
-            'path',
-            'indexed_by',
-            'owner',
-            'type', //i don't want to have people search subsets of the words 'file' and 'directory' and get all files/dirs
-            'group', //note that this is the group as specified by the crawler
-            'type', //might want to remove this to prevent people from getting all files/dirs when searching substrings of those
-
-          ]
           
           //query string search on all searchable fields (no numbers/dates)
           query.query.bool.should = [{
             'query_string': {
               'query': `*${params.q}*`
-          }
+            }
           }] 
           query.query.bool.minimum_should_match = 1
         }
 
-        //change filter parameter to include all beneath this
-
-        //TODO: ordering and pagination do not yet exist satisfactorily
+        //TODO: ordering and pagination do not yet exist satisfactorily (everything is a single page dump)
         options.body = JSON.stringify(query);
 
         console.log("stringified query: ", options.body)
