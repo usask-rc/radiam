@@ -95,38 +95,28 @@ const WelcomeCards = ({loading, hasFiles}) => {
             container
             spacing={3}
         >
-        {user && (user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
-            <FewUsers userManagedGroups={userManagedGroups} />
-        }
-        {
-            
-            //this should show if the user is an admin AND if there are no groups.
-        //there should be another if the user is in no groups
-        /*
-        
-        {userGroups !== null && userGroups.length === 0 &&
             <Grid item xs={4}>
-                <FirstSteps />
-            </Grid>
-            }
-            */
-
-        }
-        
-        { false && //to be replaced once we know what's going here.
-            <Grid item xs={4}>
-                <SecondSteps />
-            </Grid>
-        }
-        <Grid item xs={4}>
             {/*This should be conditional based on whether a project has files / if there is a group set up with users*/}
             <Welcome />
+            </Grid>
+            {user && (user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
+                <Grid item xs={4}>
+                    <FewUsers userManagedGroups={userManagedGroups} />
+                </Grid>
+            }
+                {/*This should be conditional based on whether or not the user has access to a project with files*/}
+            {!loading && !hasFiles && (user.is_admin || user.is_group_admin) && 
+                <Grid item xs={4}>
+                    <AgentInstall />
+                </Grid>
+            }
+            
+            { false && //to be replaced once we know what's going here.
+                <Grid item xs={4}>
+                    <SecondSteps />
+                </Grid>
+            }
         </Grid>
-        <Grid item xs={4}>
-            {/*This should be conditional based on whether or not the user has access to a project with files*/}
-            {!loading && !hasFiles && (user.is_admin || user.is_group_admin) && <AgentInstall />}
-        </Grid>
-    </Grid>
 )}
 
 export default WelcomeCards
