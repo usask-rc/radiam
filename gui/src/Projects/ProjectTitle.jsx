@@ -4,7 +4,6 @@ import { Typography } from '@material-ui/core';
 
 const styles = {
     createText: {
-        padding: "1em",
         fontSize: "2em",
     },
     updateText: {
