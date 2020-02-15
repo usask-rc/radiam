@@ -79,7 +79,7 @@ const actionStyles = theme => ({
 
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-
+  let _isMounted = true
   console.log("datasetshowactions data: ", data)
 
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
@@ -89,9 +89,14 @@ const actionStyles = theme => ({
       const params = { id: data.project }
       const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
       dataProvider(GET_ONE, MODELS.PROJECTS, params).then(response => {
-        isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
+        if (_isMounted){
+          isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
+        }
         //now have a group - check for adminship
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   })
   if (showEdit && data){

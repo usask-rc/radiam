@@ -36,10 +36,8 @@ const MapView = ({classes, record }) => {
     const [curFeature, setCurFeature] = useState({})
     const [mapRef, setMapRef] = useState(null)
 
-    let _isMounted = false
-
+    let _isMounted = true
     useEffect(() => {
-        _isMounted = true
         return function cleanup() {
             _isMounted = false
         }
@@ -47,14 +45,19 @@ const MapView = ({classes, record }) => {
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
-        var layer = e.target;
-        setLocation([e.latlng.lat, e.latlng.lng])
-        setCurFeature(layer.feature)
-        setPopup({active: true, for: layer._leaflet_id})
+        if (_isMounted)
+        {
+            var layer = e.target;
+            setLocation([e.latlng.lat, e.latlng.lng])
+            setCurFeature(layer.feature)
+            setPopup({active: true, for: layer._leaflet_id})
+        }
     }
 
     function _onPopupClose() {
-        setPopup({popup: {active: false, for: ""}})
+        if (_isMounted){
+            setPopup({popup: {active: false, for: ""}})
+        }
     }
 
     //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
@@ -164,7 +167,11 @@ const MapView = ({classes, record }) => {
                     {`GeoJSON Map Data`}
                 </Typography>
                 <Map
-                ref={(ref) => {setMapRef(ref)}}
+                ref={(ref) => {
+                    if (_isMounted){
+                        setMapRef(ref)
+                    }
+                }}
                 center={location}
                 className={classes.mapDisplay}
                 zoom={mapRef && mapRef.leafletElement ? mapRef.leafletElement.getZoom() : 7}

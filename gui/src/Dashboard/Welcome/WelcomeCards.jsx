@@ -11,7 +11,7 @@ import FewUsers from './FewUsers';
 
 const WelcomeCards = ({loading, hasFiles}) => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER));
-    let _isMounted = false
+    let _isMounted = true
     const [userManagedGroups, setUserManagedGroups] = useState([])
 
 ///groupMemberships is given to us from the server on login.  Using this data, we can identify the groups that a user is in and query for all users in said groups
@@ -53,7 +53,6 @@ const WelcomeCards = ({loading, hasFiles}) => {
     useEffect(() => {
         //GOAL: find how many users are in each group, if our user is not a base level user
         //if i'm the superuser, I don't care if a group doesn't have a user.  This is up to a Group Admin or a Data Manager to rectify.
-        _isMounted = true
         //TODO: protect against memory leakage
         
         if (user){

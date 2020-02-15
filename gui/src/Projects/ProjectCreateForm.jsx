@@ -7,7 +7,7 @@ import {
   SimpleForm,
   TextInput,
 } from 'react-admin';
-import { MODEL_FIELDS, MODELS} from "../_constants/index";
+import { MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
 import { getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
 import { Typography } from "@material-ui/core";
@@ -28,10 +28,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
     const [groupContactList, setGroupContactList] = useState([])
     const [loading, setLoading] = useState(false)
     const [group, setGroup] = useState(null)
-  
-    const handleSelectChange = ({...event}) => {
-      console.log("HSC event: ", event)
-    }
+    const [error, setError] = useState(null)
   
     const handleSubmit=(data) => {
       console.log("handleSubmit data is: ", data)
@@ -43,18 +40,30 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       submitObjectWithGeo(data, dataGeo, props)
     }
   
-  
     useEffect(() => {
+      let _isMounted = true
+      const abortController = new AbortController();
       if (group){
         setLoading(true)
         getUsersInGroup({id: group, is_active: true}).then(contacts => {
-          console.log("getusersingroup result: ", contacts)
-          setGroupContactList(contacts)
-          setLoading(false)
+
+          if (_isMounted){
+            console.log("getusersingroup result: ", contacts)
+            setGroupContactList(contacts)
+            setLoading(false)
+          }
+          else{
+            console.log("users in group not set; component unmounted before data received")
+          }
         }).catch(err => {
           console.error("in getprimarycontactcandidates, err: ", err)
+          setError(err)
         })
       }
+      //when we unmount, lock out the component from being able to use the state
+      return function cleanup() {
+        _isMounted = false;
+    }
     }, [group])
   
     return(
@@ -100,12 +109,11 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
                 return(
                   <div>
                     <ReferenceInput
-                      resource="researchgroups"
+                      resource={MODELS.GROUPS}
                       className="input-small"
                       label={"en.models.projects.group"}
                       source={MODEL_FIELDS.GROUP}
                       reference={MODELS.GROUPS}
-                      onChange={handleSelectChange}
                       validate={validateGroup}>
                       <SelectInput optionText={MODEL_FIELDS.NAME} />
                     </ReferenceInput>
@@ -122,7 +130,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
                       </div>)
                       : !loading && groupContactList &&  groupContactList.length === 0 ? 
                       <div>
-                        {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
+                        {formData && formData.group && <Typography><a href={`/#/${MODELS.GROUPS}/${formData.group}/${RESOURCE_OPERATIONS.SHOW}`}>{`No users in Group - Click here to add one`}</a></Typography>}
                       </div>
                       :
                       <div>

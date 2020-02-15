@@ -77,14 +77,22 @@ const styles = theme => ({
 function RecentFilesDisplay({ projects, translate, classes }) {
   const [value, setValue] =  useState(null);
 
+  let _isMounted = true
   useEffect(() => {
-    const first = projects.findIndex((project) => project.files && project.files.length > 0)
-    setValue(first)
+    if (_isMounted){
+      const first = projects.findIndex((project) => project.files && project.files.length > 0)
+      setValue(first)
+    }
+    return function cleanup() {
+      _isMounted = false
+    }
   }, [])
 
   //TODO: these can and likely should be combined
   function handleChange(event, newValue) {
-    setValue(newValue);
+    if (_isMounted){
+      setValue(newValue);
+    }
   }
 
   return (
