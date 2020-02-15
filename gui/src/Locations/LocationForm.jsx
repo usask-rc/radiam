@@ -16,11 +16,11 @@ import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
-import { Grid } from '@material-ui/core';
 import { FormDataConsumer } from 'ra-core';
 import LocationTitle from './LocationTitle';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
+import { Typography } from '@material-ui/core';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -38,6 +38,10 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  titleText: {
+    fontSize: "2em",
+    width: 'inherit',
+  }
 };
 
 class LocationForm extends Component {
@@ -50,13 +54,31 @@ class LocationForm extends Component {
       mapFormKey: 0,
       jsonTextFormKey: 1000,
     };
+    if (props.record && props.record.projects){
+      props.record.projects = this.fixProjectList(props.record.projects)
+    }
+
+    console.log("props.record.projects in locationform is: ", props.record.projects)
   }
 
   componentDidMount() {
     const { geo } = this.state
     this.setState({ geoText: geo && geo.geojson ? JSON.stringify(geo.geojson.features, null, 2) : '[]' });
+
   }
 
+  fixProjectList(projects) {
+    const projList = []
+
+    projects.map(project => {
+      projList.push(project.id)
+      return project
+    })
+    return projList
+
+  }
+
+  
   geoDataCallback = callbackGeo => {
 
     const {record} = this.props
@@ -93,6 +115,7 @@ class LocationForm extends Component {
 
   handleChange = data => {
     //start marking form as dirty only when the user makes changes.  This property is case sensitive.
+    console.log("handlechange data: ", data)
     if (data && data.timeStamp){
     this.setState({isFormDirty: true})
     }
@@ -166,8 +189,21 @@ class LocationForm extends Component {
 
   render() {
     //const {isformdirty, rest} = {...this.props}
-    const { staticContext, id, ...rest } = this.props;
+    const { staticContext, id, classes, record, mode, ...rest } = this.props;
+    /*
+    const projList = []
+    if (mode === "edit"){
+      record.projects.map(project => {
+        projList.push(project.id)
+      })
+    }
+    
+*/
+console.log("record is: ", record)
+
     const { isFormDirty, geo, mapFormKey } = this.state;
+
+
     return (
       <SimpleForm
         {...rest}
@@ -176,101 +212,98 @@ class LocationForm extends Component {
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
-      <FormDataConsumer>
-      {({formData, ...rest}) => 
-      {
-        return(
-          <Grid container>
-            {formData && formData.display_name ? <LocationTitle record={formData} prefix={"Updating"} /> : <LocationTitle prefix={"Creating Location"} />}
+        <Typography className={classes.titleText}>{record && record.length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
+        <TextInput
+          label={'en.models.locations.display_name'}
+          source={MODEL_FIELDS.DISPLAY_NAME}
+          defaultValue={record ? record.display_name : ""}
+        />
+        <TextInput
+          label={'en.models.locations.host_name'}
+          source={MODEL_FIELDS.HOST_NAME}
+          validate={validateHostname}
+          defaultValue={record && record.length > 0 ? record.host_name : "osf.io"}
+        />
+        <ReferenceInput
+          label={'en.models.locations.type'}
+          resource={MODELS.LOCATIONTYPES}
+          source={MODEL_FK_FIELDS.LOCATION_TYPE}
+          reference={MODELS.LOCATIONTYPES}
+          validate={validateLocationType}
+          defaultValue={LOCATIONTYPE_OSF}
+        >
+          <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
+        </ReferenceInput>
+        <FormDataConsumer>
+        {formDataProps => {
 
-            <Grid item xs={12}>
-              <TextInput
-                label={'en.models.locations.display_name'}
-                source={MODEL_FIELDS.DISPLAY_NAME}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextInput
-                label={'en.models.locations.host_name'}
-                source={MODEL_FIELDS.HOST_NAME}
-                validate={validateHostname}
-                defaultValue={formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF ? "osf.io" : ""}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ReferenceInput
-                label={'en.models.locations.type'}
-                resource={MODELS.LOCATIONTYPES}
-                source={MODEL_FK_FIELDS.LOCATION_TYPE}
-                reference={MODELS.LOCATIONTYPES}
-                validate={validateLocationType}
-                defaultValue={LOCATIONTYPE_OSF}
-              >
-                <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
-              </ReferenceInput>
-            </Grid>
+          console.log("formDataProps in locform is: ", formDataProps)
+          
+          const {formData} = formDataProps
 
-            <Grid item xs={12}>
-              
-              <ReferenceArrayInput
-              //this works like sensitivity level, ie, the format is garbage and wants each ID in its own object instead of just being a list.  This data is translated in handlesubmit.
-                resource={MODELS.PROJECTS}
-                className="input-medium"
-                label={"en.models.locations.projects"}
-                source={"projects"}
-                reference={"projects"}
-                required>
-                <SelectArrayInput optionText="name" />
-              </ReferenceArrayInput>
-            </Grid>
-            <>
-              <Grid item xs={12}>
-                <TextInput
-                  label={'en.models.locations.globus_endpoint'}
-                  source="globus_endpoint"
-                  validate={validateGlobusEndpoint}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextInput
-                  label={'en.models.locations.globus_path'}
-                  source="globus_path"
-                  multiline
-                />
-              </Grid>
-            </>
-            {formData && formData.location_type && formData.location_type === LOCATIONTYPE_OSF &&
-              <Grid item xs={12}>
-                <TextInput label={"en.models.locations.osf_project"} source="osf_project" required />
-              </Grid>
-            }
-            <Grid item xs={12}>
-              <TextInput
-                label={'en.models.locations.portal_url'}
-                source="portal_url"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES} />
-            </Grid>
+          let projList = []
 
-            <Grid item xs={12} key={mapFormKey}>
-              <MapForm
-                content_type={MODEL_FK_FIELDS.LOCATION}
-                recordGeo={geo}
-                id={id}
-                geoDataCallback={this.geoDataCallback}
-              />
-            </Grid>
+          if (formData.projects && formData.projects.length > 0){
+            projList = formData.projects
+          }
+          else if (record.projects && record.projects.length > 0){
+            projList = record.projects
+          }
 
-          </Grid>
-        )
-      }
-      }
-      </FormDataConsumer>
+          //somehow still need to translate this shit
+          if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
+            console.log("translating projlist into a list: ", projList)
+            const temp = []
+            projList.map(item => {
+              temp.push(item.id)
+            })
+            projList = temp
+          }
+          console.log("projList being rendered: ", projList)
+            return(<ReferenceArrayInput
+              resource={"projects"}
+              className="input-medium"
+              label={"en.models.locations.projects"}
+              source={"projects"}
+              reference={"projects"}
+              required>
+              <SelectArrayInput 
+              defaultValue={projList}
+              optionText="name" />
+            </ReferenceArrayInput>)
+          }
+        }
+        </FormDataConsumer>
 
-        <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
+        <TextInput
+          label={'en.models.locations.globus_endpoint'}
+          source="globus_endpoint"
+          validate={validateGlobusEndpoint}
+          defaultValue={record && record.globus_endpoint}
+        />
+        <TextInput
+          label={'en.models.locations.globus_path'}
+          source="globus_path"
+          defaultValue={record && record.globus_path}
+          multiline
+        />
+        <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record && record.osf_project || ""} required />
+
+        <TextInput
+          label={'en.models.locations.portal_url'}
+          source="portal_url"
+          defaultValue={record && record.portal_url || ""}
+          multiline
+        />
+        <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
+        defaultValue={record && record.notes || ""} />
+
+        <MapForm
+          content_type={MODEL_FK_FIELDS.LOCATION}
+          recordGeo={geo}
+          id={id}
+          geoDataCallback={this.geoDataCallback}
+        />
       </SimpleForm>
     );
   }

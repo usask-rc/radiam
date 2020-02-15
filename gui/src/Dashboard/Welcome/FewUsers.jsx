@@ -28,14 +28,17 @@ const styles = {
       height: "28px",
       width: "28px",
     },
+    card: {
+      minHeight: "11em",
+      minWidth: "15em",
+    },
     container: {
       textAlign: "flex-start",
-      minHeight: "11em",
-      marginLeft: "1em",
+      
     },
     groupDetails: {
-      textAlign: "right",
-      margniTop: "8px",
+      textAlign: "left",
+      marginTop: "8px",
     },
     button: {
       margin: '1em',
@@ -109,7 +112,7 @@ const FewUsers = ({ classes, userManagedGroups, translate }) => {
 
   if (groupList.length > 0){
     return(
-      <Grid item xs={2}>
+      <Grid item xs={2} className={classes.card}>
         <Card className={classes.container}>
           <CardContent>
 
@@ -126,7 +129,6 @@ const FewUsers = ({ classes, userManagedGroups, translate }) => {
                 <div className={classes.groupDisplay}>
                   <Typography key={group.id} className={classes.groupDetails} variant="body2" component="p">
                     {`${group.name} : ${group.users.length} users`}
-
                     <Link to={{pathname: `/${MODELS.GROUPMEMBERS}/Create`, group: group.id}}>
                       <Chip label={`+ Add User`} className={classes.addUserChipDisplay} variant="outlined" key={`${group.id}_adduser`} clickable />
                     </Link>

@@ -182,7 +182,7 @@ export const LocationDisplay = props =>
   return(
   <Show {...props}>
     <SimpleShowLayout>
-    <LocationTitle prefix={"Viewing"} />
+      <LocationTitle prefix={"Viewing"} />
       <TextField
         label={'en.models.locations.display_name'}
         source={MODEL_FIELDS.DISPLAY_NAME}

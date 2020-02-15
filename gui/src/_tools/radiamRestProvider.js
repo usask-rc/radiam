@@ -150,30 +150,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             
             url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
 
-            /*
-            if (page && sort) {
-              url = `${url}${page}&${sort}`;
-            } else if (page) {
-              url = `${url}${page}`;
-            } else if (sort) {
-              url = `${url}${sort}`;
-            }
-            */
-            
-            /*
-            const { page, perPage } = params.pagination;
-            const { sortField, sortOrder } = params.sort;
-
-            let query = {
-              ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
-              _sort: sortField ? sortField : null,
-              _order: sortOrder ? sortOrder : null,
-              _start: (page - 1) * perPage,
-              _end: page * perPage,
-              page: page,
-              perPage: perPage,
-            };*/
-            //url = url + `?${stringify(query)}`;
           }
         }
 
@@ -341,6 +317,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
         ret.data.map(item => (item.key = item.id));
+
+        console.log("ret in get_list is: ", ret)
 
         return ret;
 
