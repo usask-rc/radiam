@@ -881,7 +881,8 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       if (direction === 0){
         if (data.projects && data.projects.length > 0){
           const projList = []
-
+          
+          console.log("in translator, data.projects is: ", data.projects)
           data.projects.map(project => {
             projList.push(project.id)
           })
@@ -890,8 +891,9 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       }
     }
     console.log("LOCATIONS translated data: ", data)
-  }
-  */
+    
+  }*/
+  
 
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.
