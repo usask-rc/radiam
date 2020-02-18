@@ -56,20 +56,27 @@ const validateLabel = required('en.validate.role.label');
 const GroupRoleForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
-  
+  let _isMounted = true
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
       props.save(data)
     }
+    return function cleanup() {
+      _isMounted = false
+    }
   }, [data, props])
 
   function handleSubmit(formData) {
-    setIsFormDirty(false)
-    setData(formData)
+    if (_isMounted){
+      setIsFormDirty(false)
+      setData(formData)
+    }
   }
 
   function handleChange(data){
-    setIsFormDirty(true)
+    if (_isMounted){
+      setIsFormDirty(true)
+    }
   }
   
   return(
