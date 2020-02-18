@@ -51,12 +51,13 @@ from radiam.api.serializers import (
     ProjectUserAgentSerializer,
     ResearchGroupSerializer,
     SchemaSerializer,
+    SearchModelSerializer,
     SelectedFieldSerializer,
     SelectedSchemaSerializer,
     SensitivityLevelSerializer,
     SuperuserUserSerializer,
     UserSerializer,
-    UserAgentSerializer)
+    UserAgentSerializer,)
 
 # from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
@@ -548,6 +549,19 @@ class UserAgentOrderingFilter(RadiamOrderingFilter):
         return [location, user]
 
 
+class SearchModelViewSet(RadiamViewSet):
+    """
+    SearchModel endpoint to define a dataset and a search query
+    """
+    queryset = SearchModel.objects.all().order_by('dataset')
+    serializer_class = SearchModelSerializer
+
+    filter_fields = ('dataset', 'id')
+    ordering_fields = ('dataset',)
+    ordering = ('dataset')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+
 class UserAgentViewSet(RadiamViewSet):
     """
     API endpoint that allows user agents to be viewed or edited
@@ -586,8 +600,11 @@ class UserAgentViewSet(RadiamViewSet):
     def osf_configs(self, request):
 
         # Restricted to internal Docker network requests
-        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("10")):
-            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+        request_addr = request.META["REMOTE_ADDR"]
+        if not (request_addr.startswith("172") or request_addr.startswith("192.168") or request_addr.startswith("10")):
+            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("REMOTE_ADDR")}       
+        #if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("10")):
+        #    data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("HTTP_X_FORWARDED_FOR")}
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         resp = self.osf_agent_token_query()
@@ -767,6 +784,68 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
             return response
         else:
             return super().update(request, pk, **kwargs)
+
+    @action(methods=['post'],
+            detail=True,
+            url_name='search',
+            permission_classes=(IsAuthenticated,))
+    def search(self, request, pk=None):
+        """
+        Elasticsearch Search within a specific dataset's index
+        """
+
+        dataset_id = pk
+
+        self.serializer_class = ESDatasetSerializer
+
+        query = request.data
+
+        # any more validation that needs to be done?
+        dataset = Dataset.objects.get(id=dataset_id)
+
+        # radiam_service = RadiamService(str(dataset.id))
+        dataset = Dataset.objects.get(id=dataset_id)
+        project = Project.objects.get(dataset__id=dataset_id)
+        search_model = SearchModel.objects.get(dataset__id=dataset.id)
+
+        search = Search.from_dict(query)
+        search = search.index(str(project.id))
+
+        # Are the Service classes needed anymore?
+        search_service = _SearchService(search)
+
+        sort = None
+        order = None
+
+        for key, value in request.query_params.items():
+            if key in ['page_size', 'page']:
+                continue
+            elif key == 'ordering':
+                sort = value
+            # elif key != 'q':
+            #     # squeeze Windows double-backslashes in path/path_parent
+            #     if key in ['path', 'path_parent']:
+            #         value = value.replace("\\\\", "\\")
+            #
+            #     search_service.add_match(key, value)
+            else:
+                pass
+
+        # Is it possible for a Dataset to be the entire contents of a project index?
+        # In that case, create another code path that doesn't apply a filter
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+
+        self.queryset = search_service.search
+        if not sort:
+            self.queryset = self.queryset.sort()
+        else:
+            self.queryset = self.queryset.sort(sort)
+
+        page = self.paginate_queryset(self.queryset)
+        serializer = self.get_serializer(page, many=True)
+
+        return self.get_paginated_response(serializer.data)
 
     def destroy(self, request, pk, *args, **kwargs):
         dataset = Dataset.objects.get(id=pk)
@@ -1142,22 +1221,26 @@ class UserAgentTokenViewSet(viewsets.GenericViewSet):
 
     def list(self, request, useragent_id, action):
         # Restricted to internal Docker network requests
-        if ('HTTP_X_FORWARDED_FOR' not in request.META) or (not request.META['HTTP_X_FORWARDED_FOR'].startswith("172") and not request.META['HTTP_X_FORWARDED_FOR'].startswith("192.168")):
-            data = {"error":"401","access_token":"","refresh_token":"","host": request.META.get("HTTP_X_FORWARDED_FOR")}
+        request_addr = request.META.get("REMOTE_ADDR")
+        if not (request_addr.startswith("172") or request_addr.startswith("192.168") or request_addr.startswith("10")):
+            data = {"error": "401", "access_token": "", "refresh_token": "","host": request.META.get("REMOTE_ADDR")}       
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         useragent = UserAgent.objects.get(id=useragent_id)
 
         if (action and action == "new") or (useragent.local_refresh_token is None):
+            print("Generating new tokens for OSF agent")
             useragent.generate_tokens()
             useragent.save()
+        else:
+            print("Sending existing tokens to OSF agent")
 
         data = {
             "id": useragent_id,
             "user_id": useragent.user_id,
             "access_token": useragent.local_access_token,
             "refresh_token": useragent.local_refresh_token,
-            "host": request.META.get('HTTP_X_FORWARDED_FOR')
+            "host": request.META.get('REMOTE_ADDR')
         }
 
         return Response(data)
@@ -1501,13 +1584,13 @@ class DatasetDocsViewSet(viewsets.ViewSet):
         project = Project.objects.get(dataset__id=dataset_id)
         search_model = SearchModel.objects.get(dataset__id=dataset.id)
 
-        search = Search.from_dict(search_model.search)
+        search = Search()
         search = search.index(str(project.id))
-
         search_service = _SearchService(search)
+        if search_model.search:
+            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
         rawresponse = search_service.execute()
         data = rawresponse.to_dict()
-
         return Response(data)
 
 
@@ -1524,54 +1607,20 @@ class DatasetSearchViewSet(viewsets.GenericViewSet):
         Test some basic ES search
         """
 
-        query = request.data
-
-        # any more validation that needs to be done?
-        dataset = Dataset.objects.get(id=dataset_id)
-
-        # radiam_service = RadiamService(str(dataset.id))
-        dataset = Dataset.objects.get(id=dataset_id)
-        project = Project.objects.get(dataset__id=dataset_id)
-        search_model = SearchModel.objects.get(dataset__id=dataset.id)
-
-        search = Search.from_dict(query)
-        search = search.index(str(project.id))
-
-        # Are the Service classes needed anymore?
+        radiam_service = RadiamService(dataset_id)
+        search = Search(index=dataset_id)
         search_service = _SearchService(search)
 
-        sort = None
-        order = None
+        if radiam_service.index_exists(dataset_id):
+            # TODO: Do any queries need to be added here for auth?
 
-        for key,value in request.query_params.items():
-            if key in ['page_size','page']:
-                continue
-            elif key == 'ordering':
-                sort = value
-            # elif key != 'q':
-            #     # squeeze Windows double-backslashes in path/path_parent
-            #     if key in ['path', 'path_parent']:
-            #         value = value.replace("\\\\", "\\")
-            #
-            #     search_service.add_match(key, value)
-            else:
-                pass
+            rawresponse = search_service.execute()
+            data = rawresponse.to_dict()
 
-        # Is it possible for a Dataset to be the entire contents of a project index?
-        # In that case, create another code path that doesn't apply a filter
-        if search_model.search:
-            search_service.search = search_service.search.query('bool', filter=[ES_Q(search_model.search)])
+            return Response(data)
 
-        self.queryset = search_service.search
-        if not sort:
-            self.queryset = self.queryset.sort()
         else:
-            self.queryset = self.queryset.sort(sort)
-
-        page = self.paginate_queryset(self.queryset)
-        serializer = self.get_serializer(page, many=True)
-
-        return self.get_paginated_response(serializer.data)
+            raise ProjectNotFoundException()
 
 
 class MetadataUITypeViewSet(RadiamViewSet):

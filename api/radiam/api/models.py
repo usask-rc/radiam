@@ -611,6 +611,20 @@ class Location(models.Model):
             return None
         return geo_data
 
+    def get_projects(self):
+        projects = []
+        for prj in LocationProject.objects.filter(location=self):
+           projects.append(prj.project.id)
+        return Project.objects.filter(id__in=projects)
+
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(location=self):
+            locprj.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_locationprojects()
+        models.Model.delete(self, *args, **kwargs)
+
     class Meta:
         db_table = "rdm_locations"
 
@@ -766,6 +780,10 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         models.Model.save(self, *args, **kwargs)
         ESDataset.init(index=str(self.id))
 
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(project=self):
+            locprj.delete()
+
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
@@ -788,6 +806,7 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         except ObjectDoesNotExist:
             pass
 
+        self.delete_locationprojects()
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
@@ -829,6 +848,18 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
     def __str__(self):
         return self.name
 
+
+class LocationProject(models.Model):
+    """
+    The LocationProject
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, help_text="The location this project applies to")
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text="The project")
+
+    class Meta:
+        db_table = "rdm_location_projects"
 
 class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
     """
@@ -913,6 +944,14 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
             return None
         return geo_data
 
+    def get_search_model(self):
+        try:
+            search_model = SearchModel.objects.get(dataset_id=self.id)
+            return search_model
+        except SearchModel.DoesNotExist:
+            return None 
+
+
     def delete_data_collection_methods(self):
         for dcm in DatasetDataCollectionMethod.objects.filter(dataset=self):
             dcm.delete()
@@ -921,12 +960,17 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
         for dss in DatasetSensitivity.objects.filter(dataset=self):
             dss.delete()
 
+    def delete_search_model(self):
+        sm_obj = SearchModel.objects.filter(dataset=self)
+        sm_obj.delete()
+
     def delete(self, *args, **kwargs):
         """
         Delete any joint relationships between dataset and sensitivity or data collection model
         """
         self.delete_data_collection_methods()
         self.delete_sensitivities()
+        self.delete_search_model()
         try:
             entity = Entity.objects.get(dataset=self.id)
             entity.delete()
@@ -956,7 +1000,7 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
         db_table = "rdm_data_project_statistics"
 
 
-class SearchModel(models.Model):
+class SearchModel(models.Model, SearchModelPermissionMixin):
     """
     SearchModel to hold JSONField representing Search object for persistent storage
     """

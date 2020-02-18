@@ -14,11 +14,13 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //TODO: move '/api' to constants as the url for where the api is hosted.
 export function getAPIEndpoint() {
   //TODO: this is just needed for local testing.  this should eventually be removed.
-  /*
   if (window && window.location && window.location.port === '3000') {
-    return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
+    
+    //return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
+    //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
+    //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
   }
-  */
+  
   return `/${API_ENDPOINT}`;
 }
 
@@ -67,7 +69,7 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
         return "data_manager"
       }
     }
-    return "user"
+    return ROLE_USER
   }
   //no cookie or group
   else if (!user && !group){
@@ -150,7 +152,7 @@ export function getMaxUserRole(){
     else if (user.is_data_manager){
       return "data_manager" 
     }
-    return "user"
+    return ROLE_USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
@@ -225,6 +227,7 @@ export function getFirstCoordinate(layer) {
 export function getFolderFiles(
   params,
   type,
+  dataType="projects"
 ) {
 
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
@@ -241,7 +244,7 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.projectID,
+      dataType + '/' + params.projectID,
       queryParams
     )
       .then(response => {
@@ -284,8 +287,13 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
+//given json, format into something elasticsearch wants
+export function makeElasticQuery(query){
+
+}
+
 //gets the root folder paths for a given project
-export function getRootPaths(projectID) {
+export function getRootPaths(projectID, dataType="projects") {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: '' },
@@ -295,7 +303,7 @@ export function getRootPaths(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + projectID,
+      dataType + '/' + projectID,
       params
     )
       .then(response => {
@@ -337,24 +345,23 @@ export function getRootPaths(projectID) {
   });
 }
 
-export function getProjectData(params, folders = false) {
+export function getProjectData(params, dataType="projects") {
   //get only folders if true, otherwise get only files
   
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.id,
+      dataType + '/' + params.id,
       params
     )
       .then(response => {
         resolve({ files: response.data, nbFiles: response.total });
       })
       .catch(err => {
-        reject({ loading: false, error: err });
+        reject(err);
       });
   });
 }
-
 
 //given some group, return all of its parent groups.
 export function getParentGroupList(group_id, groupList = []){
@@ -867,6 +874,26 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       }
     }
   }
+/*
+  //Locations suffers the same stupid field issue that Datasets does and requires a similar transformation on Projects
+  if (resource === 'LOCATIONS'){
+    if (!Array.isArray(data)){ //no transformation needed upstream
+      if (direction === 0){
+        if (data.projects && data.projects.length > 0){
+          const projList = []
+          
+          console.log("in translator, data.projects is: ", data.projects)
+          data.projects.map(project => {
+            projList.push(project.id)
+          })
+          data.projects = projList
+        }
+      }
+    }
+    console.log("LOCATIONS translated data: ", data)
+    
+  }*/
+  
 
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.

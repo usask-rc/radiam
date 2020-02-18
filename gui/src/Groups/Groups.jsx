@@ -130,12 +130,17 @@ const actionStyles = theme => ({
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-
+  let _isMounted = true
   useEffect(() => {
     if (data && !showEdit){
       isAdminOfAParentGroup(data.id).then(data => {
-        setShowEdit(data)
+        if (_isMounted){
+          setShowEdit(data)
+        }
       })
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   }, [data, showEdit])
 
@@ -163,9 +168,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   const [groupMembers, setGroupMembers] = useState([])
   const [canEditGroup, setCanEditGroup] = useState(false)
 
-  let _isMounted = false
+  let _isMounted = true
   useEffect(() => {
-    _isMounted = true
     isAdminOfAParentGroup(props.id).then(data => {
       if (_isMounted){
         setCanEditGroup(data)
@@ -177,8 +181,6 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   }, [])
 
   useEffect(() => {
-    _isMounted = true;
-    
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupMembers(params).then((data) => {
@@ -282,11 +284,17 @@ const GroupForm = props =>
 {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
-  
+  let _isMounted = true
+
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
-      console.log("before save, isformdirty, data: ", isFormDirty, data)
-      props.save(data)
+      if (_isMounted){
+        console.log("before save, isformdirty, data: ", isFormDirty, data)
+        props.save(data)
+      }
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   }, [data])
 
@@ -318,6 +326,7 @@ const GroupForm = props =>
         label={"en.models.groups.description"}
         source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
+        multiline
       />
       <ReferenceInput
         label={"en.models.groups.parent_group"}
@@ -363,7 +372,7 @@ class BaseGroupEdit extends Component {
         toolbar={<EditToolbar />}
         redirect={RESOURCE_OPERATIONS.LIST}
       >
-      <GroupTitle prefix={"Updating"} />
+        <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
           source={MODEL_FIELDS.NAME}
@@ -374,6 +383,7 @@ class BaseGroupEdit extends Component {
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}
           style={{"max-width": "80%"}}
+          multiline
         />
         <BooleanInput
           label={"en.models.generic.active"}

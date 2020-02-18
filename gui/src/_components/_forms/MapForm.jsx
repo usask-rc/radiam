@@ -8,7 +8,7 @@ import { compose } from 'recompose';
 import {withStyles} from "@material-ui/core/styles"
 import Typography from "@material-ui/core/Typography"
 import { getFirstCoordinate } from '../../_tools/funcs';
-import {OSMTILEURL} from '../../_constants/index';
+import {LINKS} from '../../_constants/index';
 
 const styles = {
   mapDisplay: {
@@ -430,7 +430,7 @@ class MapForm extends Component {
                   'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                 }
                 userAgent={navigator.userAgent}
-                url={OSMTILEURL}
+                url={LINKS.OSMTILEURL}
               />
 
               <FeatureGroup

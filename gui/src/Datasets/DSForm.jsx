@@ -103,7 +103,7 @@ class DSForm extends Component {
                 >
                 <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
                 </ReferenceInput>
-            
+
                 <ReferenceInput
                 resource={MODELS.DATA_COLLECTION_STATUS}
                 className="input-small"

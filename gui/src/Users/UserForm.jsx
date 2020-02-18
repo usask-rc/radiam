@@ -195,6 +195,7 @@ class UserForm extends Component {
                     label={"en.models.users.notes"}
                     source={MODEL_FIELDS.NOTES}
                     onChange={this.handleChange}
+                    multiline
                 />
                 <TextInput
                     label={"en.models.users.user_orcid_id"}

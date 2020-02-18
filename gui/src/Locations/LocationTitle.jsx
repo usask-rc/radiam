@@ -7,8 +7,9 @@ const styles = {
         fontSize: "2em",
     }
 }
-
-const LocationTitle = ({ prefix="", record, classes }) => {
+//for some reason, record cannot be inherited from LocationForm.  I have no idea why this is.
+const LocationTitle = ({ prefix="", record, classes, ...rest }) => {
+    console.log("record in locationtitle: ", record, rest)
     return <Typography className={classes.titleText}>{`${prefix} ${record && record.display_name ? record.display_name : ""}`}</Typography>;
 };
 

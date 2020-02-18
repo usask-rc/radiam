@@ -12,8 +12,9 @@ import {
   Show,
   ShowController,
   SimpleForm,
-  SimpleShowLayout,
   SingleFieldList,
+  Tab,
+  TabbedShowLayout,
   TextField,
   TextInput,
   translate,
@@ -32,12 +33,15 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import { GET_ONE } from 'ra-core';
+import { GET_ONE, FormDataConsumer } from 'ra-core';
 import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
+import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
+import FilesTab from '../Projects/Files/FilesTab.jsx';
+import { Field } from 'react-final-form';
 
 const styles = {
   actions: {
@@ -59,6 +63,8 @@ const styles = {
   },
   hint: {
   fontSize: '2em',
+  },
+  searchModel: {
   }
 };
 
@@ -73,7 +79,7 @@ const actionStyles = theme => ({
 
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-
+  let _isMounted = true
   console.log("datasetshowactions data: ", data)
 
   //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
@@ -83,9 +89,14 @@ const actionStyles = theme => ({
       const params = { id: data.project }
       const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient)
       dataProvider(GET_ONE, MODELS.PROJECTS, params).then(response => {
-        isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
+        if (_isMounted){
+          isAdminOfAParentGroup(response.data.group).then(data => {setShowEdit(data)})
+        }
         //now have a group - check for adminship
       }).catch(err => {console.error("error in useeffect datasetshowactions: ", err)})
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   })
   if (showEdit && data){
@@ -105,7 +116,8 @@ const actionStyles = theme => ({
 
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show actions={<DatasetShowActions/>} {...props}>
-    <SimpleShowLayout>
+    <TabbedShowLayout>
+      <Tab label={'Summary'}>
         <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
@@ -129,6 +141,11 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         <TextField
           label={"en.models.datasets.study_site"}
           source={MODEL_FIELDS.STUDY_SITE}
+        />
+
+        <TextField multiline
+        label={"en.models.datasets.search_model"}
+        source={"search_model.search"}
         />
 
         <ReferenceField
@@ -182,24 +199,69 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           )}
         </ShowController>
         <MapView/>
-    </SimpleShowLayout>
+      </Tab>
+      <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
+        <FilesTab projectID={props.id} dataType="datasets" />
+      </Tab>
+      <Tab label={'Browse'}>
+        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`}
+        //TODO: get the project name from the referenced project and insert it here into projectName
+         />
+      </Tab>
+    </TabbedShowLayout>
   </Show>
 ));
 
 
 const validateProject = required('A project is required for a dataset');
 const validateTitle = required('en.validate.dataset.title');
+const validatedcm = required("A Data Collection Method is required")
+const validatedcs = required("A Data Collection Status is required")
+const validatedr = required("A Distribution Restriction must be specified")
+const validatesl = required("A Sensitivity Level must be specified")
 
+/*
+const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
+
+*/
+
+const validateSearchModel = (value) => {
+  console.log("validateSearchModel value: ", value)
+  
+  if (!value){
+    //we've been sent no value
+    return `Enter a search model in valid JSON`
+  }
+
+  try {
+    let result
+    if (value.search){
+      result = JSON.stringify(value.search)
+    }
+    else{
+      result = JSON.parse(value)
+    }
+    //TODO: check here for anything we don't want / invalid Elastic queries
+  }
+  catch(e){
+    console.log("json parse error e: ", value)
+    return `Entry is not valid JSON`
+  }
+
+}
 
 const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
+
+  console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
-
+  //TODO: refactor this
+  const [searchModel, setSearchModel] = useState(props.location && props.location.search_model ? JSON.stringify(props.location.search_model) : props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
 
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
@@ -207,20 +269,41 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       setIsDirty(true)
     }
   } 
+  function handleChange(e){
+    if (e.target && e.target.name === "search_model"){
+      console.log("handlechange setsearchmodel to value: ", e.target.value)
+      setSearchModel(e.target.value)
+    }
+  }
 
   function handleSubmit(data) {
     //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
 
+    console.log("datasetform handleSubmit sent data: ", data)
     setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
+    newData.search_model = {search: searchModel}
+    try{
+      let parseJSON = JSON.parse(searchModel)
+      newData.search_model.search = JSON.stringify(parseJSON)
+    }
+    catch(e){
+      console.log(`error parsing data to json: ${searchModel}` , e)
+    }
+
+    //TODO: refactor this shit
+
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
+
+    //TODO: there must be a better way to submit than this, even despite the isDirty flag.
     setData(newData) //will prompt the call in useEffect.
+
     
     console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
@@ -228,6 +311,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     props.resource = "datasets"
 
     //if (props.save){
+    if (!geo){
+
+    }
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false)
 
     if (props.setCreateModal){
@@ -236,15 +322,20 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     else if (props.setEditModal){
       props.setEditModal(false)
     }
+
   };
 
   console.log("props record after editmodal transofmration: ", props.record)
+
+
+  //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
 
   return(
   <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}>
     <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"
+      defaultValue={props.location && props.location.title || ""}
       source={MODEL_FIELDS.TITLE}
       validate={validateTitle}
       
@@ -266,11 +357,24 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       source={MODEL_FK_FIELDS.PROJECT}
       reference={MODELS.PROJECTS}
       validate={validateProject}
-      defaultValue={props.project ? props.project : null}
+      defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
       disabled={props.project ? true : false}
+      required
     >
       <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
     </ReferenceInput>
+
+      <TextInput
+      className={classes.searchModel}
+      id={"search_model"}
+      name={"search_model"}
+      label={"Search Model"}
+      multiline
+      validate={validateSearchModel}
+      value={searchModel}
+      required
+      onChange={(e) => handleChange(e)}
+    />
 
     <ReferenceInput
       resource={MODELS.DATA_COLLECTION_STATUS}
@@ -278,6 +382,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_status"}
       source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
       reference={MODELS.DATA_COLLECTION_STATUS}
+      validate={validatedcs}
       required>
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
@@ -288,6 +393,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.distribution_restriction"}
       source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
       reference={MODELS.DISTRIBUTION_RESTRICTION}
+      validate={validatedr}
       required>
       <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
     </ReferenceInput>
@@ -299,6 +405,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.data_collection_method"}
       source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
       reference={MODELS.DATA_COLLECTION_METHOD}
+      validate={validatedcm}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>
@@ -309,6 +416,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       label={"en.models.datasets.sensitivity_level"}
       source={MODEL_FIELDS.SENSITIVITY_LEVEL}
       reference={MODELS.SENSITIVITY_LEVEL}
+      validate={validatesl}
       required>
       <TranslationSelectArray optionText="label" />
     </ReferenceArrayInput>

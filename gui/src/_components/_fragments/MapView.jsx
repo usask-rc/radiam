@@ -6,7 +6,7 @@ import L from "leaflet";
 import Typography from "@material-ui/core/Typography"
 import Divider from "@material-ui/core/Divider"
 import withStyles from '@material-ui/core/styles/withStyles';
-import {OSMTILEURL} from "../../_constants/index"
+import {LINKS} from "../../_constants/index"
 
 const styles = {
     mapDisplay: {
@@ -29,17 +29,15 @@ const styles = {
   };
 
 //display map data, but prevent any interaction.
-const MapView = ({ classes, record }) => {
+const MapView = ({classes, record }) => {
     const [popup, setPopup] = useState({active: false, for: ""})
     const [location, setLocation] = useState([])
     const [mapLoading, setMapLoading] = useState(true)
     const [curFeature, setCurFeature] = useState({})
     const [mapRef, setMapRef] = useState(null)
 
-    let _isMounted = false
-
+    let _isMounted = true
     useEffect(() => {
-        _isMounted = true
         return function cleanup() {
             _isMounted = false
         }
@@ -47,14 +45,19 @@ const MapView = ({ classes, record }) => {
 
     //this is where we would put info display / editing for features.
     function _onLayerClick(e) {
-        var layer = e.target;
-        setLocation([e.latlng.lat, e.latlng.lng])
-        setCurFeature(layer.feature)
-        setPopup({active: true, for: layer._leaflet_id})
+        if (_isMounted)
+        {
+            var layer = e.target;
+            setLocation([e.latlng.lat, e.latlng.lng])
+            setCurFeature(layer.feature)
+            setPopup({active: true, for: layer._leaflet_id})
+        }
     }
 
     function _onPopupClose() {
-        setPopup({popup: {active: false, for: ""}})
+        if (_isMounted){
+            setPopup({popup: {active: false, for: ""}})
+        }
     }
 
     //https://stackoverflow.com/questions/52684688/importing-geojson-to-react-leaflet-draw
@@ -136,10 +139,12 @@ const MapView = ({ classes, record }) => {
 
             //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
+
             if (_isMounted){
                 setLocation(latLng)
-                setMapLoading(false)}
+                setMapLoading(false)
             }
+        }
 
     }
 
@@ -162,7 +167,11 @@ const MapView = ({ classes, record }) => {
                     {`GeoJSON Map Data`}
                 </Typography>
                 <Map
-                ref={(ref) => {setMapRef(ref)}}
+                ref={(ref) => {
+                    if (_isMounted){
+                        setMapRef(ref)
+                    }
+                }}
                 center={location}
                 className={classes.mapDisplay}
                 zoom={mapRef && mapRef.leafletElement ? mapRef.leafletElement.getZoom() : 7}
@@ -174,7 +183,7 @@ const MapView = ({ classes, record }) => {
                         attribution={
                         'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
                         }
-                        url={OSMTILEURL}
+                        url={LINKS.OSMTILEURL}
                         //url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
                     />
 

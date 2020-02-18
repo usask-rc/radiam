@@ -146,12 +146,17 @@ const GroupMemberShowActions = withStyles(actionStyles)(({ basePath, data, class
 {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-
+  let _isMounted = true
   useEffect(() => {
     if (data && !showEdit){
       isAdminOfAParentGroup(data.group).then(data => {
-        setShowEdit(data)
+        if (_isMounted){
+          setShowEdit(data)
+        }
       })
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   }, [data])
 
@@ -257,7 +262,7 @@ const asyncValidate = getAsyncValidateDuplicateNotExists(
 export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
-  
+  let _isMounted = true
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
       if (props.save){
@@ -273,7 +278,9 @@ export const GroupMemberForm = props => {
           putObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
             console.log("data after updating groupmember: ", data)
             if (props.setEditModal){
-              props.setEditModal(false)
+              if (_isMounted){
+                props.setEditModal(false)
+              }
             }
           })
         }
@@ -281,24 +288,32 @@ export const GroupMemberForm = props => {
           postObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
             console.log("data after posting new groupmember: ", data)
             if (props.setCreateModal){
-              props.setCreateModal(false)
+              if (_isMounted){
+                props.setCreateModal(false)
+              }
             }
           })
         }
        
       }
     }
+    return function cleanup() {
+      _isMounted = false
+    }
   }, [data])
 
   function handleSubmit(formData) {
-
-    console.log("handleSubmit in groupmembers is submitting formData: ", formData)
-    setIsFormDirty(false)
-    setData(formData)
+    if (_isMounted){ 
+      console.log("handleSubmit in groupmembers is submitting formData: ", formData)
+      setIsFormDirty(false)
+      setData(formData)
+    }
   }
 
   function handleChange(data){
-    setIsFormDirty(true)
+    if (_isMounted){
+      setIsFormDirty(true)
+    }
   }
   console.log("groupmemberform props: ", props)
   //given some chosen group, we only want to be able to add users who are not already members of said group in some form

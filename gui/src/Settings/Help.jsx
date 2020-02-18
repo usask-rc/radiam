@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import HelpOutline from '@material-ui/icons/HelpOutline';
-import {RADIAMAGENTURL, SUPPORTEMAIL, USERMANUALFILENAME, USERMANUALPATH, RADIAMAGENTREADMEURL} from "../_constants/index";
+import {LINKS} from "../_constants/index";
 
 const styles = {
     label: { width: "10em", display: "inline-block" },
@@ -32,6 +32,7 @@ const styles = {
     container: {
         textAlign: 'left',
         minWidth: "20em",
+        marginTop: "1em",
     },
     subheader: {
         fontWeight: "bold"
@@ -70,8 +71,8 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.content} variant="p" component="p">
                     {translate('en.help.download.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={RADIAMAGENTURL} target="_blank" rel="noopener noreferrer">
-                    {RADIAMAGENTURL}
+                <Typography  className={classes.link} variant="a" component="a" href={LINKS.RADIAMAGENTURL} target="_blank" rel="noopener noreferrer">
+                    {LINKS.RADIAMAGENTURL}
                 </Typography>
             </div>
 
@@ -83,8 +84,8 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.content} variant="p" component="p">
                     {translate('en.help.email.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${SUPPORTEMAIL}`} target="_blank" rel="noopener noreferrer" >
-                    {SUPPORTEMAIL}
+                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${LINKS.SUPPORTEMAIL}`} target="_blank" rel="noopener noreferrer" >
+                    {LINKS.SUPPORTEMAIL}
                 </Typography>
             </div>
             
@@ -92,8 +93,8 @@ const Help = ({ classes, translate }) => (
                 <Typography className={classes.subheader} variant="p" component="p">
                     {translate('en.help.usermanual.title')}
                 </Typography>
-                <a href={`..${USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
-                    {`${USERMANUALFILENAME}`}
+                <a href={`..${LINKS.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
+                    {`${LINKS.USERMANUALFILENAME}`}
                 </a>
             </div>
 
@@ -106,8 +107,8 @@ const Help = ({ classes, translate }) => (
                     {translate('en.help.developers.text')}
                 </Typography>
 
-                <Typography  className={classes.link} variant="a" component="a" href={RADIAMAGENTREADMEURL} target="_blank" rel="noopener noreferrer" >
-                    {RADIAMAGENTREADMEURL}
+                <Typography  className={classes.link} variant="a" component="a" href={LINKS.RADIAMAGENTREADMEURL} target="_blank" rel="noopener noreferrer" >
+                    {LINKS.RADIAMAGENTREADMEURL}
                 </Typography>
             </div>
 
