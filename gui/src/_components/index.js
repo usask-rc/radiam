@@ -1,3 +1,3 @@
-import { EditToolbar } from "./Toolbar"
+import { DefaultToolbar, UserToolbar } from "./Toolbar"
 
-export { EditToolbar }
+export { DefaultToolbar, UserToolbar }

@@ -25,7 +25,6 @@ import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
 import { Prompt } from 'react-router';
@@ -37,6 +36,7 @@ import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 import UserDetails from "../Users/UserDetails.jsx";
+import { DefaultToolbar } from "../_components/Toolbar.jsx";
 
 const styles = {
   actions: {
@@ -310,7 +310,7 @@ const GroupForm = props =>
   return(
     <SimpleForm
       {...props}
-      toolbar={<EditToolbar />}
+      toolbar={<DefaultToolbar />}
       asyncValidate={asyncValidate}
       asyncBlurFields={[ MODEL_FIELDS.NAME ]}
       onChange={handleChange}
@@ -369,7 +369,7 @@ class BaseGroupEdit extends Component {
     return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm
         basePath={basePath}
-        toolbar={<EditToolbar />}
+        toolbar={<DefaultToolbar />}
         redirect={RESOURCE_OPERATIONS.LIST}
       >
         <GroupTitle prefix={"Updating"} />

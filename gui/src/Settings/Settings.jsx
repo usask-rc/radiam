@@ -17,8 +17,6 @@ import { getTranslation } from "../_tools/funcs"
 
 
 const styles = {
-  label: { width: "10em", display: "inline-block" },
-  button: { margin: "1em" },
   container:{
     marginTop: "1em",
   }

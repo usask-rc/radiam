@@ -5,7 +5,7 @@ import { radiamRestProvider, httpClient } from "../../_tools";
 import { Responsive } from "ra-ui-materialui/lib/layout";
 import { toast, ToastContainer } from "react-toastify";
 import { UPDATE } from "ra-core";
-import { UserEditWithDeletion } from "../../Users/Users";
+import { UserEditWithDeletion, UserEdit } from "../../Users/Users";
 
 const styles = theme => ({
     flex: { display: "flex" },
@@ -107,7 +107,7 @@ class ChangeDetails extends Component {
             <Responsive
                 medium={
                     <>
-                        <UserEditWithDeletion basePath="/users" resource="users" id={user.id}  />
+                        <UserEdit basePath="/users" resource="users" id={user.id}  />
                         <ToastContainer />
                     </>
                 }

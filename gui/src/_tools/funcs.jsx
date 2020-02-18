@@ -410,6 +410,18 @@ export function getUserDetails(userID){
   })
 }
 
+export function getCurrentUserID(){
+  //return user id from local storage
+  const userCookie = JSON.parse(localStorage.getItem(ROLE_USER))
+
+  if (userCookie){
+    return userCookie.id
+  }
+  //reject and send to login page -- no login cookie
+  window.location.hash = "#/login"
+  return false
+}
+
 export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
     dataProvider('CURRENT_USER', MODELS.USERS)
