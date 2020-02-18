@@ -780,6 +780,10 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         models.Model.save(self, *args, **kwargs)
         ESDataset.init(index=str(self.id))
 
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(project=self):
+            locprj.delete()
+
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
@@ -802,6 +806,7 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         except ObjectDoesNotExist:
             pass
 
+        self.delete_locationprojects()
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
