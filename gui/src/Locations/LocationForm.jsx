@@ -21,6 +21,7 @@ import LocationTitle from './LocationTitle';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
 import { Typography } from '@material-ui/core';
+import { DefaultToolbar } from '../_components';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -188,19 +189,7 @@ class LocationForm extends Component {
   };
 
   render() {
-    //const {isformdirty, rest} = {...this.props}
     const { staticContext, id, classes, record, mode, ...rest } = this.props;
-    /*
-    const projList = []
-    if (mode === "edit"){
-      record.projects.map(project => {
-        projList.push(project.id)
-      })
-    }
-    
-*/
-console.log("record is: ", record)
-
     const { isFormDirty, geo, mapFormKey } = this.state;
 
 
@@ -209,6 +198,7 @@ console.log("record is: ", record)
         {...rest}
         save={this.handleSubmit}
         name={`locationForm`}
+        toolbar={this.props.record && <DefaultToolbar {...this.props}/> }
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >

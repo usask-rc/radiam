@@ -27,19 +27,42 @@ const BaseUserToolbar = ({classes, ...props}) => {
   </Toolbar>
 )}
 
-//for anything with `name` as a field
+//for anything with `name` as a field - Groups, Projects, display_name (Locations) title (datasets) 
 const BaseToolbar = ({classes, ...props}) => {
   console.log("BaseToolbar props: ", props)
   const { record } = props
   return(
     <Toolbar {...props}>
       <SaveButton />
-      <DeleteWithConfirmButton className={classes.deleteButton}
-      confirmTitle={`Delete ${record.name} ?`}
-      confirmContent={`Are you sure you would like to delete this record?`}/>
+      {
+        //TODO: there remains a bug here where props.record exists in the parent component (in Location only) but not here.
+        props.record && 
+        <DeleteWithConfirmButton className={classes.deleteButton}
+        confirmTitle={`Delete ${record.name || record.title || record.display_name} ?`}
+        confirmContent={`Are you sure you would like to delete this record?`}/>
+      }
     </Toolbar>
   )
 }
 
+//for anything that is a model of foreign keys with no name/title
+
+const BaseFKToolbar = ({classes, ...props}) => {
+  console.log("FKToolbar props: ", props)
+  const { record } = props
+  return(
+    <Toolbar {...props}>
+      <SaveButton />
+      {props.record && 
+        <DeleteWithConfirmButton className={classes.deleteButton}
+        confirmTitle={`Delete record in table ${props.resource}?`}
+        confirmContent={`Delete ${props.resource} record ID: ${record.id}?`}
+        />
+      }
+
+    </Toolbar>
+  )
+}
 export const UserToolbar = withStyles(styles)(BaseUserToolbar)
 export const DefaultToolbar = withStyles(styles)(BaseToolbar)
+export const FKToolbar = withStyles(styles)(BaseFKToolbar)

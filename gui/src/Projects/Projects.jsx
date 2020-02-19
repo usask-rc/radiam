@@ -44,6 +44,7 @@ import { EditButton } from "ra-ui-materialui/lib/button";
 import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
 import { ProjectCreateForm } from "./ProjectCreateForm";
 import { UserInput } from "./UserInput";
+import { DefaultToolbar } from "../_components";
 
 const styles = {
   actions: {
@@ -462,7 +463,8 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, ...others } = this.props;
 
     return (<Edit actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}>
+      <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
+      toolbar={<DefaultToolbar {...this.props}/>}>
         <ProjectTitle prefix={`Updating`} />
         <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
