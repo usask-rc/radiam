@@ -4,6 +4,8 @@ import englishMessages from 'ra-language-english';
 export default {
   ...englishMessages,
   en: {
+    Type1: "Temporary Type 1",
+    Type2: "Temporary Type 2",
     metadata: {
       configure: "Metadata",
       config: {

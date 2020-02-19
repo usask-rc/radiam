@@ -10,15 +10,12 @@ import {
 } from 'react-admin';
 
 import { compose } from 'recompose';
-import {LOCATIONTYPE_OSF, MODELS, MODEL_FIELDS, MODEL_FK_FIELDS, WARNINGS} from '../_constants/index';
+import {LOCATIONTYPE_OSF, MODELS, MODEL_FIELDS, MODEL_FK_FIELDS} from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
-import { Prompt } from 'react-router';
 import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { FormDataConsumer } from 'ra-core';
-import LocationTitle from './LocationTitle';
-import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
 import { Typography } from '@material-ui/core';
 import { DefaultToolbar } from '../_components';

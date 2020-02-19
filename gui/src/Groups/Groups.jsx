@@ -130,8 +130,8 @@ const actionStyles = theme => ({
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-  let _isMounted = true
   useEffect(() => {
+    let _isMounted = true
     if (data && !showEdit){
       isAdminOfAParentGroup(data.id).then(data => {
         if (_isMounted){
@@ -168,8 +168,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   const [groupMembers, setGroupMembers] = useState([])
   const [canEditGroup, setCanEditGroup] = useState(false)
 
-  let _isMounted = true
   useEffect(() => {
+    let _isMounted = true
     isAdminOfAParentGroup(props.id).then(data => {
       if (_isMounted){
         setCanEditGroup(data)
@@ -181,6 +181,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   }, [])
 
   useEffect(() => {
+    let _isMounted = true
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupMembers(params).then((data) => {

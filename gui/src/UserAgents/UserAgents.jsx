@@ -129,7 +129,7 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
         setShowEdit(true)
       }
     }
-  }, [data])
+  }, [data, showEdit, user.id])
 
   if (showEdit){
     return(

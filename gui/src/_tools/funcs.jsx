@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from 'ra-core';
 import moment from 'moment';
 var cloneDeep = require('lodash.clonedeep');
 
@@ -646,6 +646,20 @@ export function postObjectWithoutSaveProp(formData, resource){
         resolve(response)
     }).catch(err => {
         reject(err)
+    })
+  })
+}
+
+//seems like it works - needs testing
+export function deleteItem(data, resource){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = { id: data.id, resource:resource }
+
+    dataProvider(DELETE, resource, params).then(response => {
+      resolve(response)
+    }).catch(err => {
+      reject(err)
     })
   })
 }

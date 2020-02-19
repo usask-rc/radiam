@@ -1,3 +1,4 @@
+//Toolbar.jsx
 import React from 'react';
 import { Toolbar, SaveButton, DeleteButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
@@ -14,11 +15,12 @@ const styles = {
 //separate entry for deleting users - we don't want users to be able to delete themselves.
 const BaseUserToolbar = ({classes, ...props}) => {
   console.log("BaseUserToolbar props: ", props)
-  const { record } = props
+  const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
+  const { record } = props.record
   return(
-  <Toolbar {...props}>
+  <Toolbar {...rest}>
     <SaveButton />
-    {record.id !== getCurrentUserID() && 
+    {record && record.id !== getCurrentUserID() && 
       <DeleteWithConfirmButton className={classes.deleteButton} 
         confirmTitle={`Delete User ${record.username} <${record.first_name} ${record.last_name}> ?`}
         confirmContent={`Are you sure you want to delete this user?`}
@@ -30,13 +32,14 @@ const BaseUserToolbar = ({classes, ...props}) => {
 //for anything with `name` as a field - Groups, Projects, display_name (Locations) title (datasets) 
 const BaseToolbar = ({classes, ...props}) => {
   console.log("BaseToolbar props: ", props)
+  const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
   const { record } = props
   return(
-    <Toolbar {...props}>
+    <Toolbar {...rest}>
       <SaveButton />
       {
         //TODO: there remains a bug here where props.record exists in the parent component (in Location only) but not here.
-        props.record && 
+        record && 
         <DeleteWithConfirmButton className={classes.deleteButton}
         confirmTitle={`Delete ${record.name || record.title || record.display_name} ?`}
         confirmContent={`Are you sure you would like to delete this record?`}/>
@@ -49,14 +52,15 @@ const BaseToolbar = ({classes, ...props}) => {
 
 const BaseFKToolbar = ({classes, ...props}) => {
   console.log("FKToolbar props: ", props)
-  const { record } = props
+  const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
+  const { record, id, resource} = props
   return(
-    <Toolbar {...props}>
+    <Toolbar {...rest}>
       <SaveButton />
-      {props.record && 
+      {record && 
         <DeleteWithConfirmButton className={classes.deleteButton}
-        confirmTitle={`Delete record in table ${props.resource}?`}
-        confirmContent={`Delete ${props.resource} record ID: ${record.id}?`}
+        confirmTitle={`Delete record in table ${resource}?`}
+        confirmContent={`Delete ${resource} record ID: ${id}?`}
         />
       }
 
