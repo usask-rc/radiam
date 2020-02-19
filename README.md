@@ -150,4 +150,3 @@ Default project avatars are courtesy https://www.swifticons.com
 
 Copyright 2019-2020 University of Saskatchewan and Simon Fraser University
 
-
