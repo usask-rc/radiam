@@ -6,7 +6,7 @@ import {
   AUTH_CHECK,
   AUTH_GET_PERMISSIONS
 } from "react-admin";
-import { getAPIEndpoint } from "./funcs";
+import { getAPIEndpoint, getCurrentUserDetails } from "./funcs";
 import {MODELS, MODEL_FIELDS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS, METHODS, WEBTOKEN} from "../_constants/index"
 import { toast } from "react-toastify";
 
@@ -112,33 +112,30 @@ function getGroupRoles() {
 
 function getUser(groupRoles) {
   const username = localStorage.getItem(MODEL_FIELDS.USERNAME);
-  const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=` + username);
-  return fetch(request)
-    .then(response => {
-      if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-        return response.json();
-      } else {
-        throw new Error("There was more than one user returned matching that username");
-      }
-    })
-    .then(result => {
-      if (result.count > 1) {
-        console.log("Had more than one user with the same username", result);
-        throw new Error("We have more than one user with the same username.")
-      }
+
+
+  
+  /*const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=${username}`);
+  console.log("request getuser: ", request)
+  
+  */
+ return getCurrentUserDetails()
+  .then(result => {
+    console.log("getCurrentUser result: ", result)
+    if (result && result.id) {
       console.log("in getUser, result is: ", result)
       var user = { is_admin: false, is_data_manager: false, is_group_admin: false, groupRoles: groupRoles };
-      var newUser = result.results[0];
-      var admin = newUser.is_superuser;
-      if (admin) {
-        user.is_admin = true;
-      } else {
-        user.is_admin = false;
-      }
-      user.id = newUser.id;
+
+      user.is_admin = result.is_superuser ? true : false
+
+      user.username = result.username
+
       localStorage.setItem(ROLE_USER, JSON.stringify(user));
+
+      console.log("user set to: ", user)
       return Promise.resolve(user);
-    });
+    }
+  }).catch(err => Promise.reject(err));
 }
 
 function getGroupMemberships(user) {
@@ -224,6 +221,7 @@ function getGroups(user) {
 }
 
 export default (type, params, ...rest) => {
+  console.log("type, params: ", type, params, rest)
   if (type === AUTH_LOGIN) {
 
     return new Promise((resolve, reject) => 
@@ -305,31 +303,46 @@ export default (type, params, ...rest) => {
     }
   }
   if (type === AUTH_CHECK) {
+
     const getToken = localStorage.getItem(WEBTOKEN);
-
+    
     if (!getToken || getToken.length === 0){
-      return Promise.reject()
+      let pathArr = window.location.href.split("/")
+      if (pathArr.includes("reset")){
+        return Promise.resolve()
+      }
+      else{
+        return Promise.reject()
+      }
     }
+    else{
 
-    //I'm confident that the same thing can be achieved with withRouter from react-router
-    //get the model and ID from the URL and check for user authorization on this page.
+      //I'm confident that the same thing can be achieved with withRouter from react-router
+      //get the model and ID from the URL and check for user authorization on this page.
 
-    return validateToken(JSON.parse(getToken).access)
-      .then(() => {
-          Promise.resolve()
-        }
-      )
-      .catch(
-        refreshAccessToken(JSON.parse(getToken))
-          .then(Promise.resolve())
-          .catch(Promise.reject())
-      );
+      return validateToken(JSON.parse(getToken).access)
+        .then(() => {
+            Promise.resolve()
+          }
+        )
+        .catch(
+          refreshAccessToken(JSON.parse(getToken))
+            .then(Promise.resolve())
+            .catch(Promise.reject())
+        );
+    }
   }
   if (type === AUTH_GET_PERMISSIONS) {
 
-    const user = JSON.parse(localStorage.getItem(ROLE_USER));
-    return user ? Promise.resolve(user) : Promise.reject({ role: ROLE_ANONYMOUS, is_admin: false });
+    let pathArr = window.location.href.split("/")
 
+    if (pathArr.includes("reset")){
+      return Promise.resolve({role: ROLE_ANONYMOUS, is_admin: false})
+    }
+    else{
+      const user = JSON.parse(localStorage.getItem(ROLE_USER));
+      return user ? Promise.resolve(user) : Promise.reject({ role: ROLE_ANONYMOUS, is_admin: false });
+    }
   }
   return Promise.reject("Unknown method");
 };

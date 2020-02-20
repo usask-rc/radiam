@@ -418,12 +418,10 @@ export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
     dataProvider('CURRENT_USER', MODELS.USERS)
       .then(response => {
-        const localID = JSON.parse(localStorage.getItem(ROLE_USER))
-          .id;
-
-        if (response.data.id === localID) {
+        if (response && response.data){
           resolve(response.data);
-        } else {
+        }
+          else {
           reject({ redirect: true });
           toastErrors(WARNINGS.NO_AUTH_TOKEN);
         }
