@@ -106,7 +106,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
       />
       <TextField
         label={'en.models.locations.host_name'}
-        source={MODEL_FIELDS.HOST_NAME}
+        source={"host_name"}
       />
       <ReferenceField
         link={false}

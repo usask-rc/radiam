@@ -211,7 +211,7 @@ class LocationForm extends Component {
           label={'en.models.locations.host_name'}
           source={MODEL_FIELDS.HOST_NAME}
           validate={validateHostname}
-          defaultValue={record && record.length > 0 ? record.host_name : "osf.io"}
+          defaultValue={record.host_name || "osf.io"}
         />
         <ReferenceInput
           label={'en.models.locations.type'}

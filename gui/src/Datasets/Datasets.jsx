@@ -145,8 +145,8 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         />
 
         <TextField multiline
-        label={"en.models.datasets.search_model"}
-        source={"search_model.search"}
+          label={"en.models.datasets.search_model"}
+          source={"search_model.search"}
         />
 
         <ReferenceField

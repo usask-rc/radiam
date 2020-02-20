@@ -395,6 +395,7 @@ class BaseGroupEdit extends Component {
           label={"en.models.groups.parent_group"}
           source={MODEL_FK_FIELDS.PARENT_GROUP}
           reference={MODELS.GROUPS}
+          validate={validateParentGroup}
           allowEmpty
         >
           <SelectInput

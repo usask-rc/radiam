@@ -35,6 +35,12 @@ const styles = theme => ({
   backCell: {
     verticalAlign: "middle",
     display: "flex",
+    cursor: "pointer",
+    borderRadius: "16",
+  },
+  specialBackRow: {
+    backgroundColor: "beige",
+    cursor: "pointer",
   },
   createDatasetCell: {
     margin: "0px",
@@ -48,9 +54,6 @@ const styles = theme => ({
     display: "flex",
     verticalAlign: "middle",
     flexDirection: "row",
-  },
-  fileDialog: {
-    minWidth: "50em",
   },
   iconDisplay: {
     marginTop: "-0.1em",
@@ -196,9 +199,23 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
+  const [displayParent, setDisplayParent] = useState([item.path_parent]);
+
+  const truncatePath = (path) => {
+    let tempPath = path
+    let tempPathArr = tempPath.split("/")
+    if (tempPathArr.length > 4){
+      tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
+      tempPath = ".../" + tempPathArr.join("/")
+    }
+    return tempPath
+  }
 
   const addParent = (parent) => {
     let tempParents = [...parents, parent]
+    
+    
+    setDisplayParent(truncatePath(parent))
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -414,38 +431,47 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       </div>
     </EnhancedTableHead>
     <TableBody>
-      {!loading && (parents.length > 1) &&
-        <TableRow className={classes.folderRow}>
-          <TableCell className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}><ArrowBack /><Typography className={classes.parentDisplay}>{`${parents[parents.length - 2]}`}</Typography></TableCell>
-          <TableCell>
+      {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
+      
+        <TableRow className={classes.specialBackRow} onClick={() => parents.length > 1 ? removeParent() : null}>
+          <TableCell align={"left"} colSpan={4} className={classes.backCell} >
+            <ArrowBack />
+            <Typography className={classes.parentDisplay}>{`${displayParent}`}</Typography>
           </TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          <TableCell />
+          <TableCell />
+          <TableCell />
+          <TableCell />
+
+
         </TableRow>
       }
       {!loading && folders && folders.length > 0 && 
       <>
         {folders.map( folder => {
+          //split to 3 folders up
+          let truncated_path = truncatePath(folder.path_parent)
+
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
               {folder.name}
             </TableCell>
-            <TableCell className={classes.fileCountCell}>
+            <TableCell className={classes.fileCountCell} onClick={() => addParent(folder.path)}>
               <DisplayFileIcons folder={folder} classes={classes} />
             </TableCell>
-            <TableCell className={classes.nameCell}>
-              {folder.path_parent}
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
+              {truncated_path}
             </TableCell>
-            <TableCell className={classes.nameCell}>
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
               {folder.indexed_date}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path_parent}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path_parent}*`}}}}>
-                <Chip icon={<InsertChart />} clickable variant="outlined" key={`newDataset_${folder.id}`}/>
+                <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
               </Link>
             </TableCell>
           </TableRow>
-        })//<Chip label={`+ Add Dataset`} className={classes.newDatasetChipDisplay} variant="outlined" key={"newDatasetChip"} clickable onClick={() => setCreateModal(true)}/>
+        })
         }
       </>
       }
@@ -459,6 +485,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       }
       {!loading && files && files.length > 0 && 
         files.map( file => {
+          let truncated_path = truncatePath(file.path_parent)
+
           return <TableRow className={classes.fileRow} key={file.id} onClick={() => setFile(file)}>
           <TableCell className={classes.nameCell}>
             {file.name}
@@ -467,11 +495,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             {formatBytes(file.filesize)}
           </TableCell>
           <TableCell className={classes.nameCell}>
-            {file.path_parent}
+            {truncated_path}
           </TableCell>
           <TableCell className={classes.nameCell}>
             {file.indexed_date}
           </TableCell>
+          <TableCell></TableCell>
+          
         </TableRow>
       })
       }
@@ -481,13 +511,14 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
+          <TableCell></TableCell>
         </TableRow>
       }
       
     </TableBody>
     </Table>
     {file &&
-    <Dialog fullWidth className={classes.fileDialog} open={file} onClose={() => setFile(null)} aria-label="Show File">
+    <Dialog fullWidth maxWidth={false} className={classes.fileDialog} open={file} onClose={() => setFile(null)} aria-label="Show File">
       <DialogTitle>
       {file.name}
       </DialogTitle>
@@ -496,7 +527,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       </DialogContent>
     </Dialog>}
 
-  </div> )
+  </div>)
 }
 
 
