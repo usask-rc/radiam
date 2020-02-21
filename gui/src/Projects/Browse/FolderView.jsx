@@ -7,7 +7,7 @@ import Folder from "@material-ui/icons/Folder"
 import Search from "@material-ui/icons/Search"
 import InsertChart from "@material-ui/icons/InsertChart"
 import { compose } from 'recompose';
-import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
+import {PATHS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
 import Typography from "@material-ui/core/Typography"
 import Table from "@material-ui/core/Table"
 import TableHead from "@material-ui/core/TableHead"
@@ -182,10 +182,11 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects", projectName, ...props }) {
-  console.log("FolderView projectName: ", projectName, "props: ", props)
+function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, ...props }) {
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
+
+  //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
@@ -200,6 +201,16 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
   const [displayParent, setDisplayParent] = useState([item.path_parent]);
+
+  const canCreateDataset = () => {
+    const user = JSON.parse(localStorage.getItem(ROLE_USER))
+    if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
+      console.log("user groupadminships: ", user.groupAdminships, groupID)
+      return true
+    }
+    return false
+  }
+
 
   const truncatePath = (path) => {
     let tempPath = path
@@ -466,9 +477,12 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               {folder.indexed_date}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
-              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path_parent}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path_parent}*`}}}}>
-                <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
-              </Link>
+              {canCreateDataset() ? 
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
+                  <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
+                </Link>
+                : null
+              }
             </TableCell>
           </TableRow>
         })

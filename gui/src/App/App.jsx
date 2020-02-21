@@ -215,7 +215,7 @@ const App = props => {
             list={LocationList}
             show={LocationDisplay}
             create={LocationCreate}
-            edit={LocationEdit}
+            edit={permissions.is_admin ? LocationEdit : null} //Security states only SU may update locations
           />,
           
           <Resource

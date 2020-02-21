@@ -18,7 +18,7 @@ const styles = theme => ({
   },
 });
 
-function BrowseTab({ projectID, classes, translate, dataType="projects", projectName }) {
+function BrowseTab({ projectID, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
@@ -89,6 +89,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
             projectID={projectID}
             key={item.key}
             dataType={dataType}
+            groupID={props.record.group || null}
           />
         }
       )
