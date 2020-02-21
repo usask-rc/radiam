@@ -6,7 +6,7 @@ Radiam Agent designed for harvesting metadata from the Open Science Framework.
 
 The Radiam OSF Agent runs automatically as part of a Radiam API deployment. Unlike the generic Radiam Agent, it is configured directly from the Radiam admin interface, and will crawl any attached OSF locations continuously.
 
-To configure the Radiam OSF Agent, first ensure that you've created a Project in Radiam, from the "Projects" menu on the sidebar (this part will probably already have been done if you've already been working with Radiam):
+To configure the Radiam OSF Agent, first ensure that you've created a project in Radiam, from the "Projects" menu on the sidebar (this part will probably already have been done if you've already been working with Radiam):
 
 ![projects screenshot](osf_images/radiam-project.png)
 
