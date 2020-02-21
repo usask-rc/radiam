@@ -111,35 +111,24 @@ function getGroupRoles() {
 }
 
 function getUser(groupRoles) {
-  const username = localStorage.getItem(MODEL_FIELDS.USERNAME);
 
+  return getCurrentUserDetails()
+    .then(result => {
+      if (result && result.id) {
+        var user = { is_admin: false, is_data_manager: false, is_group_admin: false, groupRoles: groupRoles };
+        user.is_admin = result.is_superuser ? true : false //this affects what options are visible - not what are available to preform
+        user.username = result.username
+        user.id = result.id
 
-  
-  /*const request = getRequest(`/${MODELS.USERS}/?${MODEL_FIELDS.USERNAME}=${username}`);
-  console.log("request getuser: ", request)
-  
-  */
- return getCurrentUserDetails()
-  .then(result => {
-    console.log("getCurrentUser result: ", result)
-    if (result && result.id) {
-      console.log("in getUser, result is: ", result)
-      var user = { is_admin: false, is_data_manager: false, is_group_admin: false, groupRoles: groupRoles };
-
-      user.is_admin = result.is_superuser ? true : false
-
-      user.username = result.username
-
-      localStorage.setItem(ROLE_USER, JSON.stringify(user));
-
-      console.log("user set to: ", user)
-      return Promise.resolve(user);
-    }
-  }).catch(err => Promise.reject(err));
+        localStorage.setItem(ROLE_USER, JSON.stringify(user));
+        return Promise.resolve(user);
+      }
+    }).catch(err => Promise.reject(err));
 }
 
 function getGroupMemberships(user) {
   const request = getRequest("/groupmembers/?user=" + user.id);
+  console.log("getGroupMemberships firing on user: ", user)
   return fetch(request)
     .then(response => {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
@@ -150,6 +139,7 @@ function getGroupMemberships(user) {
       }
     })
     .then(result => {
+      console.log("result from groupmemberships query: ", result)
       var groupMemberships = [];
       var groupAdminships = [];
       var dataManagerships = [];
@@ -181,6 +171,7 @@ function getGroupMemberships(user) {
       user.dataManagerships = dataManagerships
       user.groupUserships = groupUserships
 
+      console.log("prior to set to cookie, user is: ", user)
       localStorage.setItem(ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {

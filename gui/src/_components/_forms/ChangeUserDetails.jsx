@@ -75,7 +75,16 @@ class ChangeDetails extends Component {
         event.preventDefault();
     }
 
-    getCurrentUserDetails() {
+    constructor(props) {
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        const user = JSON.parse(localStorage.getItem(ROLE_USER))
+        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
+    }
+
+    componentDidMount() {
+        
         getCurrentUserDetails().then(data => 
         {
             this.setState(data)
@@ -86,18 +95,6 @@ class ChangeDetails extends Component {
                 console.error("Error in getCurrentUserDetails: ", err)
             }
         )
-    }
-
-    constructor(props) {
-        super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        const user = JSON.parse(localStorage.getItem(ROLE_USER))
-        this.state = {user: user, username: "", email: "", first_name: "", last_name: "", notes: "", user_orcid_id: "" }
-    }
-
-    componentDidMount() {
-        this.getCurrentUserDetails();
     }
     //existing user details should be grabbed and displayed for the user to modify.
     render() {
