@@ -526,7 +526,17 @@ class ResearchGroup(MPTTModel, ElasticSearchModel, ResearchGroupPermissionMixin)
         ElasticSearchModel.save(self, *args, **kwargs)
         MPTTModel.save(self, *args, **kwargs)
 
+    def delete_groupmembers(self):
+        for grp_mem in GroupMember.objects.filter(group=self):
+            grp_mem.delete()
+
+    def delete_groupviewgrants(self):
+        for grp_view_grts in GroupViewGrant.objects.filter(group=self):
+            grp_view_grts.delete()
+
     def delete(self, *args, **kwargs):
+        self.delete_groupviewgrants()
+        self.delete_groupmembers()
         ElasticSearchModel.delete(self, *args, **kwargs)
         MPTTModel.delete(self, *args, **kwargs)
 
