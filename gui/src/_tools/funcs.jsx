@@ -937,3 +937,13 @@ export function translateDates(date, type, direction = 1) {
   //TODO: need to do something downstream later.
   return date;
 }
+
+export const truncatePath = (path) => {
+  let tempPath = path
+  let tempPathArr = tempPath.split("/")
+  if (tempPathArr.length > 4){
+    tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
+    tempPath = ".../" + tempPathArr.join("/")
+  }
+  return tempPath
+}

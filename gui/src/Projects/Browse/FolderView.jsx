@@ -24,7 +24,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles, formatBytes } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip } from '@material-ui/core';
 import { Link } from  "react-router-dom";
@@ -209,17 +209,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       return true
     }
     return false
-  }
-
-
-  const truncatePath = (path) => {
-    let tempPath = path
-    let tempPathArr = tempPath.split("/")
-    if (tempPathArr.length > 4){
-      tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
-      tempPath = ".../" + tempPathArr.join("/")
-    }
-    return tempPath
   }
 
   const addParent = (parent) => {
