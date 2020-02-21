@@ -208,6 +208,22 @@ class User(AbstractUser, UserPermissionMixin):
 
         return group_queryset
 
+    def delete_projects(self):
+        for proj in Project.objects.filter(primary_contact_user=self):
+            proj.delete()
+
+    def delete_useragents(self):
+        for agent in UserAgent.objects.filter(user=self):
+            agent.delete()
+
+    def delete_group_memberships(self):
+        for grp_mem in GroupMember.objects.filter(user=self):
+            grp_mem.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_group_memberships()
+        models.Model.delete(self, *args, **kwargs)
+
 @receiver(reset_password_token_created)
 def send_password_reset_email(sender, reset_password_token, *args, **kwargs):
     """
@@ -441,6 +457,14 @@ class UserAgent(models.Model):
         self.local_access_token = str(refresh.access_token)
         self.local_refresh_token = str(refresh)
         return None
+
+    def delete_agentprojectconfigs(self):
+        for prjconf in UserAgentProjectConfig.objects.filter(agent=self):
+            prjconf.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_agentprojectconfigs()
+        models.Model.delete(self, *args, **kwargs)
 
 
 class UserAgentProjectConfig(models.Model):
