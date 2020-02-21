@@ -79,9 +79,12 @@ class UserForm extends Component {
                         headers: headers
                     })
 
+                    console.log("groupmemberrequest group_role and group: ", group_role, group)
+
                     if (group_role && group) {
 
                         return fetch(groupMemberRequest).then(response => {
+                            console.log("groupmemberrequest response:", response)
                             if (response.status >= 200 && response.status < 300) {
                                 return response.json();
                             }
@@ -149,7 +152,8 @@ class UserForm extends Component {
 
     //strangely, the selects and date need a different change handler.
     handleSelectChange = (e, value, prevValue, target) => {
-        this.setState({ [target]: value })
+        this.setState({ [e.target.name]: e.target.value })
+        console.log("handleselectchange state: ", this.state)
 
         if (e && e.timeStamp){
             this.setState({isFormDirty: true})
