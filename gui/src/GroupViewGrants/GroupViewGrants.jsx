@@ -25,6 +25,7 @@ import { Prompt } from 'react-router';
 import GroupViewGrantTitle from "./GroupViewGrantTitle";
 import { DatasetShow } from "../_components/_fields/DatasetShow";
 import { GroupShow } from "../_components/_fields/GroupShow";
+import { FKToolbar } from "../_components/Toolbar";
 
 const styles = {
   actions: {
@@ -177,7 +178,8 @@ const GroupViewGrantForm = props => {
   <SimpleForm {...props} 
     redirect={RESOURCE_OPERATIONS.LIST}
     onChange={handleChange}
-    save={handleSubmit}>
+    save={handleSubmit}
+    toolbar={<FKToolbar {...props} />}>
     <GroupViewGrantTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating View Grant" : "Creating View Grant"} />
 
     <ReferenceInput

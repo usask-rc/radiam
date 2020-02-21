@@ -32,6 +32,7 @@ import { Grid, Toolbar } from "@material-ui/core";
 import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import UserAgentTitle from "./UserAgentTitle";
+import { FKToolbar } from "../_components/Toolbar";
 
 const filterStyles = {
   form: {
@@ -128,7 +129,7 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
         setShowEdit(true)
       }
     }
-  }, [data])
+  }, [data, showEdit, user.id])
 
   if (showEdit){
     return(
@@ -282,7 +283,8 @@ export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Edit {...props}>
-      <SimpleForm>
+      <SimpleForm
+      toolbar={<FKToolbar {...props} />}>
         <UserAgentTitle prefix={"Editing Agent"} />
         <ReferenceField
           link={false}

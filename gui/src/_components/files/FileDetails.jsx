@@ -16,6 +16,7 @@ const styles = theme => ({
     textAlign: 'left',
     display: 'flex',
     paddingBottom: "1em",
+    minWidth: "90em",
   },
   value: {
     paddingRight: "1em",

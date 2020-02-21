@@ -101,6 +101,8 @@ import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
 import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
 import polyglotI18nProvider from "ra-i18n-polyglot";
+import { DatasetList } from '../Datasets/DatasetList';
+import { DatasetShow, DatasetCreate, DatasetEdit } from '../Datasets/Datasets';
 
 
 const messages = {
@@ -239,7 +241,10 @@ const App = props => {
             name={'datasets'}
             icon={InsertChart}
             options={{ label: 'en.sidebar.datasets' }}
-            {...datasets}
+            list={DatasetList}
+            show={ permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? DatasetShow : null}
+            create={permissions.is_admin || permissions.is_group_admin ? DatasetCreate : null}
+            edit={permissions.is_admin || permissions.is_group_admin ? DatasetEdit : null}
           />,
 
           <Resource

@@ -4,6 +4,8 @@ import englishMessages from 'ra-language-english';
 export default {
   ...englishMessages,
   en: {
+    Type1: "Temporary Type 1", //these two `type` values exist in a default db load
+    Type2: "Temporary Type 2",
     metadata: {
       configure: "Metadata",
       config: {
@@ -399,6 +401,7 @@ export default {
         sensitivity_level: 'Sensitivity Levels of Data',
         study_site: 'Study Site',
         title: 'Dataset Title',
+        search_model: "Search Model Query"
       },
       data_collection_method: {
         label: 'Data Collection Methods',

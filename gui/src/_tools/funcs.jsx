@@ -4,23 +4,15 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from 'ra-core';
 import moment from 'moment';
 var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 
-//TODO: move '/api' to constants as the url for where the api is hosted.
+//TODO: move '/api' to constants as the url for where the api is hosted?  or leave as a function?
 export function getAPIEndpoint() {
-  //TODO: this is just needed for local testing.  this should eventually be removed.
-  if (window && window.location && window.location.port === '3000') {
-    
-    //return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-    //return `http://dev7.radiam.ca:8100/api`; //TODO: will need updating after we're done with beta
-    //return `http://localhost:8100/api`; //TODO: will need updating after we're done with beta
-  }
-  
   return `/${API_ENDPOINT}`;
 }
 
@@ -410,16 +402,26 @@ export function getUserDetails(userID){
   })
 }
 
+export function getCurrentUserID(){
+  //return user id from local storage
+  const userCookie = JSON.parse(localStorage.getItem(ROLE_USER))
+
+  if (userCookie){
+    return userCookie.id
+  }
+  //reject and send to login page -- no login cookie
+  window.location.hash = "#/login"
+  return false
+}
+
 export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
     dataProvider('CURRENT_USER', MODELS.USERS)
       .then(response => {
-        const localID = JSON.parse(localStorage.getItem(ROLE_USER))
-          .id;
-
-        if (response.data.id === localID) {
+        if (response && response.data){
           resolve(response.data);
-        } else {
+        }
+          else {
           reject({ redirect: true });
           toastErrors(WARNINGS.NO_AUTH_TOKEN);
         }
@@ -642,6 +644,20 @@ export function postObjectWithoutSaveProp(formData, resource){
         resolve(response)
     }).catch(err => {
         reject(err)
+    })
+  })
+}
+
+//seems like it works - needs testing
+export function deleteItem(data, resource){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = { id: data.id, resource:resource }
+
+    dataProvider(DELETE, resource, params).then(response => {
+      resolve(response)
+    }).catch(err => {
+      reject(err)
     })
   })
 }

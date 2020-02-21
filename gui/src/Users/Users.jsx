@@ -15,7 +15,6 @@ import {
 } from "react-admin";
 import {MODEL_FIELDS, ROLE_USER} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { EditToolbar } from "../_components";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
@@ -23,6 +22,7 @@ import ToggleActiveButton from "./ToggleActiveButton";
 import Toolbar from '@material-ui/core/Toolbar';
 import { EditButton, DeleteButton } from 'react-admin';
 import UserForm from "./UserForm";
+import {  UserToolbar } from "../_components/Toolbar";
 
 const listStyles = {
   actions: {
@@ -170,7 +170,7 @@ export const UserCreate = props => {
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
     return(
-    <Edit toolbar={<EditToolbar />} {...props}>
+    <Edit toolbar={<UserToolbar />} {...props}>
       <UserEditForm {...other}/>
     </Edit>)
     
@@ -183,7 +183,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
-      <Edit toolbar={<EditToolbar />} {...props}>
+      <Edit toolbar={<UserToolbar />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )

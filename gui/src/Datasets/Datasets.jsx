@@ -42,6 +42,7 @@ import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
 import FilesTab from '../Projects/Files/FilesTab.jsx';
 import { Field } from 'react-final-form';
+import { DefaultToolbar } from '../_components/index.js';
 
 const styles = {
   actions: {
@@ -144,8 +145,8 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         />
 
         <TextField multiline
-        label={"en.models.datasets.search_model"}
-        source={"search_model.search"}
+          label={"en.models.datasets.search_model"}
+          source={"search_model.search"}
         />
 
         <ReferenceField
@@ -331,7 +332,8 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
 
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}>
+  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
+  toolbar={<DefaultToolbar {...props} />}>
     <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
     <TextInput      
       label="Title"

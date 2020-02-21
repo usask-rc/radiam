@@ -25,7 +25,6 @@ import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
 import { Prompt } from 'react-router';
@@ -37,6 +36,7 @@ import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 import UserDetails from "../Users/UserDetails.jsx";
+import { DefaultToolbar } from "../_components/Toolbar.jsx";
 
 const styles = {
   actions: {
@@ -130,8 +130,8 @@ const actionStyles = theme => ({
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-  let _isMounted = true
   useEffect(() => {
+    let _isMounted = true
     if (data && !showEdit){
       isAdminOfAParentGroup(data.id).then(data => {
         if (_isMounted){
@@ -168,8 +168,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   const [groupMembers, setGroupMembers] = useState([])
   const [canEditGroup, setCanEditGroup] = useState(false)
 
-  let _isMounted = true
   useEffect(() => {
+    let _isMounted = true
     isAdminOfAParentGroup(props.id).then(data => {
       if (_isMounted){
         setCanEditGroup(data)
@@ -181,6 +181,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   }, [])
 
   useEffect(() => {
+    let _isMounted = true
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupMembers(params).then((data) => {
@@ -310,7 +311,7 @@ const GroupForm = props =>
   return(
     <SimpleForm
       {...props}
-      toolbar={<EditToolbar />}
+      toolbar={<DefaultToolbar />}
       asyncValidate={asyncValidate}
       asyncBlurFields={[ MODEL_FIELDS.NAME ]}
       onChange={handleChange}
@@ -369,7 +370,7 @@ class BaseGroupEdit extends Component {
     return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm
         basePath={basePath}
-        toolbar={<EditToolbar />}
+        toolbar={<DefaultToolbar />}
         redirect={RESOURCE_OPERATIONS.LIST}
       >
         <GroupTitle prefix={"Updating"} />
@@ -394,6 +395,7 @@ class BaseGroupEdit extends Component {
           label={"en.models.groups.parent_group"}
           source={MODEL_FK_FIELDS.PARENT_GROUP}
           reference={MODELS.GROUPS}
+          validate={validateParentGroup}
           allowEmpty
         >
           <SelectInput

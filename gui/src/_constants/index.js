@@ -35,7 +35,7 @@ module.exports = Object.freeze({
     USERAGENTS: ["user", "location"],
   },
   LINKS: { //TODO: these were previously global, need to be re-imported properly
-    SUPPORTEMAIL: "support@radiam.ca",
+    SUPPORTEMAIL: "developers@frdr.ca",
     OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     RADIAMAGENTREADMEURL: "https://github.com/usask-rc/radiam",
     RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",

@@ -10,8 +10,6 @@ const styles = {
 }
 
 const UserTitle = ({ prefix="", record, classes, ...props }) => {
-
-    console.log("usertitle record: ", record, props)
     return <Typography className={classes.titleText}>{`${prefix} ${record ? record.username : ""}`}</Typography>;
 };
   

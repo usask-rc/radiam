@@ -29,6 +29,7 @@ import GroupMemberTitle from "./GroupMemberTitle";
 import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveProp } from "../_tools/funcs";
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
+import { FKToolbar } from "../_components/Toolbar";
 
 
 const listStyles = {
@@ -325,6 +326,7 @@ export const GroupMemberForm = props => {
     asyncBlurFields={ [ MODEL_FK_FIELDS.GROUP, MODEL_FK_FIELDS.USER ] }
     onChange={handleChange}
     save={handleSubmit}
+    toolbar={<FKToolbar {...props}/>}
   >
     {props.record && <GroupMemberTitle prefix={Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />}
 
