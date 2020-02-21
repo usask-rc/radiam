@@ -20,7 +20,7 @@ import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
 import Toolbar from '@material-ui/core/Toolbar';
-import { EditButton, DeleteButton } from 'react-admin';
+import { EditButton } from 'react-admin';
 import UserForm from "./UserForm";
 import {  UserToolbar } from "../_components/Toolbar";
 

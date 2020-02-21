@@ -28,8 +28,6 @@ import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip } from '@material-ui/core';
 import { Link } from  "react-router-dom";
-import useDebounce from "../../_hooks/useDebounce"
-
 
 const styles = theme => ({
   backCell: {

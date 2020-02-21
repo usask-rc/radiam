@@ -67,7 +67,6 @@ import {
   ProjectShow,
   ProjectEdit,
   ProjectCreate,
-  ProjectCreateForm,
 } from '../Projects/Projects';
 import {
   SensitivityLevelList,
@@ -95,7 +94,6 @@ import customRoutes from '../_tools/customRoutes';
 import Login from '../layout/Login.jsx';
 import 'moment-timezone';
 import { ToastContainer } from 'react-toastify';
-import datasets from "../Datasets"
 import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
