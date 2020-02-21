@@ -150,17 +150,6 @@ class UserForm extends Component {
         }
     };
 
-    //strangely, the selects and date need a different change handler.
-    handleSelectChange = (e, value, prevValue, target) => {
-        this.setState({ [e.target.name]: e.target.value })
-        console.log("handleselectchange state: ", this.state)
-
-        if (e && e.timeStamp){
-            this.setState({isFormDirty: true})
-        }
-    };
-
-
     render() {
         const { group, group_role, redirect, isFormDirty} = this.state
         return (<>
@@ -211,7 +200,7 @@ class UserForm extends Component {
                     label={"en.models.groupmembers.group"}
                     source={MODEL_FK_FIELDS.GROUP}
                     reference={MODELS.GROUPS}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                     defaultValue={group}
                     required
                 >
@@ -225,7 +214,7 @@ class UserForm extends Component {
                     source={MODEL_FK_FIELDS.GROUP_ROLE}
                     reference={MODELS.ROLES}
                     resource={MODELS.ROLES}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                     required
                 >
                     <TranslationSelect
@@ -243,7 +232,7 @@ class UserForm extends Component {
                     }}
                     defaultValue={""}
                     source={MODEL_FIELDS.DATE_EXPIRES}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                 />
             </SimpleForm>
             <Toolbar>
