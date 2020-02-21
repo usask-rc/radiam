@@ -102,7 +102,7 @@ import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAv
 import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import { DatasetList } from '../Datasets/DatasetList';
-import { DatasetShow, DatasetCreate, DatasetEdit } from '../Datasets/Datasets';
+import { DatasetShow, DatasetCreate, DatasetEdit, DatasetModalShow } from '../Datasets/Datasets';
 
 
 const messages = {
@@ -242,7 +242,7 @@ const App = props => {
             icon={InsertChart}
             options={{ label: 'en.sidebar.datasets' }}
             list={DatasetList}
-            show={ permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? DatasetShow : null}
+            show={ permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? DatasetShow : DatasetModalShow}
             create={permissions.is_admin || permissions.is_group_admin ? DatasetCreate : null}
             edit={permissions.is_admin || permissions.is_group_admin ? DatasetEdit : null}
           />,

@@ -41,7 +41,7 @@ import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
+import { DatasetForm, DatasetShow, DatasetModalShow } from "../Datasets/Datasets";
 import { ProjectCreateForm } from "./ProjectCreateForm";
 import { UserInput } from "./UserInput";
 import { DefaultToolbar } from "../_components";
@@ -260,7 +260,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
                   {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
                     <DialogContent>
-                      <DatasetShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
+                      <DatasetModalShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
                     </DialogContent>
                   </Dialog>}
                 </>
