@@ -27,16 +27,18 @@ import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL
 import CustomPagination from "../_components/CustomPagination";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import { Prompt } from 'react-router';
+import { Prompt, Redirect } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupMembers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupMembers, postObjectWithoutSaveProp, toastErrors } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 import UserDetails from "../Users/UserDetails.jsx";
 import { DefaultToolbar } from "../_components/Toolbar.jsx";
+import TranslationSelect from "../_components/_fields/TranslationSelect.jsx";
+import { DateInput } from "ra-ui-materialui/lib/input";
 
 const styles = {
   actions: {
@@ -278,9 +280,21 @@ const validateParentGroup = (value, allValues) => {
     return 'A Group may not be a parent group of itself'
   }
 }
+const validateUser = (value, allValues) => {
+  //must be filled if role is filled
+  if (value && !allValues.group_role){
+    return "If adding a User to this new Group, a Role must be specified."
+  }
+}
+const validateRole = (value, allValues) => {
+  if (value && !allValues.user){
+    return "A User must be selected if a Role is specified."
+  }
+}
 
 const asyncValidate = getAsyncValidateNotExists({id: MODEL_FIELDS.ID, name : MODEL_FIELDS.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, MODELS.GROUPS);
 
+//only used for group creation
 const GroupForm = props => 
 {
   const [isFormDirty, setIsFormDirty] = useState(false)
@@ -300,14 +314,17 @@ const GroupForm = props =>
   }, [data])
 
   function handleSubmit(formData) {
-    setIsFormDirty(false)
-    setData(formData)
+    const {name, description, parent_group} = formData
+
+    if (name && description){
+      props.save(formData)
+    }
   }
 
   function handleChange(data){
     setIsFormDirty(true)
   }
-
+  
   return(
     <SimpleForm
       {...props}
@@ -341,7 +358,6 @@ const GroupForm = props =>
           optionText={MODEL_FIELDS.NAME}
         />
       </ReferenceInput>
-      <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
     </SimpleForm>
   )
 };
@@ -350,7 +366,7 @@ export const GroupCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Create {...props}>
-      <GroupForm {...other} />
+      <GroupForm  {...other} />
     </Create>
   );
 }
