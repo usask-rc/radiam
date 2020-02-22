@@ -142,12 +142,12 @@ function EnhancedTableHead(props) {
               key={headCell.id}
               align={headCell.numeric ? 'right' : 'left'}
               padding={headCell.disablePadding ? 'none' : 'default'}
-              sortDirection={orderBy === headCell.id ? order : false}
+              sortDirection={order}
           >
               {headCell.canOrder ? 
               <TableSortLabel
                   active={orderBy === headCell.id}
-                  direction={order === "-" ? "desc" : "asc"}
+                  direction={order}
                   onClick={createSortHandler(headCell.id)}
                   
               >
@@ -228,7 +228,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const handleRequestSort = (event, property) => {
 
-    setOrder(order === "-" ? "" : "-")
+    setOrder(order === "desc" ? "asc" : "desc")
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -333,7 +333,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       page: filePage,
       sortBy: sortBy,
-      order: order,
+      order: order === "desc" ? "-" : "",
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -344,7 +344,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         page: folderPage,
         sortBy: sortBy,
-        order: order,
+        order: order === "desc" ? "-" : "",
         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -404,7 +404,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
 
-  console.log("FolderView with PID: ", projectID)
   return(
   <div>
     <Table size={"small"} className={classes.table}>
