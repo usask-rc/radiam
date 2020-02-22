@@ -7,7 +7,7 @@ import Folder from "@material-ui/icons/Folder"
 import Search from "@material-ui/icons/Search"
 import InsertChart from "@material-ui/icons/InsertChart"
 import { compose } from 'recompose';
-import {PATHS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
+import {PATHS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
 import Typography from "@material-ui/core/Typography"
 import Table from "@material-ui/core/Table"
 import TableHead from "@material-ui/core/TableHead"
@@ -24,12 +24,10 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles, formatBytes } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip } from '@material-ui/core';
 import { Link } from  "react-router-dom";
-import useDebounce from "../../_hooks/useDebounce"
-
 
 const styles = theme => ({
   backCell: {
@@ -144,12 +142,12 @@ function EnhancedTableHead(props) {
               key={headCell.id}
               align={headCell.numeric ? 'right' : 'left'}
               padding={headCell.disablePadding ? 'none' : 'default'}
-              sortDirection={orderBy === headCell.id ? order : false}
+              sortDirection={order}
           >
               {headCell.canOrder ? 
               <TableSortLabel
                   active={orderBy === headCell.id}
-                  direction={order === "-" ? "desc" : "asc"}
+                  direction={order}
                   onClick={createSortHandler(headCell.id)}
                   
               >
@@ -182,10 +180,11 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects", projectName, ...props }) {
-  console.log("FolderView projectName: ", projectName, "props: ", props)
+function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, ...props }) {
   let _isMounted = false
   //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
+
+  //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [parents, setParents] = useState([item.path_parent]);
@@ -201,14 +200,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [folderTotal, setFolderTotal] = useState(0)
   const [displayParent, setDisplayParent] = useState([item.path_parent]);
 
-  const truncatePath = (path) => {
-    let tempPath = path
-    let tempPathArr = tempPath.split("/")
-    if (tempPathArr.length > 4){
-      tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
-      tempPath = ".../" + tempPathArr.join("/")
+  const canCreateDataset = () => {
+    const user = JSON.parse(localStorage.getItem(ROLE_USER))
+    if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
+      console.log("user groupadminships: ", user.groupAdminships, groupID)
+      return true
     }
-    return tempPath
+    return false
   }
 
   const addParent = (parent) => {
@@ -230,7 +228,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const handleRequestSort = (event, property) => {
 
-    setOrder(order === "-" ? "" : "-")
+    setOrder(order === "desc" ? "asc" : "desc")
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -335,7 +333,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       page: filePage,
       sortBy: sortBy,
-      order: order,
+      order: order === "desc" ? "-" : "",
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -346,7 +344,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         page: folderPage,
         sortBy: sortBy,
-        order: order,
+        order: order === "desc" ? "-" : "",
         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
@@ -406,7 +404,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
 
-  console.log("FolderView with PID: ", projectID)
   return(
   <div>
     <Table size={"small"} className={classes.table}>
@@ -466,9 +463,12 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               {folder.indexed_date}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
-              <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path_parent}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path_parent}*`}}}}>
-                <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
-              </Link>
+              {canCreateDataset() ? 
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
+                  <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
+                </Link>
+                : null
+              }
             </TableCell>
           </TableRow>
         })

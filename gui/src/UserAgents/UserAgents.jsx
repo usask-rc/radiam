@@ -125,7 +125,7 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
 
   useEffect(() => {
     if (data && !showEdit){
-      if (data.user === user.id){
+      if (user.is_admin || user.is_group_admin){
         setShowEdit(true)
       }
     }

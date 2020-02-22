@@ -3,7 +3,7 @@ import React from 'react';
 import { Toolbar, SaveButton, DeleteButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
 import { getCurrentUserID } from '../_tools/funcs';
-import { DeleteWithUndoButton, DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';
+import { DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';
 //This custom toolbar exists in order to cut the Deletion button out of certain models.
 //To 'delete' these models, the user must go into the Edit function for them and deactivate them, after which they (will eventually) stop being pulled from the API except under certain circumstances.
 const styles = {

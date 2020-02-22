@@ -67,7 +67,6 @@ import {
   ProjectShow,
   ProjectEdit,
   ProjectCreate,
-  ProjectCreateForm,
 } from '../Projects/Projects';
 import {
   SensitivityLevelList,
@@ -95,14 +94,13 @@ import customRoutes from '../_tools/customRoutes';
 import Login from '../layout/Login.jsx';
 import 'moment-timezone';
 import { ToastContainer } from 'react-toastify';
-import datasets from "../Datasets"
 import Dashboard from '../Dashboard/Dashboard';
 import RadiamMenu from '../Dashboard/RadiamMenu';
 import { ProjectAvatarsList, ProjectAvatarsShow, ProjectAvatarsCreate, ProjectAvatarsEdit } from '../ProjectAvatars/ProjectAvatars';
 import { LocationList, LocationCreate, LocationEdit, LocationDisplay } from '../Locations/Locations';
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import { DatasetList } from '../Datasets/DatasetList';
-import { DatasetShow, DatasetCreate, DatasetEdit } from '../Datasets/Datasets';
+import { DatasetShow, DatasetCreate, DatasetEdit, DatasetModalShow } from '../Datasets/Datasets';
 
 
 const messages = {
@@ -215,7 +213,7 @@ const App = props => {
             list={LocationList}
             show={LocationDisplay}
             create={LocationCreate}
-            edit={LocationEdit}
+            edit={permissions.is_admin ? LocationEdit : null} //Security states only SU may update locations
           />,
           
           <Resource
@@ -242,7 +240,7 @@ const App = props => {
             icon={InsertChart}
             options={{ label: 'en.sidebar.datasets' }}
             list={DatasetList}
-            show={ permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? DatasetShow : null}
+            show={ permissions.is_admin || permissions.is_group_admin || permissions.is_data_manager ? DatasetShow : DatasetModalShow}
             create={permissions.is_admin || permissions.is_group_admin ? DatasetCreate : null}
             edit={permissions.is_admin || permissions.is_group_admin ? DatasetEdit : null}
           />,

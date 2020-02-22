@@ -27,13 +27,13 @@ import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
 import PropTypes from 'prop-types';
-import { submitObjectWithGeo, isAdminOfAParentGroup, postObjectWithoutSaveProp } from '../_tools/funcs';
+import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import { GET_ONE, FormDataConsumer } from 'ra-core';
+import { GET_ONE } from 'ra-core';
 import { Toolbar } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
@@ -41,8 +41,8 @@ import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
 import FilesTab from '../Projects/Files/FilesTab.jsx';
-import { Field } from 'react-final-form';
 import { DefaultToolbar } from '../_components/index.js';
+import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 
 const styles = {
   actions: {
@@ -115,6 +115,99 @@ const actionStyles = theme => ({
 })
 
 
+//a form used for displaying a dataset in a modal (a simplified view with no tabs))
+export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) => (
+  <Show {...props}>
+    <SimpleShowLayout>
+    <DatasetTitle prefix="Viewing" />
+        <TextField
+          label={"en.models.datasets.title"}
+          source={MODEL_FIELDS.TITLE}
+        />
+
+        <ReferenceField
+          link={false}
+          label={"en.models.grants.project"}
+          source={MODEL_FK_FIELDS.PROJECT}
+          reference={MODELS.PROJECTS}
+        >
+          <ProjectName label={"en.models.projects.name"}/>
+        </ReferenceField>
+
+        <TextField
+          label={"en.models.datasets.data_abstract"}
+          source={MODEL_FIELDS.DATA_ABSTRACT}
+        />
+
+        <TextField
+          label={"en.models.datasets.study_site"}
+          source={MODEL_FIELDS.STUDY_SITE}
+        />
+
+        <TextField multiline
+          label={"en.models.datasets.search_model"}
+          source={"search_model.search"}
+        />
+
+        <ReferenceField
+          label={"en.models.datasets.data_collection_status"}
+          source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+          reference={MODELS.DATA_COLLECTION_STATUS}
+          link={false}
+        >
+          <TranslationField
+            label={"en.models.roles.label"}
+            source={MODEL_FIELDS.LABEL}
+          />
+        </ReferenceField>
+
+        <ReferenceArrayField
+          link={false}
+          label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
+          <SingleFieldList linkType={false}>
+            <TranslationChipField link={false} source={MODEL_FIELDS.LABEL}/>
+          </SingleFieldList>
+        </ReferenceArrayField>
+
+        <ReferenceField
+          label={"en.models.datasets.distribution_restriction"}
+          source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+          reference={MODELS.DISTRIBUTION_RESTRICTION}
+          link={false}
+        >
+          <TranslationField
+            label={"en.models.roles.label"}
+            source={MODEL_FIELDS.LABEL}
+          />
+        </ReferenceField>
+
+        <ReferenceArrayField 
+          label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
+          <SingleFieldList linkType={false}>
+            <TranslationChipField link={false} source={MODEL_FIELDS.LABEL} />
+          </SingleFieldList>
+        </ReferenceArrayField>
+
+        {/** Needs a ShowController to get the record into the ShowMetadata **/}
+        <ShowController translate={translate} {...props}>
+          { controllerProps => (
+            <ShowMetadata
+              type="dataset"
+              translate={translate}
+              record={controllerProps.record}
+              basePath={controllerProps.basePath}
+              resource={controllerProps.resource}
+              id={controllerProps.record.id}
+              props={props}
+            />
+          )}
+        </ShowController>
+        <MapView/>
+    </SimpleShowLayout>
+  </Show>
+))
+
+
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show actions={<DatasetShowActions/>} {...props}>
     <TabbedShowLayout>
@@ -162,7 +255,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
-          <SingleFieldList link={"show"}>
+          <SingleFieldList linkType={false}>
             <TranslationChipField source={MODEL_FIELDS.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
@@ -180,7 +273,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
-          <SingleFieldList link={"show"}>
+          <SingleFieldList linkType={false}>
             <TranslationChipField source={MODEL_FIELDS.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>

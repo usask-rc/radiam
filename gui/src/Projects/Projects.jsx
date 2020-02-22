@@ -21,7 +21,6 @@ import {
   translate,
   withTranslate,
 } from 'react-admin';
-import { Field } from 'react-final-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
@@ -35,13 +34,13 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates} from "../_tools/funcs";
+import { Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
+import { DatasetForm, DatasetShow, DatasetModalShow } from "../Datasets/Datasets";
 import { ProjectCreateForm } from "./ProjectCreateForm";
 import { UserInput } from "./UserInput";
 import { DefaultToolbar } from "../_components";
@@ -70,7 +69,6 @@ const filterStyles = {
   },
 };
 
-const validateAvatar = required('en.validate.project.avatar');
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
@@ -260,7 +258,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
                   {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
                     <DialogContent>
-                      <DatasetShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
+                      <DatasetModalShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
                     </DialogContent>
                   </Dialog>}
                 </>

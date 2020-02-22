@@ -1,11 +1,10 @@
 //RelatedUsers.jsx
 import React, { useState, useEffect } from 'react'
-import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER, MODELS, RESOURCE_OPERATIONS } from "../_constants/index";
+import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER} from "../_constants/index";
 import '../_components/components.css';
 import Chip from "@material-ui/core/Chip"
 import Tooltip from "@material-ui/core/Tooltip"
 import UserAvatar from "react-user-avatar";
-import { Link } from  "react-router-dom";
 import { withStyles } from '@material-ui/styles';
 import Edit from '@material-ui/icons/Edit';
 
