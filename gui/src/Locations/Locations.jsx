@@ -42,6 +42,9 @@ const listStyles = {
   showBreaks: {
     whiteSpace: "pre-wrap",
   },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 const filterStyles = {
@@ -99,7 +102,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} {...other}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}} {...other}>
       <TextField
         label={'en.models.locations.display_name'}
         source={MODEL_FIELDS.DISPLAY_NAME}

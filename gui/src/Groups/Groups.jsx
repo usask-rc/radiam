@@ -49,7 +49,10 @@ const styles = {
   },
   header: {
     backgroundColor: "inherit"
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 const filterStyles = {
   form: {
@@ -94,7 +97,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     pagination={<CustomPagination />}
     bulkActionButtons={false}>
 
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <TextField
         label={"en.models.groups.name"}
         source={MODEL_FIELDS.NAME}

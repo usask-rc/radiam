@@ -36,7 +36,10 @@ const listStyles = {
   },
   email: {
     fontSize: 14,
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 const filterStyles = {
@@ -90,7 +93,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       //bulkActionButtons={<PostBulkActionButtons {...other}/>} - This can be activated as soon as Username is no longer a required field on PUT.
       bulkActionButtons={false}
     >
-      <Datagrid rowClick={userListRowClick} {...other}>
+      <Datagrid rowClick={userListRowClick} classes={{headerCell: classes.columnHeaders}} {...other}>
         <TextField
           label={"en.models.users.username"}
           source={MODEL_FIELDS.USERNAME}

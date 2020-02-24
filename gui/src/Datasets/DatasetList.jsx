@@ -30,6 +30,9 @@ const listStyles = {
     showBreaks: {
       whiteSpace: "pre-wrap",
     },
+    columnHeaders: {
+      fontWeight: "bold",
+    },
   };
   
   const filterStyles = {
@@ -73,7 +76,7 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         pagination={<CustomPagination />}
         bulkActionButtons={false}
       >
-        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
           <TextField
             label={'en.models.datasets.title'}
             source={MODEL_FIELDS.TITLE}

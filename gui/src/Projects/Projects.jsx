@@ -60,7 +60,10 @@ const styles = {
   },
   modalContainer: {
     paddingRight: "1em",
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 const filterStyles = {
@@ -106,7 +109,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <ProjectName label={'en.models.projects.name'} />
       <ReferenceField
         link={false}

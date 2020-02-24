@@ -49,6 +49,9 @@ const listStyles = {
   root: {
     backgroundColor: "inherit"
   },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
@@ -88,7 +91,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     pagination={<CustomPagination />}
     bulkActionButtons={false}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <ReferenceField
         link={false}
         label={"en.models.agents.user"}
