@@ -837,6 +837,13 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         try:
             projects_list = validated_data.pop("get_projects")
+            if not projects_list:
+                user_projects = self.context['request'].user.get_projects()
+                if user_projects.values():
+                    projects_list = [user_projects.values().first()]
+                else:
+                    # fail creating the location
+                    pass
         except KeyError:
             pass
         try:
@@ -864,6 +871,8 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         try:
             projects_list = validated_data.pop("get_projects")
+            if not projects_list:
+                pass
             self._save_location_projects(projects_list, instance)
         except KeyError:
             pass
