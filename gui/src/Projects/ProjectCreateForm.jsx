@@ -39,21 +39,20 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       delete data.geo
       submitObjectWithGeo(data, dataGeo, props)
     }
+
+    const groupChange = (data) => {
+      setGroup(data.target.value)
+    }
   
     useEffect(() => {
       let _isMounted = true
-      const abortController = new AbortController();
       if (group){
         setLoading(true)
         getUsersInGroup({id: group, is_active: true}).then(contacts => {
-
           if (_isMounted){
             console.log("getusersingroup result: ", contacts)
             setGroupContactList(contacts)
             setLoading(false)
-          }
-          else{
-            console.log("users in group not set; component unmounted before data received")
           }
         }).catch(err => {
           console.error("in getprimarycontactcandidates, err: ", err)
@@ -100,48 +99,43 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           multiline
           source={MODEL_FIELDS.KEYWORDS}
         />
-  
+        <ReferenceInput
+          resource={MODELS.GROUPS}
+          className="input-small"
+          label={"en.models.projects.group"}
+          source={MODEL_FIELDS.GROUP}
+          reference={MODELS.GROUPS}
+          onChange={(data) => groupChange(data)}
+          validate={validateGroup}>
+          <SelectInput optionText={MODEL_FIELDS.NAME} />
+        </ReferenceInput>
         <FormDataConsumer>
-            {({formData, ...rest}) => {
-              if (formData && formData.group !== group){
-                setGroup(formData.group)
-              }
-                return(
-                  <div>
-                    <ReferenceInput
-                      resource={MODELS.GROUPS}
-                      className="input-small"
-                      label={"en.models.projects.group"}
-                      source={MODEL_FIELDS.GROUP}
-                      reference={MODELS.GROUPS}
-                      validate={validateGroup}>
-                      <SelectInput optionText={MODEL_FIELDS.NAME} />
-                    </ReferenceInput>
-                    { !loading && groupContactList && groupContactList.length > 0 ?
-                      (<div>
-                        <UserInput
-                          required
-                          label={"en.models.projects.primary_contact_user"}
-                          placeholder={`Primary Contact`}
-                          validate={validatePrimaryContactUser}
-                          className="input-small"
-                          users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-                          />
-                      </div>)
-                      : !loading && groupContactList &&  groupContactList.length === 0 ? 
-                      <div>
-                        {formData && formData.group && <Typography><a href={`/#/${MODELS.GROUPS}/${formData.group}/${RESOURCE_OPERATIONS.SHOW}`}>{`No users in Group - Click here to add one`}</a></Typography>}
-                      </div>
-                      :
-                      <div>
-                        <Typography>{`Loading Associated Users...`}</Typography>
-                      </div>
-                      
-                    }
-                  </div>
-                )
-            }
+          {({formData, ...rest}) => {
+
+            console.log("groupContactList length:", groupContactList.length, groupContactList)
+          if (loading){
+            return(<div>
+              <Typography>{`Loading Associated Users...`}</Typography>
+            </div>)
           }
+          else if (!loading && formData.group && groupContactList.length === 0){
+            return (
+            <div>
+              <Typography><a href={`/#/${MODELS.GROUPS}/${formData.group}/${RESOURCE_OPERATIONS.SHOW}`}>{`There are no users to select in this Group - Click here to add one`}</a></Typography>
+            </div>
+            )
+          }
+          else{
+            return <SelectInput 
+            source={"primary_contact_user"} 
+            label={"en.models.projects.primary_contact_user"}
+            optionText={"username"} 
+            optionValue={"id"} 
+            className={classes.selectPCU}
+            choices={groupContactList}
+          />
+          }
+        }}
         </FormDataConsumer>
         <FormDataConsumer>
           {({formData, ...rest} ) =>

@@ -64,6 +64,9 @@ const styles = {
   columnHeaders: {
     fontWeight: "bold",
   },
+  selectPCU: {
+    width: "18.5em", //apparently default width of a referenceinput is 18.5em, gross.
+  }
 };
 
 const filterStyles = {
