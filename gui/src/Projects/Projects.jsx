@@ -34,7 +34,7 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates} from "../_tools/funcs";
+import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup} from "../_tools/funcs";
 import { Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
@@ -44,6 +44,7 @@ import { DatasetForm, DatasetShow, DatasetModalShow } from "../Datasets/Datasets
 import { ProjectCreateForm } from "./ProjectCreateForm";
 import { UserInput } from "./UserInput";
 import { DefaultToolbar } from "../_components";
+import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 
 const styles = {
   actions: {
@@ -65,7 +66,7 @@ const styles = {
     fontWeight: "bold",
   },
   selectPCU: {
-    width: "18.5em", //apparently default width of a referenceinput is 18.5em, gross.
+    width: "18.5em"
   }
 };
 
@@ -290,65 +291,39 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     }
 }));
 
-export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state, ...props }) => {
-  const [groupList, setGroupList] = useState([])
-  const [projectGroup, setProjectGroup] = useState(null)
+export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permissions, record, state, ...props }) => {
   const [groupContactList, setGroupContactList] = useState([])
+  const [group, setGroup] = useState(record.group)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   let _isMounted = false
 
-
-  const handleSelectChange = (e, value, prevValue, target) => {
-    console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
-    if (target === 'group' && value !== prevValue){
-      setLoading(true)
-      setGroupList([])
-      setProjectGroup(value)
-    }
-  }
-
   useEffect(() => {
-    _isMounted = true
-    if (projectGroup !== null){
-      getAllParentGroups(projectGroup)
-    }
-
-    //if we unmount, lock out the component from being able to use the state
-    return function cleanup() {
-      _isMounted = false;
-    }
-  }, [projectGroup])
-
-  //TODO: extract to funcs.jsx
-  //TODO: handle potential setstate on unmounted component
-  const getAllParentGroups = group_id => {
-    if (group_id !== null){
-      getGroupData(group_id).then(
-        data => {
-
-          let tempGroupList = groupList
-          tempGroupList.push(data)
-          setGroupList(tempGroupList)
-          getAllParentGroups(data.parent_group)
-
-          return data
+    let _isMounted = true
+    if (group){
+      setLoading(true)
+      getUsersInGroup({id: group, is_active: true}).then(contacts => {
+        if (_isMounted){
+          console.log("getusersingroup result: ", contacts)
+          setGroupContactList(contacts)
+          setLoading(false)
         }
-      ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)
+      }).catch(err => {
+        console.error("in getprimarycontactcandidates, err: ", err)
+        setError(err)
       })
     }
-    else{
-      //now get a list of users in each group
-      getPrimaryContactCandidates(groupList).then(data => {
-        setLoading(false)
-        setGroupContactList(data)})
-    }
-  };
+    //when we unmount, lock out the component from being able to use the state
+    return function cleanup() {
+      _isMounted = false;
+  }
+  }, [group])
 
+  const groupChange = (data) => {
+    setGroup(data.target.value)
+  }
+  
   if (record && record.group && isAdminOfAParentGroup(record.group)) {
-    if (projectGroup === null){
-      setProjectGroup(record.group)
-    }
 
     return (
     <CardContentInner>
@@ -362,9 +337,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
           <ReferenceInput
             resource={MODELS.PROJECTAVATARS}
             className="input-small"
+            label={"en.models.projects.avatar"}
             perPage={1000}
-
-            label={MODEL_FIELDS.AVATAR} 
+            required
             source={MODEL_FIELDS.AVATAR}  reference={MODELS.PROJECTAVATARS}>
               <SelectInput source={MODEL_FIELDS.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}/>
           </ReferenceInput>
@@ -376,52 +351,48 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
             source={MODEL_FIELDS.KEYWORDS} />
         </div>
           
-        <FormDataConsumer>
-          {({formData, ...rest}) => {
-              return(
-                <div>
-                  <ReferenceInput
-                    resource="researchgroups"
-                    className="input-small"
-                    label={"en.models.projects.group"}
-                    source={MODEL_FIELDS.GROUP}
-                    reference={MODELS.GROUPS}
-                    onChange={handleSelectChange}
-                    validate={validateGroup}>
-                    <SelectInput optionText={MODEL_FIELDS.NAME} />
-                  </ReferenceInput>
-                  { !loading && groupContactList.length > 0 ?
-                    (<div>
-                      <UserInput
-                        required
-                        label={"en.models.projects.primary_contact_user"}
-                        placeholder={`Primary Contact`}
-                        validate={validatePrimaryContactUser}
-                        className="input-small"
-                        users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-                        />
-                    </div>)
-                    : !loading && groupContactList.length === 0 ? 
-                    <div>
-                      {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
-                    </div>
-                    :
-                    <div>
-                      <Typography>{`Loading Associated Users...`}</Typography>
-                    </div>
-                    
-                  }
-                  { record && record.id && (
-                    <div>
-                      <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-                      <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-                    </div>
-                  )}
-                </div>
+        <ReferenceInput
+          resource={MODELS.GROUPS}
+          className="input-small"
+          label={"en.models.projects.group"}
+          source={MODEL_FIELDS.GROUP}
+          reference={MODELS.GROUPS}
+          onChange={(data) => groupChange(data)}
+          validate={validateGroup}
+          required>
+          <SelectInput optionText={MODEL_FIELDS.NAME} />
+        </ReferenceInput>
+
+        <div>
+          <FormDataConsumer>
+            {({formData, ...rest}) => {
+            if (loading){
+              return(<div>
+                <Typography>{`Loading Associated Users...`}</Typography>
+              </div>)
+            }
+            else if (!loading && formData.group && groupContactList.length === 0){
+              return (
+              <div>
+                <Typography><a href={`/#/${MODELS.GROUPS}/${formData.group}/${RESOURCE_OPERATIONS.SHOW}`}>{`There are no users to select in this Group - Click here to add one`}</a></Typography>
+              </div>
               )
-          }
-        }
-      </FormDataConsumer>
+            }
+            else{
+              return <SelectInput 
+                source={"primary_contact_user"} 
+                label={"en.models.projects.primary_contact_user"}
+                optionText={"username"} 
+                optionValue={"id"} 
+                className={classes.selectPCU}
+                choices={groupContactList}
+                disabled={formData.group ? false : true}
+                validate={validatePrimaryContactUser}
+            />
+            }
+          }}
+          </FormDataConsumer>
+        </div>
       <FormDataConsumer>
         {({formData, ...rest} ) =>
         {
@@ -464,13 +435,14 @@ class BaseProjectEdit extends Component {
   }
 
   render() {
-    const { classes, permissions, record, ...others } = this.props;
-
+    const { classes, permissions, record, translate, ...others } = this.props;
+    const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     return (<Edit actions={<MetadataEditActions />} {...others}>
       <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
+      //todo: resolve the issue of dupliated names asyncValidate={asyncValidate}
       toolbar={<DefaultToolbar {...this.props}/>}>
         <ProjectTitle prefix={`Updating`} />
-        <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
+        <ProjectEditInputs classes={classes} translate={translate} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
     </Edit>);
   }

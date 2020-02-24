@@ -14,10 +14,8 @@ import { Typography } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
-import { UserInput } from "./UserInput";
 import ProjectTitle from "./ProjectTitle";
 
-const validateAvatar = required('en.validate.project.avatar');
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
@@ -82,7 +80,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           resource={MODELS.PROJECTAVATARS}
           className="input-small"
           label="en.models.projects.avatar"
-          validate={validateAvatar}
+          required
           allowEmpty={false}
           perPage={1000}
           sort={{ field: 'random', order: 'ASC' }}
@@ -106,7 +104,8 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           source={MODEL_FIELDS.GROUP}
           reference={MODELS.GROUPS}
           onChange={(data) => groupChange(data)}
-          validate={validateGroup}>
+          validate={validateGroup}
+          required>
           <SelectInput optionText={MODEL_FIELDS.NAME} />
         </ReferenceInput>
         <FormDataConsumer>
@@ -127,12 +126,14 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           }
           else{
             return <SelectInput 
-            source={"primary_contact_user"} 
-            label={"en.models.projects.primary_contact_user"}
-            optionText={"username"} 
-            optionValue={"id"} 
-            className={classes.selectPCU}
-            choices={groupContactList}
+              source={"primary_contact_user"} 
+              label={"en.models.projects.primary_contact_user"}
+              optionText={"username"} 
+              optionValue={"id"} 
+              className={classes.selectPCU}
+              choices={groupContactList}
+              disabled={formData.group ? false : true}
+              validate={validatePrimaryContactUser}
           />
           }
         }}
