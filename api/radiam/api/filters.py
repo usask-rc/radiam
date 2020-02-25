@@ -2,7 +2,7 @@
 from django.db.models import Q
 
 from rest_framework.filters import BaseFilterBackend
-from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics, Location, UserAgent, UserAgentProjectConfig, LocationProject
+from .models import Project, Dataset, ResearchGroup, GroupMember, GroupViewGrant, ProjectStatistics, Location, User, UserAgent, UserAgentProjectConfig, LocationProject
 
 from rest_framework.exceptions import APIException
 
@@ -65,11 +65,16 @@ class RadiamAuthUserFilter(BaseFilterBackend):
         if not user.is_superuser:
             groups = user.get_groups()
 
-            query = Q(groupmember__group__in=groups)
-            users = users_queryset.filter(
-                query
-            ).distinct()
-            return users
+            if groups:
+                query = Q(groupmember__group__in=groups)
+                users = users_queryset.filter(
+                    query
+                ).distinct()
+                return users
+            else:
+                # users should always at least be able to see themselves
+                user = User.objects.filter(id=user.id)
+                return user
         else:
             return users_queryset
 
