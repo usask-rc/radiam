@@ -62,6 +62,11 @@ const styles = {
   modalContainer: {
     paddingRight: "1em",
   },
+  mapFormHeader: {
+    paddingBottom: "1em",
+    marginTop: "1em",
+
+  },
   columnHeaders: {
     fontWeight: "bold",
   },
@@ -406,9 +411,14 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
           };
 
           return(
+            <>
+              <div className={classes.mapFormHeader}>
+                <Typography>{`GeoLocation Information`}</Typography>
+              </div>
             <div>
               <MapForm content_type={'project'} recordGeo={record ? record.geo : null} id={record ? record.id : null} geoDataCallback={geoDataCallback}/>
             </div>
+            </>
           )
         }
         }

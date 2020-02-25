@@ -147,9 +147,14 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
             };
   
             return(
+              <>
+              <div>
+                <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
+              </div>
               <div>
                 <MapForm content_type={'project'} recordGeo={null} id={null} geoDataCallback={geoDataCallback}/>
               </div>
+              </>
             )
           }
           }
