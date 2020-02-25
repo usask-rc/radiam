@@ -45,6 +45,7 @@ import { ProjectCreateForm } from "./ProjectCreateForm";
 import { DefaultToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import KeywordsChip from "./KeywordsChip";
+import ChipInput from "material-ui-chip-input";
 
 const styles = {
   actions: {
@@ -309,6 +310,9 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
   const [group, setGroup] = useState(record.group)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [keywords, setKeywords] = useState(record.keywords ? record.keywords : null)
+  const [displayKeywords, setDisplayKeywords] = useState(record.keywords ? record.keywords.split(",") : "")
+
   let _isMounted = false
 
   useEffect(() => {
@@ -331,6 +335,20 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
       _isMounted = false;
   }
   }, [group])
+
+  const handleChipAdd = (data) => {
+    setKeywords([...keywords, data])
+  }
+  const handleChipDelete = (data, idx) => {
+    let tempKeywords = keywords
+    tempKeywords.splice(idx)
+    setKeywords(tempKeywords)
+  }
+  const handleChipChange = (data) => {
+    console.log("chip change data: ", data)
+    setKeywords(data)
+  }
+
 
   const groupChange = (data) => {
     setGroup(data.target.value)
@@ -362,6 +380,16 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
             label={"en.models.projects.keywords"}
             multiline
             source={MODEL_FIELDS.KEYWORDS} />
+          {/*}
+          <ChipInput
+            label={"en.models.projects.keywords"}
+            newChipKeys={[',']}
+            onAdd = {data => handleChipAdd(data)}
+            onDelete = {(data, idx) => handleChipDelete(data, idx)}
+            onChange={handleChipChange}
+            source={MODEL_FIELDS.KEYWORDS}
+          />
+    */}
         </div>
           
         <ReferenceInput
@@ -451,7 +479,6 @@ class BaseProjectEdit extends Component {
       config: false,
     };
   }
-
   render() {
     const { classes, permissions, record, translate, ...others } = this.props;
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
