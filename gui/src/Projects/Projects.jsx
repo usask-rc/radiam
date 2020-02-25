@@ -65,8 +65,12 @@ const styles = {
   columnHeaders: {
     fontWeight: "bold",
   },
+  //different widths in create / edit form.  Why?  I dunno.
   selectPCU: {
     width: "18.5em"
+  },
+  selectPCUEdit: {
+    width: "23em",
   }
 };
 
@@ -384,7 +388,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
                 label={"en.models.projects.primary_contact_user"}
                 optionText={"username"} 
                 optionValue={"id"} 
-                className={classes.selectPCU}
+                className={classes.selectPCUEdit}
                 choices={groupContactList}
                 disabled={formData.group ? false : true}
                 validate={validatePrimaryContactUser}
