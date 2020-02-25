@@ -5,6 +5,7 @@ import ArrowBack from "@material-ui/icons/ArrowBack"
 import Description from "@material-ui/icons/Description"
 import Folder from "@material-ui/icons/Folder"
 import Search from "@material-ui/icons/Search"
+import CloseIcon from "@material-ui/icons/Close"
 import InsertChart from "@material-ui/icons/InsertChart"
 import { compose } from 'recompose';
 import {PATHS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index";
@@ -26,7 +27,7 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
-import { Chip, Tooltip } from '@material-ui/core';
+import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
 
 const styles = theme => ({
@@ -72,6 +73,21 @@ const styles = theme => ({
   },
   locationIcon: {
     verticalAlign: "middle",
+  },
+  closeButton: {
+    float: "right",
+  },
+  modalTitle: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    display: "inline",
+  },
+  modalTitleText: {
+    float: "left",
+    marginTop: "1em",
+    marginBottom: "1em",
+    fontWeight: "bold",
   },
   parentDisplay: {
     marginLeft: "1em",
@@ -266,7 +282,9 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     return keys;
   }
 
-  
+  const handleDialogClose = () => {
+    setFile(null)
+  }
 
   const handleSearch = (e) => {
     console.log("handlesearch: ", e.target.elements.search.value)
@@ -535,9 +553,15 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     </TableBody>
     </Table>
     {file &&
-    <Dialog fullWidth maxWidth={false} className={classes.fileDialog} open={file} onClose={() => setFile(null)} aria-label="Show File">
+    <Dialog fullWidth maxWidth={false} aria-labelledby="customized-dialog-title" className={classes.fileDialog} open={file} onClose={handleDialogClose}>
+      
       <DialogTitle>
-      {file.name}
+        <div className={classes.modalTitle}>
+          <Typography className={classes.modalTitleText} variant={"h6"}>{file.name}</Typography>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={handleDialogClose}>
+            <CloseIcon />
+          </IconButton>
+        </div>
       </DialogTitle>
       <DialogContent className={classes.fileDialogContent}>
         <FileDetails item={file} getJsonKeys={getJsonKeys} />
