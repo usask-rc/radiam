@@ -837,6 +837,11 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         try:
             projects_list = validated_data.pop("get_projects")
+            if not projects_list:
+                # try to assign the first associated project if none are given
+                user_projects = self.context['request'].user.get_projects()
+                if user_projects.values():
+                    projects_list = [user_projects.values().first()]
         except KeyError:
             pass
         try:
