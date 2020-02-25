@@ -26,7 +26,7 @@ import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
-import { Chip } from '@material-ui/core';
+import { Chip, Tooltip } from '@material-ui/core';
 import { Link } from  "react-router-dom";
 
 const styles = theme => ({
@@ -34,7 +34,8 @@ const styles = theme => ({
     verticalAlign: "middle",
     display: "flex",
     cursor: "pointer",
-    borderRadius: "16",
+    backgroundColor: "beige",
+    height: "40px",
   },
   specialBackRow: {
     backgroundColor: "beige",
@@ -57,6 +58,13 @@ const styles = theme => ({
     marginTop: "-0.1em",
     paddingLeft: "0.1em",
     paddingRight: "0.1em",
+  },
+  curFolderDisplay: {
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  showFolderRow: {
+    height: "40px",
   },
   locationDisplay: {
     margin: '0.25em',
@@ -95,7 +103,7 @@ const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
   {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
-  {id : "indexed_date", numeric: false, disablePadding: false, canOrder: true, label: "Last Indexed At"},
+  {id : "last_modified", numeric: false, disablePadding: false, canOrder: true, label: "Last Modified"},
   {id : "create_dataset", numeric: false, disablePadding: true, canOrder: false, label: ""} //a column for an icon to create a dataset out of this folder on click
   //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
@@ -187,7 +195,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState([item.path_parent]);
+  const [parents, setParents] = useState([item.path_parent]); //base level is simply a path
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -198,7 +206,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
-  const [displayParent, setDisplayParent] = useState([item.path_parent]);
 
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
@@ -209,11 +216,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     return false
   }
 
-  const addParent = (parent) => {
-    let tempParents = [...parents, parent]
-    
-    
-    setDisplayParent(truncatePath(parent))
+  const addParent = (folder) => {
+    let tempParents = [...parents, folder]
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -286,7 +290,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     //folderpath is probably irrelevant
     _isMounted = true
-    let folderPath = parents[0] //TODO: there can arise a conflict with two identical folder paths but different locations.
+    let folderPath = parents[0] //TODO: this is fine for now - parents[0] is always a path itself.  will have to change.
 
 
     if (search && search.length > 0){
@@ -324,7 +328,14 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   useEffect(() => {
 
-    let folderPath = parents[parents.length - 1]
+    let folderPath
+
+    if (parents.length > 1){
+      folderPath = parents[parents.length - 1].path
+    }
+    else{
+      folderPath = parents[0]
+    }
     _isMounted = true
 
     let fileParams = {
@@ -430,16 +441,20 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     <TableBody>
       {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
       
-        <TableRow className={classes.specialBackRow} onClick={() => parents.length > 1 ? removeParent() : null}>
-          <TableCell align={"left"} colSpan={4} className={classes.backCell} >
+        <TableRow className={classes.showFolderRow}>
+          <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
             <ArrowBack />
-            <Typography className={classes.parentDisplay}>{`${displayParent}`}</Typography>
           </TableCell>
-          <TableCell />
-          <TableCell />
-          <TableCell />
-          <TableCell />
-
+          <TableCell onClick={() => setFile(parents[parents.length - 1])}>
+            <Typography className={classes.curFolderDisplay}><div><Folder />{`${parents[parents.length - 1].name}`}</div></Typography>
+          </TableCell>
+          <TableCell>
+            <Typography>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
+          </TableCell>
+          <TableCell>
+            <Typography className={classes.curFolderDisplay}>{`${parents[parents.length - 1].last_modified}`}</Typography>
+            
+          </TableCell>
 
         </TableRow>
       }
@@ -450,22 +465,24 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           let truncated_path = truncatePath(folder.path_parent)
 
           return <TableRow className={classes.folderRow} key={folder.id}>
-            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
               {folder.name}
             </TableCell>
-            <TableCell className={classes.fileCountCell} onClick={() => addParent(folder.path)}>
+            <TableCell className={classes.fileCountCell} onClick={() => addParent(folder)}>
               <DisplayFileIcons folder={folder} classes={classes} />
             </TableCell>
-            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
               {truncated_path}
             </TableCell>
-            <TableCell className={classes.nameCell} onClick={() => addParent(folder.path)}>
-              {folder.indexed_date}
+            <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
+              {folder.last_modified}
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
                 <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
-                  <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
+                  <Tooltip title={"Create Dataset"}>
+                    <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
+                  </Tooltip>
                 </Link>
                 : null
               }
@@ -498,7 +515,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             {truncated_path}
           </TableCell>
           <TableCell className={classes.nameCell}>
-            {file.indexed_date}
+            {file.last_modified}
           </TableCell>
           <TableCell></TableCell>
           

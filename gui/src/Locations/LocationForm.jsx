@@ -44,6 +44,9 @@ const styles = {
     paddingBottom: "1em",
     marginTop: "1em",
   },
+  projectList: {
+    minWidth: "18em",
+  },
 };
 
 class LocationForm extends Component {
@@ -255,8 +258,8 @@ class LocationForm extends Component {
           console.log("projList being rendered: ", projList)
             return(<ReferenceArrayInput
               resource={"projects"}
-              className="input-medium"
               label={"en.models.locations.projects"}
+              className={classes.projectList}
               source={"projects"}
               reference={"projects"}
               required>
