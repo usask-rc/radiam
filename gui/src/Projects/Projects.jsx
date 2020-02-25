@@ -26,7 +26,7 @@ import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
 import FilesTab from "./Files/FilesTab";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import { MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { UserShow } from "../_components/_fields/UserShow";
@@ -35,20 +35,23 @@ import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
 import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup} from "../_tools/funcs";
-import { Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
+import { Typography, Toolbar, Dialog, DialogTitle, DialogContent, Chip } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
 import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { DatasetForm, DatasetShow, DatasetModalShow } from "../Datasets/Datasets";
+import { DatasetForm, DatasetModalShow } from "../Datasets/Datasets";
 import { ProjectCreateForm } from "./ProjectCreateForm";
-import { UserInput } from "./UserInput";
 import { DefaultToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
+import KeywordsChip from "./KeywordsChip";
 
 const styles = {
   actions: {
     backgroundColor: 'inherit',
+  },
+  keywordChip: {
+    marginRight: "0.5em",
   },
   header: {
     backgroundColor: 'inherit',
@@ -140,11 +143,12 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
       >
         <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
-      <TextField
-        label={'en.models.projects.keywords'}
-        source={MODEL_FIELDS.KEYWORDS}
-        multiline
-      />
+
+      <KeywordsChip {...props}
+      classes={classes}
+      label={"en.models.projects.keywords"}
+        />
+     
     </Datagrid>
   </List>
 ));
@@ -222,10 +226,10 @@ export const ProjectShow = withTranslate(withStyles(styles)(
           <Tab label={'summary'}>
             {projectDatasets && <RelatedDatasets setCreateModal={setCreateModal} setEditModal={setEditModal} setViewModal={setViewModal} projectDatasets={projectDatasets} canEditModal={canEditModal} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
-            <TextField
-              label={'en.models.projects.keywords'}
-              source={MODEL_FIELDS.KEYWORDS}
-              multiline
+            
+            <KeywordsChip {...props}
+              classes={classes}
+              label={"en.models.projects.keywords"}
             />
             <ReferenceField
               label={'en.models.projects.primary_contact_user'}

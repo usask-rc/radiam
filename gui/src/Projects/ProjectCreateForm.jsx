@@ -15,6 +15,7 @@ import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import ProjectTitle from "./ProjectTitle";
+import ChipInput from "material-ui-chip-input"
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
@@ -27,9 +28,16 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
     const [loading, setLoading] = useState(false)
     const [group, setGroup] = useState(null)
     const [error, setError] = useState(null)
-  
+    const [keywords, setKeywords] = useState("")
+
+    const handleChipChange = (data) => {
+      console.log("chip change data: ", data)
+      setKeywords(data)
+    }
+
     const handleSubmit=(data) => {
-      console.log("handleSubmit data is: ", data)
+      let tempKeywords = keywords.join(",")
+      data.keywords = tempKeywords
       props.resource = "projects"
       data.number = null
       data.metadata = null
@@ -62,6 +70,8 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
         _isMounted = false;
     }
     }, [group])
+
+    console.log("keywords: ", keywords)
   
     return(
       <SimpleForm
@@ -91,11 +101,10 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
             optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}
           />
         </ReferenceInput>
-        <TextInput
-          className="input-medium"
+        <ChipInput
           label={"en.models.projects.keywords"}
-          multiline
-          source={MODEL_FIELDS.KEYWORDS}
+          newChipKeys={[',']}
+          onChange={handleChipChange}
         />
         <ReferenceInput
           resource={MODELS.GROUPS}
