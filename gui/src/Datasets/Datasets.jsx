@@ -34,7 +34,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
 import { GET_ONE } from 'ra-core';
-import { Toolbar } from '@material-ui/core';
+import { Toolbar, Typography } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
@@ -66,6 +66,10 @@ const styles = {
   fontSize: '2em',
   },
   searchModel: {
+  },
+  mapFormHeader: {
+    marginTop: "1em",
+    paddingBottom: "1em",
   }
 };
 
@@ -137,6 +141,7 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
         <TextField
           label={"en.models.datasets.data_abstract"}
           source={MODEL_FIELDS.DATA_ABSTRACT}
+          options={{ multiline: true }}
         />
 
         <TextField
@@ -522,7 +527,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         <ConfigMetadata id={props.id} type="dataset" />
       </>
     )}
-
+    <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
     <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
   </SimpleForm>)
 };

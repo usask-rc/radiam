@@ -39,7 +39,14 @@ const styles = {
   titleText: {
     fontSize: "2em",
     width: 'inherit',
-  }
+  },
+  mapFormHeader: {
+    paddingBottom: "1em",
+    marginTop: "1em",
+  },
+  projectList: {
+    minWidth: "18em",
+  },
 };
 
 class LocationForm extends Component {
@@ -251,8 +258,8 @@ class LocationForm extends Component {
           console.log("projList being rendered: ", projList)
             return(<ReferenceArrayInput
               resource={"projects"}
-              className="input-medium"
               label={"en.models.locations.projects"}
+              className={classes.projectList}
               source={"projects"}
               reference={"projects"}
               required>
@@ -286,7 +293,7 @@ class LocationForm extends Component {
         />
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
         defaultValue={record && record.notes || ""} />
-
+        <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
         <MapForm
           content_type={MODEL_FK_FIELDS.LOCATION}
           recordGeo={geo}

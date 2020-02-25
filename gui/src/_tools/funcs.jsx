@@ -939,6 +939,9 @@ export function translateDates(date, type, direction = 1) {
 }
 
 export const truncatePath = (path) => {
+  if (!path){
+    return path
+  }
   let tempPath = path
   let tempPathArr = tempPath.split("/")
   if (tempPathArr.length > 4){

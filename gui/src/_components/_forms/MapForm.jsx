@@ -37,6 +37,7 @@ class MapForm extends Component {
       notDisplayedFeatures: [],
       popup: { active: false, for: '' },
       prevProperties: {},
+      location: [51.652111, -105.527802], //map location
     };
     this.updateGeo = this.updateGeo.bind(this);
     this._updateFeatures = this._updateFeatures.bind(this);
@@ -199,6 +200,8 @@ class MapForm extends Component {
       //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
       latLng[1] = this._normLng(latLng[1]);
       this.setState({ location: latLng });
+
+      console.log("set location to: ", latLng)
     }
   };
 
@@ -405,9 +408,6 @@ class MapForm extends Component {
       <>
         {location && location.length > 0 && (
           <>
-            <Typography className={classes.mapTitle} component={'p'}>
-              {`Location Information`}
-            </Typography>
             <Map
               ref={ref => {
                 if (!mapRef && ref) {

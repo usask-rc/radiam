@@ -37,6 +37,9 @@ const styles = {
   root: {
     backgroundColor: "inherit"
   },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 const filterStyles = {
@@ -83,7 +86,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
       }
       pagination={<CustomPagination />}
     >
-      <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+      <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
         <ReferenceField
           link={false}
           label={"en.models.grants.group"}

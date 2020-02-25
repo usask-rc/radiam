@@ -41,7 +41,10 @@ const listStyles = {
   },
   header: {
     backgroundColor: "inherit"
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 const filterStyles = {
   form: {
@@ -92,7 +95,7 @@ export const GroupMemberList = withStyles(listStyles)(
         pagination={<CustomPagination />}
         bulkActionButtons={false}
       >
-        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
 
           <ReferenceField
             link={false}
