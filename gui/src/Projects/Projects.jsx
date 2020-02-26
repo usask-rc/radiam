@@ -483,15 +483,20 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, translate, ...others } = this.props;
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     return (<Edit actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
+      <ProjectCreateForm classes={classes} translate={translate} {...this.props} />
+    </Edit>);
+  }
+};
+
+/*
+        <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
       //todo: resolve the issue of dupliated names asyncValidate={asyncValidate}
       toolbar={<DefaultToolbar {...this.props}/>}>
         <ProjectTitle prefix={`Updating`} />
         <ProjectEditInputs classes={classes} translate={translate} permissions={permissions} record={record} state={this.state} />
       </SimpleForm>
-    </Edit>);
-  }
-};
+*/
+
 
 const enhance = compose(
   translate,

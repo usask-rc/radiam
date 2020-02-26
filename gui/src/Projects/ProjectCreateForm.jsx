@@ -16,6 +16,9 @@ import { FormDataConsumer, required } from "ra-core";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import ProjectTitle from "./ProjectTitle";
 import ChipInput from "material-ui-chip-input"
+import {Redirect} from "react-router-dom"
+import { toast } from "react-toastify"
+
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
@@ -23,27 +26,68 @@ const validatePrimaryContactUser = required('en.validate.project.primary_contact
 
 export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) => {
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
-  
     const [groupContactList, setGroupContactList] = useState([])
     const [loading, setLoading] = useState(false)
-    const [group, setGroup] = useState(null)
+    const [group, setGroup] = useState(props.record ? props.record.group : null)
     const [error, setError] = useState(null)
-    const [keywords, setKeywords] = useState("")
-
+    const [geo, setGeo] = useState(props.record ? props.record.geo : null)
+    const [keywords, setKeywords] = useState(props.record && props.record.keywords ? props.record.keywords.split(",") : "")
+    const [redirect, setRedirect] = useState(null)
     const handleChipChange = (data) => {
       console.log("chip change data: ", data)
       setKeywords(data)
     }
 
+    const handleChipAdd = (data) => {
+      console.log("keywords added, set to: ", [...keywords, data])
+
+      setKeywords([...keywords, data])
+    }
+    const handleChipDelete = (data, idx) => {
+      let tempKeywords = [...keywords]
+      tempKeywords.splice(idx, 1)
+      console.log("keywords deleted, set to: ", tempKeywords)
+      setKeywords(tempKeywords)
+    }
+
     const handleSubmit=(data) => {
+
+      const { record } = props
+      console.log("keywords in submit is: ", keywords)
       let tempKeywords = keywords.join(",")
       data.keywords = tempKeywords
       props.resource = "projects"
+
       data.number = null
       data.metadata = null
-      const dataGeo = data.geo //this must be excised from dataGeo to prevent a 400 error on submission for a project
+
+      if (record.number){
+        data.number = record.number
+      }
+      if (record.metadata){ //TODO: no, because it could have updated.
+        data.metadata = record.metadata
+      }
+      if (record.id){
+        data.id = record.id
+      }
+
       delete data.geo
-      submitObjectWithGeo(data, dataGeo, props)
+
+      if (!props.record){
+        submitObjectWithGeo(data, geo, props).then(data => {
+          toast.success("Project successfully created")
+          setRedirect("/projects")
+        })
+        .catch(err => console.log("error in creating geo: ", err))
+
+      }
+      else{
+        submitObjectWithGeo(data, geo, props).then(data => {
+          toast.success("Project successfully updated")
+          setRedirect("/projects")
+        })
+        .catch(err => console.log("error in updating geo: ", err))
+      }
     }
 
     const groupChange = (data) => {
@@ -71,8 +115,8 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
     }
     }, [group])
 
-    console.log("keywords: ", keywords)
-  
+    const { record } = props
+
     return(
       <SimpleForm
       asyncValidate={asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
@@ -85,6 +129,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           label={"en.models.projects.name"}
           source={MODEL_FIELDS.NAME}
           validate={validateName}
+          defaultValue={record ? record.name : ""}
         />
         <ReferenceInput
           resource={MODELS.PROJECTAVATARS}
@@ -95,6 +140,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           perPage={1000}
           sort={{ field: 'random', order: 'ASC' }}
           source={MODEL_FIELDS.AVATAR} reference={MODELS.PROJECTAVATARS}
+          defaultValue={record ? record.avatar : null}
         >
           <SelectInput
             source={MODEL_FIELDS.AVATAR_IMAGE}
@@ -102,9 +148,12 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           />
         </ReferenceInput>
         <ChipInput
-          label={"en.models.projects.keywords"}
+          label={translate("en.models.projects.keywords")} //typically dont need to invoke translate, this is custom so we do.
           newChipKeys={[',']}
+          onAdd={(data) => handleChipAdd(data)}
+          onDelete={(data, idx) => handleChipDelete(data, idx)}
           onChange={handleChipChange}
+          value={keywords}
         />
         <ReferenceInput
           resource={MODELS.GROUPS}
@@ -113,6 +162,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           source={MODEL_FIELDS.GROUP}
           reference={MODELS.GROUPS}
           onChange={(data) => groupChange(data)}
+          defaultValue={record ? record.group : null}
           validate={validateGroup}
           required>
           <SelectInput optionText={MODEL_FIELDS.NAME} />
@@ -143,6 +193,7 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
               choices={groupContactList}
               disabled={formData.group ? false : true}
               validate={validatePrimaryContactUser}
+              defaultValue={record ? record.primary_contact_user : null}
           />
           }
         }}
@@ -150,24 +201,20 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
         <FormDataConsumer>
           {({formData, ...rest} ) =>
           {
-            //NOTE: This FormDataConsumer area is required for the map implementation.
-            const geoDataCallback = geo => {
-              formData.geo = geo
-            };
-  
             return(
               <>
               <div>
                 <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
               </div>
               <div>
-                <MapForm content_type={'project'} recordGeo={null} id={null} geoDataCallback={geoDataCallback}/>
+                <MapForm content_type={'project'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>
               </div>
               </>
             )
           }
           }
         </FormDataConsumer>
+        {redirect && <Redirect to={redirect} /> }
       </SimpleForm>
     )
   }

@@ -590,34 +590,46 @@ export function submitObjectWithGeo(
   redirect = RESOURCE_OPERATIONS.LIST,
   inModal=false
 ) {
-  console.log('formData heading into submitobjectwithgeo is: ', formData);
-  if (formData.id) {
-    updateObjectWithGeo(formData, geo, props, redirect);
-  } else {
-    createObjectWithGeo(formData, geo, props, inModal);
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log('formData heading into submitobjectwithgeo is: ', formData);
+    if (formData.id) {
+      
+      updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
+    } else {
+      createObjectWithGeo(formData, geo, props, inModal).then(data => resolve(data)).catch(err => reject(err));
+    }
+  })
 }
 
 function updateObjectWithGeo(formData, geo, props) {
-  if (geo && Object.keys(geo).length > 0) {
-    formData.geo = geo;
-  } else {
-    //api wont allow null geojson, so replace it with an empty list of features.
-    formData.geo = {
-      object_id: formData.id,
-      content_type: props.resource.substring(0, props.resource.length - 1),
-      geojson: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    };
-  }
-  if (props.save){
-    props.save(formData, RESOURCE_OPERATIONS.LIST);
-  }
-  else{
-    putObjectWithoutSaveProp(formData, props.resource)
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log("formData, geo in updateobjectwithgeo: ", formData, geo)
+    if (geo && Object.keys(geo).length > 0) {
+      formData.geo = geo;
+      formData.geo.object_id = formData.id
+    } else {
+      //api wont allow null geojson, so replace it with an empty list of features.
+      formData.geo = {
+        object_id: formData.id,
+        content_type: props.resource.substring(0, props.resource.length - 1),
+        geojson: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      };
+    }
+    if (props.save){ //use the react-admin form's default save func
+      resolve(props.save(formData, RESOURCE_OPERATIONS.LIST));
+    }
+    else{
+      putObjectWithoutSaveProp(formData, props.resource).then(data => {
+        resolve(data)
+      }).catch(err => reject(err))
+    }
+
+  })
 }
 
 export function putObjectWithoutSaveProp(formData, resource){
@@ -664,89 +676,89 @@ export function deleteItem(data, resource){
 
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
-  console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
-  let headers = new Headers({ 'Content-Type': 'application/json' });
-  const token = localStorage.getItem(WEBTOKEN);
 
-  if (token) {
-    const parsedToken = JSON.parse(token);
-    headers.set('Authorization', `Bearer ${parsedToken.access}`);
+  return new Promise((resolve, reject) => {
+    console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem(WEBTOKEN);
 
-    //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
-    const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
-      method: METHODS.POST,
-      body: JSON.stringify({ ...formData }),
-      headers: headers,
-    });
+    if (token) {
+      const parsedToken = JSON.parse(token);
+      headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    return fetch(request)
-      .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          return response.json();
-        }
-        throw new Error(response.statusText); //error here when creating dataset nested in project
-      })
-      .then(data => {
-        console.log('data in createobjectwithgeo is: ', data);
-        //some data exists - add in the object ID before submission
-        if (geo && geo.content_type) {
-          data.geo = geo;
-          data.geo.object_id = data.id;
-        } else {
-          //no value - can't send null into geo, so make a basic structure.
-          data.geo = {
-            object_id: data.id,
-            content_type: props.resource.substring(
-              0,
-              props.resource.length - 1
-            ),
-            geojson: {
-              type: 'FeatureCollection',
-              features: [],
-            },
-          };
-        }
+      //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
+      const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
+        method: METHODS.POST,
+        body: JSON.stringify({ ...formData }),
+        headers: headers,
+      });
 
-        //the PUT request to update this object with its geoJSON
-        const request = new Request(
-          getAPIEndpoint() + `/${props.resource}/${data.id}/`,
-          {
-            method: METHODS.PUT,
-            body: JSON.stringify({ ...data }),
-            headers: headers,
+      return fetch(request)
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            return response.json();
           }
-        );
+          reject({err: `Could not submit ${props.resource} to API, status: ${response.status} ${response.statusText}`})
+          throw new Error(response.statusText); //error here when creating dataset nested in project
+        })
+        .then(data => {
+          console.log('data in createobjectwithgeo is: ', data);
+          //some data exists - add in the object ID before submission
+          if (geo && geo.content_type) {
+            data.geo = geo;
+            data.geo.object_id = data.id;
+          } else {
+            //no value - can't send null into geo, so make a basic structure.
+            data.geo = {
+              object_id: data.id,
+              content_type: props.resource.substring(
+                0,
+                props.resource.length - 1
+              ),
+              geojson: {
+                type: 'FeatureCollection',
+                features: [],
+              },
+            };
+          }
 
-        return fetch(request)
-          .then(response => {
-            if (response.status >= 200 && response.status < 300) {
-              return response.json();
+          //the PUT request to update this object with its geoJSON
+          const request = new Request(
+            getAPIEndpoint() + `/${props.resource}/${data.id}/`,
+            {
+              method: METHODS.PUT,
+              body: JSON.stringify({ ...data }),
+              headers: headers,
             }
-            throw new Error(response.statusText);
-          })
-          .then(data => {
-            console.log("Data from geoJSON update: ", data);
-            if (!inModal){ //stop redirect if in a modal
-              props.history.push(`/${props.resource}`);
-            }
-          });
-      }).catch(err => {
-        console.log("err in POST new object with geo: ", err, formData, geo, props)
-      })
-      ;
-  } else {
-    //TODO: logout the user.
-    toastErrors(WARNINGS.NO_AUTH_TOKEN);
+          );
 
-    if (props && props.history) {
-      props.history.push(`/login`);
+          return fetch(request)
+            .then(response => {
+              if (response.status >= 200 && response.status < 300) {
+                return response.json();
+              }
+              throw new Error(response.statusText);
+            })
+            .then(data => {
+              resolve(data)
+
+              //TODO: test thoroughly what happens in modals
+              console.log("Data from geoJSON update: ", data);
+              if (!inModal){ //stop redirect if in a modal
+                props.history.push(`/${props.resource}`);
+              }
+            });
+        }).catch(err => {
+          console.log("err in POST new object with geo: ", err, formData, geo, props)
+          reject(err)
+        })
+        ;
     } else {
-      console.error(
-        'no props sent to createobjectwithgeo - how did this happen?  formData: ',
-        formData
-      );
+      //TODO: logout the user.
+      toastErrors(WARNINGS.NO_AUTH_TOKEN);
+      reject({error: WARNINGS.NO_AUTH_TOKEN})
     }
-  }
+  })
 }
 
 export function getTranslation(
