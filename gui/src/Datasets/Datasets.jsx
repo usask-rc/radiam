@@ -43,6 +43,7 @@ import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
 import FilesTab from '../Projects/Files/FilesTab.jsx';
 import { DefaultToolbar } from '../_components/index.js';
 import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
+import { Redirect } from 'react-router';
 
 const styles = {
   actions: {
@@ -359,6 +360,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
+  const [redirect, setRedirect] = useState(null)
   //TODO: refactor this
   const [searchModel, setSearchModel] = useState(props.location && props.location.search_model ? JSON.stringify(props.location.search_model) : props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
 
@@ -413,8 +415,14 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     if (!geo){
 
     }
-    submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false)
+    submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
+      data => {
+        console.log("submitobjectwithgeo success, returned data: ", data)
+        setRedirect("/datasets")
+      }
+    ).catch(err => console.error("submitobjectwithgeo dataset error", err))
 
+    //TODO: what is this
     if (props.setCreateModal){
       props.setCreateModal(false)
     }
@@ -529,6 +537,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     )}
     <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
     <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
+    {redirect && <Redirect to={redirect} /> }
   </SimpleForm>)
 };
 

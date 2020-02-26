@@ -19,6 +19,7 @@ import { FormDataConsumer } from 'ra-core';
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
 import { Typography } from '@material-ui/core';
 import { DefaultToolbar } from '../_components';
+import { Redirect } from 'react-router';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -58,6 +59,7 @@ class LocationForm extends Component {
       isFormDirty: false,
       mapFormKey: 0,
       jsonTextFormKey: 1000,
+      redirect: null,
     };
     if (props.record && props.record.projects){
       props.record.projects = this.fixProjectList(props.record.projects)
@@ -113,7 +115,14 @@ class LocationForm extends Component {
     })
     data.projects = projList
     this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`);
+        submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
+        .then(data => {
+          console.log("locationform submitobjectwithgeo data: ", data)
+
+          this.setState({redirect: "/locations"})
+        }).catch(err => {
+          console.error("error in submitobjectwithgeo in locationform: ", err)
+        });
     })
     
   };
@@ -122,7 +131,7 @@ class LocationForm extends Component {
     //start marking form as dirty only when the user makes changes.  This property is case sensitive.
     console.log("handlechange data: ", data)
     if (data && data.timeStamp){
-    this.setState({isFormDirty: true})
+      this.setState({isFormDirty: true})
     }
   }
 
@@ -300,6 +309,7 @@ class LocationForm extends Component {
           id={id}
           geoDataCallback={this.geoDataCallback}
         />
+        {this.state.redirect && <Redirect to={this.state.redirect} /> }
       </SimpleForm>
     );
   }
