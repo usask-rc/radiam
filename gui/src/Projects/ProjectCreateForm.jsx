@@ -9,7 +9,7 @@ import {
 } from 'react-admin';
 import { MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
-import { getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
+import { getUsersInGroup, submitObjectWithGeo, toastErrors } from "../_tools/funcs";
 import { Typography } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
@@ -78,7 +78,11 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           toast.success("Project successfully created")
           setRedirect("/projects")
         })
-        .catch(err => console.log("error in creating geo: ", err))
+        .catch(err => {
+          console.log("error in creating geo: ", err)
+          toast.error("Error Updating Project, please ensure the form is fully completed.")
+
+        })
 
       }
       else{
@@ -86,7 +90,11 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           toast.success("Project successfully updated")
           setRedirect("/projects")
         })
-        .catch(err => console.log("error in updating geo: ", err))
+        .catch(err => 
+          {
+            console.log("error in updating geo: ", err)
+            toast.error("Error Updating Project, please ensure the form is fully completed.")
+          })
       }
     }
 
