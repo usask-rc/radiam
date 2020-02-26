@@ -574,6 +574,7 @@ class UserAgentViewSet(RadiamViewSet):
 
     filter_backends = (
        DjangoFilterBackend,
+       RadiamAuthUseragentFilter,
        UserAgentOrderingFilter,
     )
 

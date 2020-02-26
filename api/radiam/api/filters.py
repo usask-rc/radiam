@@ -205,15 +205,7 @@ class RadiamAuthResearchGroupFilter(BaseFilterBackend):
         user = request.user
 
         if not user.is_superuser:
-
-            user_groups = ResearchGroup.objects.filter(groupmember__user=request.user)\
-                .order_by('date_updated').distinct()
-            group_queryset = ResearchGroup.objects.none()
-
-            for g in user_groups:
-                group_queryset |= g.get_descendants(include_self=True)
-
-            return group_queryset
+            return user.get_groups()
 
         else:
             return researchgroups_queryset.distinct()
@@ -259,8 +251,7 @@ class RadiamAuthProjectStatisticsFilter(BaseFilterBackend):
 
 class RadiamAuthLocationFilter(BaseFilterBackend):
     """
-    Return the queryset if superuser, else if a user is a member of a group associated with a project that is
-    referenced in a useragent's project list then that user will be able to see that useragent's location
+    Return the queryset if superuser, otherwise filter location according to projects associated with locations
     """
 
     def filter_queryset(self, request, location_queryset, view):
@@ -268,13 +259,27 @@ class RadiamAuthLocationFilter(BaseFilterBackend):
         user = request.user
 
         if not user.is_superuser:
-
-            user_groupmembers = GroupMember.objects.filter(user=user)
-            user_groups = ResearchGroup.objects.filter(groupmember__in=user_groupmembers)
-            user_projects = Project.objects.filter(group__in=user_groups)
-            user_locationprojects = LocationProject.objects.filter(project__in=user_projects)
+            user_locationprojects = LocationProject.objects.filter(project__in=user.get_projects())
             user_locations = Location.objects.filter(locationproject__in=user_locationprojects).distinct()
 
             return user_locations
         else:
             return location_queryset
+
+
+class RadiamAuthUseragentFilter(BaseFilterBackend):
+    """
+    Return the queryset if superuser, otherwise filter agents according to projects
+    """
+
+    def filter_queryset(self, request, agent_queryset, view):
+
+        user = request.user
+
+        if not user.is_superuser:
+            useragentprojectconfigs = UserAgentProjectConfig.objects.filter(project__in=user.get_projects())
+            agents = UserAgent.objects.filter(useragentprojectconfig__in=useragentprojectconfigs)
+
+            return agents
+        else:
+            return agent_queryset
