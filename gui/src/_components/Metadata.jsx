@@ -670,9 +670,11 @@ class BaseConfigMetadata extends MetadataComponent {
   saveFields = () => {
     const { entity, fields } = this.state;
 
+    console.log("saveFields entity, fields: ", entity, fields)
+
     var createdFields = Object.values(fields).filter(field => field.selected && !field.was_selected);
-    var updatedFields = Object.values(fields).filter(field => field.selected && field.was_selected);
-    var deletedFields = Object.values(fields).filter(field => !field.selected);
+    var updatedFields = Object.values(fields).filter(field => field.selected && field.was_selected && field.changed);
+    var deletedFields = Object.values(fields).filter(field => !field.selected && field.was_selected);
 
     var promises = this.updateFields(updatedFields, entity);
     promises = promises.concat(this.createFields(createdFields, entity));

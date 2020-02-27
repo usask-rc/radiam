@@ -44,8 +44,8 @@ const styles = {
   actions: {
     backgroundColor: "inherit"
   },
-  root: {
-    backgroundColor: "inherit"
+  description: {
+    maxWidth: "80%",
   },
   header: {
     backgroundColor: "inherit"
