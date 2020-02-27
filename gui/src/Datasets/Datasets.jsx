@@ -21,7 +21,7 @@ import {
   withTranslate,
 } from 'react-admin';
 import compose from "recompose/compose";
-import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx/index.js";
 import {RESOURCE_OPERATIONS, MODEL_FK_FIELDS, MODELS, ROLE_USER, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
