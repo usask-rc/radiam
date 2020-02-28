@@ -58,11 +58,10 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
       const { record } = props
       props.resource = "projects"
-      
       data.keywords = keywords ? keywords.join(",") : ""
-
       data.number = null
 
+      //what is this field?
       if (record.number){
         data.number = record.number
       }

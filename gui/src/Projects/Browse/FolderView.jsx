@@ -46,6 +46,12 @@ const styles = theme => ({
     margin: "0px",
     padding: "0px"
   },
+  searchForm: {
+
+  },
+  searchFormTextField: {
+    verticalAlign: "middle",
+  },
   displayFileIcons: {
     display: "flex",
     flexDirection: "row",
@@ -180,20 +186,20 @@ function EnhancedTableHead(props) {
               :
               headCell.label
               }
-              {idx === 0 && <>
-                <form className={classes.flex} onSubmit={handleSearch}>
-
+              {idx === 4 && 
+                <form className={classes.searchForm} onSubmit={handleSearch}>
                   <TextField
                     id={PATHS.SEARCH}
                     name={PATHS.SEARCH}
                     type={PATHS.SEARCH}
-                    className={classes.textField}
+                    className={classes.searchFormTextField}
                     value={search}
                     placeholder={`Search Files`}
                   />
-                <Search />
+                  <IconButton type={"submit"} className={classes.searchButton}>
+                    <Search />
+                  </IconButton>
                 </form>
-            </>
               }
             
           </TableCell>
@@ -498,7 +504,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
                 <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
-                  <Tooltip title={"Create Dataset"}>
+                  <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>
                 </Link>
