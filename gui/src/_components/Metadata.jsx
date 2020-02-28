@@ -1301,6 +1301,7 @@ class BaseEditMetadata extends MetadataComponent {
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
