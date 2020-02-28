@@ -1440,8 +1440,7 @@ class BaseEditMetadata extends MetadataComponent {
           <div className={classes.subsection}>
             {rootFields.map((field, index) => { //should have the defaulted values here as well
               if (field.selected) { //then there is some record of this in `values`
-                console.log("rootFields mapped field, index: ", field, index, this.state.values[field.id])
-                return this.renderField(classes, translate, field, this.state.values[field.id], 0, "metadata");
+                return this.renderField(classes, translate, field, this.state.values ? this.state.values[field.id] : null, 0, "metadata");
               }
               return null
             })}

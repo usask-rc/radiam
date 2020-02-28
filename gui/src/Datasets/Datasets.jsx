@@ -531,7 +531,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
     { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
       <>
-        <EditMetadata id={props.id} type="dataset"/>
+        <EditMetadata id={props.id} values={props.record ? props.record.metadata : null} type="dataset"/>
         <ConfigMetadata id={props.id} type="dataset" />
       </>
     )}
