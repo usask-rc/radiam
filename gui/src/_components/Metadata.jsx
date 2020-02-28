@@ -1185,6 +1185,7 @@ class BaseEditMetadata extends MetadataComponent {
   constructor (props) {
     super(props);
     drawerState.registerFull(this, this.update);
+    this.state = {values: props.values} //values being the pre-existing metadata values.  This is only used for filling defaults.
   }
 
   componentWillUnmount() {
@@ -1214,200 +1215,200 @@ class BaseEditMetadata extends MetadataComponent {
     return parentPath + "." + field.id + ".value";
   };
 
-  renderField = (classes, translate, field, depth, parentPath) => {
-    if (field.selected) {
-      var type = get(field, "metadata_ui_type.key", null);
-      if (type === "boolean" ||
-          type ==="container" ||
-          type ==="date" ||
-          type ==="dateYear" ||
-          type === MODEL_FIELDS.EMAIL ||
-          type ==="float" ||
-          type ==="integer" ||
-          type ==="text" ||
-          type ==="url") {
-        return <div className={classes.container} key={"text-container-" + field.id}>
-          { field.many_values &&
-            <ArrayInput label={field.label + ".label"} source={parentPath + "." + field.id}>
-              <IndexedSimpleFormIterator
-                childClasses={classes}
-                field={field}
-                depth={depth}
-                renderChildren={this.renderChildren}
-                parentPath={parentPath}
-              >
-              { type ==="boolean" ?
-                    <NullableBooleanInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+  renderField = (classes, translate, field, values, depth, parentPath) => {
+    var type = get(field, "metadata_ui_type.key", null);
+    if (type === "boolean" ||
+        type ==="container" ||
+        type ==="date" ||
+        type ==="dateYear" ||
+        type === MODEL_FIELDS.EMAIL ||
+        type ==="float" ||
+        type ==="integer" ||
+        type ==="text" ||
+        type ==="url") {
+      console.log("field, values: ", field, values) 
+      console.log("values[field.id]: ", values[field.id]) 
+      return <div className={classes.container} key={"text-container-" + field.id}>
+        { field.many_values &&
+          <ArrayInput label={field.label + ".label"} source={`${parentPath}.${field.id}`}
+          defaultValue={values[field.id]}>
+            <IndexedSimpleFormIterator
+              childClasses={classes}
+              field={field}
+              depth={depth}
+              renderChildren={this.renderChildren}
+              parentPath={parentPath}
+            >
+            { type ==="boolean" ?
+                  <NullableBooleanInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type === "container" ?
-                    <></>
+              : type === "container" ?
+                  <></>
 
-                : type ==="date" ?
-                    <DateInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+              : type ==="date" ?
+                  <DateInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type ==="dateYear" ?
-                    <DateInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+              : type ==="dateYear" ?
+                  <DateInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type === MODEL_FIELDS.EMAIL ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequiredEmail : validateEmail }
-                    />
+              : type === MODEL_FIELDS.EMAIL ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequiredEmail : validateEmail }
+                  />
 
-                : type ==="float" ?
-                    <NumberInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+              : type ==="float" ?
+                  <NumberInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type ==="integer" ?
-                    <NumberInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+              : type ==="integer" ?
+                  <NumberInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type ==="text" ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      defaultValue={ field.default }
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
+              : type ==="text" ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
 
-                : type ==="url" ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={field.id}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequiredURL : validateURL }
-                    />
+              : type ==="url" ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={field.id}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequiredURL : validateURL }
+                  />
 
-                : null }
+              : null }
 
-              </IndexedSimpleFormIterator>
-            </ArrayInput>
-          }
-
-          { !field.many_values &&
-            <>
-              {   type ==="boolean" ?
-                    <NullableBooleanInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-
-                : type ==="date" ?
-                    <DateInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-
-                : type ==="dateYear" ?
-                    <DateInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-                : type === MODEL_FIELDS.EMAIL ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequiredEmail : validateEmail }
-                    />
-
-                : type ==="float" ?
-                    <NumberInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-
-                : type ==="integer" ?
-                    <NumberInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-
-                : type ==="text" ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      defaultValue={ field.default }
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequired : null }
-                    />
-
-                : type ==="url" ?
-                    <TextInput
-                      key={"text-input-" + field.id}
-                      label={translate(field.label + ".label")}
-                      source={this.getSource(field, parentPath)}
-                      className={ field.visible ? null : classes.invisible }
-                      validate={ field.required ? validateRequiredURL : validateURL }
-                    />
-
-
-                : null }
-                { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
-            </>
-          }
-
-        </div>
-      } else {
-        if (!type) {
-          console.error("Unknown metadata ui type with no key.");
-          console.error(field.metadata_ui_type.key);
-          return null;
-        } else {
-          console.error("Unknown metadata ui type " + field.metadata_ui_type.key);
-          return null;
+            </IndexedSimpleFormIterator>
+          </ArrayInput>
         }
+
+        { !field.many_values &&
+          <>
+            {   type ==="boolean" ?
+                  <NullableBooleanInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+
+              : type ==="date" ?
+                  <DateInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+
+              : type ==="dateYear" ?
+                  <DateInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+              : type === MODEL_FIELDS.EMAIL ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequiredEmail : validateEmail }
+                  />
+
+              : type ==="float" ?
+                  <NumberInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+
+              : type ==="integer" ?
+                  <NumberInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+
+              : type ==="text" ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    defaultValue={this.state.values[field.id] ? this.state.values[field.id][0].value : field.default }
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequired : null }
+                  />
+
+              : type ==="url" ?
+                  <TextInput
+                    key={"text-input-" + field.id}
+                    label={translate(field.label + ".label")}
+                    source={this.getSource(field, parentPath)}
+                    className={ field.visible ? null : classes.invisible }
+                    validate={ field.required ? validateRequiredURL : validateURL }
+                  />
+
+
+              : null }
+              { this.renderChildren(classes, translate, field, depth + 1, parentPath + "." + field.id) }
+          </>
+        }
+
+      </div>
+    } else {
+      if (!type) {
+        console.error("Unknown metadata ui type with no key.");
+        console.error(field.metadata_ui_type.key);
+        return null;
+      } else {
+        console.error("Unknown metadata ui type " + field.metadata_ui_type.key);
+        return null;
       }
     }
   };
@@ -1416,6 +1417,7 @@ class BaseEditMetadata extends MetadataComponent {
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
     const { classes, id, translate } = this.props;
+    console.log("editmetadata: ", rootFields, this.state, this.props)
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
@@ -1430,8 +1432,12 @@ class BaseEditMetadata extends MetadataComponent {
       return <div className={classes.section}>
         <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
           <div className={classes.subsection}>
-            {rootFields.map((field, index) => {
-              return this.renderField(classes, translate, field, 0, "metadata");
+            {rootFields.map((field, index) => { //should have the defaulted values here as well
+              if (field.selected) { //then there is some record of this in `values`
+                console.log("rootFields mapped field, index: ", field, index, this.state.values)
+                return this.renderField(classes, translate, field, this.state.values, 0, "metadata");
+              }
+              return null
             })}
           </div>
         </div>;

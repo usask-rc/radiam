@@ -53,6 +53,8 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
     const handleSubmit=(data) => {
 
+      console.log("data in handlesubmit is:" , data)
+
       const { record } = props
       console.log("keywords in submit is: ", keywords)
       let tempKeywords = keywords.join(",")
@@ -60,18 +62,13 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
       props.resource = "projects"
 
       data.number = null
-      data.metadata = null
 
       if (record.number){
         data.number = record.number
       }
-      if (record.metadata){  //metadata is not handled via this form, it's handled by the metadata component.
-        data.metadata = record.metadata
-      }
       if (record.id){
         data.id = record.id
       }
-
       delete data.geo
 
       if (!props.record){
@@ -211,7 +208,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
         </FormDataConsumer>
         { record && record.id && (
           <>
-            <EditMetadata id={record.id} type="project"/>
+            <EditMetadata id={record.id} values={props.record ? props.record.metadata : null} type="project"/>
             <ConfigMetadata id={record.id} type="project" />
           </>
         )}
