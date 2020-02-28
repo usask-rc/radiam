@@ -1226,12 +1226,11 @@ class BaseEditMetadata extends MetadataComponent {
         type ==="integer" ||
         type ==="text" ||
         type ==="url") {
-      console.log("field, values: ", field, values) 
-      console.log("values[field.id]: ", values[field.id]) 
+      console.log("field being rendered: ", field, values)
       return <div className={classes.container} key={"text-container-" + field.id}>
         { field.many_values &&
           <ArrayInput label={field.label + ".label"} source={`${parentPath}.${field.id}`}
-          defaultValue={values[field.id]}>
+          defaultValue={values}>
             <IndexedSimpleFormIterator
               childClasses={classes}
               field={field}
@@ -1239,11 +1238,12 @@ class BaseEditMetadata extends MetadataComponent {
               renderChildren={this.renderChildren}
               parentPath={parentPath}
             >
-            { type ==="boolean" ?
+            { type === "boolean" ?
                   <NullableBooleanInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1251,20 +1251,22 @@ class BaseEditMetadata extends MetadataComponent {
               : type === "container" ?
                   <></>
 
-              : type ==="date" ?
+              : type === "date" ?
                   <DateInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
 
-              : type ==="dateYear" ?
+              : type === "dateYear" ?
                   <DateInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1274,29 +1276,32 @@ class BaseEditMetadata extends MetadataComponent {
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequiredEmail : validateEmail }
                   />
 
-              : type ==="float" ?
+              : type === "float" ?
                   <NumberInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
 
-              : type ==="integer" ?
+              : type === "integer" ?
                   <NumberInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
 
-              : type ==="text" ?
+              : type === "text" ?
                   <TextInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
@@ -1306,11 +1311,12 @@ class BaseEditMetadata extends MetadataComponent {
                     validate={ field.required ? validateRequired : null }
                   />
 
-              : type ==="url" ?
+              : type === "url" ?
                   <TextInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
                     source={field.id}
+                    defaultValue={field.default}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequiredURL : validateURL }
                   />
@@ -1327,7 +1333,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <NullableBooleanInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1336,7 +1342,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <DateInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1345,7 +1351,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <DateInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1353,7 +1359,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <TextInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequiredEmail : validateEmail }
                   />
@@ -1362,7 +1368,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <NumberInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1371,17 +1377,16 @@ class BaseEditMetadata extends MetadataComponent {
                   <NumberInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
 
-              : type ==="text" ?
+              : type === "text" ?
                   <TextInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
-                    defaultValue={this.state.values[field.id] ? this.state.values[field.id][0].value : field.default }
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequired : null }
                   />
@@ -1390,7 +1395,7 @@ class BaseEditMetadata extends MetadataComponent {
                   <TextInput
                     key={"text-input-" + field.id}
                     label={translate(field.label + ".label")}
-                    source={this.getSource(field, parentPath)}
+                    source={field.id}
                     className={ field.visible ? null : classes.invisible }
                     validate={ field.required ? validateRequiredURL : validateURL }
                   />
@@ -1435,8 +1440,8 @@ class BaseEditMetadata extends MetadataComponent {
           <div className={classes.subsection}>
             {rootFields.map((field, index) => { //should have the defaulted values here as well
               if (field.selected) { //then there is some record of this in `values`
-                console.log("rootFields mapped field, index: ", field, index, this.state.values)
-                return this.renderField(classes, translate, field, this.state.values, 0, "metadata");
+                console.log("rootFields mapped field, index: ", field, index, this.state.values[field.id])
+                return this.renderField(classes, translate, field, this.state.values[field.id], 0, "metadata");
               }
               return null
             })}
