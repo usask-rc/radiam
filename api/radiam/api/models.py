@@ -174,7 +174,8 @@ class User(AbstractUser, UserPermissionMixin):
         """
         Get the user's groups
         """
-        user_groups = ResearchGroup.objects.filter(groupmember__user=self) \
+        user_groups = ResearchGroup.objects.filter(Q(groupmember__user=self, groupmember__date_expires__gte=now())| \
+                                                   Q(groupmember__user=self, groupmember__date_expires=None)) \
             .order_by('date_updated').distinct()
         group_queryset = ResearchGroup.objects.none()
 
@@ -199,8 +200,12 @@ class User(AbstractUser, UserPermissionMixin):
         """
         Get the groups that the user admins
         """
-        admingroups = ResearchGroup.objects.filter(groupmember__group_role__label__contains="admin",
-                                                   groupmember__user=self)
+        admingroups = ResearchGroup.objects.filter(Q(groupmember__group_role__label__contains="admin",
+                                                     groupmember__user=self,
+                                                     groupmember__date_expires__gte=now())| \
+                    Q(groupmember__group_role__label__contains="admin",
+                      groupmember__user=self,
+                      groupmember__date_expires=None))
         group_queryset = ResearchGroup.objects.none()
 
         for g in admingroups:
