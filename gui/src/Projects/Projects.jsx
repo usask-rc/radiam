@@ -26,7 +26,6 @@ import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
 import FilesTab from "./Files/FilesTab";
-import { MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { UserShow } from "../_components/_fields/UserShow";
@@ -38,14 +37,12 @@ import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryCont
 import { Typography, Toolbar, Dialog, DialogTitle, DialogContent, Chip } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
-import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { DatasetForm, DatasetModalShow } from "../Datasets/Datasets";
-import { ProjectCreateForm } from "./ProjectCreateForm";
-import { DefaultToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import KeywordsChip from "./KeywordsChip";
-import ChipInput from "material-ui-chip-input";
+import { ProjectForm } from "./ProjectForm";
+import { MetadataEditActions, ShowMetadata } from "../_components/Metadata";
 
 const styles = {
   actions: {
@@ -467,7 +464,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, translate, permi
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
     <Create submitOnEnter={false} {...props}>
-      <ProjectCreateForm classes={classes} translate={translate} {...props} />
+      <ProjectForm classes={classes} translate={translate} {...props} />
     </Create>
   ))
 );
@@ -483,19 +480,10 @@ class BaseProjectEdit extends Component {
     const { classes, permissions, record, translate, ...others } = this.props;
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     return (<Edit actions={<MetadataEditActions />} {...others}>
-      <ProjectCreateForm classes={classes} translate={translate} {...this.props} />
+      <ProjectForm classes={classes} translate={translate} {...this.props} />
     </Edit>);
   }
 };
-
-/*
-        <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
-      //todo: resolve the issue of dupliated names asyncValidate={asyncValidate}
-      toolbar={<DefaultToolbar {...this.props}/>}>
-        <ProjectTitle prefix={`Updating`} />
-        <ProjectEditInputs classes={classes} translate={translate} permissions={permissions} record={record} state={this.state} />
-      </SimpleForm>
-*/
 
 
 const enhance = compose(

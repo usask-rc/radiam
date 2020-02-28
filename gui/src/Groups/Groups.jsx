@@ -44,8 +44,8 @@ const styles = {
   actions: {
     backgroundColor: "inherit"
   },
-  root: {
-    backgroundColor: "inherit"
+  description: {
+    maxWidth: "80%",
   },
   header: {
     backgroundColor: "inherit"
@@ -424,7 +424,7 @@ class BaseGroupEdit extends Component {
         </ReferenceInput>
         { id && (
           <>
-            <EditMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
+            <EditMetadata id={id} values={record ? record.metadata : null}  type={MODEL_FK_FIELDS.GROUP}/>
             <ConfigMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
           </>
           )}

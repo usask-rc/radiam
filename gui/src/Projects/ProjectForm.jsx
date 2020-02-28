@@ -1,4 +1,4 @@
-//ProjectCreateForm.jsx
+//ProjectForm.jsx
 import React, {useEffect, useState} from "react";
 import {
   ImageField,
@@ -18,13 +18,14 @@ import ProjectTitle from "./ProjectTitle";
 import ChipInput from "material-ui-chip-input"
 import {Redirect} from "react-router-dom"
 import { toast } from "react-toastify"
+import { EditMetadata, ConfigMetadata } from "../_components/Metadata";
 
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
 
-export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) => {
+export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     const [groupContactList, setGroupContactList] = useState([])
     const [loading, setLoading] = useState(false)
@@ -52,6 +53,8 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
 
     const handleSubmit=(data) => {
 
+      console.log("data in handlesubmit is:" , data)
+
       const { record } = props
       console.log("keywords in submit is: ", keywords)
       let tempKeywords = keywords.join(",")
@@ -59,18 +62,13 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
       props.resource = "projects"
 
       data.number = null
-      data.metadata = null
 
       if (record.number){
         data.number = record.number
       }
-      if (record.metadata){ //TODO: no, because it could have updated.
-        data.metadata = record.metadata
-      }
       if (record.id){
         data.id = record.id
       }
-
       delete data.geo
 
       if (!props.record){
@@ -125,13 +123,15 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
 
     const { record } = props
 
+    console.log("record project: ", record)
+
     return(
       <SimpleForm
       asyncValidate={asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
       asyncBlurFields={[MODEL_FIELDS.NAME]}
       save={handleSubmit}
       >
-        <ProjectTitle prefix={`Creating Project`} />
+        <ProjectTitle prefix={record ? `Updating Project` : `Creating Project`} />
         <TextInput
           className="input-small"
           label={"en.models.projects.name"}
@@ -206,6 +206,12 @@ export const ProjectCreateForm = ({classes, translate, mode, save, ...props}) =>
           }
         }}
         </FormDataConsumer>
+        { record && record.id && (
+          <>
+            <EditMetadata id={record.id} values={props.record ? props.record.metadata : null} type="project"/>
+            <ConfigMetadata id={record.id} type="project" />
+          </>
+        )}
         <FormDataConsumer>
           {({formData, ...rest} ) =>
           {
