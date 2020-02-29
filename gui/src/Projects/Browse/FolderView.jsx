@@ -294,16 +294,21 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const handleSearch = (e) => {
     console.log("handlesearch: ", e.target.elements.search.value)
-    setLoading(true)
-    setFilePage(1)
-    setFolderPage(1)
-    setFileTotal(0)
-    setFolderTotal(0)
-    setFolders([])
-    setFiles([])
-    setSearch(e.target.elements.search.value)
-    e.preventDefault()
 
+    if (search !== e.target.elements.search.value){
+      setLoading(true)
+      setFilePage(1)
+      setFolderPage(1)
+      setFileTotal(0)
+      setFolderTotal(0)
+      setFolders([])
+      setFiles([])
+      setSearch(e.target.elements.search.value)
+    }
+    else{
+      console.log("same search string, no refresh needed")
+    }
+    e.preventDefault()
   }
 
   //TODO: honestly i just dont really feel like doing this rn
