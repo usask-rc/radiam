@@ -29,6 +29,7 @@ import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
+import moment from 'moment';
 
 const styles = theme => ({
   backCell: {
@@ -221,7 +222,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(1)
+  const [perPage, setPerPage] = useState(3)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")
@@ -485,8 +486,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <Typography>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
           </TableCell>
           <TableCell>
-            <Typography className={classes.curFolderDisplay}>{`${parents[parents.length - 1].last_modified}`}</Typography>
-            
+            <Tooltip title={`${parents[parents.length - 1].last_modified}`}>
+              <Typography className={classes.curFolderDisplay}>
+                {`${moment().diff(moment(parents[parents.length - 1].last_modified).toISOString(), "days")} days ago`}
+              </Typography>
+            </Tooltip>
           </TableCell>
 
         </TableRow>
@@ -508,7 +512,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               {truncated_path}
             </TableCell>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
-              {folder.last_modified}
+              <Tooltip title={`${folder.last_modified}`}>
+                <Typography>
+                  {`${moment().diff(moment(folder.last_modified).toISOString(), "days")} days ago`}
+                </Typography>
+              </Tooltip>
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
@@ -531,6 +539,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
+          <TableCell></TableCell>
         </TableRow>
       }
       {!loading && files && files.length > 0 && 
@@ -547,9 +556,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell className={classes.nameCell}>
             {truncated_path}
           </TableCell>
-          <TableCell className={classes.nameCell}>
-            {file.last_modified}
-          </TableCell>
+            <TableCell className={classes.nameCell}>
+              <Tooltip title={file.last_modified}>
+                <Typography>
+                  {`${moment().diff(moment(file.last_modified).toISOString(), "days")} days ago`}
+                </Typography>
+              </Tooltip>
+            </TableCell>
           <TableCell></TableCell>
           
         </TableRow>
@@ -558,6 +571,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       {!loading && files && files.length < fileTotal &&
         <TableRow className={classes.fileRow} onClick={() => setFilePage(filePage + 1)}>
           <TableCell>{`... ${fileTotal - files.length} more files`}</TableCell>
+          <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
