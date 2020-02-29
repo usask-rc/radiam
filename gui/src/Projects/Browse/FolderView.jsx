@@ -229,7 +229,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
-
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
     if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
@@ -343,6 +342,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (_isMounted){
           setFolders(data.files)
           setLoading(false)
+
+          if (!data.files && !files){
+            
+          }
         }
       }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
@@ -474,7 +477,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     </EnhancedTableHead>
     <TableBody>
       {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
-      
         <TableRow className={classes.showFolderRow}>
           <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
             <ArrowBack />
@@ -577,6 +579,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell></TableCell>
           <TableCell></TableCell>
         </TableRow>
+      }
+      {!loading && files.length === 0 && folders.length === 0 && search &&
+      <TableRow className={classes.fileRow}>
+          <TableCell colSpan={5}>{`No Files were found with query: <${search}>.  Please try a different Query.`}</TableCell>
+      </TableRow>
       }
       
     </TableBody>
