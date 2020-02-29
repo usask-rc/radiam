@@ -221,7 +221,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(50)
+  const [perPage, setPerPage] = useState(1)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")
@@ -305,9 +305,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       setFiles([])
       setSearch(e.target.elements.search.value)
     }
-    else{
-      console.log("same search string, no refresh needed")
-    }
     e.preventDefault()
   }
 
@@ -390,7 +387,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     }
 
     if (!search){ //TODO: there is a better way to separate this out
-
       getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
         console.log("folder files data: ", data.files)
         if (_isMounted){
@@ -398,20 +394,21 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           setFolderTotal(data.total)
           //cases for where we want to add more files via `...`
           //TODO: sort functionality adds duplicates in - the logic has to change here.
-          if (folders && folders.length  > 0 ){
-            const prevFolders = folders
-            setFolders([...prevFolders, ...data.files])
-            console.log("setting files to: ", [...prevFolders, ...data.files])
+          const prevFolders = folders
+
+          //first page, set the values, otherwise append
+          if (folderPage > 1){
+            if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id)
+            {
+              setFolders([...prevFolders, ...data.files])
+            }
           }
           else{
-            setFolders(data.files)
+            setFolders([...data.files]) 
           }
-        }
-        return data
-      }).then(() => {
-        if (_isMounted && folders){
           setLoading(false)
         }
+        return data
       })
       .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
@@ -419,23 +416,20 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         console.log("files data: ", data)
         if (_isMounted){
           setFileTotal(data.total)
-          if (files && files.length > 0){
-            const prevFiles = files
-            console.log("setting files to: ", [...prevFiles, ...data.files])
-            setFiles([...prevFiles, ...data.files])
+
+          const prevFiles = files
+          if (filePage > 1){
+            if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
+            {
+              setFiles([...prevFiles, ...data.files])
+            }
           }
           else{
-            setFiles(data.files)
+            setFiles([...data.files]) 
           }
-        }
-      }).then(() => 
-      {
-        if (_isMounted && files)
-        {
           setLoading(false)
         }
-      }
-      ).catch((err => {console.error("error in getFiles is: ", err)}))
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
 
     //if we unmount, lock out the component from being able to use the state
@@ -443,6 +437,16 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       _isMounted = false;
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
+
+  //needs different UE for both folder and files
+
+  //folder UE
+  /* What do we want from this?
+    At this level (PATH / parents?) get X (perFolderPage / perPage) Folders on Page (folderPage), sorted by (sortBy), ordered by (order)
+  useEffect(() => {
+
+  }, [folderPage, sortBy, order, folderPage, ])
+   */
 
   return(
   <div>
