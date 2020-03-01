@@ -23,7 +23,7 @@ import { EditMetadata, ConfigMetadata } from "../_components/Metadata";
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
-const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
+const validatePrimaryContactUser =[required()]
 
 export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
@@ -34,6 +34,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const [geo, setGeo] = useState(props.record ? props.record.geo : null)
     const [keywords, setKeywords] = useState(props.record && props.record.keywords ? props.record.keywords.split(",") : "")
     const [redirect, setRedirect] = useState(null)
+    const [pcu, setPcu] = useState(props.record ? props.record.primary_contact_user : null)
     const handleChipChange = (data) => {
       console.log("chip change data: ", data)
       setKeywords(data)
@@ -56,13 +57,11 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
       console.log("data in handlesubmit is:" , data)
 
       const { record } = props
-      console.log("keywords in submit is: ", keywords)
-      let tempKeywords = keywords.join(",")
-      data.keywords = tempKeywords
       props.resource = "projects"
-
+      data.keywords = keywords ? keywords.join(",") : ""
       data.number = null
 
+      //what is this field?
       if (record.number){
         data.number = record.number
       }
@@ -175,37 +174,21 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
           required>
           <SelectInput optionText={MODEL_FIELDS.NAME} />
         </ReferenceInput>
-        <FormDataConsumer>
-          {({formData, ...rest}) => {
 
-            console.log("groupContactList length:", groupContactList.length, groupContactList)
-          if (loading){
-            return(<div>
-              <Typography>{`Loading Associated Users...`}</Typography>
-            </div>)
-          }
-          else if (!loading && formData.group && groupContactList.length === 0){
-            return (
-            <div>
-              <Typography><a href={`/#/${MODELS.GROUPS}/${formData.group}/${RESOURCE_OPERATIONS.SHOW}`}>{`There are no users to select in this Group - Click here to add one`}</a></Typography>
-            </div>
-            )
-          }
-          else{
-            return <SelectInput 
-              source={"primary_contact_user"} 
-              label={"en.models.projects.primary_contact_user"}
-              optionText={"username"} 
-              optionValue={"id"} 
-              className={classes.selectPCU}
-              choices={groupContactList}
-              disabled={formData.group ? false : true}
-              validate={validatePrimaryContactUser}
-              defaultValue={record ? record.primary_contact_user : null}
+        {!loading && group && groupContactList.length === 0 &&
+              <Typography><a href={`/#/${MODELS.GROUPS}/${group}/${RESOURCE_OPERATIONS.SHOW}`}>{`There are no users in the selected Group - Click here to add one`}</a></Typography>
+        }
+        <SelectInput 
+            source={"primary_contact_user"} 
+            label={"en.models.projects.primary_contact_user"}
+            optionText={"username"} 
+            optionValue={"id"} 
+            className={classes.selectPCU}
+            choices={groupContactList}
+            disabled={groupContactList.length === 0 ? true : false}
+            validate={validatePrimaryContactUser} //this input has troubles showing an error message when invalid
+            defaultValue={record ? record.primary_contact_user : null}
           />
-          }
-        }}
-        </FormDataConsumer>
         { record && record.id && (
           <>
             <EditMetadata id={record.id} values={props.record ? props.record.metadata : null} type="project"/>

@@ -29,6 +29,7 @@ import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from '../../_components/files/FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
+import moment from 'moment';
 
 const styles = theme => ({
   backCell: {
@@ -45,6 +46,12 @@ const styles = theme => ({
   createDatasetCell: {
     margin: "0px",
     padding: "0px"
+  },
+  searchForm: {
+
+  },
+  searchFormTextField: {
+    verticalAlign: "middle",
   },
   displayFileIcons: {
     display: "flex",
@@ -180,20 +187,20 @@ function EnhancedTableHead(props) {
               :
               headCell.label
               }
-              {idx === 0 && <>
-                <form className={classes.flex} onSubmit={handleSearch}>
-
+              {idx === 4 && 
+                <form className={classes.searchForm} onSubmit={handleSearch}>
                   <TextField
                     id={PATHS.SEARCH}
                     name={PATHS.SEARCH}
                     type={PATHS.SEARCH}
-                    className={classes.textField}
+                    className={classes.searchFormTextField}
                     value={search}
                     placeholder={`Search Files`}
                   />
-                <Search />
+                  <IconButton type={"submit"} className={classes.searchButton}>
+                    <Search />
+                  </IconButton>
                 </form>
-            </>
               }
             
           </TableCell>
@@ -215,14 +222,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(50)
+  const [perPage, setPerPage] = useState(5)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
-
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
     if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
@@ -288,16 +294,18 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const handleSearch = (e) => {
     console.log("handlesearch: ", e.target.elements.search.value)
-    setLoading(true)
-    setFilePage(1)
-    setFolderPage(1)
-    setFileTotal(0)
-    setFolderTotal(0)
-    setFolders([])
-    setFiles([])
-    setSearch(e.target.elements.search.value)
-    e.preventDefault()
 
+    if (search !== e.target.elements.search.value){
+      setLoading(true)
+      setFilePage(1)
+      setFolderPage(1)
+      setFileTotal(0)
+      setFolderTotal(0)
+      setFolders([])
+      setFiles([])
+      setSearch(e.target.elements.search.value)
+    }
+    e.preventDefault()
   }
 
   //TODO: honestly i just dont really feel like doing this rn
@@ -334,6 +342,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (_isMounted){
           setFolders(data.files)
           setLoading(false)
+
+          if (!data.files && !files){
+            
+          }
         }
       }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
@@ -379,7 +391,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     }
 
     if (!search){ //TODO: there is a better way to separate this out
-
       getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
         console.log("folder files data: ", data.files)
         if (_isMounted){
@@ -387,20 +398,21 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           setFolderTotal(data.total)
           //cases for where we want to add more files via `...`
           //TODO: sort functionality adds duplicates in - the logic has to change here.
-          if (folders && folders.length  > 0 ){
-            const prevFolders = folders
-            setFolders([...prevFolders, ...data.files])
-            console.log("setting files to: ", [...prevFolders, ...data.files])
+          const prevFolders = folders
+
+          //first page, set the values, otherwise append
+          if (folderPage > 1){
+            if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id)
+            {
+              setFolders([...prevFolders, ...data.files])
+            }
           }
           else{
-            setFolders(data.files)
+            setFolders([...data.files]) 
           }
-        }
-        return data
-      }).then(() => {
-        if (_isMounted && folders){
           setLoading(false)
         }
+        return data
       })
       .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
 
@@ -408,23 +420,20 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         console.log("files data: ", data)
         if (_isMounted){
           setFileTotal(data.total)
-          if (files && files.length > 0){
-            const prevFiles = files
-            console.log("setting files to: ", [...prevFiles, ...data.files])
-            setFiles([...prevFiles, ...data.files])
+
+          const prevFiles = files
+          if (filePage > 1){
+            if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
+            {
+              setFiles([...prevFiles, ...data.files])
+            }
           }
           else{
-            setFiles(data.files)
+            setFiles([...data.files]) 
           }
-        }
-      }).then(() => 
-      {
-        if (_isMounted && files)
-        {
           setLoading(false)
         }
-      }
-      ).catch((err => {console.error("error in getFiles is: ", err)}))
+      }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
 
     //if we unmount, lock out the component from being able to use the state
@@ -432,6 +441,16 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       _isMounted = false;
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
+
+  //needs different UE for both folder and files
+
+  //folder UE
+  /* What do we want from this?
+    At this level (PATH / parents?) get X (perFolderPage / perPage) Folders on Page (folderPage), sorted by (sortBy), ordered by (order)
+  useEffect(() => {
+
+  }, [folderPage, sortBy, order, folderPage, ])
+   */
 
   return(
   <div>
@@ -458,7 +477,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     </EnhancedTableHead>
     <TableBody>
       {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
-      
         <TableRow className={classes.showFolderRow}>
           <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
             <ArrowBack />
@@ -470,9 +488,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <Typography>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
           </TableCell>
           <TableCell>
-            <Typography className={classes.curFolderDisplay}>{`${parents[parents.length - 1].last_modified}`}</Typography>
-            
+            <Tooltip title={`${parents[parents.length - 1].last_modified}`}>
+              <Typography className={classes.curFolderDisplay}>
+                {`${moment().diff(moment(parents[parents.length - 1].last_modified).toISOString(), "days")} days ago`}
+              </Typography>
+            </Tooltip>
           </TableCell>
+          <TableCell/>
 
         </TableRow>
       }
@@ -493,12 +515,16 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               {truncated_path}
             </TableCell>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
-              {folder.last_modified}
+              <Tooltip title={`${folder.last_modified}`}>
+                <Typography>
+                  {`${moment().diff(moment(folder.last_modified).toISOString(), "days")} days ago`}
+                </Typography>
+              </Tooltip>
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
                 <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
-                  <Tooltip title={"Create Dataset"}>
+                  <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>
                 </Link>
@@ -513,6 +539,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       {!loading && folders && folders.length < folderTotal &&
         <TableRow className={classes.folderRow} onClick={() => setFolderPage(folderPage + 1)}>
           <TableCell>{`... ${folderTotal - folders.length} more directories`}</TableCell>
+          <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
@@ -532,9 +559,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell className={classes.nameCell}>
             {truncated_path}
           </TableCell>
-          <TableCell className={classes.nameCell}>
-            {file.last_modified}
-          </TableCell>
+            <TableCell className={classes.nameCell}>
+              <Tooltip title={file.last_modified}>
+                <Typography>
+                  {`${moment().diff(moment(file.last_modified).toISOString(), "days")} days ago`}
+                </Typography>
+              </Tooltip>
+            </TableCell>
           <TableCell></TableCell>
           
         </TableRow>
@@ -547,7 +578,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
+          <TableCell></TableCell>
         </TableRow>
+      }
+      {!loading && files.length === 0 && folders.length === 0 && search &&
+      <TableRow className={classes.fileRow}>
+          <TableCell colSpan={5}>{`No Files were found with query: <${search}>.  Please try a different Query.`}</TableCell>
+      </TableRow>
       }
       
     </TableBody>

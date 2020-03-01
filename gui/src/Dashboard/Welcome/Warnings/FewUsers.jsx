@@ -1,11 +1,11 @@
-//FirstSteps.jsx
+//FewUsers.jsx
 import React from "react";
 import { CardContent, Card, Typography, Button, Chip, Grid } from "@material-ui/core";
 import { Link } from  "react-router-dom";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import {MODELS} from "../../_constants/index"
+import {MODELS} from "../../../_constants/index"
 import GroupAddIcon from "@material-ui/icons/GroupAdd"
 
 
@@ -34,7 +34,7 @@ const styles = {
     },
     container: {
       textAlign: "flex-start",
-      
+      marginRight: "1em",
     },
     groupDetails: {
       textAlign: "left",
@@ -112,7 +112,6 @@ const FewUsers = ({ classes, userManagedGroups, translate }) => {
 
   if (groupList.length > 0){
     return(
-      <Grid item xs={2} className={classes.card}>
         <Card className={classes.container}>
           <CardContent>
 
@@ -138,7 +137,6 @@ const FewUsers = ({ classes, userManagedGroups, translate }) => {
             })}
           </CardContent>
         </Card>
-      </Grid>
     )
   }
   else{

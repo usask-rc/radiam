@@ -5,6 +5,7 @@ import { Responsive } from 'react-admin';
 import ProjectCards from "./ProjectCards/ProjectCards"
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
+import WarningCards from './Welcome/WarningCards';
 
 
 const styles = theme => ({
@@ -52,6 +53,9 @@ class Dashboard extends PureComponent {
             medium={
               <>
                 <WelcomeCards loading={loading} hasFiles={hasFiles}  />
+                
+                <WarningCards />
+                
                 {!loading &&
                   <>
                     <ProjectCards projects={projects} />

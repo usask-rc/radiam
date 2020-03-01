@@ -42,15 +42,15 @@ const styles = {
         alignItems: 'flex-end',
     },
     table: {
-        width: "65em",
+        width: "inherit",
     },
     textTop: {
         color: 'white',
     },
     container: {
-        marginTop: '3em',
+        marginTop: '1em',
         textAlign: 'center',
-        minWidth: "20em",
+        width: "inherit",
     },
     fileCount: {
         textAlign: "right",
@@ -179,8 +179,9 @@ const ProjectList = ({classes, projects}) => {
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
     const [order, setOrder] = useState("asc")
-    const [orderBy, setOrderBy] = useState('name')
+    const [orderBy, setOrderBy] = useState("daysOld")
     const [selected, setSelected] = useState([]);
+
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
@@ -240,87 +241,87 @@ const ProjectList = ({classes, projects}) => {
   
     return(
     <Card className={classes.container}>
-    <Table className={classes.table} size="small">
-    <EnhancedTableHead
-        classes={classes}
-        numSelected={selected.length}
-        order={order}
-        orderBy={orderBy}
-        onRequestSort={handleRequestSort}
-        rowCount={projects.length}
-        />
-    <TableBody>
-        {projects.length > 0 &&
+        <Table className={classes.table} size="small">
+        <EnhancedTableHead
+            classes={classes}
+            numSelected={selected.length}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            rowCount={projects.length}
+            />
+        <TableBody>
+            {projects.length > 0 &&
 
-        stableSort(projects, getSorting(order, orderBy))
-        .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
-            .map((project, index) => {
-                const isItemSelected = isSelected(project.name)
-                return (
-                    <TableRow key={project.id}
-                    className={classes.projectRow}
-                    hover
-                    onClick={event => handleClick(event, project.name)}
-                    tabIndex={-1}
-                    key={project.name}
-                    selected={isItemSelected}
-                    >
-                        <TableCell className={classes.iconCell}>
-                            <ReferenceField
-                                record={project}
-                                basePath={MODELS.PROJECTS}
-                                link={false}
-                                source={MODEL_FIELDS.AVATAR}
-                                reference={MODELS.PROJECTAVATARS}
-                                allowEmpty
-                            >
-                                <ImageField
-                                    classes={{ image: classes.image }}
-                                    title={project.name}
-                                    source={MODEL_FIELDS.AVATAR_IMAGE}
+            stableSort(projects, getSorting(order, orderBy))
+            .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
+                .map((project, index) => {
+                    const isItemSelected = isSelected(project.name)
+                    return (
+                        <TableRow key={project.id}
+                        className={classes.projectRow}
+                        hover
+                        onClick={event => handleClick(event, project.name)}
+                        tabIndex={-1}
+                        key={project.name}
+                        selected={isItemSelected}
+                        >
+                            <TableCell className={classes.iconCell}>
+                                <ReferenceField
+                                    record={project}
+                                    basePath={MODELS.PROJECTS}
+                                    link={false}
+                                    source={MODEL_FIELDS.AVATAR}
+                                    reference={MODELS.PROJECTAVATARS}
                                     allowEmpty
-                                />
+                                >
+                                    <ImageField
+                                        classes={{ image: classes.image }}
+                                        title={project.name}
+                                        source={MODEL_FIELDS.AVATAR_IMAGE}
+                                        allowEmpty
+                                    />
 
-                            </ReferenceField>
-                        </TableCell>
-                        <TableCell className={classes.nameCell}>
-                        <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
-                            {project.name}
-                        </Link>
-                        </TableCell>
-                        <TableCell className={classes.keywordCell}>
-                            <ProjectKeywords classes={classes} project={project} />
-                        </TableCell>
-                        <TableCell className={classes.searchCell}>
-                            {project.nbFiles > 0 ? 
-                                <ProjectSearch project={project} classes={classes} />
-                                :
-                                <Typography className={classes.noFiles}>{`No Files to Search`}</Typography>
-                            }
-                        </TableCell>
-                        <TableCell className={classes.lastFileCell}>
-                        {console.log("recentFile is: ", project.recentFile)}
-                            {project.recentFile ? 
-                                <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
-                                :
-                                <Typography className={classes.noFiles}>{`None`}</Typography>
-                            }
-                        </TableCell>
-                    </TableRow>
-                )
-            })
-        }
-    </TableBody>
-    </Table>
-    <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={projects.length}
-        rowsPerPage={tableRows}
-        page={tablePage}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-    />
+                                </ReferenceField>
+                            </TableCell>
+                            <TableCell className={classes.nameCell}>
+                            <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
+                                {project.name}
+                            </Link>
+                            </TableCell>
+                            <TableCell className={classes.keywordCell}>
+                                <ProjectKeywords classes={classes} project={project} />
+                            </TableCell>
+                            <TableCell className={classes.searchCell}>
+                                {project.nbFiles > 0 ? 
+                                    <ProjectSearch project={project} classes={classes} />
+                                    :
+                                    <Typography className={classes.noFiles}>{`No Files to Search`}</Typography>
+                                }
+                            </TableCell>
+                            <TableCell className={classes.lastFileCell}>
+                            {console.log("recentFile is: ", project.recentFile)}
+                                {project.recentFile ? 
+                                    <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
+                                    :
+                                    <Typography className={classes.noFiles}>{`None`}</Typography>
+                                }
+                            </TableCell>
+                        </TableRow>
+                    )
+                })
+            }
+        </TableBody>
+        </Table>
+        <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={projects.length}
+            rowsPerPage={tableRows}
+            page={tablePage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
     </Card>
     )
 }
