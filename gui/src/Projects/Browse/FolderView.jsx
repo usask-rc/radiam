@@ -222,7 +222,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(3)
+  const [perPage, setPerPage] = useState(5)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")
@@ -494,6 +494,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               </Typography>
             </Tooltip>
           </TableCell>
+          <TableCell/>
 
         </TableRow>
       }
