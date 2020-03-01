@@ -48,7 +48,7 @@ const styles = {
         color: 'white',
     },
     container: {
-        marginTop: '3em',
+        marginTop: '1em',
         textAlign: 'center',
         width: "inherit",
     },

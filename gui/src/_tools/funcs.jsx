@@ -1,5 +1,5 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, ROLES, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
@@ -136,20 +136,20 @@ export function getMaxUserRole(){
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
-      return "admin"
+      return ROLES.ADMIN
     }
     else if (user.is_group_admin){
-      return "group_admin"
+      return ROLES.GROUP_ADMIN
     }
     else if (user.is_data_manager){
-      return "data_manager" 
+      return ROLES.DATA_MANAGER 
     }
-    return ROLE_USER
+    return ROLES.USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
-    return "anonymous"
+    return ROLES.ANONYMOUS
   }
 }
 
