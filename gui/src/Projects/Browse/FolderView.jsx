@@ -325,6 +325,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         projectID: projectID,
         numFiles: 1000,  //TODO: paginate the file search component
         page: 1, //TODO: affix this to some other panel
+        order: order === "desc" ? "-" : "",
+        sortBy: sortBy,
         q: search
       }
 
@@ -354,7 +356,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     return function cleanup() {
       _isMounted = false;
     }
-  }, [search])
+  }, [search, order])
 
   useEffect(() => {
 
@@ -378,6 +380,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
+
+    
 
     let folderParams = {
         folderPath: folderPath,
