@@ -290,11 +290,11 @@ export const GroupViewGrantCreate = withTranslate(({translate, ...props}) => {
   );
 });
 
-export const GroupViewGrantEdit = props => {
+export const GroupViewGrantEdit = withTranslate(({translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Edit {...props}>
-      <GroupViewGrantForm {...other} />
+      <GroupViewGrantForm translate={translate} {...other} />
     </Edit>
   );
-};
+});
