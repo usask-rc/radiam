@@ -301,12 +301,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         <MapView/>
       </Tab>
       <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
-        <FilesTab projectID={props.id} dataType="datasets" />
-      </Tab>
-      <Tab label={'Browse'}>
-        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`}
-        //TODO: get the project name from the referenced project and insert it here into projectName
-         />
+        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`} />
       </Tab>
     </TabbedShowLayout>
   </Show>

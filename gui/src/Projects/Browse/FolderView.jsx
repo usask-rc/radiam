@@ -588,7 +588,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         </TableRow>
       }
       {!loading && files.length === 0 && folders.length === 0 && search &&
-      <TableRow className={classes.fileRow}>
+      <TableRow className={classes.fileRow} onClick={() => setSearch("")}>
           <TableCell colSpan={5}>{`No Files were found with query: <${search}>.  Please try a different Query.`}</TableCell>
       </TableRow>
       }

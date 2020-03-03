@@ -286,10 +286,6 @@ export const ProjectShow = withTranslate(withStyles(styles)(
             <MapView/>
           </Tab>
           <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>
-            <ProjectName label={'en.models.projects.name'} />
-            <FilesTab projectID={props.id} />
-          </Tab>
-          <Tab label={'browse'} path={'browse'}>
             <ProjectName label={'en.models.projects.name'} setProjectName={setProjectName} />
             <BrowseTab projectID={props.id} projectName={projectName} />
           </Tab>
