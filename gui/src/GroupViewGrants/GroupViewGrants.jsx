@@ -29,6 +29,7 @@ import { FKToolbar } from "../_components/Toolbar";
 import FieldsChip from "./FieldsChip";
 import ChipInput from "material-ui-chip-input";
 import { translate } from "ra-core";
+import withTranslate from "ra-core/esm/i18n/translate";
 
 const styles = {
   actions: {
@@ -207,7 +208,7 @@ const validateSearchModel = (value) => {
 */
 
 
-const GroupViewGrantForm = props => {
+const GroupViewGrantForm = ({translate, classes, ...props}) => {
   const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")
 
 
@@ -280,14 +281,14 @@ const GroupViewGrantForm = props => {
   </SimpleForm>
 )};
 
-export const GroupViewGrantCreate = props => {
+export const GroupViewGrantCreate = withTranslate(({translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <GroupViewGrantForm {...other} />
+      <GroupViewGrantForm translate={translate} {...other} />
     </Create>
   );
-};
+});
 
 export const GroupViewGrantEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
