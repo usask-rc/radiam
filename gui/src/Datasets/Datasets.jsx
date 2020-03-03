@@ -326,6 +326,13 @@ const validateUsername = [required('en.validate.user.username'), minLength(3), m
 */
 
 const validateSearchModel = (value) => {
+
+  //return true if searchModel is not yet loaded - this is to get around the fact that the parse arrives after initial validation
+  //after initial load, this value should be either valid or invalid JSON, but never undef again
+  if (value === undefined){
+    return
+  }
+
   console.log("validateSearchModel value: ", value)
   
   if (!value){
@@ -362,7 +369,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [isDirty, setIsDirty] = useState(false)
   const [redirect, setRedirect] = useState(null)
   //TODO: refactor this
-  const [searchModel, setSearchModel] = useState(props.location && props.location.search_model ? JSON.stringify(props.location.search_model) : props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
+  const [searchModel, setSearchModel] = useState(props && props.location && props.location.search_model ? JSON.stringify(props.location.search_model) :
+   props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) :
+    "{}")
 
   function geoDataCallback(geo){
     if (props.project || (props.record && props.record.geo !== geo)){
@@ -411,10 +420,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
     props.resource = "datasets"
 
-    //if (props.save){
-    if (!geo){
-
-    }
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
       data => {
         console.log("submitobjectwithgeo success, returned data: ", data)
@@ -438,107 +443,108 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
 
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
-  toolbar={<DefaultToolbar {...props} />}>
-    <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
-    <TextInput      
-      label="Title"
-      defaultValue={props.location && props.location.title || ""}
-      source={MODEL_FIELDS.TITLE}
-      validate={validateTitle}
-      
-    />
-    <TextInput
-      className="input-large"
-      label={"en.models.datasets.data_abstract"}
-      options={{ multiline: true }}
-      source={MODEL_FIELDS.ABSTRACT}
-    />
-    <TextInput
-      className="input-small"
-      label={"en.models.datasets.study_site"}
-      source={MODEL_FIELDS.STUDY_SITE}
-    />
-
-    <ReferenceInput
-      label={'en.models.datasets.project'}
-      source={MODEL_FK_FIELDS.PROJECT}
-      reference={MODELS.PROJECTS}
-      validate={validateProject}
-      defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
-      disabled={props.project ? true : false}
-      required
-    >
-      <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
-    </ReferenceInput>
-
+    <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
+    toolbar={<DefaultToolbar {...props} />}>
+      <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
+      <TextInput      
+        label="Title"
+        defaultValue={props.location && props.location.title || ""}
+        source={MODEL_FIELDS.TITLE}
+        validate={validateTitle}
+        
+      />
       <TextInput
-      className={classes.searchModel}
-      id={"search_model"}
-      name={"search_model"}
-      label={"Search Model"}
-      multiline
-      validate={validateSearchModel}
-      value={searchModel}
-      required
-      onChange={(e) => handleChange(e)}
-    />
+        className="input-large"
+        label={"en.models.datasets.data_abstract"}
+        options={{ multiline: true }}
+        source={MODEL_FIELDS.ABSTRACT}
+      />
+      <TextInput
+        className="input-small"
+        label={"en.models.datasets.study_site"}
+        source={MODEL_FIELDS.STUDY_SITE}
+      />
 
-    <ReferenceInput
-      resource={MODELS.DATA_COLLECTION_STATUS}
-      className="input-small"
-      label={"en.models.datasets.data_collection_status"}
-      source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
-      reference={MODELS.DATA_COLLECTION_STATUS}
-      validate={validatedcs}
-      required>
-      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
-    </ReferenceInput>
+      <ReferenceInput
+        label={'en.models.datasets.project'}
+        source={MODEL_FK_FIELDS.PROJECT}
+        reference={MODELS.PROJECTS}
+        validate={validateProject}
+        defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
+        disabled={props.project ? true : false}
+        required
+      >
+        <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
+      </ReferenceInput>
 
-    <ReferenceInput
-      resource={MODELS.DISTRIBUTION_RESTRICTION}
-      className="input-small"
-      label={"en.models.datasets.distribution_restriction"}
-      source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
-      reference={MODELS.DISTRIBUTION_RESTRICTION}
-      validate={validatedr}
-      required>
-      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
-    </ReferenceInput>
+        <TextInput
+        className={classes.searchModel}
+        id={"search_model"}
+        name={"search_model"}
+        label={"Search Model"}
+        multiline
+        validate={validateSearchModel}
+        value={searchModel}
+        required
+        onChange={(e) => handleChange(e)}
+      />
 
-    <ReferenceArrayInput
-      allowEmpty
-      resource={MODELS.DATA_COLLECTION_METHOD}
-      className="input-medium"
-      label={"en.models.datasets.data_collection_method"}
-      source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
-      reference={MODELS.DATA_COLLECTION_METHOD}
-      validate={validatedcm}
-      required>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
+      <ReferenceInput
+        resource={MODELS.DATA_COLLECTION_STATUS}
+        className="input-small"
+        label={"en.models.datasets.data_collection_status"}
+        source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+        reference={MODELS.DATA_COLLECTION_STATUS}
+        validate={validatedcs}
+        required>
+        <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
+      </ReferenceInput>
 
-    <ReferenceArrayInput
-      resource={MODELS.SENSITIVITY_LEVEL}
-      className="input-medium"
-      label={"en.models.datasets.sensitivity_level"}
-      source={MODEL_FIELDS.SENSITIVITY_LEVEL}
-      reference={MODELS.SENSITIVITY_LEVEL}
-      validate={validatesl}
-      required>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
+      <ReferenceInput
+        resource={MODELS.DISTRIBUTION_RESTRICTION}
+        className="input-small"
+        label={"en.models.datasets.distribution_restriction"}
+        source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+        reference={MODELS.DISTRIBUTION_RESTRICTION}
+        validate={validatedr}
+        required>
+        <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
+      </ReferenceInput>
 
-    { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
-      <>
-        <EditMetadata id={props.id} values={props.record ? props.record.metadata : null} type="dataset"/>
-        <ConfigMetadata id={props.id} type="dataset" />
-      </>
-    )}
-    <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
-    <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
-    {redirect && <Redirect to={redirect} /> }
-  </SimpleForm>)
+      <ReferenceArrayInput
+        allowEmpty
+        resource={MODELS.DATA_COLLECTION_METHOD}
+        className="input-medium"
+        label={"en.models.datasets.data_collection_method"}
+        source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
+        reference={MODELS.DATA_COLLECTION_METHOD}
+        validate={validatedcm}
+        required>
+        <TranslationSelectArray optionText="label" />
+      </ReferenceArrayInput>
+
+      <ReferenceArrayInput
+        resource={MODELS.SENSITIVITY_LEVEL}
+        className="input-medium"
+        label={"en.models.datasets.sensitivity_level"}
+        source={MODEL_FIELDS.SENSITIVITY_LEVEL}
+        reference={MODELS.SENSITIVITY_LEVEL}
+        validate={validatesl}
+        required>
+        <TranslationSelectArray optionText="label" />
+      </ReferenceArrayInput>
+
+      { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
+        <>
+          <EditMetadata id={props.id} values={props.record ? props.record.metadata : null} type="dataset"/>
+          <ConfigMetadata id={props.id} type="dataset" />
+        </>
+      )}
+      <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
+      <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
+      {redirect && <Redirect to={redirect} /> }
+    </SimpleForm>
+  )
 };
 
 

@@ -189,17 +189,19 @@ function EnhancedTableHead(props) {
               }
               {idx === 4 && 
                 <form className={classes.searchForm} onSubmit={handleSearch}>
-                  <TextField
-                    id={PATHS.SEARCH}
-                    name={PATHS.SEARCH}
-                    type={PATHS.SEARCH}
-                    className={classes.searchFormTextField}
-                    value={search}
-                    placeholder={`Search Files`}
-                  />
-                  <IconButton type={"submit"} className={classes.searchButton}>
-                    <Search />
-                  </IconButton>
+                  <div>
+                    <TextField
+                      id={PATHS.SEARCH}
+                      name={PATHS.SEARCH}
+                      type={PATHS.SEARCH}
+                      className={classes.searchFormTextField}
+                      value={search}
+                      placeholder={`Search Files`}
+                    />
+                    <IconButton type={"submit"} className={classes.searchButton}>
+                      <Search />
+                    </IconButton>
+                  </div>
                 </form>
               }
             
