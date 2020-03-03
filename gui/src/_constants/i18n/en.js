@@ -629,6 +629,11 @@ export default {
         user: 'A user is required for this agent.',
         version: 'Version Number is in format X.X.X ',
       },
+      viewgrants: {
+        dataset: 'A Dataset must be specified from which to provide a View Grant.',
+        group: 'A Group must be specified to give View Access to.',
+        date_start: 'A Start Date must be specified for when View Access will be granted.',
+      },
     },
     warnings: {}
   },

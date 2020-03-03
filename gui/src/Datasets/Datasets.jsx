@@ -315,11 +315,6 @@ const validatedcs = required("A Data Collection Status is required")
 const validatedr = required("A Distribution Restriction must be specified")
 const validatesl = required("A Sensitivity Level must be specified")
 
-/*
-const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
-
-*/
-
 const validateSearchModel = (value) => {
 
   //return true if searchModel is not yet loaded - this is to get around the fact that the parse arrives after initial validation
@@ -327,8 +322,6 @@ const validateSearchModel = (value) => {
   if (value === undefined){
     return
   }
-
-  console.log("validateSearchModel value: ", value)
   
   if (!value){
     //we've been sent no value
@@ -349,7 +342,6 @@ const validateSearchModel = (value) => {
     console.log("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
-
 }
 
 const CustomLabel = ({classes, translate, labelText} ) => {

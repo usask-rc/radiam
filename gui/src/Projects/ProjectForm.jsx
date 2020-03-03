@@ -35,20 +35,18 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const [keywords, setKeywords] = useState(props.record && props.record.keywords ? props.record.keywords.split(",") : "")
     const [redirect, setRedirect] = useState(null)
     const [pcu, setPcu] = useState(props.record ? props.record.primary_contact_user : null)
+    
     const handleChipChange = (data) => {
-      console.log("chip change data: ", data)
       setKeywords(data)
     }
 
     const handleChipAdd = (data) => {
-      console.log("keywords added, set to: ", [...keywords, data])
-
       setKeywords([...keywords, data])
     }
+    
     const handleChipDelete = (data, idx) => {
       let tempKeywords = [...keywords]
       tempKeywords.splice(idx, 1)
-      console.log("keywords deleted, set to: ", tempKeywords)
       setKeywords(tempKeywords)
     }
 
