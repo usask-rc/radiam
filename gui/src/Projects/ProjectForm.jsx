@@ -10,7 +10,7 @@ import {
 import { MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
 import { getUsersInGroup, submitObjectWithGeo, toastErrors } from "../_tools/funcs";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
@@ -35,6 +35,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const [keywords, setKeywords] = useState(props.record && props.record.keywords ? props.record.keywords.split(",") : "")
     const [redirect, setRedirect] = useState(null)
     const [pcu, setPcu] = useState(props.record ? props.record.primary_contact_user : null)
+    const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
     
     const handleChipChange = (data) => {
       setKeywords(data)
@@ -51,9 +52,6 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     }
 
     const handleSubmit=(data) => {
-
-      console.log("data in handlesubmit is:" , data)
-
       const { record } = props
       props.resource = "projects"
       data.keywords = keywords ? keywords.join(",") : ""
@@ -198,12 +196,15 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
           {
             return(
               <>
-              <div>
-                <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
+              <div className={classes.preMapArea}>
+                <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
+                <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map` : `Show Map`}</Button>
               </div>
+              {showMap && 
               <div>
                 <MapForm content_type={'project'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>
               </div>
+              }
               </>
             )
           }

@@ -26,6 +26,7 @@ import LocationTitle from './LocationTitle';
 import ReferenceArrayField from 'ra-ui-materialui/lib/field/ReferenceArrayField';
 import { SingleFieldList } from 'ra-ui-materialui/lib/list';
 import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
+import { ShowController } from 'ra-core';
 
 
 const listStyles = {
@@ -218,9 +219,15 @@ export const LocationDisplay = props =>
       <GlobusPathShow />
       <PortalUrlShow />
       <NotesShow />
-      <MapView/>
-
-      
+      <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+      </ShowController>
     </SimpleShowLayout>
   </Show>)
   }

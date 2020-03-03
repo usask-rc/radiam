@@ -34,7 +34,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
 import { GET_ONE } from 'ra-core';
-import { Toolbar, Typography } from '@material-ui/core';
+import { Toolbar, Typography, Button } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
@@ -71,7 +71,10 @@ const styles = {
   mapFormHeader: {
     marginTop: "1em",
     paddingBottom: "1em",
-  }
+  },
+  preMapArea: {
+    marginBottom: "1em",
+  },
 };
 
 const actionStyles = theme => ({
@@ -208,7 +211,15 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
             />
           )}
         </ShowController>
-        <MapView/>
+        <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+        </ShowController>
     </SimpleShowLayout>
   </Show>
 ))
@@ -298,7 +309,15 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
             />
           )}
         </ShowController>
-        <MapView/>
+        <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+        </ShowController>
       </Tab>
       <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
         <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`} />
@@ -355,6 +374,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const [data, setData] = useState({})
   const [isDirty, setIsDirty] = useState(false)
   const [redirect, setRedirect] = useState(null)
+  const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
   //TODO: refactor this
   const [searchModel, setSearchModel] = useState(props && props.location && props.location.search_model ? JSON.stringify(props.location.search_model) :
    props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) :
@@ -427,7 +447,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   console.log("props record after editmodal transofmration: ", props.record)
 
 
-  //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
+  const { record } = props
 
   return(
     <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
@@ -527,8 +547,13 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
           <ConfigMetadata id={props.id} type="dataset" />
         </>
       )}
-      <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
-      <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
+      <div className={classes.preMapArea}>
+        <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
+        <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map` : `Show Map`}</Button>
+      </div>
+      {showMap && 
+        <MapForm content_type={'dataset'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>
+      }
       {redirect && <Redirect to={redirect} /> }
     </SimpleForm>
   )

@@ -66,7 +66,9 @@ const styles = {
   mapFormHeader: {
     paddingBottom: "1em",
     marginTop: "1em",
-
+  },
+  preMapArea: {
+    marginBottom: "1em",
   },
   columnHeaders: {
     fontWeight: "bold",
@@ -283,7 +285,15 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
               )}
             </ShowController>
-            <MapView/>
+            <ShowController {...props}>
+              {controllerProps => (controllerProps.record && 
+              controllerProps.record.geo && 
+              controllerProps.record.geo.geojson && 
+              controllerProps.record.geo.geojson.features.length > 0 ?
+              <MapView {...controllerProps}/>
+              : null
+              )}
+            </ShowController>
           </Tab>
           <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>
             <ProjectName label={'en.models.projects.name'} setProjectName={setProjectName} />

@@ -17,7 +17,7 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { FormDataConsumer } from 'ra-core';
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
-import { Typography } from '@material-ui/core';
+import { Typography, Button } from '@material-ui/core';
 import { DefaultToolbar } from '../_components';
 import { Redirect } from 'react-router';
 
@@ -60,7 +60,10 @@ class LocationForm extends Component {
       mapFormKey: 0,
       jsonTextFormKey: 1000,
       redirect: null,
+      showMap: props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false,
     };
+
+    console.log("props record locform: ", props.record)
     if (props.record && props.record.projects){
       props.record.projects = this.fixProjectList(props.record.projects)
     }
@@ -203,7 +206,7 @@ class LocationForm extends Component {
 
   render() {
     const { staticContext, id, classes, record, mode, ...rest } = this.props;
-    const { isFormDirty, geo, mapFormKey } = this.state;
+    const { isFormDirty, geo, showMap, mapFormKey } = this.state;
 
     //TODO: there is a discrepancy between how we separate `record` from rest and props and how it `should` be done
     //this is likely the cause of the loading error - investigate tomorrow
@@ -303,12 +306,18 @@ class LocationForm extends Component {
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
         defaultValue={record && record.notes || ""} />
         <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
-        <MapForm
-          content_type={MODEL_FK_FIELDS.LOCATION}
-          recordGeo={geo}
-          id={id}
-          geoDataCallback={this.geoDataCallback}
-        />
+        <div className={classes.preMapArea}>
+          <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
+          <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map` : `Show Map`}</Button>
+        </div>
+        {showMap && 
+          <MapForm
+            content_type={MODEL_FK_FIELDS.LOCATION}
+            recordGeo={geo}
+            id={id}
+            geoDataCallback={this.geoDataCallback}
+          />
+        }
         {this.state.redirect && <Redirect to={this.state.redirect} /> }
       </SimpleForm>
     );
