@@ -26,6 +26,10 @@ import GroupViewGrantTitle from "./GroupViewGrantTitle";
 import { DatasetShow } from "../_components/_fields/DatasetShow";
 import { GroupShow } from "../_components/_fields/GroupShow";
 import { FKToolbar } from "../_components/Toolbar";
+import FieldsChip from "./FieldsChip";
+import ChipInput from "material-ui-chip-input";
+import { translate } from "ra-core";
+import withTranslate from "ra-core/esm/i18n/translate";
 
 const styles = {
   actions: {
@@ -36,6 +40,14 @@ const styles = {
   },
   root: {
     backgroundColor: "inherit"
+  },
+  fieldChip: {
+    marginRight: "0.5em",
+  },
+  fieldChipLabel: {
+    fontSize: "0.8em",
+    color: "grey",
+    marginBottom: "0.5em",
   },
   columnHeaders: {
     fontWeight: "bold",
@@ -103,7 +115,11 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
         >
           <TextField source={MODEL_FIELDS.TITLE} />
         </ReferenceField>
-        <TextField source={MODEL_FIELDS.FIELDS} allowEmpty />
+        <FieldsChip
+          type={"list"}
+          classes={classes}
+          label={"en.models.grants.fields"} 
+        />
         <DateField
           source={MODEL_FIELDS.DATE_STARTS}
           label={"en.models.generic.date_starts"}
@@ -119,7 +135,7 @@ export const GroupViewGrantList = withStyles(styles)(({ classes, ...props }) => 
   )
 );
 
-export const GroupViewGrantShow = props => (
+export const GroupViewGrantShow = withStyles(styles)(({ classes, ...props }) => (
   <Show {...props}>
     <SimpleShowLayout>
       <GroupViewGrantTitle prefix="Showing View Grant" />
@@ -139,7 +155,10 @@ export const GroupViewGrantShow = props => (
       >
         <DatasetShow />
       </ReferenceField>
-      <TextField source={MODEL_FIELDS.FIELDS} allowEmpty />
+      <FieldsChip
+          classes={classes}
+          label={"en.models.grants.fields"}
+      />
       <DateField
         source={MODEL_FIELDS.DATE_STARTS}
         label={"en.models.generic.date_starts"}
@@ -152,37 +171,74 @@ export const GroupViewGrantShow = props => (
       />
     </SimpleShowLayout>
   </Show>
-);
+));
 
 const validateDataset = required('en.validate.viewgrants.dataset');
 const validateGroup = required('en.validate.viewgrants.group');
+const validateDateStarts = required("en.validate.viewgrants.date_start");
+/*
+const validateSearchModel = (value) => {
 
-const GroupViewGrantForm = props => {
-  const [isFormDirty, setIsFormDirty] = useState(false)
-  const [data, setData] = useState({})
+  //return true if searchModel is not yet loaded - this is to get around the fact that the parse arrives after initial validation
+  //after initial load, this value should be either valid or invalid JSON, but never undef again
+  if (value === undefined){
+    return
+  }
   
-  useEffect(() => {
-    if (data && Object.keys(data).length > 0) {
-      console.log("before save, isformdirty, data: ", isFormDirty, data)
-      props.save(data)
+  if (!value){
+    //we've been sent no value
+    return `Enter a search model in valid JSON`
+  }
+
+  try {
+    let result
+    if (value.search){
+      result = JSON.stringify(value.search)
     }
-  }, [data])
+    else{
+      result = JSON.parse(value)
+    }
+    //TODO: check here for anything we don't want / invalid Elastic queries
+  }
+  catch(e){
+    console.log("json parse error e: ", value)
+    return `Entry is not valid JSON`
+  }
+}
+*/
 
-  function handleSubmit(formData) {
-    setIsFormDirty(false)
-    setData(formData)
+
+const GroupViewGrantForm = ({translate, classes, ...props}) => {
+  const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")
+
+
+  const handleChipChange = (data) => {
+    setGrantedFields(data)
   }
 
-  function handleChange(data){
-    setIsFormDirty(true)
+  const handleChipAdd = (data) => {
+    setGrantedFields([...grantedFields, data])
   }
+  
+  const handleChipDelete = (data, idx) => {
+    let tempGrantedFields = [...grantedFields]
+    tempGrantedFields.splice(idx, 1)
+    setGrantedFields(tempGrantedFields)
+  }
+
+  const handleSubmit=(data) => {
+    console.log("gvg handlesubmit: ", data)
+    data.fields = grantedFields ? grantedFields.join(",") : ""
+    props.save(data)
+  }
+
   console.log("props in groupviewgrantform: ", props)
   return(
   <SimpleForm {...props} 
     redirect={RESOURCE_OPERATIONS.LIST}
-    onChange={handleChange}
     save={handleSubmit}
-    toolbar={<FKToolbar {...props} />}>
+    toolbar={<FKToolbar {...props} />}
+    >
     <GroupViewGrantTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating View Grant" : "Creating View Grant"} />
 
     <ReferenceInput
@@ -190,6 +246,7 @@ const GroupViewGrantForm = props => {
       source={MODEL_FK_FIELDS.GROUP}
       reference={MODELS.GROUPS}
       validate={validateGroup}
+      required
     >
       <SelectInput source={MODEL_FIELDS.NAME} />
     </ReferenceInput>
@@ -198,39 +255,46 @@ const GroupViewGrantForm = props => {
       source={MODEL_FK_FIELDS.DATASET}
       reference={MODELS.DATASETS}
       validate={validateDataset}
+      required
     >
       <SelectInput optionText={MODEL_FIELDS.TITLE} />
     </ReferenceInput>
-    <TextInput source={MODEL_FIELDS.FIELDS} allowEmpty />
+    <ChipInput
+      label={translate("en.models.grants.fields")} //typically dont need to invoke translate, this is custom so we do.
+      newChipKeys={[',']}
+      onAdd={(data) => handleChipAdd(data)}
+      onDelete={(data, idx) => handleChipDelete(data, idx)}
+      onChange={handleChipChange}
+      value={grantedFields}
+    />
     <DateInput
       source={MODEL_FIELDS.DATE_STARTS}
       label={"en.models.generic.date_starts"}
-      allowEmpty
+      validate={validateDateStarts}
     />
     <DateInput
       source={MODEL_FIELDS.DATE_EXPIRES}
       label={"en.models.generic.date_expires"}
       allowEmpty
     />
-    <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
 
   </SimpleForm>
 )};
 
-export const GroupViewGrantCreate = props => {
+export const GroupViewGrantCreate = withTranslate(({translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Create {...props}>
-      <GroupViewGrantForm {...other} />
+      <GroupViewGrantForm translate={translate} {...other} />
     </Create>
   );
-};
+});
 
-export const GroupViewGrantEdit = props => {
+export const GroupViewGrantEdit = withTranslate(({translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Edit {...props}>
-      <GroupViewGrantForm {...other} />
+      <GroupViewGrantForm translate={translate} {...other} />
     </Edit>
   );
-};
+});
