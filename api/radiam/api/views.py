@@ -988,7 +988,7 @@ class LocationViewSet(RadiamViewSet):
         LocationOrderingFilter,
     )
 
-    search_fields = ['display_name', 'host_name']
+    search_fields = ['display_name', 'host_name', 'locationproject__project__id', 'locationproject__project__name']
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
     ordering = ('display_name')
