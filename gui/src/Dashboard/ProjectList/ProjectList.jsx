@@ -65,6 +65,10 @@ const styles = {
     chipItem: {
         margin: "0.25em"
     },
+    moreChips: {
+        margin: "0.25em",
+        backgroundColor: "green",
+    },
     chipContainer: {
         display: 'flex',
         width: 'inherit',
@@ -190,11 +194,8 @@ const ProjectList = ({classes, projects}) => {
             if (order !== 0) return order;
             return a[1] - b[1];
         });
-
         return stabilizedThis.map(el => el[0]);
-        }
-
-        
+    }
 
     function getSorting(order, orderBy) {
     return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);

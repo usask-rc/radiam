@@ -15,6 +15,7 @@ import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
 import { withStyles } from '@material-ui/core/styles';
 import Search from '@material-ui/icons/Search';
+import DatasetListTitle from './DatasetListTitle';
 
 const listStyles = {
     actions: {
@@ -77,9 +78,10 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         bulkActionButtons={false}
       >
         <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
-          <TextField
+          <DatasetListTitle
             label={'en.models.datasets.title'}
             source={MODEL_FIELDS.TITLE}
+            classes={classes}
           />
           <ReferenceField
             link={false}
