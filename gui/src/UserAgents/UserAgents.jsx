@@ -33,6 +33,9 @@ import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import UserAgentTitle from "./UserAgentTitle";
 import { FKToolbar } from "../_components/Toolbar";
+import ProjectName from "../_components/_fields/ProjectName";
+import { ProjectShow } from "../Projects/Projects";
+import { ReferenceArrayField } from "ra-ui-materialui/lib/field";
 
 const filterStyles = {
   form: {
@@ -109,10 +112,31 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
       >
         <LocationShow />
       </ReferenceField>
-      
+      <ArrayField source={"project_config_list"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"project"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
     </Datagrid>
   </List>
 ));
+
+/*
+<ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+<SingleFieldList>
+        <ReferenceField source={"id"} reference={"projects"} link="show">
+          <ChipField source={MODEL_FIELDS.NAME} />
+        </ReferenceField>
+      </SingleFieldList>
+*/
 
 const actionStyles = theme => ({
   toolbar:{
