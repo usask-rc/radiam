@@ -197,6 +197,13 @@ function EnhancedTableHead(props) {
                       className={classes.searchFormTextField}
                       value={search}
                       placeholder={`Search Files`}
+                      defaultValue={
+                        (props &&
+                          props.location &&
+                          props.location.state &&
+                          props.location.state.search) ||
+                        null
+                      }
                     />
                     <IconButton type={"submit"} className={classes.searchButton}>
                       <Search />
@@ -226,7 +233,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [folderPage, setFolderPage] = useState(1)
   const [perPage, setPerPage] = useState(5)
   const [sortBy, setSortBy] = useState("name.keyword")
-  const [search, setSearch] = useState("") //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
+  const [search, setSearch] = useState(
+    props &&
+      props.location &&
+      props.location.state &&
+      props.location.state.search ||
+    null
+  ); //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
@@ -465,7 +478,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     onRequestSort={handleRequestSort}
     order={order}
     orderBy={sortBy}
-    handleSearch={handleSearch}>
+    handleSearch={handleSearch}
+    {...props}>
       <div className={classes.locationDisplay}>
         <AddLocation className={classes.locationIcon} />
         <ReferenceField
