@@ -527,19 +527,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         />
       </ReferenceInput>
 
-      <ReferenceInput
-        resource={MODELS.DISTRIBUTION_RESTRICTION}
-        label={"en.models.datasets.distribution_restriction"}
-        source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
-        reference={MODELS.DISTRIBUTION_RESTRICTION}
-        validate={validatedr}
-        className={classes.otherField}
-        required>
-        <TranslationSelect 
-          optionText={MODEL_FIELDS.LABEL} 
-        />
-      </ReferenceInput>
-
       <ReferenceArrayInput
         allowEmpty
         resource={MODELS.DATA_COLLECTION_METHOD}
@@ -553,6 +540,19 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
           optionText="label" 
         />
       </ReferenceArrayInput>
+
+      <ReferenceInput
+        resource={MODELS.DISTRIBUTION_RESTRICTION}
+        label={"en.models.datasets.distribution_restriction"}
+        source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+        reference={MODELS.DISTRIBUTION_RESTRICTION}
+        validate={validatedr}
+        className={classes.otherField}
+        required>
+        <TranslationSelect 
+          optionText={MODEL_FIELDS.LABEL} 
+        />
+      </ReferenceInput>
 
       <ReferenceArrayInput
         resource={MODELS.SENSITIVITY_LEVEL}
