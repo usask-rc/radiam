@@ -133,6 +133,7 @@ module.exports = Object.freeze({
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
     USER: "user",
+    PROJECT_CONFIG_LIST: "project_config_list",
     SENSITIVITY: "sensitivity",
   },
   PASSWORD_CHANGE: {

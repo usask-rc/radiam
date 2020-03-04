@@ -23,7 +23,6 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
 import LocationTitle from './LocationTitle';
-import ReferenceArrayField from 'ra-ui-materialui/lib/field/ReferenceArrayField';
 import { SingleFieldList } from 'ra-ui-materialui/lib/list';
 import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
 import { ShowController } from 'ra-core';
@@ -129,15 +128,15 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         source={'notes'}
         multiline
       />
-       <ArrayField source={"projects"} label={"Projects"}>
-        <SingleFieldList>
-          <ReferenceField source={"id"} reference={"projects"} link="show">
-            <ChipField source={MODEL_FIELDS.NAME} />
-          </ReferenceField>
-        </SingleFieldList>
-      </ArrayField>
-    </Datagrid>
-  </List>
+      <ArrayField source={"projects"} label={"Projects"}>
+      <SingleFieldList>
+        <ReferenceField source={"id"} reference={"projects"} link="show">
+          <ChipField source={MODEL_FIELDS.NAME} />
+        </ReferenceField>
+      </SingleFieldList>
+    </ArrayField>
+  </Datagrid>
+</List>
 )});
 
 const GlobusEndpointShow = ({ record, ...rest }) =>
