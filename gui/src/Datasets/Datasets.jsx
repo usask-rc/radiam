@@ -49,6 +49,18 @@ const styles = {
   actions: {
     backgroundColor: 'inherit',
   },
+  abstractField: {
+    width: "50em",
+  },
+  titleField: {
+    width: "50em",
+  },
+  otherField: {
+    width: "20em",
+  },
+  searchModelField: {
+    width: "30em",
+  },
   header: {
     backgroundColor: 'inherit',
   },
@@ -135,17 +147,18 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
 
         <ReferenceField
           link={false}
-          label={"en.models.grants.project"}
+          label={"en.models.datasets.project"}
           source={MODEL_FK_FIELDS.PROJECT}
           reference={MODELS.PROJECTS}
         >
-          <ProjectName label={"en.models.projects.name"}/>
+          <ProjectName label={"en.models.projects.name"}
+          />
         </ReferenceField>
 
         <TextField
           label={"en.models.datasets.data_abstract"}
           source={MODEL_FIELDS.DATA_ABSTRACT}
-          options={{ multiline: true }}
+          options={{ multiline: true}}
         />
 
         <TextField
@@ -153,7 +166,7 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
           source={MODEL_FIELDS.STUDY_SITE}
         />
 
-        <TextField multiline
+        <TextField
           label={"en.models.datasets.search_model"}
           source={"search_model.search"}
         />
@@ -254,7 +267,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           source={MODEL_FIELDS.STUDY_SITE}
         />
 
-        <TextField multiline
+        <TextField
           label={"en.models.datasets.search_model"}
           source={"search_model.search"}
         />
@@ -458,16 +471,18 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         defaultValue={props.location && props.location.title || ""}
         source={MODEL_FIELDS.TITLE}
         validate={validateTitle}
-        
+        className={classes.titleField}
       />
       <TextInput
         className="input-large"
         label={"en.models.datasets.data_abstract"}
-        options={{ multiline: true }}
+        options={{ multiline: true, rows: 8 }}
         source={MODEL_FIELDS.ABSTRACT}
+        rows={5}
+        className={classes.abstractField}
       />
       <TextInput
-        className="input-small"
+        className={classes.otherField}
         label={"en.models.datasets.study_site"}
         source={MODEL_FIELDS.STUDY_SITE}
       />
@@ -480,16 +495,19 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
         disabled={props.project ? true : false}
         required
+        className={classes.otherField}
       >
         <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
       </ReferenceInput>
 
-        <TextInput
+      <TextInput
         className={classes.searchModel}
         id={"search_model"}
         name={"search_model"}
         label={"Search Model"}
+        className={classes.searchModelField}
         multiline
+        rows={5}
         validate={validateSearchModel}
         value={searchModel}
         required
@@ -498,47 +516,55 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
       <ReferenceInput
         resource={MODELS.DATA_COLLECTION_STATUS}
-        className="input-small"
         label={"en.models.datasets.data_collection_status"}
         source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
         reference={MODELS.DATA_COLLECTION_STATUS}
         validate={validatedcs}
+        className={classes.otherField}
         required>
-        <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
+        <TranslationSelect 
+          optionText={MODEL_FIELDS.LABEL}
+        />
       </ReferenceInput>
 
       <ReferenceInput
         resource={MODELS.DISTRIBUTION_RESTRICTION}
-        className="input-small"
         label={"en.models.datasets.distribution_restriction"}
         source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
         reference={MODELS.DISTRIBUTION_RESTRICTION}
         validate={validatedr}
+        className={classes.otherField}
         required>
-        <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
+        <TranslationSelect 
+          optionText={MODEL_FIELDS.LABEL} 
+        />
       </ReferenceInput>
 
       <ReferenceArrayInput
         allowEmpty
         resource={MODELS.DATA_COLLECTION_METHOD}
-        className="input-medium"
         label={"en.models.datasets.data_collection_method"}
         source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
         reference={MODELS.DATA_COLLECTION_METHOD}
         validate={validatedcm}
+        className={classes.otherField}
         required>
-        <TranslationSelectArray optionText="label" />
+        <TranslationSelectArray 
+          optionText="label" 
+        />
       </ReferenceArrayInput>
 
       <ReferenceArrayInput
         resource={MODELS.SENSITIVITY_LEVEL}
-        className="input-medium"
         label={"en.models.datasets.sensitivity_level"}
         source={MODEL_FIELDS.SENSITIVITY_LEVEL}
         reference={MODELS.SENSITIVITY_LEVEL}
         validate={validatesl}
+        className={classes.otherField}
         required>
-        <TranslationSelectArray optionText="label" />
+        <TranslationSelectArray 
+        optionText="label"
+         />
       </ReferenceArrayInput>
 
       { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (

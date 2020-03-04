@@ -397,7 +397,7 @@ export default {
         data_collection_method: 'Data Collection Methods',
         data_collection_status: 'Data Collection Status',
         distribution_restriction: 'Distribution Restrictions',
-        project: 'Projects',
+        project: 'Project',
         sensitivity_level: 'Sensitivity Levels of Data',
         study_site: 'Study Site',
         title: 'Dataset Title',
