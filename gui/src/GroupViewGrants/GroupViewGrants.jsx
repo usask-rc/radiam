@@ -17,19 +17,17 @@ import {
   SimpleShowLayout,
   TextField,
   TextInput,
+  withTranslate,
 } from "react-admin";
 import {RESOURCE_OPERATIONS, WARNINGS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
-import { Prompt } from 'react-router';
 import GroupViewGrantTitle from "./GroupViewGrantTitle";
 import { DatasetShow } from "../_components/_fields/DatasetShow";
 import { GroupShow } from "../_components/_fields/GroupShow";
 import { FKToolbar } from "../_components/Toolbar";
 import FieldsChip from "./FieldsChip";
 import ChipInput from "material-ui-chip-input";
-import { translate } from "ra-core";
-import withTranslate from "ra-core/esm/i18n/translate";
 
 const styles = {
   actions: {
