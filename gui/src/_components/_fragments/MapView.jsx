@@ -168,7 +168,7 @@ const MapView = ({classes, record }) => {
             {location && location.length > 0 && (
             <>
                 <Typography variant={"h5"} component={"h5"} className={classes.locationTitle}>
-                    {`Geolocation Information`}
+                    {`Geolocation Info`}
                 </Typography>
                 <Map
                 ref={(ref) => {

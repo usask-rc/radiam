@@ -197,8 +197,8 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
             return(
               <>
               <div className={classes.preMapArea}>
-                <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
-                <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map` : `Show Map`}</Button>
+                <Typography className={classes.mapFormHeader}>{``}</Typography>
+                <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
               </div>
               {showMap && 
               <div>

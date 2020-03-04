@@ -548,8 +548,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         </>
       )}
       <div className={classes.preMapArea}>
-        <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
-        <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map` : `Show Map`}</Button>
+        <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
       </div>
       {showMap && 
         <MapForm content_type={'dataset'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>

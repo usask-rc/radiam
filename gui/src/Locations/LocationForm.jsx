@@ -37,6 +37,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  preMapArea: {
+    marginBottom: "1em",
+  },
   titleText: {
     fontSize: "2em",
     width: 'inherit',
@@ -305,10 +308,8 @@ class LocationForm extends Component {
         />
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
         defaultValue={record && record.notes || ""} />
-        <Typography className={classes.mapFormHeader}>{`GeoLocation Information`}</Typography>
         <div className={classes.preMapArea}>
-          <Typography className={classes.mapFormHeader}>{`GeoLocation Info`}</Typography>
-          <Button variant="contained" color={showMap ? "primary" : "secondary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map` : `Show Map`}</Button>
+          <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
         </div>
         {showMap && 
           <MapForm
