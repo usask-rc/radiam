@@ -7,7 +7,6 @@ import {MODEL_FIELDS, MODEL_FK_FIELDS} from "../../_constants/index";
 export const agentSelect = choice => choice.location ?
     `${choice.location}` : `${choice.user}`;
 
-//TODO: once we finally get some fresh data, test to make sure this AgentShow is displaying on project files.
 export const AgentShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = ({
     className,
     allowEmpty,

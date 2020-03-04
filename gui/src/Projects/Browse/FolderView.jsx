@@ -502,7 +502,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <ArrowBack />
           </TableCell>
           <TableCell onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderDisplay}><div><Folder />{`${parents[parents.length - 1].name}`}</div></Typography>
+            <Typography className={classes.curFolderDisplay}><div>{`${parents[parents.length - 1].name}`}</div></Typography>
           </TableCell>
           <TableCell>
             <Typography>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>

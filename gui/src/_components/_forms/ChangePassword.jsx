@@ -52,8 +52,6 @@ const styles = theme => ({
   }
 });
 
-//TODO: move api call to the central security provider file if possible once this functionality is completed.
-//there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangePassword extends Component {
   constructor(props) {
     super(props);
@@ -72,8 +70,6 @@ class ChangePassword extends Component {
       const parsedToken = JSON.parse(token);
       headers.set("Authorization", `Bearer ${parsedToken.access}`);
     } else {
-      //TODO: no token?  Log the user out.
-      //no idea how to do this when I have no access to History since authprovider is monopolized by the Admin component.
       toastErrors(
         WARNINGS.NO_AUTH_TOKEN
       );
@@ -134,7 +130,6 @@ class ChangePassword extends Component {
         );
       }
     }
-    //TODO: if we're somehow here and there is no user in localstorage, we need to log out. Probably want a toast to indicate this.
     else {
       toastErrors(
         WARNINGS.NO_AUTH_TOKEN
