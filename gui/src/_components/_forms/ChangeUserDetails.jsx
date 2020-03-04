@@ -52,9 +52,6 @@ const styles = theme => ({
     }
 });
 
-
-//TODO: move api call to the central security provider file if possible once this functionality is completed.
-//there HAS to be a way to access the existing cookies / token through authprovider / radiamrestprovider rather than doing it here.  I just can't think of how to go about doing it.
 class ChangeDetails extends Component {
     
     handleSubmit = event => {

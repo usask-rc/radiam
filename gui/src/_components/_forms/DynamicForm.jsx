@@ -42,7 +42,6 @@ const DynamicForm = ({classes, prevProperties, setProperties}) => {
         setFeatureParams(newFeatureParams)
     }
 
-    //TODO: does not update dynamically after adding a new parameter.
     const addLabel = (e) => {
         if (featureParamLabel && featureParamLabel.length > 0)
         {

@@ -23,8 +23,7 @@ const styles = {
     marginBottom: '2em',
   },
 };
-//NOTE: adding returns in the arrow functions somehow breaks the map.  the warnings will persist for now.
-//TODO: some duplicate processing occurs here and needs to be refactored.
+
 class MapForm extends Component {
   constructor(props) {
     super(props);
@@ -129,14 +128,12 @@ class MapForm extends Component {
     return newFeature;
   };
 
-  //latitude should never require normalizing, but a bug exists in Leaflet that causes the map to repeat itself longitudinally.
+  //Leaflet maps repeat longitudinally - need to adjust for this
   _normLng(lng) {
     return lng % 180;
   }
-
-  //TODO: there is a bug that will result in multiple edits not updating all item details, as the form only appears once.
-  //this can be resolved using a Promise, but it's not a high priority right now and will be shelved.
-  //ADM-1496
+  
+  //TODO: there is a bug that will result in multiple map edits before hitting 'save' not updating all item details
   setProperties = featureParams => {
     const { features, popup } = this.state
     const featureList = { ...features };
