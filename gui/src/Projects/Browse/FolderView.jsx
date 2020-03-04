@@ -68,8 +68,10 @@ const styles = theme => ({
     paddingRight: "0.1em",
   },
   curFolderDisplay: {
-    fontWeight: "bold",
     cursor: "pointer",
+  },
+  curFolderText: {
+    fontWeight: "bold",
   },
   showFolderRow: {
     height: "40px",
@@ -501,15 +503,15 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
             <ArrowBack />
           </TableCell>
-          <TableCell onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderDisplay}><div>{`${parents[parents.length - 1].name}`}</div></Typography>
+          <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
+            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name}`}</div></Typography>
           </TableCell>
-          <TableCell>
-            <Typography>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
+          <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
+            <Typography className={classes.curFolderText}>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
           </TableCell>
-          <TableCell>
+          <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Tooltip title={`${parents[parents.length - 1].last_modified}`}>
-              <Typography className={classes.curFolderDisplay}>
+              <Typography className={classes.curFolderText}>
                 {`${moment().diff(moment(parents[parents.length - 1].last_modified).toISOString(), "days")} days ago`}
               </Typography>
             </Tooltip>
