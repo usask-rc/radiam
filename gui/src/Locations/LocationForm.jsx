@@ -223,7 +223,7 @@ class LocationForm extends Component {
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
-        <Typography className={classes.titleText}>{record && record.length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
+        <Typography className={classes.titleText}>{record && Object.keys(record).length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
         <TextInput
           label={'en.models.locations.display_name'}
           source={MODEL_FIELDS.DISPLAY_NAME}
@@ -241,49 +241,49 @@ class LocationForm extends Component {
           source={MODEL_FK_FIELDS.LOCATION_TYPE}
           reference={MODELS.LOCATIONTYPES}
           validate={validateLocationType}
-          defaultValue={LOCATIONTYPE_OSF}
+          defaultValue={record && Object.keys(record).length > 0 ? record.location_type : LOCATIONTYPE_OSF}
         >
           <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
         </ReferenceInput>
         <FormDataConsumer>
-        {formDataProps => {
+          {formDataProps => {
 
-          console.log("formDataProps in locform is: ", formDataProps)
-          
-          const {formData} = formDataProps
+            console.log("formDataProps in locform is: ", formDataProps)
+            
+            const {formData} = formDataProps
 
-          let projList = []
+            let projList = []
 
-          if (formData.projects && formData.projects.length > 0){
-            projList = formData.projects
-          }
-          else if (record.projects && record.projects.length > 0){
-            projList = record.projects
-          }
+            if (formData.projects && formData.projects.length > 0){
+              projList = formData.projects
+            }
+            else if (record.projects && record.projects.length > 0){
+              projList = record.projects
+            }
 
-          //somehow still need to translate this shit
-          if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
-            console.log("translating projlist into a list: ", projList)
-            const temp = []
-            projList.map(item => {
-              temp.push(item.id)
-            })
-            projList = temp
+            //somehow still need to translate this shit
+            if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
+              console.log("translating projlist into a list: ", projList)
+              const temp = []
+              projList.map(item => {
+                temp.push(item.id)
+              })
+              projList = temp
+            }
+            console.log("projList being rendered: ", projList)
+              return(<ReferenceArrayInput
+                resource={"projects"}
+                label={"en.models.locations.projects"}
+                className={classes.projectList}
+                source={"projects"}
+                reference={"projects"}
+                required>
+                <SelectArrayInput 
+                defaultValue={projList}
+                optionText="name" />
+              </ReferenceArrayInput>)
+            }
           }
-          console.log("projList being rendered: ", projList)
-            return(<ReferenceArrayInput
-              resource={"projects"}
-              label={"en.models.locations.projects"}
-              className={classes.projectList}
-              source={"projects"}
-              reference={"projects"}
-              required>
-              <SelectArrayInput 
-              defaultValue={projList}
-              optionText="name" />
-            </ReferenceArrayInput>)
-          }
-        }
         </FormDataConsumer>
 
         <TextInput

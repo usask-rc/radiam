@@ -157,7 +157,7 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
 
         <TextField
           label={"en.models.datasets.data_abstract"}
-          source={MODEL_FIELDS.DATA_ABSTRACT}
+          source={MODEL_FIELDS.ABSTRACT}
           options={{ multiline: true}}
         />
 
@@ -259,7 +259,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
 
         <TextField
           label={"en.models.datasets.data_abstract"}
-          source={MODEL_FIELDS.DATA_ABSTRACT}
+          source={MODEL_FIELDS.ABSTRACT}
         />
 
         <TextField
