@@ -154,6 +154,20 @@ class DatasetPKRelatedField(serializers.PrimaryKeyRelatedField):
         else:
             return Dataset.objects.all()
 
+class LocationPKRelatedField(serializers.PrimaryKeyRelatedField):
+    """
+    Location PK-related field for foreign key relationships that require filtering
+    """
+    def get_queryset(self):
+        user = self.context['request'].user
+
+        if not user.is_superuser:
+            user_locationprojects = LocationProject.objects.filter(project__in=user.get_projects())
+            user_locations = Location.objects.filter(locationproject__in=user_locationprojects).distinct()
+            return user_locations
+        else:
+            return Dataset.objects.all()
+
 
 class ContentObjectNameForeignKey(serializers.RelatedField):
     """
@@ -1015,6 +1029,18 @@ class DatasetSensitivitySerializer(serializers.ModelSerializer):
         fields = ('id',
                   'dataset',
                   'sensitivity')
+
+class LocationProjectSerializer(serializers.ModelSerializer):
+    location = LocationPKRelatedField(help_text="The location this project applies to")
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=LocationProject.objects.all(),
+        help_text="The project linked to this location"
+    )
+    class Meta:
+        model = LocationProject
+        fields = ('id',
+                  'location',
+                  'project')
 
 
 class ProjectSerializer(serializers.ModelSerializer, MetadataSerializer):
