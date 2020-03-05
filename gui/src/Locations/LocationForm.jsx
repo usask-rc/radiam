@@ -120,6 +120,10 @@ class LocationForm extends Component {
       return project
     })
     data.projects = projList
+
+    if (this.props.record && this.props.record.id){
+      data.id = this.props.record.id
+    }
     this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
         .then(data => {
