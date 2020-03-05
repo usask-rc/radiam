@@ -312,7 +312,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case GET_LIST:
         json.results = translateResource(resource, json.results);
 
-        ret = {
+        let ret = {
           data: json.results,
           total: json.count,
           next: json.next,
