@@ -41,6 +41,7 @@ from radiam.api.serializers import (
     GroupRoleSerializer,
     GroupViewGrantSerializer,
     LocationSerializer,
+    LocationProjectSerializer,
     LocationTypeSerializer,
     MetadataUITypeSerializer,
     MetadataValueTypeSerializer,
@@ -79,6 +80,7 @@ from .models import (
     GroupRole,
     GroupViewGrant,
     Location,
+    LocationProject,
     LocationType,
     MetadataUIType,
     MetadataValueType,
@@ -938,6 +940,21 @@ class DatasetSensitivityViewSet(RadiamViewSet):
     )
 
     filter_fields=('dataset', 'sensitivity')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+class LocationProjectViewSet(RadiamViewSet):
+    """
+    API endpoint that allows the association of locations with multiple projects.
+    """
+    queryset = LocationProject.objects.all().order_by('location')
+    serializer_class = LocationProjectSerializer
+
+    filter_backends = (
+        DjangoFilterBackend,
+        RadiamAuthLocationFilter,
+    )
+
+    filter_fields=('location', 'project')
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
 

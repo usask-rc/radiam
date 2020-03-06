@@ -900,6 +900,22 @@ class LocationProject(models.Model):
     class Meta:
         db_table = "rdm_location_projects"
 
+    def has_read_permission(request):
+        """
+        Global 'Model' permission. All users can read the locationproject lists
+        """
+        return True
+
+    def has_write_permission(request):
+        """
+        Global 'Model' permission. Superuser and Admin user can create new searches.
+        """
+        if request.user.is_superuser or request.user.is_admin():
+            return True
+        else:
+            return False
+
+
 class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
     """
     Dataset
