@@ -3,7 +3,7 @@ import { Typography } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import React, { Component } from "react";
+import React, { Component, useCallback, useState } from "react";
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import RelatedUsers from "../Groups/RelatedUsers";
@@ -24,6 +24,7 @@ import {
   NumberInput,
   RefreshButton,
   required,
+  SaveButton,
   ShowButton,
   TextField,
   TextInput,
@@ -50,6 +51,7 @@ import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
 import { getGroupMembers } from "../_tools/funcs";
 import Cancel from "@material-ui/icons/Cancel";
+import { useFormState } from 'react-final-form';
 
 const configStyles = {
   root: {
@@ -182,10 +184,12 @@ class MetadataComponent extends Component {
 
   componentDidMount() {
     const { id, record, type } = this.props;
-    if (record) {
+    if (id) {
+      this.getEntitySchemasFields(id, type, false);
+    } else if (record) {
       this.getEntitySchemasFields(record.id, type, false);
     } else {
-      this.getEntitySchemasFields(id, type, false);
+        console.error("No record or id specified for this metadata component");
     }
   };
 
@@ -523,6 +527,8 @@ class MetadataComponent extends Component {
   };
 
   getFileParentEntitySchemaFields = (id) => {
+      return;
+      /**
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const { projectID } = this.props;
     if (!projectID)
@@ -550,6 +556,7 @@ class MetadataComponent extends Component {
       });
     }
     fetchData();
+    **/
   }
 
   createEntity = (fromParent) => {
@@ -1214,6 +1221,7 @@ const validateURL = [];
 // const validateRequiredURL = [required(), regex(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)];
 // const validateURL = regex(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi);
 
+
 class BaseEditMetadata extends MetadataComponent {
   constructor (props) {
     super(props);
@@ -1445,10 +1453,10 @@ class BaseEditMetadata extends MetadataComponent {
     }
   };
 
-
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
-    const { classes, id, translate } = this.props;
+    const { addSave, classes, id, record, translate } = this.props;
+
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
@@ -1467,6 +1475,11 @@ class BaseEditMetadata extends MetadataComponent {
               return this.renderField(classes, translate, field, 0, "metadata");
             })}
           </div>
+          { addSave ?
+              <SaveButton />
+              :
+              null
+          }
         </div>;
     } else {
       return <div>{translate("en.metadata.no")}</div>;
@@ -1908,14 +1921,13 @@ class BaseShowMetadata extends MetadataComponent {
       }
       return field
     });
-    
+
     return hasValue;
   };
 
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
     const { classes, record, id, translate } = this.props;
-
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.show.title")}</Typography>
@@ -1948,41 +1960,96 @@ BaseShowMetadata.propTypes = {
   resource: PropTypes.string,
 };
 
-class BaseEditConfigMetadataForm extends MetadataComponent {
+class BaseEditConfigMetadataForm extends Component {
+
   constructor (props) {
     super(props);
+    this.state = {
+    };
   }
 
-  onSubmit = async values => {
-      console.log("onSubmit");
-      console.log(values);
-  };
 
   render() {
-    const { id, translate } = this.props;
+    const { id, doc, onCancel, onSave, projectID, record, translate } = this.props;
     return (
-      <Form
-        onSubmit={this.onSubmit}
-        mutators={arrayMutators}
-        render={({ handleSubmit, form, submitting, pristine, values }) => (
-        <form>
-        <React.Fragment>
-          <EditMetadata
-            type={MODEL_FK_FIELDS.FILE}
-            translate={translate}
-            id={id}
-          />
-          <ConfigMetadata
-            type={MODEL_FK_FIELDS.FILE}
-            translate={translate}
-            id={id}
-          />
-        </React.Fragment>
-        </form>
-        )}/>
+      <>
+        <Form
+          mutators={arrayMutators}
+          onSubmit={() => {onSave()} }
+          initialValues={record}
+          render={({ handleSubmit, form, submitting, pristine, values }) => (
+          <form>
+          <React.Fragment>
+            <EditMetadata
+              type={MODEL_FK_FIELDS.FILE}
+              translate={translate}
+              id={id}
+              record={record}
+            />
+            <SaveEditMetadataFormButton
+                doc={doc}
+                onCancel={onCancel}
+                onSave={onSave}
+                projectID={projectID}
+            />
+            <Button onClick={onCancel}>{translate('ra.action.cancel')}</Button>
+            <ConfigMetadata
+              type={MODEL_FK_FIELDS.FILE}
+              translate={translate}
+              id={id}
+              record={record}
+            />
+          </React.Fragment>
+          </form>
+          )}/>
+        </>
     );
   };
 };
+
+const SaveEditMetadataFormButton = ({doc, onSave, projectID, ...rest}) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const formState = useFormState();
+    const handleSaveClick = useCallback(() => {
+        if (!formState.valid) {
+            return;
+        }
+        let params = {
+            id: doc,
+            data: formState.values
+        };
+        const sendData = async () => {
+            await dataProvider(
+              UPDATE,
+              "projects/" + projectID + "/docs",
+              params
+            ).then(response => {
+              if (onSave) {
+                  onSave();
+              }
+              return response
+            }).catch(error => {
+              console.error(error);
+              return;
+            });
+
+        };
+        sendData();
+    }, [
+        formState.valid,
+        formState.values,
+        /**
+        create,
+        notify,
+        redirectTo,
+        redirect,
+        basePath,
+        **/
+    ]);
+
+    return <SaveButton {...rest} handleSubmitWithRedirect={handleSaveClick} />
+};
+
 
 export const EditConfigMetadataForm = enhanceEdit(BaseEditConfigMetadataForm);
 export const ConfigMetadata = enhanceConfig(BaseConfigMetadata);

@@ -50,9 +50,17 @@ class FileDetails extends Component {
     this.state = {
         show: true,
         edit: false,
-        config: false
+        config: false,
+        record: {}
     };
   }
+
+  toggleDisplay = (event) => {
+    this.setState(prevState => (
+      { show: !prevState.show,
+        edit: !prevState.edit}));
+  };
+
   render() {
   const { classes, item, getJsonKeys, projectID, translate } = this.props;
   return (
@@ -64,6 +72,7 @@ class FileDetails extends Component {
           {!isObject(item[key]) && 
               key !== MODEL_FIELDS.NAME &&
               key !== 'key' &&
+              key !== 'metadata' &&
               key !== 'children' ? (
 
                   <Grid className={classes.key} item xs={6}>
@@ -98,13 +107,14 @@ class FileDetails extends Component {
                         item[key]
                       )}
                   </Grid>
-              ) : isObject(item[key]) && key !== 'children' ? 
+              ) : isObject(item[key]) && key !== 'children' && key !== 'metadata' ? 
           <>
             <Typography
               className={classes.title}
             >{`${key}:`}
             </Typography>
             <FileDetails
+              translate={translate}
               item={item[key]}
               getJsonKeys={getJsonKeys}
               classes={classes}
@@ -135,6 +145,7 @@ class FileDetails extends Component {
                 type={MODEL_FK_FIELDS.FILE}
                 translate={translate}
                 id={item.entity}
+                record={item}
                 projectID={projectID}
               />
             </>
@@ -154,7 +165,15 @@ class FileDetails extends Component {
                   {translate('ra.action.cancel')}
                 </Button>
               } />
-              <EditConfigMetadataForm id={item.entity} translate={translate} />
+              <EditConfigMetadataForm
+                  id={item.entity}
+                  doc={item.id}
+                  onCancel={this.toggleDisplay}
+                  onSave={this.toggleDisplay}
+                  projectID={projectID}
+                  record={item}
+                  translate={translate}
+                  />
             </>
             : null
           }
