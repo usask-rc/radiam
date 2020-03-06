@@ -25,29 +25,34 @@ import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { EditToolbar } from "../_components";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import { Prompt } from 'react-router';
+import { Prompt, Redirect } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupMembers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupMembers, postObjectWithoutSaveProp, toastErrors } from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
 import UserDetails from "../Users/UserDetails.jsx";
+import { DefaultToolbar } from "../_components/Toolbar.jsx";
+import TranslationSelect from "../_components/_fields/TranslationSelect.jsx";
+import { DateInput } from "ra-ui-materialui/lib/input";
 
 const styles = {
   actions: {
     backgroundColor: "inherit"
   },
-  root: {
-    backgroundColor: "inherit"
+  description: {
+    maxWidth: "80%",
   },
   header: {
     backgroundColor: "inherit"
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 const filterStyles = {
   form: {
@@ -92,7 +97,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     pagination={<CustomPagination />}
     bulkActionButtons={false}>
 
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <TextField
         label={"en.models.groups.name"}
         source={MODEL_FIELDS.NAME}
@@ -130,12 +135,17 @@ const actionStyles = theme => ({
 const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...props}) => {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
-
   useEffect(() => {
+    let _isMounted = true
     if (data && !showEdit){
       isAdminOfAParentGroup(data.id).then(data => {
-        setShowEdit(data)
+        if (_isMounted){
+          setShowEdit(data)
+        }
       })
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   }, [data, showEdit])
 
@@ -163,9 +173,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   const [groupMembers, setGroupMembers] = useState([])
   const [canEditGroup, setCanEditGroup] = useState(false)
 
-  let _isMounted = false
   useEffect(() => {
-    _isMounted = true
+    let _isMounted = true
     isAdminOfAParentGroup(props.id).then(data => {
       if (_isMounted){
         setCanEditGroup(data)
@@ -177,8 +186,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
   }, [])
 
   useEffect(() => {
-    _isMounted = true;
-    
+    let _isMounted = true
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupMembers(params).then((data) => {
@@ -275,34 +283,55 @@ const validateParentGroup = (value, allValues) => {
     return 'A Group may not be a parent group of itself'
   }
 }
+const validateUser = (value, allValues) => {
+  //must be filled if role is filled
+  if (value && !allValues.group_role){
+    return "If adding a User to this new Group, a Role must be specified."
+  }
+}
+const validateRole = (value, allValues) => {
+  if (value && !allValues.user){
+    return "A User must be selected if a Role is specified."
+  }
+}
 
 const asyncValidate = getAsyncValidateNotExists({id: MODEL_FIELDS.ID, name : MODEL_FIELDS.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, MODELS.GROUPS);
 
+//only used for group creation
 const GroupForm = props => 
 {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
-  
+  let _isMounted = true
+
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
-      console.log("before save, isformdirty, data: ", isFormDirty, data)
-      props.save(data)
+      if (_isMounted){
+        console.log("before save, isformdirty, data: ", isFormDirty, data)
+        props.save(data)
+      }
+    }
+    return function cleanup() {
+      _isMounted = false
     }
   }, [data])
 
   function handleSubmit(formData) {
-    setIsFormDirty(false)
-    setData(formData)
+    const {name, description, parent_group} = formData
+
+    if (name && description){
+      props.save(formData)
+    }
   }
 
   function handleChange(data){
     setIsFormDirty(true)
   }
-
+  
   return(
     <SimpleForm
       {...props}
-      toolbar={<EditToolbar />}
+      toolbar={<DefaultToolbar />}
       asyncValidate={asyncValidate}
       asyncBlurFields={[ MODEL_FIELDS.NAME ]}
       onChange={handleChange}
@@ -318,6 +347,7 @@ const GroupForm = props =>
         label={"en.models.groups.description"}
         source={MODEL_FIELDS.DESCRIPTION}
         validate={validateDescription}
+        multiline
       />
       <ReferenceInput
         label={"en.models.groups.parent_group"}
@@ -331,7 +361,6 @@ const GroupForm = props =>
           optionText={MODEL_FIELDS.NAME}
         />
       </ReferenceInput>
-      <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
     </SimpleForm>
   )
 };
@@ -340,7 +369,7 @@ export const GroupCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Create {...props}>
-      <GroupForm {...other} />
+      <GroupForm  {...other} />
     </Create>
   );
 }
@@ -360,10 +389,10 @@ class BaseGroupEdit extends Component {
     return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm
         basePath={basePath}
-        toolbar={<EditToolbar />}
+        toolbar={<DefaultToolbar />}
         redirect={RESOURCE_OPERATIONS.LIST}
       >
-      <GroupTitle prefix={"Updating"} />
+        <GroupTitle prefix={"Updating"} />
         <TextInput
           label={"en.models.groups.name"}
           source={MODEL_FIELDS.NAME}
@@ -374,6 +403,7 @@ class BaseGroupEdit extends Component {
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}
           style={{"max-width": "80%"}}
+          multiline
         />
         <BooleanInput
           label={"en.models.generic.active"}
@@ -384,6 +414,7 @@ class BaseGroupEdit extends Component {
           label={"en.models.groups.parent_group"}
           source={MODEL_FK_FIELDS.PARENT_GROUP}
           reference={MODELS.GROUPS}
+          validate={validateParentGroup}
           allowEmpty
         >
           <SelectInput
@@ -393,7 +424,7 @@ class BaseGroupEdit extends Component {
         </ReferenceInput>
         { id && (
           <>
-            <EditMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
+            <EditMetadata id={id} values={record ? record.metadata : null}  type={MODEL_FK_FIELDS.GROUP}/>
             <ConfigMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
           </>
           )}

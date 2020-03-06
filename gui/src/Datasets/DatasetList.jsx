@@ -15,6 +15,7 @@ import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
 import { withStyles } from '@material-ui/core/styles';
 import Search from '@material-ui/icons/Search';
+import DatasetListTitle from './DatasetListTitle';
 
 const listStyles = {
     actions: {
@@ -29,6 +30,9 @@ const listStyles = {
     /* https://stackoverflow.com/questions/55940218/preserving-line-breaks-with-react-admin-material-uis-textfields */
     showBreaks: {
       whiteSpace: "pre-wrap",
+    },
+    columnHeaders: {
+      fontWeight: "bold",
     },
   };
   
@@ -73,10 +77,11 @@ export const DatasetList = withStyles(listStyles)(({ classes, ...props }) => {
         pagination={<CustomPagination />}
         bulkActionButtons={false}
       >
-        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
-          <TextField
+        <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
+          <DatasetListTitle
             label={'en.models.datasets.title'}
             source={MODEL_FIELDS.TITLE}
+            classes={classes}
           />
           <ReferenceField
             link={false}

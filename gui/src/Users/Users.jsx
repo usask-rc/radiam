@@ -15,14 +15,14 @@ import {
 } from "react-admin";
 import {MODEL_FIELDS, ROLE_USER} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
-import { EditToolbar } from "../_components";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleActiveButton from "./ToggleActiveButton";
 import Toolbar from '@material-ui/core/Toolbar';
-import { EditButton, DeleteButton } from 'react-admin';
+import { EditButton } from 'react-admin';
 import UserForm from "./UserForm";
+import {  UserToolbar } from "../_components/Toolbar";
 
 const listStyles = {
   actions: {
@@ -36,7 +36,10 @@ const listStyles = {
   },
   email: {
     fontSize: 14,
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 
 const filterStyles = {
@@ -90,7 +93,7 @@ export const UserList = withStyles(listStyles)(({ classes, ...props }) => {
       //bulkActionButtons={<PostBulkActionButtons {...other}/>} - This can be activated as soon as Username is no longer a required field on PUT.
       bulkActionButtons={false}
     >
-      <Datagrid rowClick={userListRowClick} {...other}>
+      <Datagrid rowClick={userListRowClick} classes={{headerCell: classes.columnHeaders}} {...other}>
         <TextField
           label={"en.models.users.username"}
           source={MODEL_FIELDS.USERNAME}
@@ -135,8 +138,9 @@ const UserDetailsActions = ({permissions, basePath, data, resource, classes}) =>
   if (permissions && permissions.is_admin){
     return(<Toolbar className={classes.root}>
           <EditButton basePath={basePath} record={data} />
-          {permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
       </Toolbar>)
+    //there was a deletebutton here, i've restricted deleting users to the API only.
+    //{permissions.is_admin && <DeleteButton basePath={basePath} record={data} resource={resource} />}
   }
   else{
       return null
@@ -169,7 +173,7 @@ export const UserCreate = props => {
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
     return(
-    <Edit toolbar={<EditToolbar />} {...props}>
+    <Edit toolbar={<UserToolbar />} {...props}>
       <UserEditForm {...other}/>
     </Edit>)
     
@@ -182,7 +186,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
-      <Edit toolbar={<EditToolbar />} {...props}>
+      <Edit toolbar={<UserToolbar />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )

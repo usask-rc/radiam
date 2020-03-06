@@ -1,11 +1,10 @@
 //RelatedUsers.jsx
 import React, { useState, useEffect } from 'react'
-import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER, MODELS, RESOURCE_OPERATIONS } from "../_constants/index";
+import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER} from "../_constants/index";
 import '../_components/components.css';
 import Chip from "@material-ui/core/Chip"
 import Tooltip from "@material-ui/core/Tooltip"
 import UserAvatar from "react-user-avatar";
-import { Link } from  "react-router-dom";
 import { withStyles } from '@material-ui/styles';
 import Edit from '@material-ui/icons/Edit';
 
@@ -44,7 +43,7 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
   const [members, setMembers] = useState([])
   const [unknown, setUnknown] = useState([])
   const [loading, setLoading] = useState(true)
-
+  let _isMounted = true
   useEffect(() => {
     let tempGA = []
     let tempDM = []
@@ -65,11 +64,17 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
         tempU.push(groupMember)
       }
     })
-    setGroupAdmins(tempGA)
-    setDataManagers(tempDM)
-    setMembers(tempM)
-    setUnknown(tempU)
-    setLoading(false)
+    
+    if (_isMounted){
+      setGroupAdmins(tempGA)
+      setDataManagers(tempDM)
+      setMembers(tempM)
+      setUnknown(tempU)
+      setLoading(false)
+    }
+    return function cleanup() {
+      _isMounted = false
+    }
   }, [groupMembers])
 
   return(
@@ -87,9 +92,9 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
                     }
                     label={`${groupMember.user.username}`}
                     clickable={inModal ? false : true}
-                    onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                    onClick={() => {if (!inModal && setViewModal !== null) {
-                      setViewModal(groupMember)
+                    onDelete={setEditModal && !inModal && _isMounted ? () => setEditModal(groupMember) : null}
+                    onClick={() => {if (!inModal && setViewModal !== null && _isMounted) {
+                        setViewModal(groupMember)
                     }}}
                     deleteIcon={<Edit />}
                   />
@@ -108,8 +113,8 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
                         }
                         label={`${groupMember.user.username}`}
                         clickable={inModal ? false : true}
-                        onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                        onClick={() => {if (!inModal && setViewModal !== null) {
+                        onDelete={setEditModal && !inModal && _isMounted ? () => setEditModal(groupMember) : null}
+                        onClick={() => {if (!inModal && setViewModal !== null && _isMounted) {
                           setViewModal(groupMember)
                         }}}
                         deleteIcon={<Edit />}
@@ -130,8 +135,8 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
                       }
                       label={`${groupMember.user.username}`}
                       clickable={inModal ? false : true}
-                      onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                      onClick={() => {if (!inModal && setViewModal !== null) {
+                      onDelete={setEditModal && !inModal && _isMounted ? () => setEditModal(groupMember) : null}
+                      onClick={() => {if (!inModal && setViewModal !== null && _isMounted) {
                         setViewModal(groupMember)
                       }}}
                       deleteIcon={<Edit />}
@@ -151,8 +156,8 @@ const RelatedUsers = ({classes, setCreateModal, groupMembers, setEditModal=null,
                       }
                       label={`${groupMember.user.username}`}
                       clickable={inModal ? false : true}
-                      onDelete={setEditModal && !inModal ? () => setEditModal(groupMember) : null}
-                      onClick={() => {if (!inModal && setViewModal !== null) {
+                      onDelete={setEditModal && !inModal && _isMounted ? () => setEditModal(groupMember) : null}
+                      onClick={() => {if (!inModal && setViewModal !== null && _isMounted) {
                         setViewModal(groupMember)
                       }}}
                       deleteIcon={<Edit />}

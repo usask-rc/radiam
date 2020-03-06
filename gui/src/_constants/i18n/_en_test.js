@@ -4,244 +4,247 @@ import englishMessages from 'ra-language-english';
 export default {
   ...englishMessages,
   en: {
+    Type1: 'Temporary Type 1', //these two `type` values exist in a default db load
+    Type2: 'Temporary Type 2',
     metadata: {
-      configure: "Metadata",
+      configure: 'Metadata',
       config: {
-        title: "Configure Additional Metadata",
+        title: 'Configure Additional Metadata',
       },
-      default: "Default Value",
+      default: 'Default Value',
       edit: {
-        title: "Edit Additional Metadata",
+        title: 'Edit Additional Metadata',
       },
-      fields: "Choose Metadata Fields",
-      loading: "Loading additional metadata.",
-      no: "No Additional Metadata",
-      off: "Off",
-      on: "On",
-      order: "Order",
-      required: "Required",
-      schemas: "Choose Metadata Schemas",
+      fields: 'Choose Metadata Fields',
+      loading: 'Loading additional metadata.',
+      loadingError: 'Error loading data',
+      no: 'No Additional Metadata',
+      off: 'Off',
+      on: 'On',
+      order: 'Order',
+      required: 'Required',
+      schemas: 'Choose Metadata Schemas',
       show: {
-        title: "Additional Metadata",
+        title: 'Additional Metadata',
       },
-      visible: "Visible",
+      visible: 'Visible',
       datacite: {
         4.2: {
-          label: "Datacite 4.2",
-          short: "DC 4.2"
+          label: 'Datacite 4.2',
+          short: 'DC 4.2'
         },
         alternateIdentifiers: {
-          label: "Alternate Identifiers",
+          label: 'Alternate Identifiers',
           alternateIdentifier: {
-            label: "Alternate Identifier",
+            label: 'Alternate Identifier',
             alternateIdentifierType: {
-              label: "Alternate Identifier Type",
+              label: 'Alternate Identifier Type',
             },
           },
         },
         contributors: {
-          label: "Contributors",
+          label: 'Contributors',
           contributor: {
-            label: "Contributor",
+            label: 'Contributor',
             affiliation: {
-              label: "Affiliation"
+              label: 'Affiliation'
             },
             contributorName: {
-              label: "Contributor Name"
+              label: 'Contributor Name'
             },
             contributorType: {
-              label: "Contributor Type"
+              label: 'Contributor Type'
             },
             familyName: {
-              label: "Family Name"
+              label: 'Family Name'
             },
             givenName: {
-              label: "Given Name"
+              label: 'Given Name'
             },
             nameIdentifier: {
-              label: "Name Identifier",
+              label: 'Name Identifier',
               nameIdentifierScheme: {
-                label: "Name Identifier Scheme"
+                label: 'Name Identifier Scheme'
               },
               schemeURI: {
-                label: "Scheme URI"
+                label: 'Scheme URI'
               },
             },
           }
         },
         creators: {
-          label: "Creators",
+          label: 'Creators',
           creator: {
-            label: "Creator",
+            label: 'Creator',
             creatorName: {
-              label: "Creator Name",
+              label: 'Creator Name',
               nameType: {
-                label: "Name Type",
+                label: 'Name Type',
                 organizational: {
-                  label: "Organizational",
+                  label: 'Organizational',
                 },
                 personal: {
-                  label: "Personal",
+                  label: 'Personal',
                 },
               },
             },
             familyName: {
-              label: "Family Name"
+              label: 'Family Name'
             },
             givenName: {
-              label: "Given Name"
+              label: 'Given Name'
             },
             nameIdentifier: {
-              label: "Name Identifier",
+              label: 'Name Identifier',
               nameIdentifierScheme: {
-                label: "Name Identifier Scheme",
+                label: 'Name Identifier Scheme',
               },
               schemeURI: {
-                label: "Scheme URI",
+                label: 'Scheme URI',
               },
             },
           },
         },
         dates: {
-          label: "Dates",
+          label: 'Dates',
           date: {
-            label: "Date",
+            label: 'Date',
             dateInformation: {
-              label: "Date Information",
+              label: 'Date Information',
             },
             dateType: {
-              label: "Date Type",
+              label: 'Date Type',
             },
           },
         },
         descriptions: {
-          label: "Descriptions",
+          label: 'Descriptions',
           description: {
-            label: "Description",
+            label: 'Description',
             descriptionType: {
-              label: "Description Type"
+              label: 'Description Type'
             },
             xmlLang: {
-              label: "Description Language"
+              label: 'Description Language'
             },
           },
         },
         formats: {
-          label: "Formats",
+          label: 'Formats',
           format: {
-            label: "Format"
+            label: 'Format'
           },
         },
         fundingReferences: {
-          label: "Funding References",
+          label: 'Funding References',
           fundingReference: {
-            label: "Funding Reference",
+            label: 'Funding Reference',
             awardNumber: {
-              label: "Award Number",
+              label: 'Award Number',
             },
             awardTitle: {
-              label: "Award Title",
+              label: 'Award Title',
             },
             funderIdentifier: {
-              label: "Funder Identifier",
+              label: 'Funder Identifier',
               funderIdentifierType: {
-                label: "Funder Identifier Type"
+                label: 'Funder Identifier Type'
               },
             },
             funderName: {
-              label: "Funder Name"
+              label: 'Funder Name'
             },
           },
         },
         identifier: {
-          label: "Identifier"
+          label: 'Identifier'
         },
         language: {
-          label: "Language",
-          en: "English",
-          fr: "French",
+          label: 'Language',
+          en: 'English',
+          fr: 'French',
         },
         publisher: {
-          label: "Publisher"
+          label: 'Publisher'
         },
         publicationYear: {
-          label: "Publication Year"
+          label: 'Publication Year'
         },
         resourceType: {
-          label: "Resource Type",
+          label: 'Resource Type',
           resourceTypeGeneral: {
-            label: "Resource Type General"
+            label: 'Resource Type General'
           },
         },
         relatedIdentifiers: {
-          label: "Related Identifiers",
+          label: 'Related Identifiers',
           relatedIdentifier: {
-            label: "Related Identifier",
+            label: 'Related Identifier',
             relatedIdentifierType: {
-              label: "Related Identifier Type",
+              label: 'Related Identifier Type',
             },
             relatedMetadataScheme: {
-              label: "Related Metadata Scheme",
+              label: 'Related Metadata Scheme',
             },
             relationType: {
-              label: "Relation Type",
+              label: 'Relation Type',
             },
             schemeURI: {
-              label: "Scheme URI",
+              label: 'Scheme URI',
             },
           },
         },
         rightsList: {
-          label: "Rights List",
+          label: 'Rights List',
           rights: {
-            label: "Rights",
+            label: 'Rights',
             rightsURI: {
-              label: "Rights URI",
+              label: 'Rights URI',
             },
             xmlLang: {
-              label: "Language",
+              label: 'Language',
             },
           },
         },
         sizes: {
-          label: "Sizes",
+          label: 'Sizes',
           size: {
-            label: "Size",
+            label: 'Size',
           },
         },
         subjects: {
-          label: "Subjects",
+          label: 'Subjects',
           subject: {
-            label: "Subject",
+            label: 'Subject',
             schemeURI: {
-              label: "Scheme URI"
+              label: 'Scheme URI'
             },
             subjectScheme: {
-              label: "Subject Scheme"
+              label: 'Subject Scheme'
             },
             xmlLang: {
-              label: "Subject Language",
+              label: 'Subject Language',
             },
           }
         },
         titles : {
-          label: "Titles",
+          label: 'Titles',
           title: {
-            label: "Title",
+            label: 'Title',
             titleType: {
-              label: "Title Type",
-              AlternativeTitle: "Alternative Title",
-              Other: "Other",
-              Subtitle: "Subtitle",
-              TranslatedTitle: "Translated Title",
+              label: 'Title Type',
+              AlternativeTitle: 'Alternative Title',
+              Other: 'Other',
+              Subtitle: 'Subtitle',
+              TranslatedTitle: 'Translated Title',
             },
             xmlLang: {
-              label: "Title Language",
+              label: 'Title Language',
             },
           }
         },
         version: {
-          label: "Version",
+          label: 'Version',
         },
       }
     },
@@ -311,10 +314,10 @@ export default {
     dashboard: {
       agents: 'Agents',
       agent: {
-        available_at: 'Download the Radiam agent for ',
+        available_at: 'Download the Radiam agent ',
         description:
           'Start adding files to Radiam by installing the Radiam Agent anywhere you would like to start tracking files.',
-        link_text: 'Windows, Mac or Linux',
+        link_text: 'here',
         subtitle: 'Install Agent',
       },
       projectCards: {
@@ -323,8 +326,8 @@ export default {
         folders: 'Folders',
       },
       fewUsers: {
-        content: "",
-        subtitle: "Groups With Few Users",
+        content: '',
+        subtitle: 'Groups With Few Users',
       },
       file_path: 'File Path',
       file_name: 'File Name',
@@ -398,6 +401,7 @@ export default {
         sensitivity_level: 'Sensitivity Levels of Data',
         study_site: 'Study Site',
         title: 'Dataset Title',
+        search_model: 'Search Model Query'
       },
       data_collection_method: {
         label: 'Data Collection Methods',
@@ -409,10 +413,10 @@ export default {
         label: 'Distribution Restriction',
       },
       filters: {
-        search: "Search",
+        search: 'Search',
       },
       groups: {
-        id: "Id",
+        id: 'Id',
         name: 'Group Name',
         active: 'Active',
         description: 'Description',
@@ -439,6 +443,7 @@ export default {
         osf_project: 'OSF Project ID',
         portal_url: 'Portal Url',
         type: 'Location Type',
+        projects: 'Projects',
       },
       locationtypes: {
         label: 'Type of Location',
@@ -516,6 +521,7 @@ export default {
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
+        hubzero: 'Hub Zero',
       },
     },
     distribution: {
@@ -622,6 +628,11 @@ export default {
         locations: 'A location is required for this agent.',
         user: 'A user is required for this agent.',
         version: 'Version Number is in format X.X.X ',
+      },
+      viewgrants: {
+        dataset: 'A Dataset must be specified from which to provide a View Grant.',
+        group: 'A Group must be specified to give View Access to.',
+        date_start: 'A Start Date must be specified for when View Access will be granted.',
       },
     },
     warnings: {}

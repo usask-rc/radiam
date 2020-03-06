@@ -174,7 +174,8 @@ class User(AbstractUser, UserPermissionMixin):
         """
         Get the user's groups
         """
-        user_groups = ResearchGroup.objects.filter(groupmember__user=self) \
+        user_groups = ResearchGroup.objects.filter(Q(groupmember__user=self, groupmember__date_expires__gte=now())| \
+                                                   Q(groupmember__user=self, groupmember__date_expires=None)) \
             .order_by('date_updated').distinct()
         group_queryset = ResearchGroup.objects.none()
 
@@ -199,14 +200,34 @@ class User(AbstractUser, UserPermissionMixin):
         """
         Get the groups that the user admins
         """
-        admingroups = ResearchGroup.objects.filter(groupmember__group_role__label__contains="admin",
-                                                   groupmember__user=self)
+        admingroups = ResearchGroup.objects.filter(Q(groupmember__group_role__label__contains="admin",
+                                                     groupmember__user=self,
+                                                     groupmember__date_expires__gte=now())| \
+                    Q(groupmember__group_role__label__contains="admin",
+                      groupmember__user=self,
+                      groupmember__date_expires=None))
         group_queryset = ResearchGroup.objects.none()
 
         for g in admingroups:
             group_queryset |= g.get_descendants(include_self=True)
 
         return group_queryset
+
+    def delete_projects(self):
+        for proj in Project.objects.filter(primary_contact_user=self):
+            proj.delete()
+
+    def delete_useragents(self):
+        for agent in UserAgent.objects.filter(user=self):
+            agent.delete()
+
+    def delete_group_memberships(self):
+        for grp_mem in GroupMember.objects.filter(user=self):
+            grp_mem.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_group_memberships()
+        models.Model.delete(self, *args, **kwargs)
 
 @receiver(reset_password_token_created)
 def send_password_reset_email(sender, reset_password_token, *args, **kwargs):
@@ -442,6 +463,14 @@ class UserAgent(models.Model):
         self.local_refresh_token = str(refresh)
         return None
 
+    def delete_agentprojectconfigs(self):
+        for prjconf in UserAgentProjectConfig.objects.filter(agent=self):
+            prjconf.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_agentprojectconfigs()
+        models.Model.delete(self, *args, **kwargs)
+
 
 class UserAgentProjectConfig(models.Model):
     """
@@ -502,7 +531,17 @@ class ResearchGroup(MPTTModel, ElasticSearchModel, ResearchGroupPermissionMixin)
         ElasticSearchModel.save(self, *args, **kwargs)
         MPTTModel.save(self, *args, **kwargs)
 
+    def delete_groupmembers(self):
+        for grp_mem in GroupMember.objects.filter(group=self):
+            grp_mem.delete()
+
+    def delete_groupviewgrants(self):
+        for grp_view_grts in GroupViewGrant.objects.filter(group=self):
+            grp_view_grts.delete()
+
     def delete(self, *args, **kwargs):
+        self.delete_groupviewgrants()
+        self.delete_groupmembers()
         ElasticSearchModel.delete(self, *args, **kwargs)
         MPTTModel.delete(self, *args, **kwargs)
 
@@ -610,6 +649,20 @@ class Location(models.Model):
         except GeoData.DoesNotExist:
             return None
         return geo_data
+
+    def get_projects(self):
+        projects = []
+        for prj in LocationProject.objects.filter(location=self):
+           projects.append(prj.project.id)
+        return Project.objects.filter(id__in=projects)
+
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(location=self):
+            locprj.delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_locationprojects()
+        models.Model.delete(self, *args, **kwargs)
 
     class Meta:
         db_table = "rdm_locations"
@@ -766,6 +819,10 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         models.Model.save(self, *args, **kwargs)
         ESDataset.init(index=str(self.id))
 
+    def delete_locationprojects(self):
+        for locprj in LocationProject.objects.filter(project=self):
+            locprj.delete()
+
     def delete(self, *args, **kwargs):
         ElasticSearchModel.delete(self, *args, **kwargs)
 
@@ -788,6 +845,7 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
         except ObjectDoesNotExist:
             pass
 
+        self.delete_locationprojects()
         models.Model.delete(self, *args, **kwargs)
 
     def _save_metadata_doc(self):
@@ -828,6 +886,34 @@ class Project(models.Model, ElasticSearchModel, ProjectPermissionMixin):
 
     def __str__(self):
         return self.name
+
+
+class LocationProject(models.Model):
+    """
+    The LocationProject
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, help_text="The location this project applies to")
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text="The project")
+
+    class Meta:
+        db_table = "rdm_location_projects"
+
+    def has_read_permission(request):
+        """
+        Global 'Model' permission. All users can read the locationproject lists
+        """
+        return True
+
+    def has_write_permission(request):
+        """
+        Global 'Model' permission. Superuser and Admin user can create new searches.
+        """
+        if request.user.is_superuser or request.user.is_admin():
+            return True
+        else:
+            return False
 
 
 class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
@@ -913,6 +999,14 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
             return None
         return geo_data
 
+    def get_search_model(self):
+        try:
+            search_model = SearchModel.objects.get(dataset_id=self.id)
+            return search_model
+        except SearchModel.DoesNotExist:
+            return None 
+
+
     def delete_data_collection_methods(self):
         for dcm in DatasetDataCollectionMethod.objects.filter(dataset=self):
             dcm.delete()
@@ -921,12 +1015,17 @@ class Dataset(models.Model, ElasticSearchModel, DatasetPermissionMixin):
         for dss in DatasetSensitivity.objects.filter(dataset=self):
             dss.delete()
 
+    def delete_search_model(self):
+        sm_obj = SearchModel.objects.filter(dataset=self)
+        sm_obj.delete()
+
     def delete(self, *args, **kwargs):
         """
         Delete any joint relationships between dataset and sensitivity or data collection model
         """
         self.delete_data_collection_methods()
         self.delete_sensitivities()
+        self.delete_search_model()
         try:
             entity = Entity.objects.get(dataset=self.id)
             entity.delete()
@@ -956,7 +1055,7 @@ class ProjectStatistics(models.Model, ProjectDetailPermissionMixin):
         db_table = "rdm_data_project_statistics"
 
 
-class SearchModel(models.Model):
+class SearchModel(models.Model, SearchModelPermissionMixin):
     """
     SearchModel to hold JSONField representing Search object for persistent storage
     """

@@ -1,17 +1,18 @@
 //UserEditForm.jsx
 import React, { Component } from 'react';
-import { BooleanInput, SaveButton, SimpleForm, TextInput, Toolbar } from "react-admin";
+import { BooleanInput, SaveButton, SimpleForm, TextInput } from "react-admin";
 import {WEBTOKEN, WARNINGS, MODELS, METHODS, MODEL_FIELDS} from "../_constants/index";
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { email, maxLength, minLength, required, FormDataConsumer, regex } from 'ra-core';
 import { toastErrors, getUserGroups } from '../_tools/funcs';
-import { Prompt, Redirect } from 'react-router';
+import { Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
-import { Dialog, DialogContent } from '@material-ui/core';
+import { Dialog, DialogContent, Toolbar } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
 import { toast } from 'react-toastify';
+import { UserToolbar } from '../_components/Toolbar';
 
 const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
 const validateFirstName = [required('en.validate.user.first_name')]
@@ -110,18 +111,19 @@ class UserEditForm extends Component {
 
     render() {
         const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
-        const {setViewModal} = this.props
+        const {setViewModal, record} = this.props
         return (<>
             <SimpleForm
                 save={this.handleSubmit}
                 resource={MODELS.USERS}
                 asyncValidate={asyncValidate}
-                asyncBlurFields={[MODEL_FIELDS.USERNAME]} >
+                toolbar={<UserToolbar />}
+                asyncBlurFields={[MODEL_FIELDS.USERNAME]} {...this.props}>
                 
                 <FormDataConsumer>
                     {({formData }) => 
                     {
-                        return(<UserTitle prefix={"Updating"} record={formData} />)}
+                        return(<UserTitle record={formData} prefix={"Updating"} />)}
                     }
                 </FormDataConsumer>
 
@@ -183,8 +185,6 @@ class UserEditForm extends Component {
                     </Dialog>
                 }
             </SimpleForm>
-            
-            <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
             {redirect && <Redirect to="/login"/>}
         </>
         );

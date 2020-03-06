@@ -79,9 +79,12 @@ class UserForm extends Component {
                         headers: headers
                     })
 
+                    console.log("groupmemberrequest group_role and group: ", group_role, group)
+
                     if (group_role && group) {
 
                         return fetch(groupMemberRequest).then(response => {
+                            console.log("groupmemberrequest response:", response)
                             if (response.status >= 200 && response.status < 300) {
                                 return response.json();
                             }
@@ -147,16 +150,6 @@ class UserForm extends Component {
         }
     };
 
-    //strangely, the selects and date need a different change handler.
-    handleSelectChange = (e, value, prevValue, target) => {
-        this.setState({ [target]: value })
-
-        if (e && e.timeStamp){
-            this.setState({isFormDirty: true})
-        }
-    };
-
-
     render() {
         const { group, group_role, redirect, isFormDirty} = this.state
         return (<>
@@ -195,6 +188,7 @@ class UserForm extends Component {
                     label={"en.models.users.notes"}
                     source={MODEL_FIELDS.NOTES}
                     onChange={this.handleChange}
+                    multiline
                 />
                 <TextInput
                     label={"en.models.users.user_orcid_id"}
@@ -206,7 +200,7 @@ class UserForm extends Component {
                     label={"en.models.groupmembers.group"}
                     source={MODEL_FK_FIELDS.GROUP}
                     reference={MODELS.GROUPS}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                     defaultValue={group}
                     required
                 >
@@ -220,7 +214,7 @@ class UserForm extends Component {
                     source={MODEL_FK_FIELDS.GROUP_ROLE}
                     reference={MODELS.ROLES}
                     resource={MODELS.ROLES}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                     required
                 >
                     <TranslationSelect
@@ -238,7 +232,7 @@ class UserForm extends Component {
                     }}
                     defaultValue={""}
                     source={MODEL_FIELDS.DATE_EXPIRES}
-                    onChange={this.handleSelectChange}
+                    onChange={this.handleChange}
                 />
             </SimpleForm>
             <Toolbar>

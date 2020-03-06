@@ -1286,6 +1286,14 @@
     }
 },
 {
+    "model": "api.locationproject",
+    "pk": "e3da55d9-05f2-47b8-81b8-21c46059f488",
+    "fields": {
+        "location": "a71edb52-6380-4a01-a06e-c6a714ed6e12",
+        "project": "ef6db556-f6df-474f-9abb-640aa1736384"
+    }
+},
+{
     "model": "api.useragent",
     "pk": "12785dfb-1791-4771-953e-09febcb8b103",
     "fields": {

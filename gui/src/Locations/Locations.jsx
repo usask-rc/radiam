@@ -13,6 +13,7 @@ import {
   SimpleShowLayout,
   TextField,
   TextInput,
+  ChipField,
 } from 'react-admin';
 import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from '../_components/CustomPagination';
@@ -22,6 +23,9 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
 import LocationTitle from './LocationTitle';
+import { SingleFieldList } from 'ra-ui-materialui/lib/list';
+import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
+import { ShowController } from 'ra-core';
 
 
 const listStyles = {
@@ -37,6 +41,9 @@ const listStyles = {
   /* https://stackoverflow.com/questions/55940218/preserving-line-breaks-with-react-admin-material-uis-textfields */
   showBreaks: {
     whiteSpace: "pre-wrap",
+  },
+  columnHeaders: {
+    fontWeight: "bold",
   },
 };
 
@@ -95,14 +102,14 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} {...other}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}} {...other}>
       <TextField
         label={'en.models.locations.display_name'}
         source={MODEL_FIELDS.DISPLAY_NAME}
       />
       <TextField
         label={'en.models.locations.host_name'}
-        source={MODEL_FIELDS.HOST_NAME}
+        source={"host_name"}
       />
       <ReferenceField
         link={false}
@@ -119,7 +126,15 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         className={classes.showBreaks}
         label={'en.models.locations.notes'}
         source={'notes'}
+        multiline
       />
+      <ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
     </Datagrid>
   </List>
 )});
@@ -157,7 +172,7 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
   record && record.notes
     ? (
       <Labeled label={'en.models.locations.notes'}>
-        <TextField className={classes.showBreaks} record={record} source={'notes'} {...rest} />
+        <TextField className={classes.showBreaks} multiline record={record} source={'notes'} {...rest} />
       </Labeled>
     )
     : null
@@ -166,10 +181,11 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 
 export const LocationDisplay = props => 
   {
+    console.log("LocationDisplay data: ", props)
   return(
   <Show {...props}>
     <SimpleShowLayout>
-    <LocationTitle prefix={"Viewing"} />
+      <LocationTitle prefix={"Viewing"} />
       <TextField
         label={'en.models.locations.display_name'}
         source={MODEL_FIELDS.DISPLAY_NAME}
@@ -189,13 +205,28 @@ export const LocationDisplay = props =>
           source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
+      
+      <ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+
       <GlobusEndpointShow />
       <GlobusPathShow />
       <PortalUrlShow />
       <NotesShow />
-      <MapView/>
-
-      
+      <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+      </ShowController>
     </SimpleShowLayout>
   </Show>)
   }

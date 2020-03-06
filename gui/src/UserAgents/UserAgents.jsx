@@ -32,6 +32,10 @@ import { Grid, Toolbar } from "@material-ui/core";
 import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import UserAgentTitle from "./UserAgentTitle";
+import { FKToolbar } from "../_components/Toolbar";
+import ProjectName from "../_components/_fields/ProjectName";
+import { ProjectShow } from "../Projects/Projects";
+import { ReferenceArrayField } from "ra-ui-materialui/lib/field";
 
 const filterStyles = {
   form: {
@@ -47,6 +51,9 @@ const listStyles = {
   },
   root: {
     backgroundColor: "inherit"
+  },
+  columnHeaders: {
+    fontWeight: "bold",
   },
 };
 
@@ -87,7 +94,7 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
     pagination={<CustomPagination />}
     bulkActionButtons={false}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <ReferenceField
         link={false}
         label={"en.models.agents.user"}
@@ -105,10 +112,31 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
       >
         <LocationShow />
       </ReferenceField>
-      
+      <ArrayField source={"project_config_list"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"project"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
     </Datagrid>
   </List>
 ));
+
+/*
+<ArrayField source={"projects"} label={"Projects"}>
+        <SingleFieldList>
+          <ReferenceField source={"id"} reference={"projects"} link="show">
+            <ChipField source={MODEL_FIELDS.NAME} />
+          </ReferenceField>
+        </SingleFieldList>
+      </ArrayField>
+<SingleFieldList>
+        <ReferenceField source={"id"} reference={"projects"} link="show">
+          <ChipField source={MODEL_FIELDS.NAME} />
+        </ReferenceField>
+      </SingleFieldList>
+*/
 
 const actionStyles = theme => ({
   toolbar:{
@@ -124,11 +152,11 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
 
   useEffect(() => {
     if (data && !showEdit){
-      if (data.user === user.id){
+      if (user.is_admin || user.is_group_admin){
         setShowEdit(true)
       }
     }
-  }, [data])
+  }, [data, showEdit, user.id])
 
   if (showEdit){
     return(
@@ -282,7 +310,8 @@ export const UserAgentEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Edit {...props}>
-      <SimpleForm>
+      <SimpleForm
+      toolbar={<FKToolbar {...props} />}>
         <UserAgentTitle prefix={"Editing Agent"} />
         <ReferenceField
           link={false}
@@ -302,40 +331,40 @@ export const UserAgentEdit = props => {
           <UserShow />
         </ReferenceField>
         <FormDataConsumer>
-        {formDataProps  => 
-        {
-          const record = formDataProps.record
-          console.log("in fdc, formData is: ", record)
-          //if record has an api token and username, it is an OSF agent and we want to allow modification of this
-          if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
-            record.project_config_list.map(project => {
-              //delete config for this prior to display, it's not relevant
-              const newProj = project
-              delete newProj.config
-              return newProj
-            })
-            return(
-              <>
-                <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
-                  <SimpleFormIterator disableRemove disableAdd>
-                    <ReferenceInput
-                    label={"en.models.agents.projects"}
-                    source={MODEL_FK_FIELDS.PROJECT}
-                    reference={MODELS.PROJECTS}>
-                      <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
-                    </ReferenceInput>
-                    {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
-                  </SimpleFormIterator>
-                </ArrayInput>
-              </>)
+          {formDataProps => 
+            {
+              const record = formDataProps.record
+              console.log("in fdc, formData is: ", record)
+              //if record has an api token and username, it is an OSF agent and we want to allow modification of this
+              if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
+                record.project_config_list.map(project => {
+                  //delete config for this prior to display, it's not relevant
+                  const newProj = project
+                  delete newProj.config
+                  return newProj
+                })
+                return(
+                  <>
+                    <ArrayInput source={MODEL_FIELDS.PROJECT_CONFIG_LIST}>
+                      <SimpleFormIterator disableRemove disableAdd>
+                        <ReferenceInput
+                        label={"en.models.agents.projects"}
+                        source={MODEL_FK_FIELDS.PROJECT}
+                        reference={MODELS.PROJECTS}>
+                          <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
+                        </ReferenceInput>
+                        {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+                      </SimpleFormIterator>
+                    </ArrayInput>
+                  </>)
+              }
+              else{
+                //need something returned here or RA will complain - but we want nothing returned for non-OSF agents here.
+                  return <></>
+                
+              }
+            }
           }
-          else{
-            //need something returned here or RA will complain - but we want nothing returned for non-OSF agents here.
-              return <></>
-            
-          }
-        }
-        }
         </FormDataConsumer>
         
         <Grid container direction="row">

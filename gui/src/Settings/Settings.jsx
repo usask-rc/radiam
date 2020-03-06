@@ -1,3 +1,4 @@
+//settings.jsx
 import React from "react";
 import { connect } from "react-redux";
 import { translate, changeLocale, Title } from "react-admin";
@@ -16,13 +17,14 @@ import { getTranslation } from "../_tools/funcs"
 
 
 const styles = {
-  label: { width: "10em", display: "inline-block" },
-  button: { margin: "1em" }
+  container:{
+    marginTop: "1em",
+  }
 };
 
 //TODO: this file should contain email / password change components.
-const Settings = ({ translate }) => (
-  <>
+const Settings = ({ classes, translate }) => (
+  <div className={classes.container}>
     <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
         <Typography>
@@ -49,7 +51,7 @@ const Settings = ({ translate }) => (
       </ExpansionPanelDetails>
     </ExpansionPanel>
     <ToastContainer />
-  </>
+    </div>
 );
 
 const mapStateToProps = state => ({

@@ -1,24 +1,18 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, ROLES, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from 'ra-core';
 import moment from 'moment';
 var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 
-//TODO: move '/api' to constants as the url for where the api is hosted.
+//TODO: move '/api' to constants as the url for where the api is hosted?  or leave as a function?
 export function getAPIEndpoint() {
-  //TODO: this is just needed for local testing.  this should eventually be removed.
-  /*
-  if (window && window.location && window.location.port === '3000') {
-    return `https://dev2.radiam.ca/api`; //TODO: will need updating after we're done with beta
-  }
-  */
   return `/${API_ENDPOINT}`;
 }
 
@@ -67,7 +61,7 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
         return "data_manager"
       }
     }
-    return "user"
+    return ROLE_USER
   }
   //no cookie or group
   else if (!user && !group){
@@ -142,20 +136,20 @@ export function getMaxUserRole(){
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
-      return "admin"
+      return ROLES.ADMIN
     }
     else if (user.is_group_admin){
-      return "group_admin"
+      return ROLES.GROUP_ADMIN
     }
     else if (user.is_data_manager){
-      return "data_manager" 
+      return ROLES.DATA_MANAGER 
     }
-    return "user"
+    return ROLES.USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
-    return "anonymous"
+    return ROLES.ANONYMOUS
   }
 }
 
@@ -225,6 +219,7 @@ export function getFirstCoordinate(layer) {
 export function getFolderFiles(
   params,
   type,
+  dataType="projects"
 ) {
 
   //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
@@ -241,7 +236,7 @@ export function getFolderFiles(
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.projectID,
+      dataType + '/' + params.projectID,
       queryParams
     )
       .then(response => {
@@ -284,8 +279,13 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
+//given json, format into something elasticsearch wants
+export function makeElasticQuery(query){
+
+}
+
 //gets the root folder paths for a given project
-export function getRootPaths(projectID) {
+export function getRootPaths(projectID, dataType="projects") {
   const params = {
     pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
     sort: { field: 'last_modified', order: '' },
@@ -295,7 +295,7 @@ export function getRootPaths(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + projectID,
+      dataType + '/' + projectID,
       params
     )
       .then(response => {
@@ -337,24 +337,23 @@ export function getRootPaths(projectID) {
   });
 }
 
-export function getProjectData(params, folders = false) {
+export function getProjectData(params, dataType="projects") {
   //get only folders if true, otherwise get only files
   
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
-      MODELS.PROJECTS + '/' + params.id,
+      dataType + '/' + params.id,
       params
     )
       .then(response => {
         resolve({ files: response.data, nbFiles: response.total });
       })
       .catch(err => {
-        reject({ loading: false, error: err });
+        reject(err);
       });
   });
 }
-
 
 //given some group, return all of its parent groups.
 export function getParentGroupList(group_id, groupList = []){
@@ -403,16 +402,26 @@ export function getUserDetails(userID){
   })
 }
 
+export function getCurrentUserID(){
+  //return user id from local storage
+  const userCookie = JSON.parse(localStorage.getItem(ROLE_USER))
+
+  if (userCookie){
+    return userCookie.id
+  }
+  //reject and send to login page -- no login cookie
+  window.location.hash = "#/login"
+  return false
+}
+
 export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
     dataProvider('CURRENT_USER', MODELS.USERS)
       .then(response => {
-        const localID = JSON.parse(localStorage.getItem(ROLE_USER))
-          .id;
-
-        if (response.data.id === localID) {
+        if (response && response.data){
           resolve(response.data);
-        } else {
+        }
+          else {
           reject({ redirect: true });
           toastErrors(WARNINGS.NO_AUTH_TOKEN);
         }
@@ -581,34 +590,46 @@ export function submitObjectWithGeo(
   redirect = RESOURCE_OPERATIONS.LIST,
   inModal=false
 ) {
-  console.log('formData heading into submitobjectwithgeo is: ', formData);
-  if (formData.id) {
-    updateObjectWithGeo(formData, geo, props, redirect);
-  } else {
-    createObjectWithGeo(formData, geo, props, inModal);
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log('formData heading into submitobjectwithgeo is: ', formData);
+    if (formData.id) {
+      
+      updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
+    } else {
+      createObjectWithGeo(formData, geo, props, inModal).then(data => resolve(data)).catch(err => reject(err));
+    }
+  })
 }
 
 function updateObjectWithGeo(formData, geo, props) {
-  if (geo && Object.keys(geo).length > 0) {
-    formData.geo = geo;
-  } else {
-    //api wont allow null geojson, so replace it with an empty list of features.
-    formData.geo = {
-      object_id: formData.id,
-      content_type: props.resource.substring(0, props.resource.length - 1),
-      geojson: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    };
-  }
-  if (props.save){
-    props.save(formData, RESOURCE_OPERATIONS.LIST);
-  }
-  else{
-    putObjectWithoutSaveProp(formData, props.resource)
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log("formData, geo in updateobjectwithgeo: ", formData, geo)
+    if (geo && Object.keys(geo).length > 0) {
+      formData.geo = geo;
+      formData.geo.object_id = formData.id
+    } else {
+      //api wont allow null geojson, so replace it with an empty list of features.
+      formData.geo = {
+        object_id: formData.id,
+        content_type: props.resource.substring(0, props.resource.length - 1),
+        geojson: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      };
+    }
+    if (props.save){ //use the react-admin form's default save func
+      resolve(props.save(formData, RESOURCE_OPERATIONS.LIST));
+    }
+    else{
+      putObjectWithoutSaveProp(formData, props.resource).then(data => {
+        resolve(data)
+      }).catch(err => reject(err))
+    }
+
+  })
 }
 
 export function putObjectWithoutSaveProp(formData, resource){
@@ -639,91 +660,105 @@ export function postObjectWithoutSaveProp(formData, resource){
   })
 }
 
+//seems like it works - needs testing
+export function deleteItem(data, resource){
+  return new Promise((resolve, reject) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const params = { id: data.id, resource:resource }
+
+    dataProvider(DELETE, resource, params).then(response => {
+      resolve(response)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
-  console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
-  let headers = new Headers({ 'Content-Type': 'application/json' });
-  const token = localStorage.getItem(WEBTOKEN);
 
-  if (token) {
-    const parsedToken = JSON.parse(token);
-    headers.set('Authorization', `Bearer ${parsedToken.access}`);
+  return new Promise((resolve, reject) => {
+    console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem(WEBTOKEN);
 
-    //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
-    const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
-      method: METHODS.POST,
-      body: JSON.stringify({ ...formData }),
-      headers: headers,
-    });
+    if (token) {
+      const parsedToken = JSON.parse(token);
+      headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    return fetch(request)
-      .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          return response.json();
-        }
-        throw new Error(response.statusText); //error here when creating dataset nested in project
-      })
-      .then(data => {
-        console.log('data in createobjectwithgeo is: ', data);
-        //some data exists - add in the object ID before submission
-        if (geo && geo.content_type) {
-          data.geo = geo;
-          data.geo.object_id = data.id;
-        } else {
-          //no value - can't send null into geo, so make a basic structure.
-          data.geo = {
-            object_id: data.id,
-            content_type: props.resource.substring(
-              0,
-              props.resource.length - 1
-            ),
-            geojson: {
-              type: 'FeatureCollection',
-              features: [],
-            },
-          };
-        }
+      //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
+      const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
+        method: METHODS.POST,
+        body: JSON.stringify({ ...formData }),
+        headers: headers,
+      });
 
-        //the PUT request to update this object with its geoJSON
-        const request = new Request(
-          getAPIEndpoint() + `/${props.resource}/${data.id}/`,
-          {
-            method: METHODS.PUT,
-            body: JSON.stringify({ ...data }),
-            headers: headers,
+      return fetch(request)
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            return response.json();
           }
-        );
+          reject({err: `Could not submit ${props.resource} to API, status: ${response.status} ${response.statusText}`})
+          throw new Error(response.statusText); //error here when creating dataset nested in project
+        })
+        .then(data => {
+          console.log('data in createobjectwithgeo is: ', data);
+          //some data exists - add in the object ID before submission
+          if (geo && geo.content_type) {
+            data.geo = geo;
+            data.geo.object_id = data.id;
+          } else {
+            //no value - can't send null into geo, so make a basic structure.
+            data.geo = {
+              object_id: data.id,
+              content_type: props.resource.substring(
+                0,
+                props.resource.length - 1
+              ),
+              geojson: {
+                type: 'FeatureCollection',
+                features: [],
+              },
+            };
+          }
 
-        return fetch(request)
-          .then(response => {
-            if (response.status >= 200 && response.status < 300) {
-              return response.json();
+          //the PUT request to update this object with its geoJSON
+          const request = new Request(
+            getAPIEndpoint() + `/${props.resource}/${data.id}/`,
+            {
+              method: METHODS.PUT,
+              body: JSON.stringify({ ...data }),
+              headers: headers,
             }
-            throw new Error(response.statusText);
-          })
-          .then(data => {
-            console.log("Data from geoJSON update: ", data);
-            if (!inModal){ //stop redirect if in a modal
-              props.history.push(`/${props.resource}`);
-            }
-          });
-      }).catch(err => {
-        console.log("err in POST new object with geo: ", err, formData, geo, props)
-      })
-      ;
-  } else {
-    //TODO: logout the user.
-    toastErrors(WARNINGS.NO_AUTH_TOKEN);
+          );
 
-    if (props && props.history) {
-      props.history.push(`/login`);
+          return fetch(request)
+            .then(response => {
+              if (response.status >= 200 && response.status < 300) {
+                return response.json();
+              }
+              throw new Error(response.statusText);
+            })
+            .then(data => {
+              resolve(data)
+
+              //TODO: test thoroughly what happens in modals
+              console.log("Data from geoJSON update: ", data);
+              if (!inModal){ //stop redirect if in a modal
+                props.history.push(`/${props.resource}`);
+              }
+            });
+        }).catch(err => {
+          console.log("err in POST new object with geo: ", err, formData, geo, props)
+          reject(err)
+        })
+        ;
     } else {
-      console.error(
-        'no props sent to createobjectwithgeo - how did this happen?  formData: ',
-        formData
-      );
+      //TODO: logout the user.
+      toastErrors(WARNINGS.NO_AUTH_TOKEN);
+      reject({error: WARNINGS.NO_AUTH_TOKEN})
     }
-  }
+  })
 }
 
 export function getTranslation(
@@ -867,6 +902,26 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       }
     }
   }
+/*
+  //Locations suffers the same stupid field issue that Datasets does and requires a similar transformation on Projects
+  if (resource === 'LOCATIONS'){
+    if (!Array.isArray(data)){ //no transformation needed upstream
+      if (direction === 0){
+        if (data.projects && data.projects.length > 0){
+          const projList = []
+          
+          console.log("in translator, data.projects is: ", data.projects)
+          data.projects.map(project => {
+            projList.push(project.id)
+          })
+          data.projects = projList
+        }
+      }
+    }
+    console.log("LOCATIONS translated data: ", data)
+    
+  }*/
+  
 
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.
@@ -893,4 +948,17 @@ export function translateDates(date, type, direction = 1) {
   }
   //TODO: need to do something downstream later.
   return date;
+}
+
+export const truncatePath = (path) => {
+  if (!path){
+    return path
+  }
+  let tempPath = path
+  let tempPathArr = tempPath.split("/")
+  if (tempPathArr.length > 4){
+    tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
+    tempPath = ".../" + tempPathArr.join("/")
+  }
+  return tempPath
 }

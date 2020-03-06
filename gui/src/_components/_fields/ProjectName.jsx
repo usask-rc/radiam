@@ -34,8 +34,14 @@ export const ProjectName: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> 
   allowEmpty,
   basePath,
   translateChoice,
+  setProjectName,
   record = {},
 }) => {
+  //return projectname from record if we need it
+  if (setProjectName){
+    setProjectName(record.name)
+  }
+
   return <span>
     <div className={classes.imageContainer}>
       <ReferenceField

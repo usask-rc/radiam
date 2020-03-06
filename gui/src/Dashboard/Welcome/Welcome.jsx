@@ -5,7 +5,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
 import { withStyles } from "@material-ui/core/styles";
-import {USERMANUALPATH} from "../../_constants/index"
+import {LINKS} from "../../_constants/index"
 const styles = {
   headlineTop: {
     backgroundColor: "#688db2",
@@ -48,9 +48,9 @@ const Welcome = ({ classes, translate }) => (
       </Typography><br/>
       <Typography variant={"body2"} component="p">
         {translate("en.dashboard.welcome.content2")}
-        <a href={USERMANUALPATH}></a>
+        <a href={LINKS.USERMANUALPATH}></a>
 
-        <a href={`..${USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
+        <a href={`..${LINKS.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
           {translate("en.dashboard.welcome.usermanual")}
         </a>
       </Typography> 
