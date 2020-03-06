@@ -145,7 +145,7 @@ export class IndexedSimpleFormIterator extends Component {
                                     variant="body1"
                                     className={classes.index}
                                 >
-                                •
+                               &nbsp;
                                 </Typography>
                                 <section className={classes.form}>
                                     {Children.map(children, (input, index2) =>

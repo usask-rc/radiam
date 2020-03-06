@@ -1675,7 +1675,7 @@ class BaseShowMetadata extends MetadataComponent {
             }
             fields.push(
               <div className={classes.subfield}>
-                <div className={classes.index}>•</div>
+                <div className={classes.index}>&nbsp;</div>
                 <div>
                   { type ==="boolean" ?
                         <div>
