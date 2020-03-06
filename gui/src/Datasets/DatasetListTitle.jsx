@@ -8,14 +8,23 @@ import { Typography, Tooltip } from "@material-ui/core";
 const DatasetListTitle = ({record, classes}) => {
     const title = record.title
     const splitTitle = truncatePath(title)
-    if (title.length > splitTitle.length){
-        return (
+    let shortTitle
+
+    if (title.length > 40){
+        shortTitle = `...${title.slice(-40)}`
+    }
+
+    return (
         <Tooltip title={title}>
-            <Typography>{`${splitTitle}`}</Typography>
-        </Tooltip>)
-    }
-    else{
-        return <Typography>{`${title}`}</Typography>
-    }
+            {
+                title.length > splitTitle.length ? 
+                    <Typography>{`${splitTitle}`}</Typography>
+                :shortTitle ? 
+                    <Typography>{`${shortTitle}`}</Typography>
+                :
+                    <Typography>{`${title}`}</Typography>
+            }
+        </Tooltip>
+    )
 }
 export default DatasetListTitle
