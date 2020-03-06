@@ -285,6 +285,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
   const convertHTTPResponse = (response, type, resource, params) => {
     const { headers, json } = response;
+    let ret = null;
 
     switch (type) {
       case 'PASSWORD_RESET_EMAIL':
@@ -298,7 +299,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         json.results = translateResource(resource, json.results);
 
-        let ret = {
+        ret = {
           data: json.results,
           total: json.count,
           next: json.next,
@@ -321,7 +322,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         ret.data.map(item => (item.key = item.id));
 
         console.log("ret in get_list is: ", ret)
-
         return ret;
 
       case GET_ONE:
@@ -347,18 +347,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           many = translateResource(resource, json);
         }
 
-        let rets;
-
-        rets = {
+        ret = {
           data: many.filter(item =>
             params.ids.find(element => element === item.id)
           ),
         };
 
         //map our IDs and Keys
-        rets.data.map(item => (item.key = item.id));
-
-        return rets;
+        ret.data.map(item => (item.key = item.id));
+        return ret;
 
       case GET_MANY_REFERENCE:
 
