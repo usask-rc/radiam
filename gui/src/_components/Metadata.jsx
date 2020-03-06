@@ -127,7 +127,7 @@ const showStyles = {
   index: {
     width: '3em',
     marginRight: "1em",
-    fontSize: "1rem",
+    fontSize: "1.75em",
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif;',
     lineHeight: "1",
   },
@@ -1675,7 +1675,7 @@ class BaseShowMetadata extends MetadataComponent {
             }
             fields.push(
               <div className={classes.subfield}>
-                <div className={classes.index}>{index + 1}</div>
+                <div className={classes.index}>•</div>
                 <div>
                   { type ==="boolean" ?
                         <div>

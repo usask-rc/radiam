@@ -52,6 +52,7 @@ const styles = theme =>
             },
         },
         index: {
+            fontSize: '1.75em',
             width: '3em',
             paddingTop: '1em',
             [theme.breakpoints.down('sm')]: { display: 'none' },
@@ -144,7 +145,7 @@ export class IndexedSimpleFormIterator extends Component {
                                     variant="body1"
                                     className={classes.index}
                                 >
-                                    {index + 1}
+                                •
                                 </Typography>
                                 <section className={classes.form}>
                                     {Children.map(children, (input, index2) =>
