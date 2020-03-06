@@ -675,7 +675,6 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     filter_backends = (
         filters.SearchFilter,
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthResearchGroupFilter,
         ResearchGroupOrderingFilter,
     )
@@ -699,6 +698,11 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
             return response
         else:
             return super().partial_update(request, pk, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 
 class GroupRoleViewSet(RadiamViewSet):
@@ -731,7 +735,6 @@ class GroupMemberViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthGroupMemberFilter,
         GroupMemberOrderingFilter,
     )
@@ -739,6 +742,11 @@ class GroupMemberViewSet(RadiamViewSet):
     filter_fields=('group', 'group_role', 'user', 'date_expires')
     ordering_fields=('group', 'group_role', 'user', 'date_expires', 'date_created', 'date_updated')
     permission_classes = (IsAuthenticated, DRYPermissions,)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 
 class DatasetOrderingFilter(RadiamOrderingFilter):
@@ -1000,7 +1008,6 @@ class LocationViewSet(RadiamViewSet):
     filter_backends = (
         filters.SearchFilter,
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthLocationFilter,
         LocationOrderingFilter,
     )
@@ -1031,6 +1038,11 @@ class LocationViewSet(RadiamViewSet):
             return super().filter_queryset(queryset).filter(location_id_qs)
         else:
             return super().filter_queryset(queryset)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 class LocationTypeViewSet(RadiamViewSet):
     """
