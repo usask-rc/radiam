@@ -213,7 +213,7 @@ class LocationForm extends Component {
 
   render() {
     const { staticContext, id, classes, record, mode, ...rest } = this.props;
-    const { isFormDirty, geo, showMap, mapFormKey } = this.state;
+    const { geo, showMap } = this.state;
 
     //TODO: there is a discrepancy between how we separate `record` from rest and props and how it `should` be done
     //this is likely the cause of the loading error - investigate tomorrow
@@ -271,6 +271,7 @@ class LocationForm extends Component {
               const temp = []
               projList.map(item => {
                 temp.push(item.id)
+                return item
               })
               projList = temp
             }

@@ -7,7 +7,7 @@ import {
   AUTH_GET_PERMISSIONS
 } from "react-admin";
 import { getAPIEndpoint, getCurrentUserDetails } from "./funcs";
-import {MODELS, MODEL_FIELDS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS, METHODS, WEBTOKEN} from "../_constants/index"
+import {MODELS, ROLE_USER, ROLE_DATA_MANAGER, ROLE_GROUP_ADMIN, ROLE_ANONYMOUS, LOGIN_DETAILS, METHODS, WEBTOKEN} from "../_constants/index"
 import { toast } from "react-toastify";
 
 function validateToken(checkToken) {

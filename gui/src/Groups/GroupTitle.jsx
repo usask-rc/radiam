@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+//GroupTitle.jsx
+import React from 'react'
 import { withStyles } from '@material-ui/styles';
 import { Typography } from '@material-ui/core';
 

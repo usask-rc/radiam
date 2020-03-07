@@ -1,5 +1,5 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, ROLES, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, ROLES, ROLE_ANONYMOUS, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
@@ -26,7 +26,7 @@ export function isAdminOfAParentGroup(group_id){
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
     if (user){
       if (user.is_admin){
-      resolve(true)
+        resolve(true)
       }
     }else{
       reject("No User Cookie")
@@ -44,7 +44,7 @@ export function isAdminOfAParentGroup(group_id){
 
     }).catch(err => {
       console.error("isadminofaparentgroup error: ",err)
-      reject("Invalid Key")
+      reject("Invalid Group ID Key")
     })
   })
 };
@@ -63,12 +63,10 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
     }
     return ROLE_USER
   }
-  //no cookie or group
   else if (!user && !group){
-    return "anonymous"
+    return ROLE_ANONYMOUS
   }
   else{
-    //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
   }
@@ -92,6 +90,7 @@ export function getRecentProjects(count=1000) {
       .then(projects => {
 
         const promises = []
+
         projects.map(project => {
           promises.push(getProjectData({id: project.id,
             sort: {
@@ -124,6 +123,7 @@ export function getRecentProjects(count=1000) {
           }
         })
         resolve({projects: projects, loading: false, hasFiles: hasFiles})
+        return data
       }).catch(err => {
         reject(err)
       })
@@ -594,7 +594,6 @@ export function submitObjectWithGeo(
   return new Promise((resolve, reject) => {
     console.log('formData heading into submitobjectwithgeo is: ', formData);
     if (formData.id) {
-      
       updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
     } else {
       createObjectWithGeo(formData, geo, props, inModal).then(data => resolve(data)).catch(err => reject(err));

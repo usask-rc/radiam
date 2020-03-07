@@ -34,13 +34,12 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
 import { GET_ONE } from 'ra-core';
-import { Toolbar, Typography, Button } from '@material-ui/core';
+import { Toolbar, Button } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
-import FilesTab from '../Projects/Files/FilesTab.jsx';
 import { DefaultToolbar } from '../_components/index.js';
 import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 import { Redirect } from 'react-router';
@@ -361,12 +360,11 @@ const validateSearchModel = (value) => {
   }
 
   try {
-    let result
     if (value.search){
-      result = JSON.stringify(value.search)
+      JSON.stringify(value.search)
     }
     else{
-      result = JSON.parse(value)
+      JSON.parse(value)
     }
     //TODO: check here for anything we don't want / invalid Elastic queries
   }
@@ -384,8 +382,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
   console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
-  const [data, setData] = useState({})
-  const [isDirty, setIsDirty] = useState(false)
   const [redirect, setRedirect] = useState(null)
   const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
   //TODO: refactor this
@@ -393,12 +389,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
    props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) :
     "{}")
 
-  function geoDataCallback(geo){
-    if (props.project || (props.record && props.record.geo !== geo)){
-      setGeo(geo)
-      setIsDirty(true)
-    }
-  } 
   function handleChange(e){
     if (e.target && e.target.name === "search_model"){
       console.log("handlechange setsearchmodel to value: ", e.target.value)
@@ -411,7 +401,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
 
     console.log("datasetform handleSubmit sent data: ", data)
-    setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
@@ -430,10 +419,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-
-    //TODO: there must be a better way to submit than this, even despite the isDirty flag.
-    setData(newData) //will prompt the call in useEffect.
-
     
     console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
@@ -463,23 +448,22 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   const { record } = props
 
   return(
-    <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
+    <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
     toolbar={<DefaultToolbar {...props} />}>
       <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
       <TextInput      
         label="Title"
-        defaultValue={props.location && props.location.title || ""}
+        defaultValue={props.location && props.location.title ? props.location.title : ""}
         source={MODEL_FIELDS.TITLE}
         validate={validateTitle}
         className={classes.titleField}
       />
       <TextInput
-        className="input-large"
+        className={classes.abstractField}
         label={"en.models.datasets.data_abstract"}
         options={{ multiline: true, rows: 8 }}
         source={MODEL_FIELDS.ABSTRACT}
         rows={5}
-        className={classes.abstractField}
       />
       <TextInput
         className={classes.otherField}
@@ -501,11 +485,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       </ReferenceInput>
 
       <TextInput
-        className={classes.searchModel}
+        className={classes.searchModelField}
         id={"search_model"}
         name={"search_model"}
         label={"Search Model"}
-        className={classes.searchModelField}
         multiline
         rows={5}
         validate={validateSearchModel}
