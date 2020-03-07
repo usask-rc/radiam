@@ -9,7 +9,7 @@ import {
 } from 'react-admin';
 import { MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
-import { getUsersInGroup, submitObjectWithGeo, toastErrors } from "../_tools/funcs";
+import { getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
 import { Typography, Button } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
@@ -30,11 +30,9 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const [groupContactList, setGroupContactList] = useState([])
     const [loading, setLoading] = useState(false)
     const [group, setGroup] = useState(props.record ? props.record.group : null)
-    const [error, setError] = useState(null)
     const [geo, setGeo] = useState(props.record ? props.record.geo : null)
     const [keywords, setKeywords] = useState(props.record && props.record.keywords ? props.record.keywords.split(",") : "")
     const [redirect, setRedirect] = useState(null)
-    const [pcu, setPcu] = useState(props.record ? props.record.primary_contact_user : null)
     const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
     
     const handleChipChange = (data) => {
@@ -107,7 +105,6 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
           }
         }).catch(err => {
           console.error("in getprimarycontactcandidates, err: ", err)
-          setError(err)
         })
       }
       //when we unmount, lock out the component from being able to use the state

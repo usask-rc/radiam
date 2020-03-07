@@ -59,7 +59,7 @@ export const ProjectAvatarsShow = withStyles(styles)(({ classes, ...props }) => 
         label={"en.models.project_avatars.width"} />
       <NumberField
         source="height"
-        label={"en.models.project_avatars.width"} />
+        label={"en.models.project_avatars.height"} />
     </SimpleShowLayout>
   </Show>
 ));

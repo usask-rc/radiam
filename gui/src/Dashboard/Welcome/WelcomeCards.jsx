@@ -9,13 +9,11 @@ import SecondSteps from './SecondSteps';
 
 const WelcomeCards = ({loading, hasFiles}) => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER));
-    let _isMounted = true
 
-///groupMemberships is given to us from the server on login.  Using this data, we can identify the groups that a user is in and query for all users in said groups
-//if there are no users and the role is sufficiently high (refer to constants file to see if it is), we tell the user to add users to the group
-//if the user has no groupmemberships we tell the user to associate them with some group, or to ask a superior to do so
-//this data exists in groupMemberships, and said data can be cross-referenced with groups which is also in storage.
-
+    ///groupMemberships is given to us from the server on login.  Using this data, we can identify the groups that a user is in and query for all users in said groups
+    //if there are no users and the role is sufficiently high (refer to constants file to see if it is), we tell the user to add users to the group
+    //if the user has no groupmemberships we tell the user to associate them with some group, or to ask a superior to do so
+    //this data exists in groupMemberships, and said data can be cross-referenced with groups which is also in storage.
     //Get Users in groups that this user is a group admin or data manager of.
 
     return(
