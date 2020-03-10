@@ -1666,7 +1666,7 @@ class BaseShowMetadata extends MetadataComponent {
         if (field.many_values)
         {
           var fields = [];
-          fields.push(<Typography className={classes.label}>{translate(field.label + ".label")}</Typography>);
+          fields.push(<Typography key={field.id + ".label"} className={classes.label}>{translate(field.label + ".label")}</Typography>);
 
           for (var index = 0; index < current.length; index++) {
             var fieldClass = classes.field;
@@ -1674,7 +1674,7 @@ class BaseShowMetadata extends MetadataComponent {
               fieldClass = classes.lastField;
             }
             fields.push(
-              <div className={classes.subfield}>
+              <div key={field.id + "-" + index + "-subfield"} className={classes.subfield}>
                 <div className={classes.index}>&nbsp;</div>
                 <div>
                   { type ==="boolean" ?
@@ -1787,7 +1787,7 @@ class BaseShowMetadata extends MetadataComponent {
               </div>
             </div>
             );
-            fields.push(<Divider className={classes.indexSpacer}/>);
+            fields.push(<Divider key={field.id + "-" + index + "index-spacer"} className={classes.indexSpacer}/>);
           }
 
           return (<div className={classes.container} key={"text-container-" + field.id}>
