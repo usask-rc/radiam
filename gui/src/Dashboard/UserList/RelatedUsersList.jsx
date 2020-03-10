@@ -288,6 +288,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                             basePath={MODELS.GROUPS}
                                             key={`${user.id}.${group}`}
                                             link={true}
+                                            linkType={"show"}
                                             source={"group"}
                                             reference={"researchgroups"}
                                             >
