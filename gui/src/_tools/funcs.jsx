@@ -106,6 +106,8 @@ export function getRecentProjects(count=1000) {
               const newProject = project
               newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
               newProject.nbFiles = data.nbFiles
+
+              //TODO: move down to the component level?
               const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), "days")
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`

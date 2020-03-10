@@ -1,10 +1,11 @@
 //RelatedUserList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography } from '@material-ui/core';
+import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip } from '@material-ui/core';
 import {PropTypes} from "prop-types";
 import {ChipField, ReferenceField} from "react-admin"
 import { MODELS } from "../../_constants/index"
+import moment, { now } from 'moment';
 
 const styles = {
     headlineTop: {
@@ -97,7 +98,7 @@ const styles = {
         {id: "username", numeric: false, disablePadding: false, canOrder: true, label: "Username"},
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
         {id: "email", numeric: false, disablePadding: false, canOrder: true, label: "Email"},
-        {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Since"},
+        {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Created"},
         {id: "groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
 
     ]
@@ -182,6 +183,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
     const [order, setOrder] = useState("asc")
     const [orderBy, setOrderBy] = useState("username")
     const [selected, setSelected] = useState([]);
+    const now = moment()
 
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
@@ -245,7 +247,8 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                             const user = userObj.user
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
-
+                            const daysAgo = now.diff(moment(userObj.date_created).toISOString(), "days")
+                            
                             console.log("userObj being mapped: ", userObj, groups)
                             return(
                                 <TableRow key={user.id}
@@ -272,9 +275,11 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                         </Typography>
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
-                                        <Typography>
-                                            {`${user.date_created}`}
-                                        </Typography>
+                                        <Tooltip title={`User Created on: ${userObj.date_created}`}>
+                                            <Typography>
+                                                {`${daysAgo} days ago`}
+                                            </Typography>
+                                        </Tooltip>
                                     </TableCell>
                                     <TableCell className={classes.groupCell}>
                                         {groups.map(group => {
