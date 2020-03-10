@@ -75,6 +75,56 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
 //this gets all projects that the user has worked on.
 //we want to get all (recent) files in a project and display them in an expandable listview.
 //TODO: handle potential setstate on unmounted component
+
+export const getUsersInMyGroups = (groups) => {
+  return new Promise((resolve, reject) => {
+      if (!groups){
+          resolve([])
+      }
+      const promises = []
+      groups.map(group => {
+
+          console.log("group being checked for users is: ", group)
+
+          let params = {
+              is_active: true,
+              id: group,
+          }
+
+          promises.push(
+              getGroupMembers(params)
+              .then(data => {
+                  console.log("getusersingroup : ", group, "is: ", data)
+                  return data
+              })
+              .catch(err => reject(err))
+          )
+      })
+
+      //TODO: this is wrong - in promise hell here, we need to attach the Group to the User if we want to list the list of groups they are in
+      //given multiple lists of users due to one list per promise
+      Promise.all(promises).then(userLists => {
+          const usersInMyGroups = {}
+
+          userLists.map(userList => {
+              userList.map(record => {
+                  //need a filtering mechanism to remove duplicate users
+                  if (usersInMyGroups.hasOwnProperty(record.user.id))
+                  {
+                    usersInMyGroups[record.user.id].group.push(record.group)
+                  }
+                  else{
+                    usersInMyGroups[record.user.id] = record
+                    usersInMyGroups[record.user.id].group = [record.group]
+                  }
+              })
+          })
+          resolve(usersInMyGroups)
+      })
+      .catch(err => reject(err))
+      })
+  }
+
 export function getRecentProjects(count=1000) {
 
   return new Promise((resolve, reject) => {
