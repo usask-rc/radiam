@@ -95,7 +95,7 @@ const styles = {
 
     const headCells = [
         {id: "username", numeric: false, disablePadding: false, canOrder: true, label: "Username"},
-        {id: "last_name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
+        {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
         {id: "email", numeric: false, disablePadding: false, canOrder: true, label: "Email"},
         {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Since"},
         {id: "groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
@@ -109,14 +109,12 @@ const styles = {
             return 0
         }
 
-
-
         let p1 = a.user[orderBy]
         let p2 = b.user[orderBy]
 
-        console.log("in desc, comparison is: ", orderBy, a.user[orderBy], b.user[orderBy], "a, b: ", a, b)
-
-        if (orderBy === "last_name"){
+        if (orderBy === "name"){
+            p1 = `${a.user["last_name"]}${a.user["first_name"]}`.toLowerCase()
+            p2 = `${b.user["last_name"]}${b.user["first_name"]}`.toLowerCase()
             p1 = p1.toLowerCase()
             p2 = p2.toLowerCase()
         }
@@ -182,7 +180,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
     const [order, setOrder] = useState("asc")
-    const [orderBy, setOrderBy] = useState("date_created")
+    const [orderBy, setOrderBy] = useState("username")
     const [selected, setSelected] = useState([]);
 
     function stableSort(array, cmp) {
