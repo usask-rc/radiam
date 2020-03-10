@@ -1,4 +1,4 @@
-//radiamrestprovider.jsx
+//radiamrestprovider.js
 import {PATHS, METHODS, MODELS} from '../_constants/index';
 import { stringify } from 'query-string';
 import {
@@ -129,6 +129,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               page: page,
               perPage: perPage,
             };
+
             url = url + `?${stringify(query)}`;
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.

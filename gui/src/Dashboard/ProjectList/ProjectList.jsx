@@ -223,9 +223,9 @@ const ProjectList = ({classes, projects}) => {
             selected.slice(0, selectedIndex),
             selected.slice(selectedIndex + 1),
             );
-    }
+        }
 
-    setSelected(newSelected);
+        setSelected(newSelected);
     };
 
     //https://material-ui.com/components/tables/
@@ -286,9 +286,9 @@ const ProjectList = ({classes, projects}) => {
                                 </ReferenceField>
                             </TableCell>
                             <TableCell className={classes.nameCell}>
-                            <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
-                                {project.name}
-                            </Link>
+                                <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
+                                    {project.name}
+                                </Link>
                             </TableCell>
                             <TableCell className={classes.keywordCell}>
                                 <ProjectKeywords classes={classes} project={project} />
