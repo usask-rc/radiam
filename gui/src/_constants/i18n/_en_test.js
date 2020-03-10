@@ -7,7 +7,7 @@ export default {
     Type1: 'Temporary Type 1', //these two `type` values exist in a default db load
     Type2: 'Temporary Type 2',
     metadata: {
-      configure: 'Metadata',
+      configure: 'Add / Remove Fields',
       config: {
         title: 'Configure Additional Metadata',
       },
@@ -397,7 +397,7 @@ export default {
         data_collection_method: 'Data Collection Methods',
         data_collection_status: 'Data Collection Status',
         distribution_restriction: 'Distribution Restrictions',
-        project: 'Projects',
+        project: 'Project',
         sensitivity_level: 'Sensitivity Levels of Data',
         study_site: 'Study Site',
         title: 'Dataset Title',
@@ -507,7 +507,7 @@ export default {
         member: {
           label: 'Member',
           description:
-            'Regular users may create and view file level metadata in thier own groups.',
+            'Regular users may create and view file level metadata in their own groups.',
         },
       },
     },

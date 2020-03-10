@@ -106,6 +106,8 @@ export function getRecentProjects(count=1000) {
               const newProject = project
               newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
               newProject.nbFiles = data.nbFiles
+
+              //TODO: move down to the component level?
               const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), "days")
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
@@ -277,11 +279,6 @@ export function getRelatedDatasets(projectID) {
       })
       .catch(err => reject(err));
   });
-}
-
-//given json, format into something elasticsearch wants
-export function makeElasticQuery(query){
-
 }
 
 //gets the root folder paths for a given project
@@ -456,6 +453,7 @@ export function getUsersInGroup(record) {
         groupMembers.map(groupMember => {
           promises.push(getUserDetails(groupMember.user).then(user => {
             groupMember.user = user
+            user.group = [record]
             groupUsers.push(user)
             return groupMember
           }))

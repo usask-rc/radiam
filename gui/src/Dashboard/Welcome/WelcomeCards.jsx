@@ -7,7 +7,7 @@ import {ROLE_USER} from "../../_constants/index"
 import SecondSteps from './SecondSteps';
 
 
-const WelcomeCards = ({loading, hasFiles}) => {
+const WelcomeCards = ({ hasFiles}) => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER));
 
     ///groupMemberships is given to us from the server on login.  Using this data, we can identify the groups that a user is in and query for all users in said groups
@@ -29,7 +29,7 @@ const WelcomeCards = ({loading, hasFiles}) => {
             </Grid>
             
             {/*This should be conditional based on whether or not the user has access to a project with files*/}
-            {!loading && !hasFiles && (user.is_admin || user.is_group_admin) && 
+            { hasFiles === false && (user.is_admin || user.is_group_admin) && 
                 <Grid item xs={4}>
                     <AgentInstall />
                 </Grid>

@@ -1,4 +1,4 @@
-//radiamrestprovider.jsx
+//radiamrestprovider.js
 import {PATHS, METHODS, MODELS} from '../_constants/index';
 import { stringify } from 'query-string';
 import {
