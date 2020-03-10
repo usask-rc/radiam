@@ -507,7 +507,7 @@ export default {
         member: {
           label: 'Member',
           description:
-            'Regular users may create and view file level metadata in thier own groups.',
+            'Regular users may create and view file level metadata in their own groups.',
         },
       },
     },

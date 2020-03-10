@@ -102,9 +102,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         if (params)
         {
           let query = {};
-          if (params.hasOwnProperty("query")) {
-            query = params["query"];
-          }
           if (
             params.filter &&
             params.sort && //new - adding this might have broken things.
@@ -120,7 +117,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               order = ""
             }
 
-            query.push = {
+            query = {
               ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
               ordering: `${order}${field}`,
 
@@ -129,7 +126,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               page: page,
               perPage: perPage,
             };
-
+            if (params.hasOwnProperty("query")) {
+                Object.keys(params["query"]).map(function(key) {
+                    query[key] = params["query"][key];
+                });
+            }
             url = url + `?${stringify(query)}`;
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
