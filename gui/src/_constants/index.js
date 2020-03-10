@@ -125,6 +125,7 @@ module.exports = Object.freeze({
     DATA_COLLECTION_METHOD: "data_collection_method",
     DATASET: "dataset",
     DISTRIBUTION_RESTRICTION: "distribution_restriction",
+    FILE: "file",
     GROUP_ROLE: "group_role",
     GROUP: "group",
     LOCATION: "location",
