@@ -14,7 +14,6 @@ import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_co
 import CustomPagination from '../_components/CustomPagination';
 import ProjectName from "../_components/_fields/ProjectName";
 import { withStyles } from '@material-ui/core/styles';
-import Search from '@material-ui/icons/Search';
 import DatasetListTitle from './DatasetListTitle';
 
 const listStyles = {

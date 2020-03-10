@@ -233,7 +233,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
-  const [perPage, setPerPage] = useState(5)
+  const [perPage, setPerPage] = useState(50)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState(
     props &&

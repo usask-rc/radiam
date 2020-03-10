@@ -49,7 +49,7 @@ function FilesTab({ projectID, classes, translate, dataType="projects", ...props
   const [status, setStatus] = useState({ loading: true });
   const [data, setData] = useState({ files: [] });
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
+  const [perPage, setPerPage] = useState(50);
   const [order, setOrder] = useState(''); //in case we ever want to be able to toggle asc/desc sorted values
   const [search, setSearch] = useState(
     (props &&
