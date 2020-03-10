@@ -7,7 +7,7 @@ import {
   SimpleForm,
   TextInput,
 } from 'react-admin';
-import { MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
+import { MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
 import { getUsersInGroup, submitObjectWithGeo, toastErrors } from "../_tools/funcs";
 import { Typography, Button } from "@material-ui/core";
@@ -185,10 +185,10 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
             validate={validatePrimaryContactUser} //this input has troubles showing an error message when invalid
             defaultValue={record ? record.primary_contact_user : null}
           />
-        { record && record.id && (
+        { record && (
           <>
-            <EditMetadata id={record.id} values={props.record ? props.record.metadata : null} type="project"/>
-            <ConfigMetadata id={record.id} type="project" />
+            <EditMetadata record={record} type={MODEL_FK_FIELDS.PROJECT}/>
+            <ConfigMetadata record={record} type={MODEL_FK_FIELDS.PROJECT}/>
           </>
         )}
         <FormDataConsumer>

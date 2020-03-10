@@ -7,7 +7,7 @@ export default {
     Type1: 'Temporary Type 1', //these two `type` values exist in a default db load
     Type2: 'Temporary Type 2',
     metadata: {
-      configure: 'Metadata',
+      configure: 'Add / Remove Fields',
       config: {
         title: 'Configure Additional Metadata',
       },
