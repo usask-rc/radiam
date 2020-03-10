@@ -95,20 +95,28 @@ const styles = {
 
     const headCells = [
         {id: "username", numeric: false, disablePadding: false, canOrder: true, label: "Username"},
-        {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
+        {id: "last_name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
         {id: "email", numeric: false, disablePadding: false, canOrder: true, label: "Email"},
         {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Since"},
-        {id: "Groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
+        {id: "groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
 
     ]
 
     function desc(a, b, orderBy) {
 
-        console.log("in desc, comparison is: ", a[orderBy], b[orderBy], "a, b: ", a, b)
+        //TODO: handle separately - 'group' sits outside of the user object
+        if (orderBy === "group"){
+            return 0
+        }
 
-        let p1 = a[orderBy]
-        let p2 = b[orderBy]
-        if (orderBy === "name" || orderBy === "keywords"){
+
+
+        let p1 = a.user[orderBy]
+        let p2 = b.user[orderBy]
+
+        console.log("in desc, comparison is: ", orderBy, a.user[orderBy], b.user[orderBy], "a, b: ", a, b)
+
+        if (orderBy === "last_name"){
             p1 = p1.toLowerCase()
             p2 = p2.toLowerCase()
         }
@@ -177,7 +185,6 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
     const [orderBy, setOrderBy] = useState("date_created")
     const [selected, setSelected] = useState([]);
 
-    console.log("RUL: ", relatedUsers)
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
