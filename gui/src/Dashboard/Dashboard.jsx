@@ -7,8 +7,6 @@ import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
 import WarningCards from './Welcome/WarningCards';
 import {ROLES, MODELS} from "../_constants/index"
-import { Typography } from '@material-ui/core';
-import GroupUsers from './Welcome/GroupUsers';
 import UserCards from './UserCards';
 
 

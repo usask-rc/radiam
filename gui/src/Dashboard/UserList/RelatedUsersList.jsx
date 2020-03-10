@@ -3,12 +3,21 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography } from '@material-ui/core';
 import {PropTypes} from "prop-types";
+import {ChipField, ReferenceField} from "react-admin"
+import { MODELS } from "../../_constants/index"
 
 const styles = {
     headlineTop: {
         backgroundColor: '#688db2',
         color: 'white',
         marginTop: '-16px !important;',
+    },
+    groupCell: {
+
+    },
+    chipField: {
+        marginRight: "1em",
+        cursor: "pointer",
     },
     headerDiv: {
     float:   'left',
@@ -86,10 +95,10 @@ const styles = {
 
     const headCells = [
         {id: "username", numeric: false, disablePadding: false, canOrder: true, label: "Username"},
-        {id: "name", numeric: false, disablePadding: true, canOrder: true, label: "Name"},
-        {id: "email", numeric: false, disablePadding: true, canOrder: true, label: "Email"},
+        {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
+        {id: "email", numeric: false, disablePadding: false, canOrder: true, label: "Email"},
         {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Since"},
-        {id: "Groups", numeric: false, disablePadding: true, canOrder: true, label: "User Groups" },
+        {id: "Groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
 
     ]
 
@@ -232,39 +241,52 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
 
-                            console.log("userObj being mapped: ", userObj)
+                            console.log("userObj being mapped: ", userObj, groups)
                             return(
                                 <TableRow key={user.id}
-                            className={classes.projectRow}
-                            hover
-                            onClick={event => handleClick(event, user.username)}
-                            tabIndex={-1}
-                            key={user.username}
-                            selected={isItemSelected}
-                            >
-                                <TableCell className={classes.nameCell}>
-                                    <Link className={classes.projectName} href={`/#/users/${user.id}/show`}>
-                                        {user.username}
-                                    </Link>
-                                </TableCell>
-                                <TableCell className={classes.nameCell}>
-                                    <Typography>
-                                        {`${user.last_name}, ${user.first_name}`}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell className={classes.nameCell}>
-                                    <Typography>
-                                        {`${user.email}`}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell className={classes.nameCell}>
-                                    <Typography>
-                                        {`${user.date_created}`}
-                                    </Typography>
-                                </TableCell>
-                            </TableRow>
-                        )
-
+                                className={classes.projectRow}
+                                hover
+                                onClick={event => handleClick(event, user.username)}
+                                tabIndex={-1}
+                                key={user.username}
+                                selected={isItemSelected}
+                                >
+                                    <TableCell className={classes.nameCell}>
+                                        <Link className={classes.projectName} href={`/#/users/${user.id}/show`}>
+                                            {user.username}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell className={classes.nameCell}>
+                                        <Typography>
+                                            {`${user.last_name}, ${user.first_name}`}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell className={classes.nameCell}>
+                                        <Typography>
+                                            {`${user.email}`}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell className={classes.nameCell}>
+                                        <Typography>
+                                            {`${user.date_created}`}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell className={classes.groupCell}>
+                                        {groups.map(group => {
+                                            return <ReferenceField 
+                                            record={{group: group}}
+                                            basePath={MODELS.GROUPS}
+                                            key={`${user.id}.${group}`}
+                                            link={true}
+                                            source={"group"}
+                                            reference={"researchgroups"}
+                                            >
+                                                <ChipField source={"name"} className={classes.chipField} />
+                                            </ReferenceField>
+                                        })}
+                                    </TableCell>
+                                </TableRow>
+                            )
                         }
                         )
                     }
