@@ -103,13 +103,14 @@ export const getUsersInMyGroups = (groups) => {
         return groupList
       })
       .then(groupRecords => {
-        
         Promise.all(promises).then(userLists => {
             const usersInMyGroups = {}
             userLists.map(userList => {
                 userList.map(record => {
+                  console.log("userList.record: ", record)
                     record.group.since = record.date_created
                     record.group.expires = record.date_expires
+                    record.group.group_role = record.group_role //a role is associated with the user-group relationship
 
                     //a filtering mechanism to remove duplicate users and listify them
                     if (usersInMyGroups.hasOwnProperty(record.user.id))

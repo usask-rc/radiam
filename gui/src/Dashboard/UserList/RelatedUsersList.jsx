@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip } from '@material-ui/core';
 import {PropTypes} from "prop-types";
-import {ChipField, ReferenceField} from "react-admin"
-import { MODELS } from "../../_constants/index"
-import moment, { now } from 'moment';
+import { translate } from "react-admin"
+import moment from 'moment';
+import { compose } from 'recompose';
 
 const styles = {
     headlineTop: {
@@ -179,7 +179,7 @@ EnhancedTableHead.propTypes = {
     rowCount: PropTypes.number.isRequired,
 };
 
-const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
+const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
     const [order, setOrder] = useState("asc")
@@ -279,12 +279,12 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                     </TableCell>
                                     <TableCell className={classes.groupCell}>
                                         {groups.map(group => {
-
+                                            const role = group.group_role
                                             const memberSince = moment(group.since).format("YYYY-MM-DD")
                                             const memberUntil = group.expires ? moment(group.expires).format("YYYY-MM-DD") : ""
 
                                             return(
-                                                <Tooltip title={`Member Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
+                                                <Tooltip title={`${translate(`en.${role.label}`)} Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
                                                     <Link href={`/#/researchgroups/${group.id}/show`}>
                                                         <Chip 
                                                         label= {group.name}
@@ -307,4 +307,9 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
     )
 }
 
-export default withStyles(styles)(RelatedUsersList)
+const enhance = compose(
+    translate,
+    withStyles(styles)
+)
+
+export default enhance(RelatedUsersList)
