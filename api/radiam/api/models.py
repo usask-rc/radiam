@@ -1245,3 +1245,16 @@ class SelectedField(models.Model, MetadataSchemaPermissionMixin):
 
     class Meta:
         db_table = "rdm_selected_fields"
+
+class ExportRequest(models.Model, DatasetPermissionMixin):
+    """
+    Export Requests for metadata
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    status = models.CharField(max_length=100, blank=False, null=False, help_text="The status of this export request")
+    export_reference = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=True, blank=True, null=True,
+                            help_text="The reference to the exported contents")
+
+    class Meta:
+        db_table = "rdm_export_requests"
