@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRecentProjects, getGroupMembers, getUsersInMyGroups } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
-import ProjectCards from "./ProjectCards/ProjectCards"
+import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
 import WarningCards from './Welcome/WarningCards';
@@ -49,7 +49,7 @@ const Dashboard = ({classes, permissions, ...rest}) => {
                 <WarningCards />
                 {recentProjects &&
                   <>
-                    <ProjectCards projects={recentProjects} />
+                    <ProjectsCard projects={recentProjects} />
                   </>
                 }
                 {relatedUsers && 

@@ -82,47 +82,51 @@ export const getUsersInMyGroups = (groups) => {
           resolve([])
       }
       const promises = []
+      const groupPromises = []
+
+
+      //1. get group data
       groups.map(group => {
-
-          console.log("group being checked for users is: ", group)
-
-          let params = {
-              is_active: true,
-              id: group,
-          }
-
-          promises.push(
-              getGroupMembers(params)
-              .then(data => {
-                  console.log("getusersingroup : ", group, "is: ", data)
-                  return data
-              })
-              .catch(err => reject(err))
-          )
+        groupPromises.push(getGroupData(group).then(groupData => {
+          return groupData
+        }))
       })
+      //2. with group data, get lists of users associated with each group
+      Promise.all(groupPromises).then(groupList => {
 
-      //TODO: this is wrong - in promise hell here, we need to attach the Group to the User if we want to list the list of groups they are in
-      //given multiple lists of users due to one list per promise
-      Promise.all(promises).then(userLists => {
-          const usersInMyGroups = {}
+          groupList.map(group => {
+            return promises.push(getGroupMembers(group).then(groupData => {
+              console.log("groupData in promises push is: ", groupData)
+              return groupData
+          }))
+        })
+        return groupList
+      })
+      .then(groupRecords => {
+        
+        Promise.all(promises).then(userLists => {
+            const usersInMyGroups = {}
+            userLists.map(userList => {
+                userList.map(record => {
+                    record.group.since = record.date_created
+                    record.group.expires = record.date_expires
 
-          userLists.map(userList => {
-              userList.map(record => {
-                  //need a filtering mechanism to remove duplicate users
-                  if (usersInMyGroups.hasOwnProperty(record.user.id))
-                  {
-                    usersInMyGroups[record.user.id].group.push(record.group)
-                  }
-                  else{
-                    usersInMyGroups[record.user.id] = record
-                    usersInMyGroups[record.user.id].group = [record.group]
-                  }
-              })
-          })
-          resolve(usersInMyGroups)
-      })
-      .catch(err => reject(err))
-      })
+                    //a filtering mechanism to remove duplicate users and listify them
+                    if (usersInMyGroups.hasOwnProperty(record.user.id))
+                    {
+                      usersInMyGroups[record.user.id].group.push(record.group)
+                    }
+                    else{
+                      usersInMyGroups[record.user.id] = record
+                      usersInMyGroups[record.user.id].group = [record.group]
+                    }
+                })
+            })
+            resolve(usersInMyGroups)
+        })
+        .catch(err => reject(err))
+        })
+    })
   }
 
 export function getRecentProjects(count=1000) {
@@ -546,6 +550,7 @@ export function getGroupMembers(record) {
               promises.push(getUserDetails(groupMember.user).then(user => {
                 groupMember.user = user
                 groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+                groupMember.group = record
                 return user
               }))
             });
