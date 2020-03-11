@@ -1,11 +1,12 @@
 //RelatedUserList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip } from '@material-ui/core';
+import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip, TablePagination } from '@material-ui/core';
 import {PropTypes} from "prop-types";
 import { translate } from "react-admin"
 import moment from 'moment';
 import { compose } from 'recompose';
+import EnhancedTableHead from '../EnhancedTableHead';
 
 const styles = {
     headlineTop: {
@@ -18,6 +19,9 @@ const styles = {
     },
     chipLink: {
         cursor: "pointer"
+    },
+    titleRowCell: {
+        fontWeight: "bold"
     },
     chipField: {
         marginRight: "1em",
@@ -130,54 +134,6 @@ const styles = {
         }
         return 0;
     }
-function EnhancedTableHead(props) {
-    const { classes, order, orderBy, onRequestSort } = props;
-    const createSortHandler = property => event => {
-        onRequestSort(event, property);
-    };
-
-    return (
-        <TableHead>
-            <TableRow>
-                {headCells.map(headCell => (
-                <TableCell
-                    key={headCell.id}
-                    align={headCell.numeric ? 'right' : 'left'}
-                    padding={headCell.disablePadding ? 'none' : 'default'}
-                    sortDirection={orderBy === headCell.id ? order : false}
-                >
-                    {headCell.canOrder ? 
-                    <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={order}
-                        onClick={createSortHandler(headCell.id)}
-                        
-                    >
-                    {headCell.label}
-                    {orderBy === headCell.id ? (
-                        <span className={classes.visuallyHidden}>
-                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                        </span>
-                    ) : null}
-                    </TableSortLabel>
-                    :
-                    headCell.label
-                    }
-                </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
-}
-
-EnhancedTableHead.propTypes = {
-    classes: PropTypes.object.isRequired,
-    numSelected: PropTypes.number.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
-};
 
 const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
     const [tableRows, setTableRows] = useState(5);
@@ -227,6 +183,16 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
         setOrder(isDesc ? 'asc' : 'desc');
         setOrderBy(property);
     };  
+
+    //https://material-ui.com/components/tables/
+    const handleChangePage = (event, newPage) => {
+        setTablePage(newPage);
+    };
+    
+    const handleChangeRowsPerPage = event => {
+    setTableRows(parseInt(event.target.value, 10));
+    setTablePage(0);
+    };
     
     const isSelected = name => selected.indexOf(name) !== -1;
 
@@ -240,6 +206,7 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                     orderBy={orderBy}
                     onRequestSort={handleRequestSort}
                     rowCount={relatedUsers.length}
+                    headCells={headCells}
                     />
                 <TableBody>
                     {
@@ -302,6 +269,15 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                         )
                     }
                 </TableBody>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={relatedUsers.length}
+                    rowsPerPage={tableRows}
+                    page={tablePage}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                />
             </Table>
         </Card>
     )
