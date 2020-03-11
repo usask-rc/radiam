@@ -27,26 +27,38 @@ import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
 import PropTypes from 'prop-types';
-import { submitObjectWithGeo, isAdminOfAParentGroup, postObjectWithoutSaveProp } from '../_tools/funcs';
+import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
-import { GET_ONE, FormDataConsumer } from 'ra-core';
-import { Toolbar } from '@material-ui/core';
+import { GET_ONE } from 'ra-core';
+import { Toolbar, Button } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
 import DatasetTitle from './DatasetTitle.jsx';
 import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
-import FilesTab from '../Projects/Files/FilesTab.jsx';
-import { Field } from 'react-final-form';
 import { DefaultToolbar } from '../_components/index.js';
+import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
+import { Redirect } from 'react-router';
 
 const styles = {
   actions: {
     backgroundColor: 'inherit',
+  },
+  abstractField: {
+    width: "50em",
+  },
+  titleField: {
+    width: "50em",
+  },
+  otherField: {
+    width: "20em",
+  },
+  searchModelField: {
+    width: "30em",
   },
   header: {
     backgroundColor: 'inherit',
@@ -66,7 +78,14 @@ const styles = {
   fontSize: '2em',
   },
   searchModel: {
-  }
+  },
+  mapFormHeader: {
+    marginTop: "1em",
+    paddingBottom: "1em",
+  },
+  preMapArea: {
+    marginBottom: "1em",
+  },
 };
 
 const actionStyles = theme => ({
@@ -115,6 +134,109 @@ const actionStyles = theme => ({
 })
 
 
+//a form used for displaying a dataset in a modal (a simplified view with no tabs))
+export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) => (
+  <Show {...props}>
+    <SimpleShowLayout>
+    <DatasetTitle prefix="Viewing" />
+        <TextField
+          label={"en.models.datasets.title"}
+          source={MODEL_FIELDS.TITLE}
+        />
+
+        <ReferenceField
+          link={false}
+          label={"en.models.datasets.project"}
+          source={MODEL_FK_FIELDS.PROJECT}
+          reference={MODELS.PROJECTS}
+        >
+          <ProjectName label={"en.models.projects.name"}
+          />
+        </ReferenceField>
+
+        <TextField
+          label={"en.models.datasets.data_abstract"}
+          source={MODEL_FIELDS.ABSTRACT}
+          options={{ multiline: true}}
+        />
+
+        <TextField
+          label={"en.models.datasets.study_site"}
+          source={MODEL_FIELDS.STUDY_SITE}
+        />
+
+        <TextField
+          label={"en.models.datasets.search_model"}
+          source={"search_model.search"}
+        />
+
+        <ReferenceField
+          label={"en.models.datasets.data_collection_status"}
+          source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+          reference={MODELS.DATA_COLLECTION_STATUS}
+          link={false}
+        >
+          <TranslationField
+            label={"en.models.roles.label"}
+            source={MODEL_FIELDS.LABEL}
+          />
+        </ReferenceField>
+
+        <ReferenceArrayField
+          link={false}
+          label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
+          <SingleFieldList linkType={false}>
+            <TranslationChipField link={false} source={MODEL_FIELDS.LABEL}/>
+          </SingleFieldList>
+        </ReferenceArrayField>
+
+        <ReferenceField
+          label={"en.models.datasets.distribution_restriction"}
+          source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+          reference={MODELS.DISTRIBUTION_RESTRICTION}
+          link={false}
+        >
+          <TranslationField
+            label={"en.models.roles.label"}
+            source={MODEL_FIELDS.LABEL}
+          />
+        </ReferenceField>
+
+        <ReferenceArrayField 
+          label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
+          <SingleFieldList linkType={false}>
+            <TranslationChipField link={false} source={MODEL_FIELDS.LABEL} />
+          </SingleFieldList>
+        </ReferenceArrayField>
+
+        {/** Needs a ShowController to get the record into the ShowMetadata **/}
+        <ShowController translate={translate} {...props}>
+          { controllerProps => (
+            <ShowMetadata
+              type="dataset"
+              translate={translate}
+              record={controllerProps.record}
+              basePath={controllerProps.basePath}
+              resource={controllerProps.resource}
+              id={controllerProps.record.id}
+              props={props}
+            />
+          )}
+        </ShowController>
+        <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+        </ShowController>
+    </SimpleShowLayout>
+  </Show>
+))
+
+
 export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
   <Show actions={<DatasetShowActions/>} {...props}>
     <TabbedShowLayout>
@@ -136,7 +258,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
 
         <TextField
           label={"en.models.datasets.data_abstract"}
-          source={MODEL_FIELDS.DATA_ABSTRACT}
+          source={MODEL_FIELDS.ABSTRACT}
         />
 
         <TextField
@@ -144,7 +266,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
           source={MODEL_FIELDS.STUDY_SITE}
         />
 
-        <TextField multiline
+        <TextField
           label={"en.models.datasets.search_model"}
           source={"search_model.search"}
         />
@@ -162,7 +284,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.data_collection_method"} reference={MODELS.DATA_COLLECTION_METHOD} source={MODEL_FIELDS.DATA_COLLECTION_METHOD}>
-          <SingleFieldList link={"show"}>
+          <SingleFieldList linkType={false}>
             <TranslationChipField source={MODEL_FIELDS.LABEL}/>
           </SingleFieldList>
         </ReferenceArrayField>
@@ -180,7 +302,7 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
         </ReferenceField>
 
         <ReferenceArrayField label={"en.models.datasets.sensitivity_level"} reference={MODELS.SENSITIVITY_LEVEL} source={MODEL_FIELDS.SENSITIVITY_LEVEL}>
-          <SingleFieldList link={"show"}>
+          <SingleFieldList linkType={false}>
             <TranslationChipField source={MODEL_FIELDS.LABEL} />
           </SingleFieldList>
         </ReferenceArrayField>
@@ -199,15 +321,18 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
             />
           )}
         </ShowController>
-        <MapView/>
+        <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+        </ShowController>
       </Tab>
       <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
-        <FilesTab projectID={props.id} dataType="datasets" />
-      </Tab>
-      <Tab label={'Browse'}>
-        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`}
-        //TODO: get the project name from the referenced project and insert it here into projectName
-         />
+        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`} />
       </Tab>
     </TabbedShowLayout>
   </Show>
@@ -221,13 +346,13 @@ const validatedcs = required("A Data Collection Status is required")
 const validatedr = required("A Distribution Restriction must be specified")
 const validatesl = required("A Sensitivity Level must be specified")
 
-/*
-const validateUsername = [required('en.validate.user.username'), minLength(3), maxLength(12), regex(/^[a-zA-Z0-9]*$/, "Only Letters and Numbers are permitted")];
-
-*/
-
 const validateSearchModel = (value) => {
-  console.log("validateSearchModel value: ", value)
+
+  //return true if searchModel is not yet loaded - this is to get around the fact that the parse arrives after initial validation
+  //after initial load, this value should be either valid or invalid JSON, but never undef again
+  if (value === undefined){
+    return
+  }
   
   if (!value){
     //we've been sent no value
@@ -235,12 +360,11 @@ const validateSearchModel = (value) => {
   }
 
   try {
-    let result
     if (value.search){
-      result = JSON.stringify(value.search)
+      JSON.stringify(value.search)
     }
     else{
-      result = JSON.parse(value)
+      JSON.parse(value)
     }
     //TODO: check here for anything we don't want / invalid Elastic queries
   }
@@ -248,7 +372,6 @@ const validateSearchModel = (value) => {
     console.log("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
-
 }
 
 const CustomLabel = ({classes, translate, labelText} ) => {
@@ -259,17 +382,13 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
   console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
-  const [data, setData] = useState({})
-  const [isDirty, setIsDirty] = useState(false)
+  const [redirect, setRedirect] = useState(null)
+  const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
   //TODO: refactor this
-  const [searchModel, setSearchModel] = useState(props.location && props.location.search_model ? JSON.stringify(props.location.search_model) : props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) : "")
+  const [searchModel, setSearchModel] = useState(props && props.location && props.location.search_model ? JSON.stringify(props.location.search_model) :
+   props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) :
+    "{}")
 
-  function geoDataCallback(geo){
-    if (props.project || (props.record && props.record.geo !== geo)){
-      setGeo(geo)
-      setIsDirty(true)
-    }
-  } 
   function handleChange(e){
     if (e.target && e.target.name === "search_model"){
       console.log("handlechange setsearchmodel to value: ", e.target.value)
@@ -282,7 +401,6 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
 
     console.log("datasetform handleSubmit sent data: ", data)
-    setIsDirty(false)
     let dcmList = []
     let slList = []
     let newData = {...data}
@@ -301,22 +419,20 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-
-    //TODO: there must be a better way to submit than this, even despite the isDirty flag.
-    setData(newData) //will prompt the call in useEffect.
-
     
     console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
     //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
     props.resource = "datasets"
 
-    //if (props.save){
-    if (!geo){
+    submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
+      data => {
+        console.log("submitobjectwithgeo success, returned data: ", data)
+        setRedirect("/datasets")
+      }
+    ).catch(err => console.error("submitobjectwithgeo dataset error", err))
 
-    }
-    submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false)
-
+    //TODO: what is this
     if (props.setCreateModal){
       props.setCreateModal(false)
     }
@@ -329,109 +445,126 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
   console.log("props record after editmodal transofmration: ", props.record)
 
 
-  //TODO: implement elasticsearch query setting area using `searchmodel/setsearchmodel`
+  const { record } = props
 
   return(
-  <SimpleForm {...props} save={handleSubmit} onChange={() => setIsDirty(true)} redirect={RESOURCE_OPERATIONS.LIST}
-  toolbar={<DefaultToolbar {...props} />}>
-    <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
-    <TextInput      
-      label="Title"
-      defaultValue={props.location && props.location.title || ""}
-      source={MODEL_FIELDS.TITLE}
-      validate={validateTitle}
-      
-    />
-    <TextInput
-      className="input-large"
-      label={"en.models.datasets.data_abstract"}
-      options={{ multiline: true }}
-      source={MODEL_FIELDS.ABSTRACT}
-    />
-    <TextInput
-      className="input-small"
-      label={"en.models.datasets.study_site"}
-      source={MODEL_FIELDS.STUDY_SITE}
-    />
+    <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
+    toolbar={<DefaultToolbar {...props} />}>
+      <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
+      <TextInput      
+        label="Title"
+        defaultValue={props.location && props.location.title ? props.location.title : ""}
+        source={MODEL_FIELDS.TITLE}
+        validate={validateTitle}
+        className={classes.titleField}
+      />
+      <TextInput
+        className={classes.abstractField}
+        label={"en.models.datasets.data_abstract"}
+        options={{ multiline: true, rows: 8 }}
+        source={MODEL_FIELDS.ABSTRACT}
+        rows={5}
+      />
+      <TextInput
+        className={classes.otherField}
+        label={"en.models.datasets.study_site"}
+        source={MODEL_FIELDS.STUDY_SITE}
+      />
 
-    <ReferenceInput
-      label={'en.models.datasets.project'}
-      source={MODEL_FK_FIELDS.PROJECT}
-      reference={MODELS.PROJECTS}
-      validate={validateProject}
-      defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
-      disabled={props.project ? true : false}
-      required
-    >
-      <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
-    </ReferenceInput>
+      <ReferenceInput
+        label={'en.models.datasets.project'}
+        source={MODEL_FK_FIELDS.PROJECT}
+        reference={MODELS.PROJECTS}
+        validate={validateProject}
+        defaultValue={props.project ? props.project : props.location && props.location.project? props.location.project :  null}
+        disabled={props.project ? true : false}
+        required
+        className={classes.otherField}
+      >
+        <SelectInput source={MODEL_FIELDS.NAME} optionText={<ProjectName basePath={basePath} label={"en.models.projects.name"}/>}/>
+      </ReferenceInput>
 
       <TextInput
-      className={classes.searchModel}
-      id={"search_model"}
-      name={"search_model"}
-      label={"Search Model"}
-      multiline
-      validate={validateSearchModel}
-      value={searchModel}
-      required
-      onChange={(e) => handleChange(e)}
-    />
+        className={classes.searchModelField}
+        id={"search_model"}
+        name={"search_model"}
+        label={"Search Model"}
+        multiline
+        rows={5}
+        validate={validateSearchModel}
+        value={searchModel}
+        required
+        onChange={(e) => handleChange(e)}
+      />
 
-    <ReferenceInput
-      resource={MODELS.DATA_COLLECTION_STATUS}
-      className="input-small"
-      label={"en.models.datasets.data_collection_status"}
-      source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
-      reference={MODELS.DATA_COLLECTION_STATUS}
-      validate={validatedcs}
-      required>
-      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
-    </ReferenceInput>
+      <ReferenceInput
+        resource={MODELS.DATA_COLLECTION_STATUS}
+        label={"en.models.datasets.data_collection_status"}
+        source={MODEL_FIELDS.DATA_COLLECTION_STATUS}
+        reference={MODELS.DATA_COLLECTION_STATUS}
+        validate={validatedcs}
+        className={classes.otherField}
+        required>
+        <TranslationSelect 
+          optionText={MODEL_FIELDS.LABEL}
+        />
+      </ReferenceInput>
 
-    <ReferenceInput
-      resource={MODELS.DISTRIBUTION_RESTRICTION}
-      className="input-small"
-      label={"en.models.datasets.distribution_restriction"}
-      source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
-      reference={MODELS.DISTRIBUTION_RESTRICTION}
-      validate={validatedr}
-      required>
-      <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
-    </ReferenceInput>
+      <ReferenceArrayInput
+        allowEmpty
+        resource={MODELS.DATA_COLLECTION_METHOD}
+        label={"en.models.datasets.data_collection_method"}
+        source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
+        reference={MODELS.DATA_COLLECTION_METHOD}
+        validate={validatedcm}
+        className={classes.otherField}
+        required>
+        <TranslationSelectArray 
+          optionText="label" 
+        />
+      </ReferenceArrayInput>
 
-    <ReferenceArrayInput
-      allowEmpty
-      resource={MODELS.DATA_COLLECTION_METHOD}
-      className="input-medium"
-      label={"en.models.datasets.data_collection_method"}
-      source={MODEL_FIELDS.DATA_COLLECTION_METHOD}
-      reference={MODELS.DATA_COLLECTION_METHOD}
-      validate={validatedcm}
-      required>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
+      <ReferenceInput
+        resource={MODELS.DISTRIBUTION_RESTRICTION}
+        label={"en.models.datasets.distribution_restriction"}
+        source={MODEL_FIELDS.DISTRIBUTION_RESTRICTION}
+        reference={MODELS.DISTRIBUTION_RESTRICTION}
+        validate={validatedr}
+        className={classes.otherField}
+        required>
+        <TranslationSelect 
+          optionText={MODEL_FIELDS.LABEL} 
+        />
+      </ReferenceInput>
 
-    <ReferenceArrayInput
-      resource={MODELS.SENSITIVITY_LEVEL}
-      className="input-medium"
-      label={"en.models.datasets.sensitivity_level"}
-      source={MODEL_FIELDS.SENSITIVITY_LEVEL}
-      reference={MODELS.SENSITIVITY_LEVEL}
-      validate={validatesl}
-      required>
-      <TranslationSelectArray optionText="label" />
-    </ReferenceArrayInput>
+      <ReferenceArrayInput
+        resource={MODELS.SENSITIVITY_LEVEL}
+        label={"en.models.datasets.sensitivity_level"}
+        source={MODEL_FIELDS.SENSITIVITY_LEVEL}
+        reference={MODELS.SENSITIVITY_LEVEL}
+        validate={validatesl}
+        className={classes.otherField}
+        required>
+        <TranslationSelectArray 
+        optionText="label"
+         />
+      </ReferenceArrayInput>
 
-    { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
-      <>
-        <EditMetadata id={props.id} type="dataset"/>
-        <ConfigMetadata id={props.id} type="dataset" />
-      </>
-    )}
-
-    <MapForm content_type={'dataset'} recordGeo={props.record ? props.record.geo : null} id={props.record ? props.record.id : null} geoDataCallback={geoDataCallback}/>
-  </SimpleForm>)
+      { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
+        <>
+          <EditMetadata id={props.id} values={props.record ? props.record.metadata : null} type="dataset"/>
+          <ConfigMetadata id={props.id} type="dataset" />
+        </>
+      )}
+      <div className={classes.preMapArea}>
+        <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
+      </div>
+      {showMap && 
+        <MapForm content_type={'dataset'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>
+      }
+      {redirect && <Redirect to={redirect} /> }
+    </SimpleForm>
+  )
 };
 
 

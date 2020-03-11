@@ -5,9 +5,7 @@ import { getTranslation } from "../../_tools/funcs";
 import { translate } from "ra-core";
 import get from 'lodash/get';
 
-//reference:  https://stackoverflow.com/questions/54366538/translate-textfield-value
 const TranslationChipField = translate(({ translate, ...props }) => {
-  //TODO: chipfields should go to their associated values' show pages if the user has access to said pages.
   const { hasCreate, hasEdit, hasList, hasShow, locale, resource, basePath, onClick, ...rest } = props
   return (
     <FunctionField {...rest}

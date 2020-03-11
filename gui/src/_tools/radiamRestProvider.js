@@ -1,4 +1,4 @@
-//radiamrestprovider.jsx
+//radiamrestprovider.js
 import {PATHS, METHODS, MODELS} from '../_constants/index';
 import { stringify } from 'query-string';
 import {
@@ -101,6 +101,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         if (params)
         {
+          let query = {};
           if (
             params.filter &&
             params.sort && //new - adding this might have broken things.
@@ -116,7 +117,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               order = ""
             }
 
-            let query = {
+            query = {
               ...fetchUtils.flattenObject(params.filter), //removed when adding in partial search
               ordering: `${order}${field}`,
 
@@ -125,13 +126,22 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               page: page,
               perPage: perPage,
             };
+            if (params.hasOwnProperty("query")) {
+                Object.keys(params["query"]).map(function(key) {
+                    query[key] = params["query"][key];
+                });
+            }
             url = url + `?${stringify(query)}`;
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
             console.log("params in else: ", params)
             let { page, perPage } = params.pagination;
-            
+
+            let query = {};
+            if (params.hasOwnProperty("query")) {
+              query = params["query"];
+            }
             if (!perPage){
               perPage = 10
             }
@@ -148,7 +158,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               ordering = `&ordering=${order}${field}`
             }
             
-            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}`;
+            url = `${apiUrl}/${resource}/?page=${page}&page_size=${perPage}${ordering}&${stringify(query)}`;
 
           }
         }
@@ -285,6 +295,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
   const convertHTTPResponse = (response, type, resource, params) => {
     const { headers, json } = response;
+    let ret = null;
 
     switch (type) {
       case 'PASSWORD_RESET_EMAIL':
@@ -298,7 +309,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         json.results = translateResource(resource, json.results);
 
-        let ret = {
+        ret = {
           data: json.results,
           total: json.count,
           next: json.next,
@@ -346,18 +357,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           many = translateResource(resource, json);
         }
 
-        let rets;
-
-        rets = {
+        ret = {
           data: many.filter(item =>
             params.ids.find(element => element === item.id)
           ),
         };
 
         //map our IDs and Keys
-        rets.data.map(item => (item.key = item.id));
-
-        return rets;
+        ret.data.map(item => (item.key = item.id));
+        return ret;
 
       case GET_MANY_REFERENCE:
 

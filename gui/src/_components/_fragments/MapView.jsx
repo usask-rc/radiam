@@ -25,6 +25,10 @@ const styles = {
     },
     mapPopupDetails: {
         
+    },
+    locationTitle: {
+        paddingTop: "1em",
+        marginBottom: "1em",
     }
   };
 
@@ -163,8 +167,8 @@ const MapView = ({classes, record }) => {
         <>
             {location && location.length > 0 && (
             <>
-                <Typography variant={"h5"} component={"h5"}>
-                    {`GeoJSON Map Data`}
+                <Typography variant={"h5"} component={"h5"} className={classes.locationTitle}>
+                    {`Geolocation Info`}
                 </Typography>
                 <Map
                 ref={(ref) => {

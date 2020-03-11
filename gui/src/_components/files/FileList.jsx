@@ -36,7 +36,7 @@ const styles = theme => ({
   },
 });
 
-const FileList = ({ classes, translate, data }) => (
+const FileList = ({ classes, translate, data, projectID }) => (
   <Grid
     container
     className={classes.fileListing}
@@ -48,7 +48,7 @@ const FileList = ({ classes, translate, data }) => (
     <Divider />
     {data &&
       data.map(item => (
-        <FileSummary caller={`list`} item={item} key={item.id} />
+        <FileSummary caller={`list`} item={item} key={item.id} projectID={projectID} />
       ))}
   </Grid>
 );

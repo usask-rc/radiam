@@ -23,9 +23,9 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
 import LocationTitle from './LocationTitle';
-import ReferenceArrayField from 'ra-ui-materialui/lib/field/ReferenceArrayField';
 import { SingleFieldList } from 'ra-ui-materialui/lib/list';
 import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
+import { ShowController } from 'ra-core';
 
 
 const listStyles = {
@@ -41,6 +41,9 @@ const listStyles = {
   /* https://stackoverflow.com/questions/55940218/preserving-line-breaks-with-react-admin-material-uis-textfields */
   showBreaks: {
     whiteSpace: "pre-wrap",
+  },
+  columnHeaders: {
+    fontWeight: "bold",
   },
 };
 
@@ -99,7 +102,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} {...other}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}} {...other}>
       <TextField
         label={'en.models.locations.display_name'}
         source={MODEL_FIELDS.DISPLAY_NAME}
@@ -125,7 +128,7 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
         source={'notes'}
         multiline
       />
-       <ArrayField source={"projects"} label={"Projects"}>
+      <ArrayField source={"projects"} label={"Projects"}>
         <SingleFieldList>
           <ReferenceField source={"id"} reference={"projects"} link="show">
             <ChipField source={MODEL_FIELDS.NAME} />
@@ -215,9 +218,15 @@ export const LocationDisplay = props =>
       <GlobusPathShow />
       <PortalUrlShow />
       <NotesShow />
-      <MapView/>
-
-      
+      <ShowController {...props}>
+          {controllerProps => (controllerProps.record && 
+          controllerProps.record.geo && 
+          controllerProps.record.geo.geojson && 
+          controllerProps.record.geo.geojson.features.length > 0 ?
+          <MapView {...controllerProps}/>
+          : null
+          )}
+      </ShowController>
     </SimpleShowLayout>
   </Show>)
   }

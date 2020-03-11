@@ -3,7 +3,9 @@ import { Typography } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import React, { Component } from "react";
+import React, { Component, useCallback, useState } from "react";
+import arrayMutators from 'final-form-arrays';
+import { Form } from 'react-final-form';
 import RelatedUsers from "../Groups/RelatedUsers";
 import {
   ArrayInput,
@@ -22,6 +24,7 @@ import {
   NumberInput,
   RefreshButton,
   required,
+  SaveButton,
   ShowButton,
   TextField,
   TextInput,
@@ -48,6 +51,7 @@ import IndexedSimpleFormIterator from "./IndexedSimpleFormIterator.js"
 import get from 'lodash/get';
 import { getGroupMembers } from "../_tools/funcs";
 import Cancel from "@material-ui/icons/Cancel";
+import { useFormState } from 'react-final-form';
 
 const configStyles = {
   root: {
@@ -123,7 +127,7 @@ const showStyles = {
   index: {
     width: '3em',
     marginRight: "1em",
-    fontSize: "1rem",
+    fontSize: "1.75em",
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif;',
     lineHeight: "1",
   },
@@ -180,10 +184,12 @@ class MetadataComponent extends Component {
 
   componentDidMount() {
     const { id, record, type } = this.props;
-    if (record) {
+    if (id) {
+      this.getEntitySchemasFields(id, type, false);
+    } else if (record) {
       this.getEntitySchemasFields(record.id, type, false);
     } else {
-      this.getEntitySchemasFields(id, type, false);
+        console.error("No record or id specified for this metadata component");
     }
   };
 
@@ -361,7 +367,7 @@ class MetadataComponent extends Component {
 
     rootFields.sort(this.orderField);
 
-    this.setState(data => ({
+    this.setState(prevState => ({
       choiceLists: choiceLists,
       choiceListValues: choiceListValues,
       fields: fields,
@@ -432,6 +438,9 @@ class MetadataComponent extends Component {
           break;
         case MODEL_FK_FIELDS.DATASET:
           this.getDatasetParentEntitySchemaFields(id);
+          break;
+        case MODEL_FK_FIELDS.FILE:
+          this.getFileParentEntitySchemaFields(id);
           break;
         default:
           console.log("Unhandled parents for type " + type);
@@ -516,6 +525,39 @@ class MetadataComponent extends Component {
     }
     fetchData();
   };
+
+  getFileParentEntitySchemaFields = (id) => {
+      return;
+      /**
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const { projectID } = this.props;
+    if (!projectID)
+    {
+      return;
+    }
+    let params = {
+      id: projectID,
+    };
+    const fetchData = async () => {
+      await dataProvider(
+        GET_ONE,
+        MODELS.PROJECTS,
+        params
+      ).then(response => {
+        if (response && response.data && response.data.project) {
+          this.getEntitySchemasFields(response.data, MODEL_FK_FIELDS.PROJECT, true);
+        } else {
+          // There are no more parents to check.
+          console.error("Every file should have a project, how did we not find one with " + projectID);
+        }
+      }).catch(error => {
+        console.error(error);
+        this.setState({ error: error});
+      });
+    }
+    fetchData();
+    **/
+  }
 
   createEntity = (fromParent) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -1179,10 +1221,12 @@ const validateURL = [];
 // const validateRequiredURL = [required(), regex(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)];
 // const validateURL = regex(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi);
 
+
 class BaseEditMetadata extends MetadataComponent {
   constructor (props) {
     super(props);
     drawerState.registerFull(this, this.update);
+    // this.state = {values: props.values}; //values being the pre-existing metadata values.  This is only used for filling defaults.
   }
 
   componentWillUnmount() {
@@ -1296,7 +1340,6 @@ class BaseEditMetadata extends MetadataComponent {
                       key={"text-input-" + field.id}
                       label={translate(field.label + ".label")}
                       source={field.id}
-                      defaultValue={ field.default }
                       className={ field.visible ? null : classes.invisible }
                       validate={ field.required ? validateRequired : null }
                     />
@@ -1410,10 +1453,10 @@ class BaseEditMetadata extends MetadataComponent {
     }
   };
 
-
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
-    const { classes, id, translate } = this.props;
+    const { addSave, classes, id, record, translate } = this.props;
+
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
@@ -1432,6 +1475,11 @@ class BaseEditMetadata extends MetadataComponent {
               return this.renderField(classes, translate, field, 0, "metadata");
             })}
           </div>
+          { addSave ?
+              <SaveButton />
+              :
+              null
+          }
         </div>;
     } else {
       return <div>{translate("en.metadata.no")}</div>;
@@ -1480,8 +1528,14 @@ class BaseMetadataEditActions extends Component {
   };
   
   render() {
-    const { basePath, bulkActions, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
+    const { basePath, bulkActions, cancel, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
     const { groupMembers } = this.state
+    let cancelButton = null;
+    if (cancel) {
+      cancelButton = cancel;
+    } else if (data && !cancel) {
+      cancelButton = <ShowButton basePath={basePath} label="Cancel" icon={<Cancel/>} record={data} />
+    }
     return <TopToolbar>
         {bulkActions && React.cloneElement(bulkActions, {
             basePath,
@@ -1500,8 +1554,7 @@ class BaseMetadataEditActions extends Component {
         { showRelatedUsers && groupMembers &&
           <RelatedUsers groupMembers={groupMembers} />
         }
-        { data && <ShowButton basePath={basePath} label="Cancel" icon={<Cancel />} record={data} /> }
-        <RefreshButton />
+        { cancelButton }
         <Button color="primary" onClick={(e) => drawerState.open(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
     </TopToolbar>
   }
@@ -1613,7 +1666,7 @@ class BaseShowMetadata extends MetadataComponent {
         if (field.many_values)
         {
           var fields = [];
-          fields.push(<Typography className={classes.label}>{translate(field.label + ".label")}</Typography>);
+          fields.push(<Typography key={field.id + ".label"} className={classes.label}>{translate(field.label + ".label")}</Typography>);
 
           for (var index = 0; index < current.length; index++) {
             var fieldClass = classes.field;
@@ -1621,8 +1674,8 @@ class BaseShowMetadata extends MetadataComponent {
               fieldClass = classes.lastField;
             }
             fields.push(
-              <div className={classes.subfield}>
-                <div className={classes.index}>{index + 1}</div>
+              <div key={field.id + "-" + index + "-subfield"} className={classes.subfield}>
+                <div className={classes.index}>&nbsp;</div>
                 <div>
                   { type ==="boolean" ?
                         <div>
@@ -1734,7 +1787,7 @@ class BaseShowMetadata extends MetadataComponent {
               </div>
             </div>
             );
-            fields.push(<Divider className={classes.indexSpacer}/>);
+            fields.push(<Divider key={field.id + "-" + index + "index-spacer"} className={classes.indexSpacer}/>);
           }
 
           return (<div className={classes.container} key={"text-container-" + field.id}>
@@ -1868,14 +1921,13 @@ class BaseShowMetadata extends MetadataComponent {
       }
       return field
     });
-    
+
     return hasValue;
   };
 
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
     const { classes, record, id, translate } = this.props;
-
     if (error) {
       return <div className={classes.section}>
           <Typography variant="h5">{translate("en.metadata.show.title")}</Typography>
@@ -1908,6 +1960,98 @@ BaseShowMetadata.propTypes = {
   resource: PropTypes.string,
 };
 
+class BaseEditConfigMetadataForm extends Component {
+
+  constructor (props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+
+  render() {
+    const { id, doc, onCancel, onSave, projectID, record, translate } = this.props;
+    return (
+      <>
+        <Form
+          mutators={arrayMutators}
+          onSubmit={() => {onSave()} }
+          initialValues={record}
+          render={({ handleSubmit, form, submitting, pristine, values }) => (
+          <form>
+          <React.Fragment>
+            <EditMetadata
+              type={MODEL_FK_FIELDS.FILE}
+              translate={translate}
+              id={id}
+              record={record}
+            />
+            <SaveEditMetadataFormButton
+                doc={doc}
+                onCancel={onCancel}
+                onSave={onSave}
+                projectID={projectID}
+            />
+            <Button onClick={onCancel}>{translate('ra.action.cancel')}</Button>
+            <ConfigMetadata
+              type={MODEL_FK_FIELDS.FILE}
+              translate={translate}
+              id={id}
+              record={record}
+            />
+          </React.Fragment>
+          </form>
+          )}/>
+        </>
+    );
+  };
+};
+
+const SaveEditMetadataFormButton = ({doc, onSave, projectID, ...rest}) => {
+    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
+    const formState = useFormState();
+    const handleSaveClick = useCallback(() => {
+        if (!formState.valid) {
+            return;
+        }
+        let params = {
+            id: doc,
+            data: formState.values
+        };
+        const sendData = async () => {
+            await dataProvider(
+              UPDATE,
+              "projects/" + projectID + "/docs",
+              params
+            ).then(response => {
+              if (onSave) {
+                  onSave();
+              }
+              return response
+            }).catch(error => {
+              console.error(error);
+              return;
+            });
+
+        };
+        sendData();
+    }, [
+        formState.valid,
+        formState.values,
+        /**
+        create,
+        notify,
+        redirectTo,
+        redirect,
+        basePath,
+        **/
+    ]);
+
+    return <SaveButton {...rest} handleSubmitWithRedirect={handleSaveClick} />
+};
+
+
+export const EditConfigMetadataForm = enhanceEdit(BaseEditConfigMetadataForm);
 export const ConfigMetadata = enhanceConfig(BaseConfigMetadata);
 export const EditMetadata = enhanceEdit(BaseEditMetadata);
 export const MetadataEditActions = enhanceEdit(BaseMetadataEditActions);

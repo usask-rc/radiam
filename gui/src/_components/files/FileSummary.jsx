@@ -81,7 +81,7 @@ class FileSummary extends React.Component {
   };
 
   render() {
-    const { classes, item, caller } = this.props;
+    const { classes, item, caller, projectID } = this.props;
     return (
       <ReducedExpansionPanel className={classes.card}>
         <ReducedExpansionPanelSummary className={classes.content}>
@@ -90,7 +90,7 @@ class FileSummary extends React.Component {
         <ExpansionPanelDetails>
           <CardContent>
             <Grid item className={classes.item} xs={10}>
-              <FileDetails item={item} getJsonKeys={getJsonKeys} />
+              <FileDetails item={item} getJsonKeys={getJsonKeys} projectID={projectID} />
             </Grid>
           </CardContent>
         </ExpansionPanelDetails>

@@ -3,6 +3,8 @@ import '../_components/components.css';
 import Chip from "@material-ui/core/Chip";
 import { withStyles } from '@material-ui/styles';
 import Edit from '@material-ui/icons/Edit';
+import { truncatePath } from '../_tools/funcs';
+import { Tooltip } from '@material-ui/core';
 
 const styles = theme => ({
   chipDisplay: {
@@ -30,35 +32,42 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
       <div className={classes.relatedDSContainer}>
         <div className={classes.chipContainer}>
           {projectDatasets && projectDatasets.map(dataset => {
+
+            //truncate unreasonably long dataset names - these will usually be caused by auto creation via browse
+            let displayTitle = truncatePath(dataset.title)
+            
             return( //TODO: display number of files in each dataset in the chip
-              <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
-              label={`${dataset.title}`}
-              clickable={inModal ? false : true}
-              onDelete={canEditModal && setEditModal && !inModal ? () => {
+              <Tooltip title={dataset.title}>
+                <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
+                  label={`${displayTitle}`}
+                  clickable={inModal ? false : true}
+                  on
+                  onDelete={canEditModal && setEditModal && !inModal ? () => {
+                    
+                    //NOTE: the array selection fields require a specific formatting to display properly.  This translation satisfies that formatting
+                    const cpDataset = dataset
+                    const dcmList = []
+                    const slList = []
+
+                    dataset.data_collection_method.map(item => {
+                      dcmList.push(item.id)
+                    })
+                    dataset.sensitivity_level.map(item => {
+                      slList.push(item.id)
+                    })
+
+                    cpDataset.data_collection_method = dcmList
+                    cpDataset.sensitivity_level = slList
+                    setEditModal(cpDataset)
+                  } : null}
                 
-                //NOTE: the array selection fields require a specific formatting to display properly.  This translation satisfies that formatting
-                const cpDataset = dataset
-                const dcmList = []
-                const slList = []
-
-                dataset.data_collection_method.map(item => {
-                  dcmList.push(item.id)
-                })
-                dataset.sensitivity_level.map(item => {
-                  slList.push(item.id)
-                })
-
-                cpDataset.data_collection_method = dcmList
-                cpDataset.sensitivity_level = slList
-                setEditModal(cpDataset)
-              } : null}
-              
-              onClick={() => {
-                if (!inModal) {
-                  setViewModal(dataset)
-                }
-              }}
-              deleteIcon={<Edit />}  />
+                onClick={() => {
+                  if (!inModal) {
+                    setViewModal(dataset)
+                  }
+                }}
+                deleteIcon={<Edit />}  />
+              </Tooltip>
             )
           })}
           {canEditModal && setCreateModal && 

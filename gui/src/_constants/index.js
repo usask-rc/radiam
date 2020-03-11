@@ -4,10 +4,10 @@ module.exports = Object.freeze({
   AVATAR_HEIGHT: "36px",
   I18N_TLE: "en", //TODO: modularize this or remove it.
   LOCATIONTYPE_OSF: "6ebfd637-c40b-4486-9cf5-b0b976f51de5",
-  ROLE_ANONYMOUS: "anonymous",
   ROLE_DATA_MANAGER: "c4e21cc8-a446-4b38-9879-f2af71c227c3",
   ROLE_GROUP_ADMIN: "a59be619-fd9b-462b-8643-486e68f38613",
   ROLE_MEMBER: "bb7792ee-c7f6-4815-ae24-506fc00d3169",
+  ROLE_ANONYMOUS: "anonymous",
   ROLE_USER: "user", //TODO: this is wrong - it should sit under something called `roles`, not sit here in global
   WEBTOKEN: "token",
   FIELDS: {
@@ -125,6 +125,7 @@ module.exports = Object.freeze({
     DATA_COLLECTION_METHOD: "data_collection_method",
     DATASET: "dataset",
     DISTRIBUTION_RESTRICTION: "distribution_restriction",
+    FILE: "file",
     GROUP_ROLE: "group_role",
     GROUP: "group",
     LOCATION: "location",
@@ -133,6 +134,7 @@ module.exports = Object.freeze({
     PRIMARY_CONTACT_USER: "primary_contact_user",
     PROJECT: "project",
     USER: "user",
+    PROJECT_CONFIG_LIST: "project_config_list",
     SENSITIVITY: "sensitivity",
   },
   PASSWORD_CHANGE: {

@@ -17,8 +17,9 @@ import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { FormDataConsumer } from 'ra-core';
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
-import { Typography } from '@material-ui/core';
+import { Typography, Button } from '@material-ui/core';
 import { DefaultToolbar } from '../_components';
+import { Redirect } from 'react-router';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -36,10 +37,20 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  preMapArea: {
+    marginBottom: "1em",
+  },
   titleText: {
     fontSize: "2em",
     width: 'inherit',
-  }
+  },
+  mapFormHeader: {
+    paddingBottom: "1em",
+    marginTop: "1em",
+  },
+  projectList: {
+    minWidth: "18em",
+  },
 };
 
 class LocationForm extends Component {
@@ -51,7 +62,11 @@ class LocationForm extends Component {
       isFormDirty: false,
       mapFormKey: 0,
       jsonTextFormKey: 1000,
+      redirect: null,
+      showMap: props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false,
     };
+
+    console.log("props record locform: ", props.record)
     if (props.record && props.record.projects){
       props.record.projects = this.fixProjectList(props.record.projects)
     }
@@ -105,8 +120,19 @@ class LocationForm extends Component {
       return project
     })
     data.projects = projList
+
+    if (this.props.record && this.props.record.id){
+      data.id = this.props.record.id
+    }
     this.setState({isFormDirty: false}, () => {
-        submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`);
+        submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
+        .then(data => {
+          console.log("locationform submitobjectwithgeo data: ", data)
+
+          this.setState({redirect: "/locations"})
+        }).catch(err => {
+          console.error("error in submitobjectwithgeo in locationform: ", err)
+        });
     })
     
   };
@@ -115,7 +141,7 @@ class LocationForm extends Component {
     //start marking form as dirty only when the user makes changes.  This property is case sensitive.
     console.log("handlechange data: ", data)
     if (data && data.timeStamp){
-    this.setState({isFormDirty: true})
+      this.setState({isFormDirty: true})
     }
   }
 
@@ -187,7 +213,7 @@ class LocationForm extends Component {
 
   render() {
     const { staticContext, id, classes, record, mode, ...rest } = this.props;
-    const { isFormDirty, geo, mapFormKey } = this.state;
+    const { geo, showMap } = this.state;
 
     //TODO: there is a discrepancy between how we separate `record` from rest and props and how it `should` be done
     //this is likely the cause of the loading error - investigate tomorrow
@@ -201,7 +227,7 @@ class LocationForm extends Component {
         //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
       >
-        <Typography className={classes.titleText}>{record && record.length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
+        <Typography className={classes.titleText}>{record && Object.keys(record).length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
         <TextInput
           label={'en.models.locations.display_name'}
           source={MODEL_FIELDS.DISPLAY_NAME}
@@ -219,49 +245,50 @@ class LocationForm extends Component {
           source={MODEL_FK_FIELDS.LOCATION_TYPE}
           reference={MODELS.LOCATIONTYPES}
           validate={validateLocationType}
-          defaultValue={LOCATIONTYPE_OSF}
+          defaultValue={record && Object.keys(record).length > 0 ? record.location_type : LOCATIONTYPE_OSF}
         >
           <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
         </ReferenceInput>
         <FormDataConsumer>
-        {formDataProps => {
+          {formDataProps => {
 
-          console.log("formDataProps in locform is: ", formDataProps)
-          
-          const {formData} = formDataProps
+            console.log("formDataProps in locform is: ", formDataProps)
+            
+            const {formData} = formDataProps
 
-          let projList = []
+            let projList = []
 
-          if (formData.projects && formData.projects.length > 0){
-            projList = formData.projects
-          }
-          else if (record.projects && record.projects.length > 0){
-            projList = record.projects
-          }
+            if (formData.projects && formData.projects.length > 0){
+              projList = formData.projects
+            }
+            else if (record.projects && record.projects.length > 0){
+              projList = record.projects
+            }
 
-          //somehow still need to translate this shit
-          if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
-            console.log("translating projlist into a list: ", projList)
-            const temp = []
-            projList.map(item => {
-              temp.push(item.id)
-            })
-            projList = temp
+            //somehow still need to translate this shit
+            if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
+              console.log("translating projlist into a list: ", projList)
+              const temp = []
+              projList.map(item => {
+                temp.push(item.id)
+                return item
+              })
+              projList = temp
+            }
+            console.log("projList being rendered: ", projList)
+              return(<ReferenceArrayInput
+                resource={"projects"}
+                label={"en.models.locations.projects"}
+                className={classes.projectList}
+                source={"projects"}
+                reference={"projects"}
+                required>
+                <SelectArrayInput 
+                defaultValue={projList}
+                optionText="name" />
+              </ReferenceArrayInput>)
+            }
           }
-          console.log("projList being rendered: ", projList)
-            return(<ReferenceArrayInput
-              resource={"projects"}
-              className="input-medium"
-              label={"en.models.locations.projects"}
-              source={"projects"}
-              reference={"projects"}
-              required>
-              <SelectArrayInput 
-              defaultValue={projList}
-              optionText="name" />
-            </ReferenceArrayInput>)
-          }
-        }
         </FormDataConsumer>
 
         <TextInput
@@ -286,13 +313,18 @@ class LocationForm extends Component {
         />
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
         defaultValue={record && record.notes || ""} />
-
-        <MapForm
-          content_type={MODEL_FK_FIELDS.LOCATION}
-          recordGeo={geo}
-          id={id}
-          geoDataCallback={this.geoDataCallback}
-        />
+        <div className={classes.preMapArea}>
+          <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
+        </div>
+        {showMap && 
+          <MapForm
+            content_type={MODEL_FK_FIELDS.LOCATION}
+            recordGeo={geo}
+            id={id}
+            geoDataCallback={this.geoDataCallback}
+          />
+        }
+        {this.state.redirect && <Redirect to={this.state.redirect} /> }
       </SimpleForm>
     );
   }

@@ -1,10 +1,13 @@
 //Dashboard.jsx
-import React, { PureComponent } from 'react';
-import { getRecentProjects } from '../_tools/funcs';
+import React, { useState, useEffect } from 'react';
+import { getRecentProjects, getGroupMembers, getUsersInMyGroups } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
-import ProjectCards from "./ProjectCards/ProjectCards"
+import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
+import WarningCards from './Welcome/WarningCards';
+import {ROLES} from "../_constants/index"
+import RelatedUsersDisplay from './RelatedUsersDisplay';
 
 
 const styles = theme => ({
@@ -13,60 +16,52 @@ const styles = theme => ({
   }
 })
 
-class Dashboard extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = { loading: true, hasFiles: false, managedGroups:{} };
-  }
+const Dashboard = ({classes, permissions, ...rest}) => {
+  const [hasFiles, setHasFiles] = useState(null)
+  const [relatedUsers, setRelatedUsers] = useState(null)
+  const [recentProjects, setRecentProjects] = useState(null)
+  const user = JSON.parse(localStorage.getItem(ROLES.USER));
 
-  //when component mounts, get the data we need to display on the front page.
-  componentDidMount() {
-    this.onMountAndRefresh()
-  }
+  useEffect(() => {
+    const myGroups = user.groupAdminships.concat(user.dataManagerships).concat(user.groupUserships)
 
-  onMountAndRefresh(){
     getRecentProjects().then(data => {
-      this.setState(data)
-      return data
+      console.log("getrecentprojects returned: ", data)
+      setRecentProjects(data.projects)
+      setHasFiles(data.hasFiles)
     })
     .catch(err => {
       console.error("Error in getRecentProjects: ", err)
     })
-  }
 
-  componentDidUpdate(prevProps) {
-    console.log("prev, cur props: ", prevProps, this.props)
-    /*if (prevProps.views !== this.props.views) {
-      this.onMountAndRefresh();
-    }
-    */
-  }
+    getUsersInMyGroups(myGroups).then(data => {
+      console.log("getusersinmygroups data: ", data)
+      setRelatedUsers(data)
+    }).catch(err => console.log("users in my groups err: ", err))
+  }, [])
 
-  render() {
-    const {classes, permissions} = this.props
-    const { loading, hasFiles, projects } = this.state
-    if (permissions){
-      return (
+  return(
         <div className={classes.root}>
           <Responsive
             medium={
               <>
-                <WelcomeCards loading={loading} hasFiles={hasFiles}  />
-                {!loading &&
+                <WelcomeCards hasFiles={hasFiles}  />
+                <WarningCards />
+                {recentProjects &&
                   <>
-                    <ProjectCards projects={projects} />
+                    <ProjectsCard projects={recentProjects} />
                   </>
+                }
+                {relatedUsers && 
+                <>
+                    <RelatedUsersDisplay relatedUsers={relatedUsers} />
+                </>
                 }
               </>
             }
           />
         </div>
       );
-    }
-    else{
-      return (<>{`Loading...`}</>)
-    }
   }
-}
 
 export default withStyles(styles)(Dashboard);

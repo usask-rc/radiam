@@ -1,5 +1,5 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
+import { API_ENDPOINT, ROLE_USER, ROLES, ROLE_ANONYMOUS, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
 import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
@@ -26,7 +26,7 @@ export function isAdminOfAParentGroup(group_id){
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
     if (user){
       if (user.is_admin){
-      resolve(true)
+        resolve(true)
       }
     }else{
       reject("No User Cookie")
@@ -44,7 +44,7 @@ export function isAdminOfAParentGroup(group_id){
 
     }).catch(err => {
       console.error("isadminofaparentgroup error: ",err)
-      reject("Invalid Key")
+      reject("Invalid Group ID Key")
     })
   })
 };
@@ -63,12 +63,10 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
     }
     return ROLE_USER
   }
-  //no cookie or group
   else if (!user && !group){
-    return "anonymous"
+    return ROLE_ANONYMOUS
   }
   else{
-    //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
   }
@@ -77,6 +75,60 @@ export function getUserRoleInGroup(group){ //given a group ID, determine the cur
 //this gets all projects that the user has worked on.
 //we want to get all (recent) files in a project and display them in an expandable listview.
 //TODO: handle potential setstate on unmounted component
+
+export const getUsersInMyGroups = (groups) => {
+  return new Promise((resolve, reject) => {
+      if (!groups){
+          resolve([])
+      }
+      const promises = []
+      const groupPromises = []
+
+
+      //1. get group data
+      groups.map(group => {
+        groupPromises.push(getGroupData(group).then(groupData => {
+          return groupData
+        }))
+      })
+      //2. with group data, get lists of users associated with each group
+      Promise.all(groupPromises).then(groupList => {
+
+          groupList.map(group => {
+            return promises.push(getGroupMembers(group).then(groupData => {
+              console.log("groupData in promises push is: ", groupData)
+              return groupData
+          }))
+        })
+        return groupList
+      })
+      .then(groupRecords => {
+        
+        Promise.all(promises).then(userLists => {
+            const usersInMyGroups = {}
+            userLists.map(userList => {
+                userList.map(record => {
+                    record.group.since = record.date_created
+                    record.group.expires = record.date_expires
+
+                    //a filtering mechanism to remove duplicate users and listify them
+                    if (usersInMyGroups.hasOwnProperty(record.user.id))
+                    {
+                      usersInMyGroups[record.user.id].group.push(record.group)
+                    }
+                    else{
+                      usersInMyGroups[record.user.id] = record
+                      usersInMyGroups[record.user.id].group = [record.group]
+                    }
+                })
+            })
+            resolve(usersInMyGroups)
+        })
+        .catch(err => reject(err))
+        })
+    })
+  }
+
 export function getRecentProjects(count=1000) {
 
   return new Promise((resolve, reject) => {
@@ -92,6 +144,7 @@ export function getRecentProjects(count=1000) {
       .then(projects => {
 
         const promises = []
+
         projects.map(project => {
           promises.push(getProjectData({id: project.id,
             sort: {
@@ -107,6 +160,8 @@ export function getRecentProjects(count=1000) {
               const newProject = project
               newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
               newProject.nbFiles = data.nbFiles
+
+              //TODO: move down to the component level?
               const timeDiff = now.diff(moment(newProject.recentFile.indexed_date).toISOString(), "days")
               newProject.daysOld = timeDiff
               newProject.recentFile.timeAgo = `${timeDiff} days ago`
@@ -124,6 +179,7 @@ export function getRecentProjects(count=1000) {
           }
         })
         resolve({projects: projects, loading: false, hasFiles: hasFiles})
+        return data
       }).catch(err => {
         reject(err)
       })
@@ -136,20 +192,20 @@ export function getMaxUserRole(){
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
-      return "admin"
+      return ROLES.ADMIN
     }
     else if (user.is_group_admin){
-      return "group_admin"
+      return ROLES.GROUP_ADMIN
     }
     else if (user.is_data_manager){
-      return "data_manager" 
+      return ROLES.DATA_MANAGER 
     }
-    return ROLE_USER
+    return ROLES.USER
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "#/login"
-    return "anonymous"
+    return ROLES.ANONYMOUS
   }
 }
 
@@ -277,11 +333,6 @@ export function getRelatedDatasets(projectID) {
       })
       .catch(err => reject(err));
   });
-}
-
-//given json, format into something elasticsearch wants
-export function makeElasticQuery(query){
-
 }
 
 //gets the root folder paths for a given project
@@ -456,6 +507,7 @@ export function getUsersInGroup(record) {
         groupMembers.map(groupMember => {
           promises.push(getUserDetails(groupMember.user).then(user => {
             groupMember.user = user
+            user.group = [record]
             groupUsers.push(user)
             return groupMember
           }))
@@ -498,6 +550,7 @@ export function getGroupMembers(record) {
               promises.push(getUserDetails(groupMember.user).then(user => {
                 groupMember.user = user
                 groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
+                groupMember.group = record
                 return user
               }))
             });
@@ -590,34 +643,45 @@ export function submitObjectWithGeo(
   redirect = RESOURCE_OPERATIONS.LIST,
   inModal=false
 ) {
-  console.log('formData heading into submitobjectwithgeo is: ', formData);
-  if (formData.id) {
-    updateObjectWithGeo(formData, geo, props, redirect);
-  } else {
-    createObjectWithGeo(formData, geo, props, inModal);
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log('formData heading into submitobjectwithgeo is: ', formData);
+    if (formData.id) {
+      updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
+    } else {
+      createObjectWithGeo(formData, geo, props, inModal).then(data => resolve(data)).catch(err => reject(err));
+    }
+  })
 }
 
 function updateObjectWithGeo(formData, geo, props) {
-  if (geo && Object.keys(geo).length > 0) {
-    formData.geo = geo;
-  } else {
-    //api wont allow null geojson, so replace it with an empty list of features.
-    formData.geo = {
-      object_id: formData.id,
-      content_type: props.resource.substring(0, props.resource.length - 1),
-      geojson: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    };
-  }
-  if (props.save){
-    props.save(formData, RESOURCE_OPERATIONS.LIST);
-  }
-  else{
-    putObjectWithoutSaveProp(formData, props.resource)
-  }
+
+  return new Promise((resolve, reject) => {
+    console.log("formData, geo in updateobjectwithgeo: ", formData, geo)
+    if (geo && Object.keys(geo).length > 0) {
+      formData.geo = geo;
+      formData.geo.object_id = formData.id
+    } else {
+      //api wont allow null geojson, so replace it with an empty list of features.
+      formData.geo = {
+        object_id: formData.id,
+        content_type: props.resource.substring(0, props.resource.length - 1),
+        geojson: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      };
+    }
+    if (props.save){ //use the react-admin form's default save func
+      resolve(props.save(formData, RESOURCE_OPERATIONS.LIST));
+    }
+    else{
+      putObjectWithoutSaveProp(formData, props.resource).then(data => {
+        resolve(data)
+      }).catch(err => reject(err))
+    }
+
+  })
 }
 
 export function putObjectWithoutSaveProp(formData, resource){
@@ -664,89 +728,89 @@ export function deleteItem(data, resource){
 
 //TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
-  console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
-  let headers = new Headers({ 'Content-Type': 'application/json' });
-  const token = localStorage.getItem(WEBTOKEN);
 
-  if (token) {
-    const parsedToken = JSON.parse(token);
-    headers.set('Authorization', `Bearer ${parsedToken.access}`);
+  return new Promise((resolve, reject) => {
+    console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem(WEBTOKEN);
 
-    //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
-    const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
-      method: METHODS.POST,
-      body: JSON.stringify({ ...formData }),
-      headers: headers,
-    });
+    if (token) {
+      const parsedToken = JSON.parse(token);
+      headers.set('Authorization', `Bearer ${parsedToken.access}`);
 
-    return fetch(request)
-      .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          return response.json();
-        }
-        throw new Error(response.statusText); //error here when creating dataset nested in project
-      })
-      .then(data => {
-        console.log('data in createobjectwithgeo is: ', data);
-        //some data exists - add in the object ID before submission
-        if (geo && geo.content_type) {
-          data.geo = geo;
-          data.geo.object_id = data.id;
-        } else {
-          //no value - can't send null into geo, so make a basic structure.
-          data.geo = {
-            object_id: data.id,
-            content_type: props.resource.substring(
-              0,
-              props.resource.length - 1
-            ),
-            geojson: {
-              type: 'FeatureCollection',
-              features: [],
-            },
-          };
-        }
+      //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
+      const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
+        method: METHODS.POST,
+        body: JSON.stringify({ ...formData }),
+        headers: headers,
+      });
 
-        //the PUT request to update this object with its geoJSON
-        const request = new Request(
-          getAPIEndpoint() + `/${props.resource}/${data.id}/`,
-          {
-            method: METHODS.PUT,
-            body: JSON.stringify({ ...data }),
-            headers: headers,
+      return fetch(request)
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            return response.json();
           }
-        );
+          reject({err: `Could not submit ${props.resource} to API, status: ${response.status} ${response.statusText}`})
+          throw new Error(response.statusText); //error here when creating dataset nested in project
+        })
+        .then(data => {
+          console.log('data in createobjectwithgeo is: ', data);
+          //some data exists - add in the object ID before submission
+          if (geo && geo.content_type) {
+            data.geo = geo;
+            data.geo.object_id = data.id;
+          } else {
+            //no value - can't send null into geo, so make a basic structure.
+            data.geo = {
+              object_id: data.id,
+              content_type: props.resource.substring(
+                0,
+                props.resource.length - 1
+              ),
+              geojson: {
+                type: 'FeatureCollection',
+                features: [],
+              },
+            };
+          }
 
-        return fetch(request)
-          .then(response => {
-            if (response.status >= 200 && response.status < 300) {
-              return response.json();
+          //the PUT request to update this object with its geoJSON
+          const request = new Request(
+            getAPIEndpoint() + `/${props.resource}/${data.id}/`,
+            {
+              method: METHODS.PUT,
+              body: JSON.stringify({ ...data }),
+              headers: headers,
             }
-            throw new Error(response.statusText);
-          })
-          .then(data => {
-            console.log("Data from geoJSON update: ", data);
-            if (!inModal){ //stop redirect if in a modal
-              props.history.push(`/${props.resource}`);
-            }
-          });
-      }).catch(err => {
-        console.log("err in POST new object with geo: ", err, formData, geo, props)
-      })
-      ;
-  } else {
-    //TODO: logout the user.
-    toastErrors(WARNINGS.NO_AUTH_TOKEN);
+          );
 
-    if (props && props.history) {
-      props.history.push(`/login`);
+          return fetch(request)
+            .then(response => {
+              if (response.status >= 200 && response.status < 300) {
+                return response.json();
+              }
+              throw new Error(response.statusText);
+            })
+            .then(data => {
+              resolve(data)
+
+              //TODO: test thoroughly what happens in modals
+              console.log("Data from geoJSON update: ", data);
+              if (!inModal){ //stop redirect if in a modal
+                props.history.push(`/${props.resource}`);
+              }
+            });
+        }).catch(err => {
+          console.log("err in POST new object with geo: ", err, formData, geo, props)
+          reject(err)
+        })
+        ;
     } else {
-      console.error(
-        'no props sent to createobjectwithgeo - how did this happen?  formData: ',
-        formData
-      );
+      //TODO: logout the user.
+      toastErrors(WARNINGS.NO_AUTH_TOKEN);
+      reject({error: WARNINGS.NO_AUTH_TOKEN})
     }
-  }
+  })
 }
 
 export function getTranslation(
@@ -936,4 +1000,17 @@ export function translateDates(date, type, direction = 1) {
   }
   //TODO: need to do something downstream later.
   return date;
+}
+
+export const truncatePath = (path) => {
+  if (!path){
+    return path
+  }
+  let tempPath = path
+  let tempPathArr = tempPath.split("/")
+  if (tempPathArr.length > 4){
+    tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
+    tempPath = ".../" + tempPathArr.join("/")
+  }
+  return tempPath
 }

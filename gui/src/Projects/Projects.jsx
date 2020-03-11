@@ -21,13 +21,11 @@ import {
   translate,
   withTranslate,
 } from 'react-admin';
-import { Field } from 'react-final-form'
 import { withStyles } from "@material-ui/core/styles";
 import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
 import FilesTab from "./Files/FilesTab";
-import { EditMetadata, ConfigMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { UserShow } from "../_components/_fields/UserShow";
@@ -35,20 +33,23 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
-import { InputLabel, Select, MenuItem, Typography, Toolbar, Dialog, DialogTitle, DialogContent, Button } from "@material-ui/core";
+import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getPrimaryContactCandidates, getUsersInGroup} from "../_tools/funcs";
+import { Typography, Toolbar, Dialog, DialogTitle, DialogContent, Chip } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer } from "ra-core";
-import ProjectTitle from "./ProjectTitle";
 import { EditButton } from "ra-ui-materialui/lib/button";
-import { DatasetForm, DatasetShow } from "../Datasets/Datasets";
-import { ProjectCreateForm } from "./ProjectCreateForm";
-import { UserInput } from "./UserInput";
-import { DefaultToolbar } from "../_components";
+import { DatasetForm, DatasetModalShow } from "../Datasets/Datasets";
+import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
+import KeywordsChip from "./KeywordsChip";
+import { ProjectForm } from "./ProjectForm";
+import { MetadataEditActions, ShowMetadata } from "../_components/Metadata";
 
 const styles = {
   actions: {
     backgroundColor: 'inherit',
+  },
+  keywordChip: {
+    marginRight: "0.5em",
   },
   header: {
     backgroundColor: 'inherit',
@@ -61,6 +62,23 @@ const styles = {
   },
   modalContainer: {
     paddingRight: "1em",
+  },
+  mapFormHeader: {
+    paddingBottom: "1em",
+    marginTop: "1em",
+  },
+  preMapArea: {
+    marginBottom: "1em",
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
+  //different widths in create / edit form.  Why?  I dunno.
+  selectPCU: {
+    width: "18.5em"
+  },
+  selectPCUEdit: {
+    width: "23em",
   }
 };
 
@@ -70,7 +88,6 @@ const filterStyles = {
   },
 };
 
-const validateAvatar = required('en.validate.project.avatar');
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
@@ -108,7 +125,7 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <ProjectName label={'en.models.projects.name'} />
       <ReferenceField
         link={false}
@@ -126,11 +143,12 @@ export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
       >
         <TextField source={MODEL_FIELDS.NAME} />
       </ReferenceField>
-      <TextField
-        label={'en.models.projects.keywords'}
-        source={MODEL_FIELDS.KEYWORDS}
-        multiline
-      />
+
+      <KeywordsChip {...props}
+      classes={classes}
+      label={"en.models.projects.keywords"}
+        />
+     
     </Datagrid>
   </List>
 ));
@@ -208,10 +226,10 @@ export const ProjectShow = withTranslate(withStyles(styles)(
           <Tab label={'summary'}>
             {projectDatasets && <RelatedDatasets setCreateModal={setCreateModal} setEditModal={setEditModal} setViewModal={setViewModal} projectDatasets={projectDatasets} canEditModal={canEditModal} {...props} /> }
             <ProjectName label={'en.models.projects.name'} />
-            <TextField
-              label={'en.models.projects.keywords'}
-              source={MODEL_FIELDS.KEYWORDS}
-              multiline
+            
+            <KeywordsChip {...props}
+              classes={classes}
+              label={"en.models.projects.keywords"}
             />
             <ReferenceField
               label={'en.models.projects.primary_contact_user'}
@@ -260,20 +278,24 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
                   {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
                     <DialogContent>
-                      <DatasetShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
+                      <DatasetModalShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
                     </DialogContent>
                   </Dialog>}
                 </>
 
               )}
             </ShowController>
-            <MapView/>
+            <ShowController {...props}>
+              {controllerProps => (controllerProps.record && 
+              controllerProps.record.geo && 
+              controllerProps.record.geo.geojson && 
+              controllerProps.record.geo.geojson.features.length > 0 ?
+              <MapView {...controllerProps}/>
+              : null
+              )}
+            </ShowController>
           </Tab>
           <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>
-            <ProjectName label={'en.models.projects.name'} />
-            <FilesTab projectID={props.id} />
-          </Tab>
-          <Tab label={'browse'} path={'browse'}>
             <ProjectName label={'en.models.projects.name'} setProjectName={setProjectName} />
             <BrowseTab projectID={props.id} projectName={projectName} />
           </Tab>
@@ -286,158 +308,6 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     }
 }));
 
-export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, record, state, ...props }) => {
-  const [groupList, setGroupList] = useState([])
-  const [projectGroup, setProjectGroup] = useState(null)
-  const [groupContactList, setGroupContactList] = useState([])
-  const [loading, setLoading] = useState(true)
-  let _isMounted = false
-
-
-  const handleSelectChange = (e, value, prevValue, target) => {
-    console.log("handlechange e: ", e, value, prevValue, target, "ismounted: ", _isMounted)
-    if (target === 'group' && value !== prevValue){
-      setLoading(true)
-      setGroupList([])
-      setProjectGroup(value)
-    }
-  }
-
-  useEffect(() => {
-    _isMounted = true
-    if (projectGroup !== null){
-      getAllParentGroups(projectGroup)
-    }
-
-    //if we unmount, lock out the component from being able to use the state
-    return function cleanup() {
-      _isMounted = false;
-    }
-  }, [projectGroup])
-
-  //TODO: extract to funcs.jsx
-  //TODO: handle potential setstate on unmounted component
-  const getAllParentGroups = group_id => {
-    if (group_id !== null){
-      getGroupData(group_id).then(
-        data => {
-
-          let tempGroupList = groupList
-          tempGroupList.push(data)
-          setGroupList(tempGroupList)
-          getAllParentGroups(data.parent_group)
-
-          return data
-        }
-      ).catch(err => {
-        console.error("error returned in getallparentgroups: ", err)
-      })
-    }
-    else{
-      //now get a list of users in each group
-      getPrimaryContactCandidates(groupList).then(data => {
-        setLoading(false)
-        setGroupContactList(data)})
-    }
-  };
-
-  if (record && record.group && isAdminOfAParentGroup(record.group)) {
-    if (projectGroup === null){
-      setProjectGroup(record.group)
-    }
-
-    return (
-    <CardContentInner>
-        <div>
-          <TextInput
-            className="input-small"
-            label={"en.models.projects.name"}
-            source={MODEL_FIELDS.NAME}
-            validate={validateName} />
-        </div>
-          <ReferenceInput
-            resource={MODELS.PROJECTAVATARS}
-            className="input-small"
-            perPage={1000}
-
-            label={MODEL_FIELDS.AVATAR} 
-            source={MODEL_FIELDS.AVATAR}  reference={MODELS.PROJECTAVATARS}>
-              <SelectInput source={MODEL_FIELDS.AVATAR_IMAGE} optionText={<ImageField classes={{image: classes.image}} source={MODEL_FIELDS.AVATAR_IMAGE} />}/>
-          </ReferenceInput>
-        <div>
-          <TextInput
-            className="input-small"
-            label={"en.models.projects.keywords"}
-            multiline
-            source={MODEL_FIELDS.KEYWORDS} />
-        </div>
-          
-        <FormDataConsumer>
-          {({formData, ...rest}) => {
-              return(
-                <div>
-                  <ReferenceInput
-                    resource="researchgroups"
-                    className="input-small"
-                    label={"en.models.projects.group"}
-                    source={MODEL_FIELDS.GROUP}
-                    reference={MODELS.GROUPS}
-                    onChange={handleSelectChange}
-                    validate={validateGroup}>
-                    <SelectInput optionText={MODEL_FIELDS.NAME} />
-                  </ReferenceInput>
-                  { !loading && groupContactList.length > 0 ?
-                    (<div>
-                      <UserInput
-                        required
-                        label={"en.models.projects.primary_contact_user"}
-                        placeholder={`Primary Contact`}
-                        validate={validatePrimaryContactUser}
-                        className="input-small"
-                        users={groupContactList} id={MODEL_FIELDS.PRIMARY_CONTACT_USER} name={MODEL_FIELDS.PRIMARY_CONTACT_USER}
-                        />
-                    </div>)
-                    : !loading && groupContactList.length === 0 ? 
-                    <div>
-                      {formData && formData.group && <Typography><a href={`/#/researchgroups/${formData.group}/show`}>{`No users in Group - Click here to add one`}</a></Typography>}
-                    </div>
-                    :
-                    <div>
-                      <Typography>{`Loading Associated Users...`}</Typography>
-                    </div>
-                    
-                  }
-                  { record && record.id && (
-                    <div>
-                      <EditMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-                      <ConfigMetadata id={record.id} type={MODEL_FK_FIELDS.PROJECT}/>
-                    </div>
-                  )}
-                </div>
-              )
-          }
-        }
-      </FormDataConsumer>
-      <FormDataConsumer>
-        {({formData, ...rest} ) =>
-        {
-          //NOTE: This FormDataConsumer area is required for the map implementation.
-          const geoDataCallback = geo => {
-            formData.geo = geo
-          };
-
-          return(
-            <div>
-              <MapForm content_type={'project'} recordGeo={record ? record.geo : null} id={record ? record.id : null} geoDataCallback={geoDataCallback}/>
-            </div>
-          )
-        }
-        }
-      </FormDataConsumer>
-    </CardContentInner>);
-  }
-});
-
 //optionText={<ImageField classes={{ image: classes.image }} source={MODEL_FIELDS.AVATAR_IMAGE} />}
 
 //TODO: geojson object does not properly update afterwards.
@@ -446,7 +316,7 @@ export const ProjectEditInputs = withStyles(styles)(({ classes, permissions, rec
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
     <Create submitOnEnter={false} {...props}>
-      <ProjectCreateForm classes={classes} translate={translate} {...props} />
+      <ProjectForm classes={classes} translate={translate} {...props} />
     </Create>
   ))
 );
@@ -458,19 +328,15 @@ class BaseProjectEdit extends Component {
       config: false,
     };
   }
-
   render() {
-    const { classes, permissions, record, ...others } = this.props;
-
+    const { classes, permissions, record, translate, ...others } = this.props;
+    const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     return (<Edit actions={<MetadataEditActions />} {...others}>
-      <SimpleForm redirect={RESOURCE_OPERATIONS.LIST} submitOnEnter={false}
-      toolbar={<DefaultToolbar {...this.props}/>}>
-        <ProjectTitle prefix={`Updating`} />
-        <ProjectEditInputs classes={classes} permissions={permissions} record={record} state={this.state} />
-      </SimpleForm>
+      <ProjectForm classes={classes} translate={translate} {...this.props} />
     </Edit>);
   }
 };
+
 
 const enhance = compose(
   translate,

@@ -23,15 +23,14 @@ import {
 } from "react-admin";
 import compose from "recompose/compose";
 import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
-import {RESOURCE_OPERATIONS, MODELS, WARNINGS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
+import {RESOURCE_OPERATIONS, MODELS, ROLE_USER, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import PropTypes from 'prop-types';
-import { Prompt } from 'react-router';
 import RelatedUsers from "./RelatedUsers";
 import { withStyles } from "@material-ui/core/styles";
 import GroupTitle from "./GroupTitle.jsx";
-import { isAdminOfAParentGroup, getGroupMembers } from "../_tools/funcs.jsx";
+import { isAdminOfAParentGroup, getGroupMembers} from "../_tools/funcs.jsx";
 import { Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { GroupMemberForm } from "../GroupMembers/GroupMembers.jsx";
@@ -42,12 +41,15 @@ const styles = {
   actions: {
     backgroundColor: "inherit"
   },
-  root: {
-    backgroundColor: "inherit"
+  description: {
+    maxWidth: "80%",
   },
   header: {
     backgroundColor: "inherit"
-  }
+  },
+  columnHeaders: {
+    fontWeight: "bold",
+  },
 };
 const filterStyles = {
   form: {
@@ -92,7 +94,7 @@ export const GroupList = withStyles(styles)(({ classes, ...props }) => {
     pagination={<CustomPagination />}
     bulkActionButtons={false}>
 
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <TextField
         label={"en.models.groups.name"}
         source={MODEL_FIELDS.NAME}
@@ -281,40 +283,25 @@ const validateParentGroup = (value, allValues) => {
 
 const asyncValidate = getAsyncValidateNotExists({id: MODEL_FIELDS.ID, name : MODEL_FIELDS.NAME, reject: "There is already a group with this name. Please pick another name for your group." }, MODELS.GROUPS);
 
+//only used for group creation
 const GroupForm = props => 
 {
-  const [isFormDirty, setIsFormDirty] = useState(false)
-  const [data, setData] = useState({})
-  let _isMounted = true
-
-  useEffect(() => {
-    if (data && Object.keys(data).length > 0) {
-      if (_isMounted){
-        console.log("before save, isformdirty, data: ", isFormDirty, data)
-        props.save(data)
-      }
-    }
-    return function cleanup() {
-      _isMounted = false
-    }
-  }, [data])
 
   function handleSubmit(formData) {
-    setIsFormDirty(false)
-    setData(formData)
+    const {name, description} = formData
+
+    if (name && description){
+      props.save(formData)
+    }
   }
 
-  function handleChange(data){
-    setIsFormDirty(true)
-  }
-
+  
   return(
     <SimpleForm
       {...props}
       toolbar={<DefaultToolbar />}
       asyncValidate={asyncValidate}
       asyncBlurFields={[ MODEL_FIELDS.NAME ]}
-      onChange={handleChange}
       save={handleSubmit}
     >
       <GroupTitle prefix={"Creating Group"} />
@@ -341,7 +328,6 @@ const GroupForm = props =>
           optionText={MODEL_FIELDS.NAME}
         />
       </ReferenceInput>
-      <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
     </SimpleForm>
   )
 };
@@ -350,7 +336,7 @@ export const GroupCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
     <Create {...props}>
-      <GroupForm {...other} />
+      <GroupForm  {...other} />
     </Create>
   );
 }
@@ -365,7 +351,7 @@ class BaseGroupEdit extends Component {
 
   render() {
 
-    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, id, ...others } = this.props;
+    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, id } = this.props;
 
     return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm
@@ -405,7 +391,7 @@ class BaseGroupEdit extends Component {
         </ReferenceInput>
         { id && (
           <>
-            <EditMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
+            <EditMetadata id={id} values={record ? record.metadata : null}  type={MODEL_FK_FIELDS.GROUP}/>
             <ConfigMetadata id={id} type={MODEL_FK_FIELDS.GROUP}/>
           </>
           )}

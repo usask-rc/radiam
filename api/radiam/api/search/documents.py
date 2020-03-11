@@ -5,9 +5,6 @@ from uuid import uuid4
 
 
 class ESDataset(Document):
-    """
-    Very simple dataset class to test ES with
-    """
     # _id = Integer()
     # title = Text()
 

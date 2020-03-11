@@ -41,6 +41,7 @@ from radiam.api.serializers import (
     GroupRoleSerializer,
     GroupViewGrantSerializer,
     LocationSerializer,
+    LocationProjectSerializer,
     LocationTypeSerializer,
     MetadataUITypeSerializer,
     MetadataValueTypeSerializer,
@@ -79,6 +80,7 @@ from .models import (
     GroupRole,
     GroupViewGrant,
     Location,
+    LocationProject,
     LocationType,
     MetadataUIType,
     MetadataValueType,
@@ -574,6 +576,7 @@ class UserAgentViewSet(RadiamViewSet):
 
     filter_backends = (
        DjangoFilterBackend,
+       RadiamAuthUseragentFilter,
        UserAgentOrderingFilter,
     )
 
@@ -672,7 +675,6 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
     filter_backends = (
         filters.SearchFilter,
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthResearchGroupFilter,
         ResearchGroupOrderingFilter,
     )
@@ -696,6 +698,11 @@ class ResearchGroupViewSet(RadiamViewSet, MetadataViewset):
             return response
         else:
             return super().partial_update(request, pk, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 
 class GroupRoleViewSet(RadiamViewSet):
@@ -728,7 +735,6 @@ class GroupMemberViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthGroupMemberFilter,
         GroupMemberOrderingFilter,
     )
@@ -736,6 +742,11 @@ class GroupMemberViewSet(RadiamViewSet):
     filter_fields=('group', 'group_role', 'user', 'date_expires')
     ordering_fields=('group', 'group_role', 'user', 'date_expires', 'date_created', 'date_updated')
     permission_classes = (IsAuthenticated, DRYPermissions,)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 
 class DatasetOrderingFilter(RadiamOrderingFilter):
@@ -939,6 +950,21 @@ class DatasetSensitivityViewSet(RadiamViewSet):
     filter_fields=('dataset', 'sensitivity')
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
+class LocationProjectViewSet(RadiamViewSet):
+    """
+    API endpoint that allows the association of locations with multiple projects.
+    """
+    queryset = LocationProject.objects.all().order_by('location')
+    serializer_class = LocationProjectSerializer
+
+    filter_backends = (
+        DjangoFilterBackend,
+        RadiamAuthLocationFilter,
+    )
+
+    filter_fields=('location', 'project')
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
 
 class GroupViewGrantOrderingFilter(RadiamOrderingFilter):
     def get_replacements(self):
@@ -982,12 +1008,11 @@ class LocationViewSet(RadiamViewSet):
     filter_backends = (
         filters.SearchFilter,
         DjangoFilterBackend,
-        ActiveModelFilter,
         RadiamAuthLocationFilter,
         LocationOrderingFilter,
     )
 
-    search_fields = ['display_name', 'host_name']
+    search_fields = ['display_name', 'host_name', 'locationproject__project__id', 'locationproject__project__name']
     filter_fields=('display_name', 'host_name', 'location_type')
     ordering_fields=('display_name', 'host_name', 'location_type', 'date_created', 'date_updated', 'globus_endpoint', 'globus_path', 'portal_url', 'osf_project', 'notes')
     ordering = ('display_name')
@@ -1013,6 +1038,11 @@ class LocationViewSet(RadiamViewSet):
             return super().filter_queryset(queryset).filter(location_id_qs)
         else:
             return super().filter_queryset(queryset)
+
+    def list(self, request, *args, **kwargs):
+        self.filter_backends += (ActiveModelFilter,)
+
+        return super().list(request, *args, **kwargs)
 
 class LocationTypeViewSet(RadiamViewSet):
     """

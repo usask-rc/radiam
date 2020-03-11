@@ -5,8 +5,8 @@ import {WEBTOKEN, WARNINGS, MODELS, METHODS, MODEL_FIELDS} from "../_constants/i
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { email, maxLength, minLength, required, FormDataConsumer, regex } from 'ra-core';
-import { toastErrors, getUserGroups, getCurrentUserID } from '../_tools/funcs';
-import { Prompt, Redirect } from 'react-router';
+import { toastErrors, getUserGroups } from '../_tools/funcs';
+import { Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
 import { Dialog, DialogContent, Toolbar } from '@material-ui/core';
