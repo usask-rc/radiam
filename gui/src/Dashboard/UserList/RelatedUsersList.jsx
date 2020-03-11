@@ -247,9 +247,10 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                         .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
                         .map((userObj, index) => {
                             const user = userObj.user
+                            const user_display_name = user.last_name ? `${user.last_name} ${user.first_name ? `, ${user.first_name}` : `` }`
+                            : user.first_name
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
-                            const daysAgo = now.diff(moment(userObj.date_created).toISOString(), "days")
                             
                             console.log("userObj being mapped: ", userObj, groups)
                             return(
@@ -268,7 +269,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
                                         <Typography>
-                                            {`${user.last_name}, ${user.first_name}`}
+                                            {user_display_name}
                                         </Typography>
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
