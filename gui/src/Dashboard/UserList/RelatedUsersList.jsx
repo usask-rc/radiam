@@ -247,7 +247,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                         .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
                         .map((userObj, index) => {
                             const user = userObj.user
-                            const user_display_name = user.last_name ? `${user.last_name} ${user.first_name ? `, ${user.first_name}` : `` }`
+                            const user_display_name = user.last_name ? `${user.last_name}${user.first_name ? `, ${user.first_name}` : `` }`
                             : user.first_name
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
@@ -279,8 +279,12 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                     </TableCell>
                                     <TableCell className={classes.groupCell}>
                                         {groups.map(group => {
+
+                                            const memberSince = moment(group.since).format("YYYY-MM-DD")
+                                            const memberUntil = group.expires ? moment(group.expires).format("YYYY-MM-DD") : ""
+
                                             return(
-                                                <Tooltip title={`Member Since ${group.since} ${group.expires ? `Until: ${group.expires}`:``}`}>
+                                                <Tooltip title={`Member Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
                                                     <Link href={`/#/researchgroups/${group.id}/show`}>
                                                         <Chip 
                                                         label= {group.name}
