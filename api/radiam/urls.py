@@ -76,6 +76,10 @@ router.register(r'datasets/(?P<dataset_id>[-\w]+)/search',
                 views.DatasetSearchViewSet,
                 basename='radiamdatasetsearch')
 
+router.register(r'datasets/(?P<dataset_id>[-\w]+)/export',
+                views.DatasetExportViewSet,
+                basename='radiamdatasetexport')
+
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [

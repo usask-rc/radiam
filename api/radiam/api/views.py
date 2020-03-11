@@ -895,6 +895,15 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     #     return self.get_paginated_response(serializer.data)
 
 
+class DatasetExportViewSet(viewsets.GenericViewSet):
+    """
+    API endpoint for exporting metadata related to datasets
+    """
+
+    def list(self, request, dataset_id):
+        return Response(request.data)
+
+
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
     """
     API endpoint that allows the association of datasets with multiple data collection methods.
