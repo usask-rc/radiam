@@ -4,7 +4,6 @@ import get from 'lodash/get';
 import Typography from '@material-ui/core/Typography';
 import { FieldProps, InjectedFieldProps, fieldPropTypes } from "react-admin";
 import {MODEL_FIELDS, AVATAR_HEIGHT} from "../../_constants/index";
-
 import { withStyles } from "@material-ui/core/styles";
 import UserAvatar from "react-user-avatar"
 

@@ -6,7 +6,6 @@ import L from 'leaflet';
 import DynamicForm from './DynamicForm';
 import { compose } from 'recompose';
 import {withStyles} from "@material-ui/core/styles"
-import Typography from "@material-ui/core/Typography"
 import { getFirstCoordinate } from '../../_tools/funcs';
 import {LINKS} from '../../_constants/index';
 

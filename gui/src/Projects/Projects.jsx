@@ -5,7 +5,6 @@ import {
   Datagrid,
   Edit,
   Filter,
-  ImageField,
   List,
   ReferenceField,
   ReferenceInput,
@@ -13,7 +12,6 @@ import {
   SelectInput,
   Show,
   ShowController,
-  SimpleForm,
   Tab,
   TabbedShowLayout,
   TextField,
@@ -22,10 +20,8 @@ import {
   withTranslate,
 } from 'react-admin';
 import { withStyles } from "@material-ui/core/styles";
-import { CardContentInner } from "ra-ui-materialui";
 import {AVATAR_HEIGHT, MODEL_FIELDS, ROLE_USER, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import BrowseTab from './Browse/BrowseTab';
-import FilesTab from "./Files/FilesTab";
 import CustomPagination from "../_components/CustomPagination";
 import { ProjectName } from "../_components/_fields/ProjectName.jsx";
 import { UserShow } from "../_components/_fields/UserShow";
@@ -33,10 +29,8 @@ import "../_components/components.css";
 import compose from "recompose/compose";
 import MapView from '../_components/_fragments/MapView';
 import RelatedDatasets from '../Datasets/RelatedDatasets';
-import { isAdminOfAParentGroup, getGroupData, getRelatedDatasets, getUsersInGroup} from "../_tools/funcs";
-import { Typography, Toolbar, Dialog, DialogTitle, DialogContent, Chip } from "@material-ui/core";
-import MapForm from "../_components/_forms/MapForm";
-import { FormDataConsumer } from "ra-core";
+import { isAdminOfAParentGroup, getRelatedDatasets} from "../_tools/funcs";
+import { Typography, Toolbar, Dialog, DialogTitle, DialogContent } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { DatasetForm, DatasetModalShow } from "../Datasets/Datasets";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";

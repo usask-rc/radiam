@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
 import {AVATAR_HEIGHT, MODELS, MODEL_FIELDS} from "../../_constants/index"
-import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, Link, Typography } from '@material-ui/core';
+import { Card, TableRow, Table, TableCell, TableBody, TablePagination, Link, Typography } from '@material-ui/core';
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';

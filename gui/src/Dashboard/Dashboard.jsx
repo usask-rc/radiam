@@ -1,6 +1,6 @@
 //Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { getRecentProjects, getGroupMembers, getUsersInMyGroups } from '../_tools/funcs';
+import { getRecentProjects, getUsersInMyGroups } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
 import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';

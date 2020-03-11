@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from 'util';
 import { toast } from 'react-toastify';
 import radiamRestProvider from './radiamRestProvider';
 import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from 'ra-core';
+import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
 import moment from 'moment';
 var cloneDeep = require('lodash.clonedeep');
 
@@ -102,11 +102,15 @@ export const getUsersInMyGroups = (groups) => {
         return groupList
       })
       .then(groupRecords => {
+        console.log("groupRecords is: ", groupRecords)
         Promise.all(promises).then(userLists => {
+          console.log("userLists is: ", userLists)
             const usersInMyGroups = {}
             userLists.map(userList => {
                 userList.map(record => {
                   console.log("userList.record: ", record)
+
+
                     record.group.since = record.date_created
                     record.group.expires = record.date_expires
                     record.group.group_role = record.group_role //a role is associated with the user-group relationship

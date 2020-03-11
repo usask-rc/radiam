@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { withStyles } from "@material-ui/styles"
-import { getGroupData, getUsersInGroup, getMaxUserRole, getAPIEndpoint, getGroupMembers } from "../../_tools/funcs"
-import {ROLES, MODELS} from "../../_constants/index"
+import { getGroupData, getUsersInGroup, getMaxUserRole, getGroupMembers } from "../../_tools/funcs"
+import {ROLES} from "../../_constants/index"
 import { Grid } from "@material-ui/core"
 import FewUsers from "./Warnings/FewUsers"
 import NoGroups from "./Warnings/NoGroups"
-import { radiamRestProvider, httpClient } from "../../_tools"
-import { GET_LIST } from "ra-core"
 
 const styles = () => ({
     container: {
@@ -113,6 +111,8 @@ const WarningCards = ({classes, ...props}) => {
             else{
                 getUsersInMyGroups(user.groupAdminships)
                 .then(data => {
+                    //receive a list of users underneath me
+                    //TODO: determine user count in each group, probably on the next level up
                     //do we care about user permission levels?
                     setManagedUsers(data)
                 })

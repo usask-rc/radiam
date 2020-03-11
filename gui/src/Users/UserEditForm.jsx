@@ -9,7 +9,7 @@ import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
-import { Dialog, DialogContent, Toolbar } from '@material-ui/core';
+import { Dialog, DialogContent } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
 import { toast } from 'react-toastify';
 import { UserToolbar } from '../_components/Toolbar';
