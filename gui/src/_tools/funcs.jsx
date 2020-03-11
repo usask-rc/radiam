@@ -10,7 +10,6 @@ var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
-
 //TODO: move '/api' to constants as the url for where the api is hosted?  or leave as a function?
 export function getAPIEndpoint() {
   return `/${API_ENDPOINT}`;
@@ -134,7 +133,6 @@ export function getRecentProjects(count=1000) {
 
   return new Promise((resolve, reject) => {
       
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const now = moment();
 
     dataProvider(GET_LIST, MODELS.PROJECTS, {
@@ -687,7 +685,6 @@ function updateObjectWithGeo(formData, geo, props) {
 
 export function putObjectWithoutSaveProp(formData, resource){
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const params = {id: formData.id, data: formData, resource:resource }
   
     dataProvider(UPDATE, resource, params).then(response => {
@@ -702,7 +699,6 @@ export function putObjectWithoutSaveProp(formData, resource){
 export function postObjectWithoutSaveProp(formData, resource){
   return new Promise((resolve, reject) => {
 
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const params = { data: formData, resource:resource }
 
     dataProvider(CREATE, resource, params).then(response => {
@@ -716,7 +712,6 @@ export function postObjectWithoutSaveProp(formData, resource){
 //seems like it works - needs testing
 export function deleteItem(data, resource){
   return new Promise((resolve, reject) => {
-    const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const params = { id: data.id, resource:resource }
 
     dataProvider(DELETE, resource, params).then(response => {
