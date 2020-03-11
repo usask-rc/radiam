@@ -33,6 +33,19 @@ const styles = {
     nameCell: {
         fontSize: "1em",
     },
+
+    projectNameContainer: {
+        display: "flex",
+        flexDirection: "row",
+        textAlign: "center",
+    },
+    projectNameText: {
+        display: "inline-block",
+        verticalAlign: "middle",
+        paddingTop: "0.9em",
+        paddingBottom: "0.9m",
+        paddingLeft: "0.5em",
+    },
     searchIcon: {
         height: '1em',
         width: '1em',
@@ -104,7 +117,6 @@ const styles = {
     };
 
     const headCells = [
-        {id: 'icon', numeric: false, disablePadding: false, canOrder: false, label: "Icon"},
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
@@ -222,27 +234,26 @@ const ProjectList = ({classes, projects}) => {
                             key={project.name}
                             selected={isItemSelected}
                             >
-                                <TableCell className={classes.iconCell}>
-                                    <ReferenceField
-                                        record={project}
-                                        basePath={MODELS.PROJECTS}
-                                        link={false}
-                                        source={MODEL_FIELDS.AVATAR}
-                                        reference={MODELS.PROJECTAVATARS}
-                                        allowEmpty
-                                    >
-                                        <ImageField
-                                            classes={{ image: classes.image }}
-                                            title={project.name}
-                                            source={MODEL_FIELDS.AVATAR_IMAGE}
-                                            allowEmpty
-                                        />
-
-                                    </ReferenceField>
-                                </TableCell>
                                 <TableCell className={classes.nameCell}>
-                                    <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
-                                        {project.name}
+                                    <Link className={classes.projectNameContainer} href={`/#/projects/${project.id}/show`}>
+                                        <ReferenceField
+                                            record={project}
+                                            basePath={MODELS.PROJECTS}
+                                            link={false}
+                                            source={MODEL_FIELDS.AVATAR}
+                                            reference={MODELS.PROJECTAVATARS}
+                                            allowEmpty
+                                        >
+                                            <ImageField
+                                                classes={{ image: classes.image }}
+                                                title={project.name}
+                                                source={MODEL_FIELDS.AVATAR_IMAGE}
+                                                allowEmpty
+                                            />
+                                        </ReferenceField>
+                                        <Typography className={classes.projectNameText}>
+                                            {project.name}
+                                        </Typography>
                                     </Link>
                                 </TableCell>
                                 <TableCell className={classes.keywordCell}>

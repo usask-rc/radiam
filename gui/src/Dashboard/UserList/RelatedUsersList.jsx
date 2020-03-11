@@ -1,12 +1,13 @@
 //RelatedUserList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip, TablePagination } from '@material-ui/core';
-import {PropTypes} from "prop-types";
+import { TableRow, TableCell, Card, Table, TableBody, Link, Typography, Tooltip, Chip, TablePagination } from '@material-ui/core';
 import { translate } from "react-admin"
 import moment from 'moment';
 import { compose } from 'recompose';
 import EnhancedTableHead from '../EnhancedTableHead';
+import UserAvatar from "react-user-avatar"
+
 
 const styles = {
     headlineTop: {
@@ -32,6 +33,18 @@ const styles = {
     },
     searchCell: {
         width: "14em",
+    },
+    usernameContainer: {
+        display: "flex",
+        flexDirection: "row",
+        textAlign: "center",
+    },
+    usernameText: {
+        display: "inline-block",
+        verticalAlign: "middle",
+        paddingTop: "0.5em",
+        paddingBottom: "0.5em",
+        paddingLeft: "0.5em",
 
     },
     nameCell: {
@@ -230,8 +243,11 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                                 selected={isItemSelected}
                                 >
                                     <TableCell className={classes.nameCell}>
-                                        <Link className={classes.projectName} href={`/#/users/${user.id}/show`}>
-                                            {user.username}
+                                        <Link className={classes.usernameContainer} href={`/#/users/${user.id}/show`}>
+                                            <UserAvatar size="36" name={`${user.first_name} ${user.last_name}`} />
+                                            <Typography className={classes.usernameText}>
+                                                {user.username}
+                                            </Typography>
                                         </Link>
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
