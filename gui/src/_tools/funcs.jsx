@@ -611,28 +611,6 @@ export function getUserGroups(record) {
   });
 }
 
-//TODO: contact candidates have to be in a gross format to work with the existing drop down list system.
-export function getPrimaryContactCandidates(groupList) {
-  let contactCandidates = {}
-  return new Promise((resolve, reject) => {
-    const promises = []
-    groupList.map(group => {
-      promises.push(getUsersInGroup(group).then(data => {
-        data.map(item => {
-          contactCandidates[item.id] = item;
-          return item;
-        })
-      }))
-    })
-
-    Promise.all(promises).then(data => {
-      const candidateList = []
-      Object.keys(contactCandidates).map(key => candidateList.push(contactCandidates[key]))
-      resolve(candidateList)
-    }).catch(err => reject(err))
-  })
-}
-
 //TODO: convert to promise / callback system
 //TODO: do the above
 export function submitObjectWithGeo(
@@ -705,19 +683,6 @@ export function postObjectWithoutSaveProp(formData, resource){
         resolve(response)
     }).catch(err => {
         reject(err)
-    })
-  })
-}
-
-//seems like it works - needs testing
-export function deleteItem(data, resource){
-  return new Promise((resolve, reject) => {
-    const params = { id: data.id, resource:resource }
-
-    dataProvider(DELETE, resource, params).then(response => {
-      resolve(response)
-    }).catch(err => {
-      reject(err)
     })
   })
 }
@@ -950,26 +915,6 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       }
     }
   }
-/*
-  //Locations suffers the same stupid field issue that Datasets does and requires a similar transformation on Projects
-  if (resource === 'LOCATIONS'){
-    if (!Array.isArray(data)){ //no transformation needed upstream
-      if (direction === 0){
-        if (data.projects && data.projects.length > 0){
-          const projList = []
-          
-          console.log("in translator, data.projects is: ", data.projects)
-          data.projects.map(project => {
-            projList.push(project.id)
-          })
-          data.projects = projList
-        }
-      }
-    }
-    console.log("LOCATIONS translated data: ", data)
-    
-  }*/
-  
 
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.

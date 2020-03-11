@@ -104,7 +104,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
             setLoading(false)
           }
         }).catch(err => {
-          console.error("in getprimarycontactcandidates, err: ", err)
+          console.error("in useEffect, err: ", err)
         })
       }
       //when we unmount, lock out the component from being able to use the state
