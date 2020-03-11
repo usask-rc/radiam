@@ -1,7 +1,7 @@
 //RelatedUserList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip } from '@material-ui/core';
+import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip } from '@material-ui/core';
 import {PropTypes} from "prop-types";
 import {ChipField, ReferenceField} from "react-admin"
 import { MODELS } from "../../_constants/index"
@@ -15,6 +15,9 @@ const styles = {
     },
     groupCell: {
 
+    },
+    chipLink: {
+        cursor: "pointer"
     },
     chipField: {
         marginRight: "1em",
@@ -58,6 +61,7 @@ const styles = {
         color: "LightGray",
     },
     chipItem: {
+        cursor: "pointer",
         margin: "0.25em"
     },
     moreChips: {
@@ -98,9 +102,7 @@ const styles = {
         {id: "username", numeric: false, disablePadding: false, canOrder: true, label: "Username"},
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Name"},
         {id: "email", numeric: false, disablePadding: false, canOrder: true, label: "Email"},
-        {id: "date_created", numeric: false, disablePadding: false, canOrder: true, label: "User Created"},
         {id: "groups", numeric: false, disablePadding: false, canOrder: true, label: "User Groups" },
-
     ]
 
     function desc(a, b, orderBy) {
@@ -274,27 +276,20 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                             {`${user.email}`}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell className={classes.nameCell}>
-                                        <Tooltip title={`User Created on: ${userObj.date_created}`}>
-                                            <Typography>
-                                                {`${daysAgo} days ago`}
-                                            </Typography>
-                                        </Tooltip>
-                                    </TableCell>
                                     <TableCell className={classes.groupCell}>
                                         {groups.map(group => {
-                                            return <ReferenceField 
-                                            record={{group: group}}
-                                            basePath={MODELS.GROUPS}
-                                            key={`${user.id}.${group}`}
-                                            link={true}
-                                            linkType={"show"}
-                                            source={"group"}
-                                            reference={"researchgroups"}
-                                            >
-                                                <ChipField source={"name"} className={classes.chipField} />
-                                            </ReferenceField>
-                                        })}
+                                            return(
+                                                <Tooltip title={`Member Since ${group.since} ${group.expires ? `Until: ${group.expires}`:``}`}>
+                                                    <Link href={`/#/researchgroups/${group.id}/show`}>
+                                                        <Chip 
+                                                        label= {group.name}
+                                                        className={classes.chipItem}
+                                                        />
+                                                    </Link>
+                                                </Tooltip>
+                                            )
+                                            }
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             )
