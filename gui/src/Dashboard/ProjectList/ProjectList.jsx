@@ -230,7 +230,6 @@ const ProjectList = ({classes, projects}) => {
                             hover
                             onClick={event => handleClick(event, project.name)}
                             tabIndex={-1}
-                            key={project.name}
                             selected={isItemSelected}
                             >
                                 <TableCell className={classes.nameCell}>

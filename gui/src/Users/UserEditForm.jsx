@@ -1,6 +1,6 @@
 //UserEditForm.jsx
 import React, { Component } from 'react';
-import { BooleanInput, SaveButton, SimpleForm, TextInput } from "react-admin";
+import { BooleanInput, SimpleForm, TextInput } from "react-admin";
 import {WEBTOKEN, WARNINGS, MODELS, METHODS, MODEL_FIELDS} from "../_constants/index";
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
@@ -110,8 +110,8 @@ class UserEditForm extends Component {
     };
 
     render() {
-        const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
-        const {setViewModal, record} = this.props
+        const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, redirect} = this.state
+        const {setViewModal} = this.props
         return (<>
             <SimpleForm
                 save={this.handleSubmit}

@@ -202,7 +202,7 @@ class MapForm extends Component {
   };
 
   _updateFeatures = feature => {
-    const { features, notDisplayedFeatures } = this.state
+    const { features } = this.state
     this.setState({ ...features, features: feature });
     console.log('in _updateFeatures, state is now: ', this.state);
     this.updateGeo();
@@ -210,22 +210,12 @@ class MapForm extends Component {
 
   updateGeo = () => {
     const {id, content_type, geoDataCallback} = this.props
-    const { features, notDisplayedFeatures } = this.state
+    const { features } = this.state
     //there are values in Geo that we don't care for in the API.
 
     let featuresList = [];
     Object.keys(features).map(key => {
       featuresList.push(features[key]);
-      return key;
-    });
-
-    //TODO: case of features that leaflet cannot display (multipolygon, multipoint, multilinestring)
-    console.log(
-      'in updategeo, notdisplayedfeatures is: ',
-      notDisplayedFeatures
-    );
-    Object.keys(notDisplayedFeatures).map(key => {
-      featuresList.push(notDisplayedFeatures[key]);
       return key;
     });
 

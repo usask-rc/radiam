@@ -22,10 +22,8 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
-  let _isMounted = false
-
   useEffect(() => {
-    _isMounted = true
+    let _isMounted = true
     setStatus({loading: true})
     
     getRootPaths(projectID, dataType).then(data => {

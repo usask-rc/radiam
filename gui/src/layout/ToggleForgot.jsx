@@ -1,5 +1,5 @@
 //ToggleForgot.jsx
-import React, { Component } from 'react'
+import React from 'react'
 import { withStyles, Link } from '@material-ui/core'
 import compose from "recompose/compose"
 import { translate } from "ra-core";

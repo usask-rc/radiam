@@ -33,9 +33,6 @@ import { Show } from "ra-ui-materialui/lib/detail";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import UserAgentTitle from "./UserAgentTitle";
 import { FKToolbar } from "../_components/Toolbar";
-import ProjectName from "../_components/_fields/ProjectName";
-import { ProjectShow } from "../Projects/Projects";
-import { ReferenceArrayField } from "ra-ui-materialui/lib/field";
 
 const filterStyles = {
   form: {
@@ -156,7 +153,7 @@ const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resourc
         setShowEdit(true)
       }
     }
-  }, [data, showEdit, user.id])
+  }, [data, showEdit, user.id, user.is_admin, user.is_group_admin])
 
   if (showEdit){
     return(
@@ -307,7 +304,6 @@ export const UserAgentCreate = props => {
 
 //TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
-  const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   return (
     <Edit {...props}>
       <SimpleForm

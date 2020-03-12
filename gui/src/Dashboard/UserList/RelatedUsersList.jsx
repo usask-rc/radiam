@@ -154,7 +154,6 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
     const [order, setOrder] = useState("asc")
     const [orderBy, setOrderBy] = useState("username")
     const [selected, setSelected] = useState([]);
-    const now = moment()
 
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
@@ -239,7 +238,6 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                                 hover
                                 onClick={event => handleClick(event, user.username)}
                                 tabIndex={-1}
-                                key={user.username}
                                 selected={isItemSelected}
                                 >
                                     <TableCell className={classes.nameCell}>
@@ -267,7 +265,7 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                                             const memberUntil = group.expires ? moment(group.expires).format("YYYY-MM-DD") : ""
 
                                             return(
-                                                <Tooltip title={`${translate(`en.${role.label}`)} Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
+                                                <Tooltip key={`${user.id}_${group.id}`} title={`${translate(`en.${role.label}`)} Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
                                                     <Link href={`/#/researchgroups/${group.id}/show`}>
                                                         <Chip 
                                                         label= {group.name}
@@ -285,16 +283,16 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                         )
                     }
                 </TableBody>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={relatedUsers.length}
-                    rowsPerPage={tableRows}
-                    page={tablePage}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                />
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={relatedUsers.length}
+                rowsPerPage={tableRows}
+                page={tablePage}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
         </Card>
     )
 }

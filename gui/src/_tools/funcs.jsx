@@ -10,7 +10,6 @@ var cloneDeep = require('lodash.clonedeep');
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
-//TODO: move '/api' to constants as the url for where the api is hosted?  or leave as a function?
 export function getAPIEndpoint() {
   return `/${API_ENDPOINT}`;
 }
@@ -27,7 +26,8 @@ export function isAdminOfAParentGroup(group_id){
       if (user.is_admin){
         resolve(true)
       }
-    }else{
+    }
+    else{
       reject("No User Cookie")
     }
 
@@ -38,7 +38,9 @@ export function isAdminOfAParentGroup(group_id){
             resolve(true)
           }
         }
+        return group
       })
+
       resolve(false)
 
     }).catch(err => {
@@ -89,6 +91,7 @@ export const getUsersInMyGroups = (groups) => {
         groupPromises.push(getGroupData(group).then(groupData => {
           return groupData
         }))
+        return group
       })
       //2. with group data, get lists of users associated with each group
       Promise.all(groupPromises).then(groupList => {
@@ -124,9 +127,12 @@ export const getUsersInMyGroups = (groups) => {
                       usersInMyGroups[record.user.id] = record
                       usersInMyGroups[record.user.id].group = [record.group]
                     }
+                    return record
                 })
+                return userList
             })
             resolve(usersInMyGroups)
+            return userLists
         })
         .catch(err => reject(err))
         })
@@ -180,6 +186,7 @@ export function getRecentProjects(count=1000) {
           if (project.recentFile){
             hasFiles = true
           }
+          return project
         })
         resolve({projects: projects, loading: false, hasFiles: hasFiles})
         return data
@@ -560,6 +567,7 @@ export function getGroupMembers(record) {
             Promise.all(promises).then(data => {
               console.log("in promise all data is: ", data, "groupmembers is: ", groupMembers)
               resolve(groupMembers)
+              return data
             }).catch(err => reject(err))
 
             return groupMembers;
