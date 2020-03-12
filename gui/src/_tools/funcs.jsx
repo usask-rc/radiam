@@ -1,12 +1,12 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, ROLES, ROLE_ANONYMOUS, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from '../_constants/index';
-import { isObject, isString, isArray } from 'util';
-import { toast } from 'react-toastify';
-import radiamRestProvider from './radiamRestProvider';
-import { httpClient } from '.';
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from 'ra-core';
-import moment from 'moment';
-var cloneDeep = require('lodash.clonedeep');
+import { API_ENDPOINT, ROLE_USER, ROLES, ROLE_ANONYMOUS, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from "../_constants/index";
+import { isObject, isString, isArray } from "util";
+import { toast } from "react-toastify";
+import radiamRestProvider from "./radiamRestProvider";
+import { httpClient } from ".";
+import { GET_LIST, GET_ONE, CREATE, UPDATE } from "ra-core";
+import moment from "moment";
+var cloneDeep = require("lodash.clonedeep");
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
@@ -50,7 +50,7 @@ export function isAdminOfAParentGroup(group_id){
   })
 };
 
-export function getUserRoleInGroup(group){ //given a group ID, determine the current user's status in said group
+export function getUserRoleInGroup(group){ //given a group ID, determine the current user"s status in said group
   //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
@@ -149,7 +149,7 @@ export function getRecentProjects(count=1000) {
           promises.push(getProjectData({id: project.id,
             sort: {
               field: MODEL_FIELDS.INDEXED_DATE,
-              order: '-',
+              order: "-",
             },
             pagination: {
               page: 1,
@@ -215,15 +215,15 @@ export function toastErrors(data) {
     for (var key in data) {
       // eslint-disable-next-line no-loop-func
       data[key].map(errType => {
-        toast.error(key + ': ' + errType);
+        toast.error(key + ": " + errType);
         return errType;
       });
     }
   } else if (isString(data)) {
-    toast.error('Error: ' + data);
+    toast.error("Error: " + data);
   } else if (isArray(data)) {
     data.map(item => {
-      toast.error('Error: ', item);
+      toast.error("Error: ", item);
       return item; 
     });
   } else {
@@ -237,24 +237,24 @@ export function getFirstCoordinate(layer) {
     const layerGeo = layer.feature.geometry;
     if (layerGeo && layerGeo.type && layerGeo.coordinates){
       switch (layerGeo.type) {
-        case 'Point':
+        case "Point":
           if (layerGeo.coordinates.length === 2){
             return [layerGeo.coordinates[1], layerGeo.coordinates[0]];
           }
           break;
-        case 'MultiPoint':
-        case 'LineString':
+        case "MultiPoint":
+        case "LineString":
           if (layerGeo.coordinates[0].length === 2){
             return [layerGeo.coordinates[0][1], layerGeo.coordinates[0][0]];
           }
           break;
-        case 'MultiLineString':
-        case 'Polygon':
+        case "MultiLineString":
+        case "Polygon":
           if (layerGeo.coordinates[0][0].length === 2){
             return [layerGeo.coordinates[0][0][1], layerGeo.coordinates[0][0][0]];
           }
           break;
-        case 'MultiPolygon':
+        case "MultiPolygon":
           if (layerGeo.coordinates[0][0][0].length === 2){
             return [
               layerGeo.coordinates[0][0][0][1],
@@ -264,7 +264,7 @@ export function getFirstCoordinate(layer) {
           break;
         default:
           console.error(
-            'Invalid feature sent to getFirstCoordinate. Layer: ',
+            "Invalid feature sent to getFirstCoordinate. Layer: ",
             layer
           );
       }
@@ -290,8 +290,8 @@ export function getFolderFiles(
 
   return new Promise((resolve, reject) => {
     dataProvider(
-      'GET_FILES',
-      dataType + '/' + params.projectID,
+      "GET_FILES",
+      dataType + "/" + params.projectID,
       queryParams
     )
       .then(response => {
@@ -322,7 +322,7 @@ export function getRelatedDatasets(projectID) {
     dataProvider(GET_LIST, MODELS.DATASETS, {
       filter: { project: projectID, is_active: true },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: MODEL_FIELDS.TITLE, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.TITLE, order: "DESC" },
     })
       .then(response => response.data)
       .then(assocDatasets => {
@@ -335,15 +335,15 @@ export function getRelatedDatasets(projectID) {
 //gets the root folder paths for a given project
 export function getRootPaths(projectID, dataType="projects") {
   const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I'm not sure this is necessary.
-    sort: { field: 'last_modified', order: '' },
-    filter: { type: 'directory' },
+    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
+    sort: { field: "last_modified", order: "" },
+    filter: { type: "directory" },
   };
 
   return new Promise((resolve, reject) => {
     dataProvider(
-      'GET_FILES',
-      dataType + '/' + projectID,
+      "GET_FILES",
+      dataType + "/" + projectID,
       params
     )
       .then(response => {
@@ -351,7 +351,7 @@ export function getRootPaths(projectID, dataType="projects") {
 
         response.data.map(file => {
           //find the root paths by taking the smallest length parent paths at each location
-          if (typeof file.location !== 'undefined') {
+          if (typeof file.location !== "undefined") {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             } else {
@@ -390,8 +390,8 @@ export function getProjectData(params, dataType="projects") {
   
   return new Promise((resolve, reject) => {
     dataProvider(
-      'GET_FILES',
-      dataType + '/' + params.id,
+      "GET_FILES",
+      dataType + "/" + params.id,
       params
     )
       .then(response => {
@@ -428,7 +428,7 @@ export function getParentGroupList(group_id, groupList = []){
 
 export function getGroupData(group_id) {
   return new Promise((resolve, reject) => {
-    //get this group's details, then ascend if it has a parent.
+    //get this group"s details, then ascend if it has a parent.
     dataProvider(GET_ONE, MODELS.GROUPS, { id: group_id })
       .then(response => {
         resolve(response.data);
@@ -463,7 +463,7 @@ export function getCurrentUserID(){
 
 export function getCurrentUserDetails() {
   return new Promise((resolve, reject) => {
-    dataProvider('CURRENT_USER', MODELS.USERS)
+    dataProvider("CURRENT_USER", MODELS.USERS)
       .then(response => {
         if (response && response.data){
           resolve(response.data);
@@ -489,7 +489,7 @@ export function getUsersInGroup(record) {
     dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
       filter: { group: id, is_active: is_active },
       pagination: { page: 1, perPage: 1000 },
-      sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
+      sort: { field: MODEL_FIELDS.USER, order: "DESC" },
     })
       .then(response => {
         
@@ -518,7 +518,7 @@ export function getUsersInGroup(record) {
 
         return groupMembers;
       })
-      .catch(err => reject('error in attempt to fetch groupMembers: ', err));
+      .catch(err => reject("error in attempt to fetch groupMembers: ", err));
   });
 }
 
@@ -533,7 +533,7 @@ export function getGroupMembers(record) {
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { group: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.USER, order: "DESC" },
         })
           .then(response => {
             return response.data;
@@ -559,7 +559,7 @@ export function getGroupMembers(record) {
             return groupMembers;
           })
           .catch(err => {
-            reject('error in in get groupmembers: ', err);
+            reject("error in in get groupmembers: ", err);
           });
         return groupRoles;
       });
@@ -575,7 +575,7 @@ export function getMyGroupIDs(){
   dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
     filter: {user: user.id},
     pagination: { page: 1, perPage: 1000 },
-    sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
+    sort: { field: MODEL_FIELDS.USER, order: "DESC" },
   }).then(response => {
     const groupList = []
     response.data.map(groupMember => {
@@ -597,7 +597,7 @@ export function getUserGroups(record) {
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
           filter: { user: id, is_active: is_active },
           pagination: { page: 1, perPage: 1000 },
-          sort: { field: MODEL_FIELDS.GROUP, order: 'DESC' },
+          sort: { field: MODEL_FIELDS.GROUP, order: "DESC" },
         })
         .then(response => {
           return response.data;
@@ -622,7 +622,7 @@ export function getUserGroups(record) {
           return groupMembers;
         })
         .catch(err => {
-          reject('error in in get groupmembers: ', err);
+          reject("error in in get groupmembers: ", err);
         });
         return groupRoles;
       });
@@ -640,7 +640,7 @@ export function submitObjectWithGeo(
 ) {
 
   return new Promise((resolve, reject) => {
-    console.log('formData heading into submitobjectwithgeo is: ', formData);
+    console.log("formData heading into submitobjectwithgeo is: ", formData);
     if (formData.id) {
       updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
     } else {
@@ -662,12 +662,12 @@ function updateObjectWithGeo(formData, geo, props) {
         object_id: formData.id,
         content_type: props.resource.substring(0, props.resource.length - 1),
         geojson: {
-          type: 'FeatureCollection',
+          type: "FeatureCollection",
           features: [],
         },
       };
     }
-    if (props.save){ //use the react-admin form's default save func
+    if (props.save){ //use the react-admin form"s default save func
       resolve(props.save(formData, RESOURCE_OPERATIONS.LIST));
     }
     else{
@@ -691,7 +691,7 @@ export function putObjectWithoutSaveProp(formData, resource){
   })
 }
 
-//for the rare cases that we don't have the Save prop and want to POST some model item
+//for the rare cases that we don"t have the Save prop and want to POST some model item
 export function postObjectWithoutSaveProp(formData, resource){
   return new Promise((resolve, reject) => {
 
@@ -710,12 +710,12 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
 
   return new Promise((resolve, reject) => {
     console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
-    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let headers = new Headers({ "Content-Type": "application/json" });
     const token = localStorage.getItem(WEBTOKEN);
 
     if (token) {
       const parsedToken = JSON.parse(token);
-      headers.set('Authorization', `Bearer ${parsedToken.access}`);
+      headers.set("Authorization", `Bearer ${parsedToken.access}`);
 
       //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
       const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
@@ -733,13 +733,13 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
           throw new Error(response.statusText); //error here when creating dataset nested in project
         })
         .then(data => {
-          console.log('data in createobjectwithgeo is: ', data);
+          console.log("data in createobjectwithgeo is: ", data);
           //some data exists - add in the object ID before submission
           if (geo && geo.content_type) {
             data.geo = geo;
             data.geo.object_id = data.id;
           } else {
-            //no value - can't send null into geo, so make a basic structure.
+            //no value - can"t send null into geo, so make a basic structure.
             data.geo = {
               object_id: data.id,
               content_type: props.resource.substring(
@@ -747,7 +747,7 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
                 props.resource.length - 1
               ),
               geojson: {
-                type: 'FeatureCollection',
+                type: "FeatureCollection",
                 features: [],
               },
             };
@@ -812,14 +812,14 @@ export function getTranslation(
 //note:  DateField/DateInput in react-admin does not display the following day until roughly 7:00 AM on that day.
 function appendTimestamp(start = false) {
   if (start) {
-    return 'T07:00:00.000000Z';
+    return "T07:00:00.000000Z";
   } else {
-    return 'T23:59:59.999999Z';
+    return "T23:59:59.999999Z";
   }
 }
 
 export function formatBytes(bytes, decimals) {
-  if (bytes === 0) return '0 KB';
+  if (bytes === 0) return "0 KB";
   var k = 1024;
   var dm;
   if (!decimals) {
@@ -827,13 +827,13 @@ export function formatBytes(bytes, decimals) {
   } else {
     dm = decimals;
   }
-  var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  var sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   var i = Math.floor(Math.log(bytes) / Math.log(k));
   // Skip bytes and do KB instead
   if (i === 0) {
     i = 1;
   }
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
 export function translateResource(resource, untranslatedData, direction = 0) {
@@ -850,7 +850,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
         FK_FIELDS[resource].map(field => {
           //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
           if (item[field] && isObject(item[field])) {
-            //TODO: something has to be done here, but I don't quite know what yet.
+            //TODO: something has to be done here, but I don"t quite know what yet.
           }
           return field;
         });
@@ -867,9 +867,9 @@ export function translateResource(resource, untranslatedData, direction = 0) {
             if (data[field] && isObject(data[field])) {
               //TODO: again, something has to be done here - i dont know what yet.
               console.log(
-                'Single Object is Resource: ',
+                "Single Object is Resource: ",
                 resource,
-                'field: ',
+                "field: ",
                 field
               );
             }
@@ -880,7 +880,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     }
   }
 
-  if (resource === 'DATASETS') {
+  if (resource === "DATASETS") {
     // If we are saving a project we need to unroll a set of data collection methods
     // or a set of data sensitivity levels from an array of ids to their own proper
     // subobjects. These are a special case as they are a many to many relationship
@@ -915,7 +915,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
           });
         }
       }
-      //the data format that is expected in the 'multi select array' fields is just an array of items, which then are queried to the server for full details.
+      //the data format that is expected in the "multi select array" fields is just an array of items, which then are queried to the server for full details.
       //django sends us objects instead of this, and as a result these values must be filtered out.
       //TODO: this needs to be tested thoroughly.
       else {
@@ -937,11 +937,11 @@ export function translateResource(resource, untranslatedData, direction = 0) {
   if (data) {
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.
     if (data.date_starts) {
-      data.date_starts = translateDates(data.date_starts, 'date_starts');
+      data.date_starts = translateDates(data.date_starts, "date_starts");
     }
     //turn this date into a timestamp, since react_admin seems to only want to send dates.  Defaulting to end of the selected day.
     if (data.date_expires) {
-      data.date_expires = translateDates(data.date_expires, 'date_expires');
+      data.date_expires = translateDates(data.date_expires, "date_expires");
     }
   }
 
@@ -951,9 +951,9 @@ export function translateResource(resource, untranslatedData, direction = 0) {
 //TODO: this is meant to replace the date section of translateResource above
 export function translateDates(date, type, direction = 1) {
   if (direction) {
-    if (type === 'date_expires' && date.length < 11) {
+    if (type === "date_expires" && date.length < 11) {
       date += appendTimestamp();
-    } else if (type === 'date_starts' && date.length < 11) {
+    } else if (type === "date_starts" && date.length < 11) {
       date += appendTimestamp(true);
     }
   }
