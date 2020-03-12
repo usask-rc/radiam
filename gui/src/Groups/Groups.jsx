@@ -180,7 +180,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     return function cleanup() { 
       _isMounted = false;
     }
-  }, [])
+  }, [props.id])
 
   useEffect(() => {
     let _isMounted = true
@@ -198,7 +198,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     return function cleanup() { 
       _isMounted = false;
     }
-  }, [createModal, editModal, viewModal])
+  }, [createModal, editModal, viewModal, props.id])
 
   return(
   <Show actions={!props.inModal && <GroupShowActions {...props} />} {...props}>
@@ -351,7 +351,7 @@ class BaseGroupEdit extends Component {
 
   render() {
 
-    const { basePath, classes, hasCreate, hasEdit, hasList, hasShow, record, translate, id } = this.props;
+    const { basePath, record, id } = this.props;
 
     return (<Edit basePath={basePath} actions={<MetadataEditActions showRelatedUsers={true} />} {...this.props}>
       <SimpleForm

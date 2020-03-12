@@ -1,5 +1,5 @@
 //GroupViewGrants.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Create,
   Datagrid,
@@ -19,7 +19,7 @@ import {
   TextInput,
   withTranslate,
 } from "react-admin";
-import {RESOURCE_OPERATIONS, WARNINGS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
+import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import { withStyles } from "@material-ui/core/styles";
 import CustomPagination from "../_components/CustomPagination";
 import GroupViewGrantTitle from "./GroupViewGrantTitle";

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Chip, Tooltip } from '@material-ui/core';
 import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER} from "../_constants/index";
 import { withStyles } from '@material-ui/styles';
-import { Link } from 'ra-ui-materialui';
 import { Redirect } from "react-router-dom"
 
 const styles = theme => ({

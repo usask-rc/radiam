@@ -22,7 +22,7 @@ const RelatedUsersDisplay = ({ classes, relatedUsers }) =>
             <Typography className={classes.titleText}
             variant={"h5"} 
             gutterBottom>
-                {`Collaborators in your Groups`}
+                {`Collaborators`}
             </Typography>
             <Grid
                 direction="row"

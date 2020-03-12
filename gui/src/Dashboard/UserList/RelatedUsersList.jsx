@@ -1,11 +1,13 @@
 //RelatedUserList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import { TableHead, TableRow, TableCell, TableSortLabel, Card, Table, TableBody, Link, Typography, Tooltip, Chip } from '@material-ui/core';
-import {PropTypes} from "prop-types";
-import {ChipField, ReferenceField} from "react-admin"
-import { MODELS } from "../../_constants/index"
-import moment, { now } from 'moment';
+import { TableRow, TableCell, Card, Table, TableBody, Link, Typography, Tooltip, Chip, TablePagination } from '@material-ui/core';
+import { translate } from "react-admin"
+import moment from 'moment';
+import { compose } from 'recompose';
+import EnhancedTableHead from '../EnhancedTableHead';
+import UserAvatar from "react-user-avatar"
+
 
 const styles = {
     headlineTop: {
@@ -19,6 +21,9 @@ const styles = {
     chipLink: {
         cursor: "pointer"
     },
+    titleRowCell: {
+        fontWeight: "bold"
+    },
     chipField: {
         marginRight: "1em",
         cursor: "pointer",
@@ -28,6 +33,18 @@ const styles = {
     },
     searchCell: {
         width: "14em",
+    },
+    usernameContainer: {
+        display: "flex",
+        flexDirection: "row",
+        textAlign: "center",
+    },
+    usernameText: {
+        display: "inline-block",
+        verticalAlign: "middle",
+        paddingTop: "0.5em",
+        paddingBottom: "0.5em",
+        paddingLeft: "0.5em",
 
     },
     nameCell: {
@@ -130,62 +147,13 @@ const styles = {
         }
         return 0;
     }
-function EnhancedTableHead(props) {
-    const { classes, order, orderBy, onRequestSort } = props;
-    const createSortHandler = property => event => {
-        onRequestSort(event, property);
-    };
 
-    return (
-        <TableHead>
-            <TableRow>
-                {headCells.map(headCell => (
-                <TableCell
-                    key={headCell.id}
-                    align={headCell.numeric ? 'right' : 'left'}
-                    padding={headCell.disablePadding ? 'none' : 'default'}
-                    sortDirection={orderBy === headCell.id ? order : false}
-                >
-                    {headCell.canOrder ? 
-                    <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={order}
-                        onClick={createSortHandler(headCell.id)}
-                        
-                    >
-                    {headCell.label}
-                    {orderBy === headCell.id ? (
-                        <span className={classes.visuallyHidden}>
-                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                        </span>
-                    ) : null}
-                    </TableSortLabel>
-                    :
-                    headCell.label
-                    }
-                </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
-}
-
-EnhancedTableHead.propTypes = {
-    classes: PropTypes.object.isRequired,
-    numSelected: PropTypes.number.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
-};
-
-const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
+const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
     const [tableRows, setTableRows] = useState(5);
     const [tablePage, setTablePage] = useState(0)
     const [order, setOrder] = useState("asc")
     const [orderBy, setOrderBy] = useState("username")
     const [selected, setSelected] = useState([]);
-    const now = moment()
 
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
@@ -227,6 +195,16 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
         setOrder(isDesc ? 'asc' : 'desc');
         setOrderBy(property);
     };  
+
+    //https://material-ui.com/components/tables/
+    const handleChangePage = (event, newPage) => {
+        setTablePage(newPage);
+    };
+    
+    const handleChangeRowsPerPage = event => {
+    setTableRows(parseInt(event.target.value, 10));
+    setTablePage(0);
+    };
     
     const isSelected = name => selected.indexOf(name) !== -1;
 
@@ -240,6 +218,7 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                     orderBy={orderBy}
                     onRequestSort={handleRequestSort}
                     rowCount={relatedUsers.length}
+                    headCells={headCells}
                     />
                 <TableBody>
                     {
@@ -247,9 +226,10 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                         .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
                         .map((userObj, index) => {
                             const user = userObj.user
+                            const user_display_name = user.last_name ? `${user.last_name}${user.first_name ? `, ${user.first_name}` : `` }`
+                            : user.first_name
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
-                            const daysAgo = now.diff(moment(userObj.date_created).toISOString(), "days")
                             
                             console.log("userObj being mapped: ", userObj, groups)
                             return(
@@ -258,17 +238,19 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                 hover
                                 onClick={event => handleClick(event, user.username)}
                                 tabIndex={-1}
-                                key={user.username}
                                 selected={isItemSelected}
                                 >
                                     <TableCell className={classes.nameCell}>
-                                        <Link className={classes.projectName} href={`/#/users/${user.id}/show`}>
-                                            {user.username}
+                                        <Link className={classes.usernameContainer} href={`/#/users/${user.id}/show`}>
+                                            <UserAvatar size="36" name={`${user.first_name} ${user.last_name}`} />
+                                            <Typography className={classes.usernameText}>
+                                                {user.username}
+                                            </Typography>
                                         </Link>
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
                                         <Typography>
-                                            {`${user.last_name}, ${user.first_name}`}
+                                            {user_display_name}
                                         </Typography>
                                     </TableCell>
                                     <TableCell className={classes.nameCell}>
@@ -278,8 +260,12 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                                     </TableCell>
                                     <TableCell className={classes.groupCell}>
                                         {groups.map(group => {
+                                            const role = group.group_role
+                                            const memberSince = moment(group.since).format("YYYY-MM-DD")
+                                            const memberUntil = group.expires ? moment(group.expires).format("YYYY-MM-DD") : ""
+
                                             return(
-                                                <Tooltip title={`Member Since ${group.since} ${group.expires ? `Until: ${group.expires}`:``}`}>
+                                                <Tooltip key={`${user.id}_${group.id}`} title={`${translate(`en.${role.label}`)} Since ${memberSince} ${memberUntil ? `Until: ${memberUntil}`:``}`}>
                                                     <Link href={`/#/researchgroups/${group.id}/show`}>
                                                         <Chip 
                                                         label= {group.name}
@@ -298,8 +284,22 @@ const RelatedUsersList = ({classes, relatedUsers, ...rest}) => {
                     }
                 </TableBody>
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={relatedUsers.length}
+                rowsPerPage={tableRows}
+                page={tablePage}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
         </Card>
     )
 }
 
-export default withStyles(styles)(RelatedUsersList)
+const enhance = compose(
+    translate,
+    withStyles(styles)
+)
+
+export default enhance(RelatedUsersList)
