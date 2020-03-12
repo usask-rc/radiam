@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles'
 
 //a form for sending emails to support - no backend equivalent to support this yet.
@@ -11,7 +11,7 @@ handleSubmit = (data) => {
     console.log("email, name, message: ", email, name, message)
 }
 
-const ContactForm = ({ classes, translate }) => {
+const ContactForm = ({ classes }) => {
     const [email, setEmail] = useState("")
     const [name, setName] = useState("")
     const [message, setMessage] = useState("")

@@ -85,17 +85,14 @@ export const getUsersInMyGroups = (groups) => {
       const promises = []
       const groupPromises = []
 
-
-      //1. get group data
       groups.map(group => {
         groupPromises.push(getGroupData(group).then(groupData => {
           return groupData
         }))
         return group
       })
-      //2. with group data, get lists of users associated with each group
-      Promise.all(groupPromises).then(groupList => {
 
+      Promise.all(groupPromises).then(groupList => {
           groupList.map(group => {
             return promises.push(getGroupMembers(group).then(groupData => {
               console.log("groupData in promises push is: ", groupData)
@@ -104,16 +101,12 @@ export const getUsersInMyGroups = (groups) => {
         })
         return groupList
       })
-      .then(groupRecords => {
-        console.log("groupRecords is: ", groupRecords)
+      .then((groupRecords) => {
         Promise.all(promises).then(userLists => {
-          console.log("userLists is: ", userLists)
             const usersInMyGroups = {}
             userLists.map(userList => {
                 userList.map(record => {
-                  console.log("userList.record: ", record)
-
-
+                    //this stuff is largely used for the dashboard display
                     record.group.since = record.date_created
                     record.group.expires = record.date_expires
                     record.group.group_role = record.group_role //a role is associated with the user-group relationship
@@ -135,16 +128,14 @@ export const getUsersInMyGroups = (groups) => {
             return userLists
         })
         .catch(err => reject(err))
+        return groupRecords
         })
     })
   }
 
 export function getRecentProjects(count=1000) {
-
   return new Promise((resolve, reject) => {
-      
     const now = moment();
-
     dataProvider(GET_LIST, MODELS.PROJECTS, {
       order: { field: MODEL_FIELDS.NAME },
       pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
@@ -214,7 +205,7 @@ export function getMaxUserRole(){
   }else{
     //punt to front page - no user cookie available
     console.error("No User Cookie Detected - Returning to front page")
-    window.location.hash = "#/login"
+    window.location.hash = "/#/login"
     return ROLES.ANONYMOUS
   }
 }
@@ -297,8 +288,6 @@ export function getFolderFiles(
     q: params.q,
   };
 
-  console.log("getFolderFiles queryParams: ", queryParams, "get_files")
-
   return new Promise((resolve, reject) => {
     dataProvider(
       'GET_FILES',
@@ -306,8 +295,6 @@ export function getFolderFiles(
       queryParams
     )
       .then(response => {
-
-        console.log("getfolderfiles response: ", response)
         let fileList = [];
         response.data.map(file => {
           const newFile = file;
@@ -465,10 +452,9 @@ export function getUserDetails(userID){
 
 export function getCurrentUserID(){
   //return user id from local storage
-  const userCookie = JSON.parse(localStorage.getItem(ROLE_USER))
-
-  if (userCookie){
-    return userCookie.id
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
+  if (user){
+    return user.id
   }
   //reject and send to login page -- no login cookie
   window.location.hash = "#/login"
