@@ -30,9 +30,6 @@ const validateGlobusEndpoint = regex(
 const GJV = require("geojson-validation")
 
 const styles = {
-  mapPopup: {
-    width: '400px',
-  },
   geoTextArea: {
     display: 'flex',
     flexDirection: 'column',
@@ -212,7 +209,7 @@ class LocationForm extends Component {
   };
 
   render() {
-    const { staticContext, id, classes, record, mode, ...rest } = this.props;
+    const { staticContext, id, classes, record, mode, basePath, ...rest } = this.props;
     const { geo, showMap } = this.state;
 
     //TODO: there is a discrepancy between how we separate `record` from rest and props and how it `should` be done
@@ -303,16 +300,16 @@ class LocationForm extends Component {
           defaultValue={record && record.globus_path}
           multiline
         />
-        <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record && record.osf_project || ""} required />
+        <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record ? record.osf_project : ""} required />
 
         <TextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
-          defaultValue={record && record.portal_url || ""}
+          defaultValue={record ? record.portal_url : ""}
           multiline
         />
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
-        defaultValue={record && record.notes || ""} />
+        defaultValue={record ? record.notes : ""} />
         <div className={classes.preMapArea}>
           <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
         </div>

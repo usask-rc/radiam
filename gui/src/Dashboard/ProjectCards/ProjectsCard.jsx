@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, Link } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import ProjectList from '../ProjectList/ProjectList';
 import { withStyles } from '@material-ui/styles';
 

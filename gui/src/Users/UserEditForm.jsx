@@ -1,6 +1,6 @@
 //UserEditForm.jsx
 import React, { Component } from 'react';
-import { BooleanInput, SaveButton, SimpleForm, TextInput } from "react-admin";
+import { BooleanInput, SimpleForm, TextInput } from "react-admin";
 import {WEBTOKEN, WARNINGS, MODELS, METHODS, MODEL_FIELDS} from "../_constants/index";
 import { getAPIEndpoint } from '../_tools';
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
@@ -9,7 +9,7 @@ import { toastErrors, getUserGroups } from '../_tools/funcs';
 import { Redirect } from 'react-router';
 import RelatedGroups from './RelatedGroups';
 import UserTitle from './UserTitle';
-import { Dialog, DialogContent, Toolbar } from '@material-ui/core';
+import { Dialog, DialogContent } from '@material-ui/core';
 import { GroupShow } from '../Groups/Groups';
 import { toast } from 'react-toastify';
 import { UserToolbar } from '../_components/Toolbar';
@@ -110,8 +110,8 @@ class UserEditForm extends Component {
     };
 
     render() {
-        const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, isFormDirty, redirect} = this.state
-        const {setViewModal, record} = this.props
+        const {groupMembers, viewModal, username, first_name, last_name, email,  notes, user_orcid_id, is_active, redirect} = this.state
+        const {setViewModal} = this.props
         return (<>
             <SimpleForm
                 save={this.handleSubmit}

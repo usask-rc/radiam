@@ -1,13 +1,13 @@
 //ProjectList.jsx
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/styles';
-import {PropTypes} from "prop-types";
 import {AVATAR_HEIGHT, MODELS, MODEL_FIELDS} from "../../_constants/index"
-import { Card, TableRow, TableHead, Table, TableCell, TableBody, TablePagination, TableSortLabel, Link, Typography } from '@material-ui/core';
+import { Card, TableRow, Table, TableCell, TableBody, TablePagination, Link, Typography } from '@material-ui/core';
 import ProjectKeywords from '../ProjectCards/ProjectKeywords';
 import ProjectSearch from '../ProjectCards/ProjectSearch';
 import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
 import { ImageField } from "react-admin"
+import EnhancedTableHead from '../EnhancedTableHead';
 const styles = {
     headlineTop: {
         backgroundColor: '#688db2',
@@ -32,6 +32,19 @@ const styles = {
     nameCell: {
         fontSize: "1em",
     },
+
+    projectNameContainer: {
+        display: "flex",
+        flexDirection: "row",
+        textAlign: "center",
+    },
+    projectNameText: {
+        display: "inline-block",
+        verticalAlign: "middle",
+        paddingTop: "0.9em",
+        paddingBottom: "0.9m",
+        paddingLeft: "0.5em",
+    },
     searchIcon: {
         height: '1em',
         width: '1em',
@@ -46,6 +59,9 @@ const styles = {
     },
     textTop: {
         color: 'white',
+    },
+    titleRowCell: {
+        fontWeight: "bold"
     },
     container: {
         marginTop: '1em',
@@ -100,7 +116,6 @@ const styles = {
     };
 
     const headCells = [
-        {id: 'icon', numeric: false, disablePadding: false, canOrder: false, label: "Icon"},
         {id: "name", numeric: false, disablePadding: false, canOrder: true, label: "Project Name"},
         {id: "keywords", numeric: false, disablePadding: false, canOrder: true, label: "Keywords" },
         {id: "nbFiles", numeric: false, disablePadding: false, canOrder: true, label: "Search Project"},
@@ -127,56 +142,6 @@ const styles = {
         }
         return 0;
     }
-function EnhancedTableHead(props) {
-    const { classes, order, orderBy, onRequestSort } = props;
-    const createSortHandler = property => event => {
-        onRequestSort(event, property);
-    };
-
-    return (
-        <TableHead>
-            <TableRow>
-                {headCells.map(headCell => (
-                <TableCell
-                    key={headCell.id}
-                    align={headCell.numeric ? 'right' : 'left'}
-                    padding={headCell.disablePadding ? 'none' : 'default'}
-                    sortDirection={orderBy === headCell.id ? order : false}
-                >
-                    {headCell.canOrder ? 
-                    <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={order}
-                        onClick={createSortHandler(headCell.id)}
-                        
-                    >
-                    {headCell.label}
-                    {orderBy === headCell.id ? (
-                        <span className={classes.visuallyHidden}>
-                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                        </span>
-                    ) : null}
-                    </TableSortLabel>
-                    :
-                    headCell.label
-                    }
-                </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
-}
-
-EnhancedTableHead.propTypes = {
-    classes: PropTypes.object.isRequired,
-    numSelected: PropTypes.number.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
-};
-
-
 
 const ProjectList = ({classes, projects}) => {
 
@@ -198,7 +163,7 @@ const ProjectList = ({classes, projects}) => {
     }
 
     function getSorting(order, orderBy) {
-    return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
+        return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
     }
 
     const handleRequestSort = (event, property) => {
@@ -243,76 +208,75 @@ const ProjectList = ({classes, projects}) => {
     return(
     <Card className={classes.container}>
         <Table className={classes.table} size="small">
-        <EnhancedTableHead
-            classes={classes}
-            numSelected={selected.length}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-            rowCount={projects.length}
-            />
-        <TableBody>
-            {projects.length > 0 &&
+            <EnhancedTableHead
+                classes={classes}
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={projects.length}
+                headCells={headCells}
+                />
+            <TableBody>
+                {projects.length > 0 &&
 
-            stableSort(projects, getSorting(order, orderBy))
-            .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
-                .map((project, index) => {
-                    const isItemSelected = isSelected(project.name)
-                    return (
-                        <TableRow key={project.id}
-                        className={classes.projectRow}
-                        hover
-                        onClick={event => handleClick(event, project.name)}
-                        tabIndex={-1}
-                        key={project.name}
-                        selected={isItemSelected}
-                        >
-                            <TableCell className={classes.iconCell}>
-                                <ReferenceField
-                                    record={project}
-                                    basePath={MODELS.PROJECTS}
-                                    link={false}
-                                    source={MODEL_FIELDS.AVATAR}
-                                    reference={MODELS.PROJECTAVATARS}
-                                    allowEmpty
-                                >
-                                    <ImageField
-                                        classes={{ image: classes.image }}
-                                        title={project.name}
-                                        source={MODEL_FIELDS.AVATAR_IMAGE}
-                                        allowEmpty
-                                    />
-
-                                </ReferenceField>
-                            </TableCell>
-                            <TableCell className={classes.nameCell}>
-                                <Link className={classes.projectName} href={`/#/projects/${project.id}/show`}>
-                                    {project.name}
-                                </Link>
-                            </TableCell>
-                            <TableCell className={classes.keywordCell}>
-                                <ProjectKeywords classes={classes} project={project} />
-                            </TableCell>
-                            <TableCell className={classes.searchCell}>
-                                {project.nbFiles > 0 ? 
-                                    <ProjectSearch project={project} classes={classes} />
-                                    :
-                                    <Typography className={classes.noFiles}>{`No Files to Search`}</Typography>
-                                }
-                            </TableCell>
-                            <TableCell className={classes.lastFileCell}>
-                            {console.log("recentFile is: ", project.recentFile)}
-                                {project.recentFile ? 
-                                    <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
-                                    :
-                                    <Typography className={classes.noFiles}>{`None`}</Typography>
-                                }
-                            </TableCell>
-                        </TableRow>
-                    )
-                })
-            }
-        </TableBody>
+                stableSort(projects, getSorting(order, orderBy))
+                .slice(tablePage * tableRows, tablePage * tableRows + tableRows)
+                    .map((project, index) => {
+                        const isItemSelected = isSelected(project.name)
+                        return (
+                            <TableRow key={project.id}
+                            className={classes.projectRow}
+                            hover
+                            onClick={event => handleClick(event, project.name)}
+                            tabIndex={-1}
+                            selected={isItemSelected}
+                            >
+                                <TableCell className={classes.nameCell}>
+                                    <Link className={classes.projectNameContainer} href={`/#/projects/${project.id}/show`}>
+                                        <ReferenceField
+                                            record={project}
+                                            basePath={MODELS.PROJECTS}
+                                            link={false}
+                                            source={MODEL_FIELDS.AVATAR}
+                                            reference={MODELS.PROJECTAVATARS}
+                                            allowEmpty
+                                        >
+                                            <ImageField
+                                                classes={{ image: classes.image }}
+                                                title={project.name}
+                                                source={MODEL_FIELDS.AVATAR_IMAGE}
+                                                allowEmpty
+                                            />
+                                        </ReferenceField>
+                                        <Typography className={classes.projectNameText}>
+                                            {project.name}
+                                        </Typography>
+                                    </Link>
+                                </TableCell>
+                                <TableCell className={classes.keywordCell}>
+                                    <ProjectKeywords classes={classes} project={project} />
+                                </TableCell>
+                                <TableCell className={classes.searchCell}>
+                                    {project.nbFiles > 0 ? 
+                                        <ProjectSearch project={project} classes={classes} />
+                                        :
+                                        <Typography className={classes.noFiles}>{`No Files to Search`}</Typography>
+                                    }
+                                </TableCell>
+                                <TableCell className={classes.lastFileCell}>
+                                {console.log("recentFile is: ", project.recentFile)}
+                                    {project.recentFile ? 
+                                        <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
+                                        :
+                                        <Typography className={classes.noFiles}>{`None`}</Typography>
+                                    }
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })
+                }
+            </TableBody>
         </Table>
         <TablePagination
             rowsPerPageOptions={[5, 10, 25]}

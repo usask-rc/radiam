@@ -1,6 +1,6 @@
 //FileDetails.jsx
 import React, {Component} from 'react';
-import { Edit, EditController, TopToolbar } from 'react-admin';
+import { TopToolbar } from 'react-admin';
 import { AgentShow } from '../_fields/AgentShow';
 import compose from 'recompose/compose';
 import {MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from '../../_constants/index';
@@ -11,10 +11,9 @@ import Typography from "@material-ui/core/Typography"
 import { ReferenceField, translate } from 'react-admin';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { isObject } from 'util';
-import { ConfigMetadata, ConfigMetadataToolbar, EditMetadata, EditConfigMetadataForm, MetadataEditActions, ShowMetadata } from "../Metadata.jsx";
+import { EditConfigMetadataForm, MetadataEditActions, ShowMetadata } from "../Metadata.jsx";
 import Button from '@material-ui/core/Button';
 import ContentCreate from '@material-ui/icons/Create';
-import Toolbar from '@material-ui/core/Toolbar';
 
 const styles = theme => ({
   additionalMetadata: {
