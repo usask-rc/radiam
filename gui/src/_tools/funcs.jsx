@@ -580,6 +580,26 @@ export function getGroupMembers(record) {
   });
 }
 
+//return a list of groups that the user is in
+export function getMyGroupIDs(){
+  return new Promise((resolve, reject) => {
+    
+  const user = JSON.parse(localStorage.getItem(ROLE_USER))
+
+  dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
+    filter: {user: user.id},
+    pagination: { page: 1, perPage: 1000 },
+    sort: { field: MODEL_FIELDS.USER, order: 'DESC' },
+  }).then(response => {
+    const groupList = []
+    response.data.map(groupMember => {
+      groupList.push(groupMember.group)
+    })
+    resolve(groupList)
+  }).catch(err => reject(err))
+})
+}
+
 //given a user, return a list of groupmember entries containing the groups they are in along with their role within it.
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {

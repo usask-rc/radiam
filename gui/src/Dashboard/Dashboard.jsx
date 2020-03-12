@@ -1,6 +1,6 @@
 //Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { getRecentProjects, getUsersInMyGroups } from '../_tools/funcs';
+import { getRecentProjects, getUsersInMyGroups, getMyGroupIDs } from '../_tools/funcs';
 import { Responsive } from 'react-admin';
 import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';
@@ -23,7 +23,7 @@ const Dashboard = ({classes, permissions, ...rest}) => {
   const user = JSON.parse(localStorage.getItem(ROLES.USER));
 
   useEffect(() => {
-    const myGroups = user.groupAdminships.concat(user.dataManagerships).concat(user.groupUserships)
+
 
     getRecentProjects().then(data => {
       console.log("getrecentprojects returned: ", data)
@@ -34,10 +34,13 @@ const Dashboard = ({classes, permissions, ...rest}) => {
       console.error("Error in getRecentProjects: ", err)
     })
 
-    getUsersInMyGroups(myGroups).then(data => {
-      console.log("getusersinmygroups data: ", data)
-      setRelatedUsers(data)
-    }).catch(err => console.log("users in my groups err: ", err))
+    getMyGroupIDs().then(myGroups => {
+      getUsersInMyGroups(myGroups).then(data => {
+        console.log("getusersinmygroups data: ", data)
+        setRelatedUsers(data)
+      }).catch(err => console.log("users in my groups err: ", err))
+      return myGroups
+    })
   }, [])
 
   return(
