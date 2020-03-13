@@ -18,7 +18,6 @@ export const GroupShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
   ...rest
 }) => {
   const title = get(record, MODEL_FIELDS.NAME)
-
     return (
     <Link href={`/#/${MODELS.GROUPS}/${record.id}/${RESOURCE_OPERATIONS.SHOW}`}>
         <Chip label={<Typography

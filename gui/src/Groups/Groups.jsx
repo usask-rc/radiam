@@ -235,6 +235,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
       <ShowController translate={translate} {...props}>
         { controllerProps => {
           console.log("controllerprops in group: ", controllerProps)
+          console.log("editModal is: ", editModal)
         return(
           <>
             <ShowMetadata
@@ -255,7 +256,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
             }
             {editModal && <Dialog fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
               <DialogContent>
-                <GroupMemberForm basePath="/groupmembers" resource="groupmembers" setEditModal={setEditModal} record={{id: editModal.id, user: editModal.user.id, group: editModal.group, group_role: editModal.group_role.id}} />
+                <GroupMemberForm basePath="/groupmembers" resource="groupmembers" setEditModal={setEditModal} record={{id: editModal.id, user: editModal.user.id, group: editModal.group.id, group_role: editModal.group_role.id}} />
               </DialogContent>
             </Dialog>
             }
