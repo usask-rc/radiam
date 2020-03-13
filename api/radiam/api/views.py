@@ -916,10 +916,12 @@ class ExportRequestViewSet(RadiamViewSet):
     serializer_class = ExportRequestSerializer
 
     filter_backends = (
+        filters.SearchFilter,
         DjangoFilterBackend,
         RadiamAuthDatasetDetailFilter,
     )
 
+    search_fields = ['id', 'status', 'export_reference']
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
