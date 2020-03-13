@@ -7,7 +7,7 @@ import {MODEL_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../../_constants/index"
 import { Link, Chip } from "@material-ui/core";
 
 
-export const groupSelect = choice => choice.title
+export const groupSelect = choice => choice.name
 
 export const GroupShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = ({
   className,
@@ -17,7 +17,7 @@ export const GroupShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
   record = {},
   ...rest
 }) => {
-  const title = get(record, MODEL_FIELDS.NAME)
+  const name = get(record, MODEL_FIELDS.NAME)
     return (
     <Link href={`/#/${MODELS.GROUPS}/${record.id}/${RESOURCE_OPERATIONS.SHOW}`}>
         <Chip label={<Typography
@@ -26,7 +26,7 @@ export const GroupShow: SFC<FieldProps & InjectedFieldProps & fieldPropTypes> = 
             className={className}
             {...rest}
         >
-            {title}
+            {name}
         </Typography>}/>
     </Link>
     );

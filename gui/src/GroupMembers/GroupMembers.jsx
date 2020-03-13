@@ -350,7 +350,7 @@ export const GroupMemberForm = props => {
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
-      <SelectInput optionText={"name"} />
+      <SelectInput optionText={groupSelect} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.role"}
