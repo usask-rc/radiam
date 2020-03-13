@@ -2,7 +2,6 @@
 import React from 'react'
 import { withStyles } from '@material-ui/styles';
 import { Typography } from '@material-ui/core';
-import get from 'lodash/get';
 
 const styles = {
     titleText: {
@@ -10,7 +9,7 @@ const styles = {
     }
 }
 
-const UserTitle = ({ prefix="", record, classes, ...props }) => {
+const UserTitle = ({ prefix="", record, classes }) => {
     return <Typography className={classes.titleText}>{`${prefix} ${record ? record.username : ""}`}</Typography>;
 };
   

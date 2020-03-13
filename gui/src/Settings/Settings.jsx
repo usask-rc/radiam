@@ -5,7 +5,7 @@ import { translate, changeLocale, Title } from "react-admin";
 import compose from "recompose/compose";
 import { changeTheme } from "./actions";
 import ChangePassword from "../_components/_forms/ChangePassword";
-import ChangeDetails from "../_components/_forms/ChangeUserDetails";
+import ChangeDetails from "../_components/_forms/ChangeDetails";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel"
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary"
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails"
