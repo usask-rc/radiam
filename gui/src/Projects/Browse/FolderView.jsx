@@ -26,7 +26,7 @@ import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
-import FileDetails from '../../_components/files/FileDetails';
+import FileDetails from '../../_components/FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
 import moment from 'moment';
