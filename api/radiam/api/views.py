@@ -35,6 +35,7 @@ from radiam.api.serializers import (
     ESDatasetSerializer,
     EntitySerializer,
     EntitySchemaFieldSerializer,
+    ExportRequestSerializer,
     FieldSerializer,
     GeoDataSerializer,
     GroupMemberSerializer,
@@ -74,6 +75,7 @@ from .models import (
     DatasetDataCollectionMethod,
     DistributionRestriction,
     Entity,
+    ExportRequest,
     Field,
     GeoData,
     GroupMember,
@@ -901,8 +903,24 @@ class DatasetExportViewSet(viewsets.GenericViewSet):
     """
 
     def list(self, request, dataset_id):
-        return Response(request.data)
+        export_request = ExportRequest.objects.create(status="In progress", export_reference=dataset_id)
+        export_request.save()
+        return Response(export_request.id)
 
+
+class ExportRequestViewSet(RadiamViewSet):
+    """
+    API endpoint for request for exporting metadata
+    """
+    queryset = ExportRequest.objects.all().order_by('status')
+    serializer_class = ExportRequestSerializer
+
+    filter_backends = (
+        DjangoFilterBackend,
+        RadiamAuthDatasetDetailFilter,
+    )
+
+    permission_classes = (IsAuthenticated, DRYPermissions,)
 
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
     """

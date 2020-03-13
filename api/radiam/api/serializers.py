@@ -28,6 +28,7 @@ from .models import (
     DatasetSensitivity,
     DistributionRestriction,
     Entity,
+    ExportRequest,
     Field,
     GeoData,
     GroupMember,
@@ -1166,6 +1167,16 @@ class ESDatasetSerializer(serializers.Serializer):
         # convert the rest of the result object into a dict and append it to rep
         representation.update(instance.to_dict())
         return representation
+
+class ExportRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(required=False, help_text="The status of this export request")
+    export_reference = serializers.UUIDField(required=False, help_text="The reference to the exported contents")
+
+    class Meta:
+        model = ExportRequest
+        fields = ('id',
+                  'status',
+                  'export_reference')
 
 class DatasetSerializer(serializers.ModelSerializer, MetadataSerializer):
 
