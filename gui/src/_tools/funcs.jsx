@@ -140,9 +140,8 @@ export function getRecentProjects(count=1000) {
       order: { field: MODEL_FIELDS.NAME },
       pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
     })
-      .then(response => response.data)
-      .then(projects => {
-
+      .then(response => {
+        const projects = response.data
         const promises = []
 
         projects.map(project => {
@@ -184,6 +183,7 @@ export function getRecentProjects(count=1000) {
       }).catch(err => {
         reject(err)
       })
+      return response
     });
   })
 };
@@ -279,7 +279,7 @@ export function getFolderFiles(
   dataType="projects"
 ) {
 
-  //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
+  //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search
   const queryParams = {
     //folderPath may or may not contain an item itself.
     filter: { path_parent: params.folderPath, type:type },
@@ -317,6 +317,7 @@ export function getFolderFiles(
   });
 }
 
+//TODO: find a way to paginate this?
 export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.DATASETS, {
@@ -324,10 +325,7 @@ export function getRelatedDatasets(projectID) {
       pagination: { page: 1, perPage: 1000 },
       sort: { field: MODEL_FIELDS.TITLE, order: "DESC" },
     })
-      .then(response => response.data)
-      .then(assocDatasets => {
-        resolve(assocDatasets);
-      })
+      .then(response => resolve(response.data))
       .catch(err => reject(err));
   });
 }
@@ -355,7 +353,6 @@ export function getRootPaths(projectID, dataType="projects") {
             if (!rootList || !rootList[file.location]) {
               rootList[file.location] = file.path_parent;
             } else {
-              
               if (rootList[file.location].length > file.path_parent.length) {
                 rootList[file.location] = file.path_parent;
               }
@@ -376,7 +373,6 @@ export function getRootPaths(projectID, dataType="projects") {
             location: key,
           });
         }
-        console.log("root paths being returned are: ", rootPaths)
         resolve(rootPaths);
       })
       .catch(error => {
@@ -492,13 +488,10 @@ export function getUsersInGroup(record) {
       sort: { field: MODEL_FIELDS.USER, order: "DESC" },
     })
       .then(response => {
-        
-        if (response && response.total === 0) {
-          resolve([]);
+        if (response.total === 0) {
+          resolve([])
         }
-        return response.data;
-      })
-      .then(groupMembers => {
+        const groupMembers = response.data
         const promises = []
         groupMembers.map(groupMember => {
           promises.push(getUserDetails(groupMember.user).then(user => {
@@ -526,8 +519,8 @@ export function getUsersInGroup(record) {
 export function getGroupMembers(record) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.ROLES)
-      .then(response => response.data)
-      .then(groupRoles => {
+      .then(response => {
+        const groupRoles = response.data
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
@@ -535,11 +528,8 @@ export function getGroupMembers(record) {
           pagination: { page: 1, perPage: 1000 },
           sort: { field: MODEL_FIELDS.USER, order: "DESC" },
         })
-          .then(response => {
-            return response.data;
-          })
-          .then(groupMembers => {
-
+          .then(response2 => {
+            const groupMembers = response2.data
             const promises = []
 
             groupMembers.map(groupMember => {
@@ -590,8 +580,8 @@ export function getMyGroupIDs(){
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.ROLES)
-      .then(response => response.data)
-      .then(groupRoles => {
+      .then(response => {
+        const groupRoles = response.data
         const { id, is_active } = record;
         
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
@@ -599,11 +589,8 @@ export function getUserGroups(record) {
           pagination: { page: 1, perPage: 1000 },
           sort: { field: MODEL_FIELDS.GROUP, order: "DESC" },
         })
-        .then(response => {
-          return response.data;
-        })
-        .then(groupMembers => {
-
+        .then(response2 => {
+          const groupMembers = response2.data
           const promises = []
           groupMembers.map(groupMember => {
 
@@ -619,7 +606,7 @@ export function getUserGroups(record) {
           Promise.all(promises).then(data => {
             resolve(groupMembers)
           }).catch(err => reject(err))
-          return groupMembers;
+          return response2;
         })
         .catch(err => {
           reject("error in in get groupmembers: ", err);
@@ -970,6 +957,10 @@ export const truncatePath = (path) => {
   if (tempPathArr.length > 4){
     tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
     tempPath = ".../" + tempPathArr.join("/")
+  }
+  else if (tempPath.length > 30){
+    //truncate anyways, keep the start - if there are no slashes, its just a long title.
+    tempPath = `${tempPath.slice(0, 30)}...`
   }
   return tempPath
 }
