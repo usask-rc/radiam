@@ -35,7 +35,7 @@ class MapForm extends Component {
       notDisplayedFeatures: [],
       popup: { active: false, for: '' },
       prevProperties: {},
-      location: [51.652111, -105.527802], //map location
+      location: [51.652111, -105.527802], //TODO: map location defaulted to saskatoon for time being, should update to first location
     };
     this.updateGeo = this.updateGeo.bind(this);
     this._updateFeatures = this._updateFeatures.bind(this);
@@ -258,6 +258,7 @@ class MapForm extends Component {
       return key;
     });
   };
+  
   //block / unblock popup display
   _onDeleteStart = e => {
     this.setState({ blockPopup: true });

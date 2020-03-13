@@ -149,7 +149,6 @@ class LocationForm extends Component {
   mapTextToGeo = event => {
     console.log('text to geo button pressed');
     let parseGeoText;
-
     const { record } = this.props
 
     const { geoText, mapFormKey} = this.state
@@ -174,26 +173,6 @@ class LocationForm extends Component {
       parseGeoText = JSON.parse(JSON.stringify(geoObject));
 
       if (parseGeoText && GJV.valid(geoObject.geojson)){
-        //check for unsupported types - Multi____
-
-        //TODO: the belong code doesn't belong on the text validator, it belongs on the map prior to a display attempt.
-        //1. parse for validity (already done by this point)
-        //2.  send to the map display for processing
-          //a. Update State
-          //b. Modify Key to force a refresh
-          //c. Map Values are now imported.  Scan them for these irregularities.
-        //3.  display alert
-        //4.  check to ensure data still exists in map when exported.
-        /*
-        parseGeoText.geojson.features.map(feature => {
-          const type = feature.geometry.type
-          //TODO:could just do a splice on the first 5 letters honestly
-          if (type === "MultiPolygon" || type === "MultiPoint" || type === "MultiLineString"){
-
-          }
-        })*/
-
-        //TODO: non-feature values should not be in the text form.
         this.setState({ geo: geoObject }, this.setState({mapFormKey: mapFormKey + 1}));
       }
       else{
