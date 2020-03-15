@@ -329,8 +329,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           next: json.next,
           previous: json.previous,
         };
-        ret.data.map(item => (item.key = item.id));
 
+        ret.data.map(item => (item.key = item.id));
         console.log("ret in get_list is: ", ret)
         return ret;
 

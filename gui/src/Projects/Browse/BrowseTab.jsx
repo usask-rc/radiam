@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData } from '../../_tools/funcs';
+import { getRootPaths, getProjectData, getRootPathsBetter } from '../../_tools/funcs';
 
 const styles = theme => ({
   main: {
@@ -25,6 +25,10 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
   useEffect(() => {
     let _isMounted = true
     setStatus({loading: true})
+
+    getRootPathsBetter(projectID, dataType).then(data => {
+      console.log("GRPB data: ", data)
+    })
     
     getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
