@@ -299,6 +299,23 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
+//specifically target a location and a path
+export function findFile(projectID, location=null, path=null, dataType="projects" ){
+  return new Promise((resolve, reject) => {
+    
+    const params = {
+      pagination: {page: 1, perPage: 1},
+      sort: {field: "path_parent.keyword", order: "DESC"},
+      filter: { location: location, path_parent: path}
+    }
+
+    dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
+      console.log("files in path, location, ", path, location, "are: ", projectFiles)
+      resolve(projectFiles.data)
+    }).catch(err => reject(err))
+  })
+}
+
 //for each Location associated with this projectID (search in table locationProject) 
   //walk up from whatever file we get to its root
 
@@ -342,8 +359,37 @@ export function getRootPathsBetter(projectID, dataType="projects"){
           filter: { location: location}
         }
         //list of locations
-        dataProvider("GET_FILES", `projects/${projectID}`, projectParams).then(projectFiles => {
+        //
+        dataProvider("GET_FILES", `${dataType}/${projectID}`, projectParams).then(projectFiles => {
           console.log("projectFiles are: ", projectFiles)
+          const files = projectFiles.data
+
+
+
+          if (files && files.length > 0){
+            //this is where we would split depending on the count / path length.
+            if (projectFiles.total > 1){
+              const path_parent = files[0].path_parent
+              console.log("path_parent: ", path_parent)
+
+              const pathSplit = path_parent.split("/")
+
+              console.log("pathSplit: ", pathSplit)
+
+              const firstHalf = pathSplit.slice(0, pathSplit.length / 2)
+
+
+              findFile(projectID, location, firstHalf.join("/"), dataType).then( files => {
+                console.log("findfilesatpathandloc call files: ", files)
+              })
+              .catch(err => console.log("findfilesatpathandloc err: ", err))
+            }
+            
+          }
+
+          //we now have some file - walk its path_parent up in a binary search
+
+
           resolve(projectFiles)
           return projectFiles
         })
