@@ -30,6 +30,7 @@ import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveP
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { FKToolbar } from "../_components/Toolbar";
+import { groupSelect } from "../_components/_fields/GroupShow";
 
 
 const listStyles = {
@@ -345,11 +346,11 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP}
       reference={MODELS.GROUPS}
       resource={MODELS.GROUPS}
-      defaultValue={props.group ? props.group : null}
+      defaultValue={props.record && props.record.group ? props.record.group : null}
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
-      <SelectInput optionText={MODEL_FIELDS.NAME} />
+      <SelectInput optionText={groupSelect} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.role"}

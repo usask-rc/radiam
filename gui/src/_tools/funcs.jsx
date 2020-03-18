@@ -10,29 +10,30 @@ var cloneDeep = require("lodash.clonedeep");
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
+//returns the endpoint set in constants
 export function getAPIEndpoint() {
+  return "https://dev2.radiam.ca/api"
   return `/${API_ENDPOINT}`;
 }
 
-//given a group id and our cookies, can we edit this value?
+//there are various pages across the app that use this to have their edit button gated off.
+//note that they have their edit functionality gated on the API side, but we need a way to block it from appearing to users who are not authenticated.
 export function isAdminOfAParentGroup(group_id){
   return new Promise((resolve, reject) => {
-    if (!group_id){
-      reject("No Group ID")
-    }
-
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
-    if (user){
-      if (user.is_admin){
-        resolve(true)
-      }
+    if (!group_id || !user){
+      reject("User Not Authenticated")
     }
-    else{
-      reject("No User Cookie")
+    else if (user.is_admin){ //sysadmins have blanket permissions regardless of group
+      resolve(true)
     }
 
     getParentGroupList(group_id).then(data => {
       data.map(group => {
+        //iterate through groups we know the user to be an admin in.
+        //TODO: this should fail if the user is made admin of a parent group and then accesses said page without logging out and back in
+        //the alternative is to regularly update this or to make a query for each parent group - i don't think either is valid
+        //workaround is that the user will have to log out / back in.
         for (var i = 0; i < user.groupAdminships.length; i++){
           if (group.id === user.groupAdminships[i]){
             resolve(true)
@@ -40,99 +41,71 @@ export function isAdminOfAParentGroup(group_id){
         }
         return group
       })
-
       resolve(false)
-
     }).catch(err => {
-      console.error("isadminofaparentgroup error: ",err)
-      reject("Invalid Group ID Key")
+      reject(err)
     })
   })
 };
 
-export function getUserRoleInGroup(group){ //given a group ID, determine the current user"s status in said group
-  //given the cookies available, return the highest level that this user could be.  Note that this is only used to display first time use instructions.
-  const user = JSON.parse(localStorage.getItem(ROLE_USER))
-  if (user){
-    if (group !== null){
-      if (user.groupAdminships && group in user.groupAdminships){
-        return "group_admin"
-      }
-      else if (user.dataManagerships && group in user.dataManagerships){
-        return "data_manager"
-      }
-    }
-    return ROLE_USER
-  }
-  else if (!user && !group){
-    return ROLE_ANONYMOUS
-  }
-  else{
-    console.error("No User Cookie Detected - Returning to front page")
-    window.location.hash = "#/login"
-  }
-}
-
-//this gets all projects that the user has worked on.
-//we want to get all (recent) files in a project and display them in an expandable listview.
-//TODO: handle potential setstate on unmounted component
-
-export const getUsersInMyGroups = (groups) => {
+//retrieve a list of group IDs, retrieve a list of users with their Role and Group data attached.
+export const getUsersInMyGroups = (groupIDs) => {
   return new Promise((resolve, reject) => {
-      if (!groups){
+      if (!groupIDs){
           resolve([])
       }
       const promises = []
       const groupPromises = []
 
-      groups.map(group => {
-        groupPromises.push(getGroupData(group).then(groupData => {
+      groupIDs.map(groupID => {
+        groupPromises.push(getGroupData(groupID).then(groupData => {
           return groupData
         }))
-        return group
+        return groupID
       })
 
       Promise.all(groupPromises).then(groupList => {
-          groupList.map(group => {
-            return promises.push(getGroupMembers(group).then(groupData => {
-              console.log("groupData in promises push is: ", groupData)
-              return groupData
+        groupList.map(group => {
+          return promises.push(getGroupMembers(group).then(groupData => {
+            return groupData
           }))
         })
         return groupList
       })
       .then((groupRecords) => {
         Promise.all(promises).then(userLists => {
-            const usersInMyGroups = {}
-            userLists.map(userList => {
-                userList.map(record => {
-                    //this stuff is largely used for the dashboard display
-                    record.group.since = record.date_created
-                    record.group.expires = record.date_expires
-                    record.group.group_role = record.group_role //a role is associated with the user-group relationship
+          const usersInMyGroups = {}
+          userLists.map(userList => {
+            userList.map(record => {
+              //this stuff is largely used for the dashboard display
+              record.group.since = record.date_created
+              record.group.expires = record.date_expires
+              record.group.group_role = record.group_role //a role is associated with the user-group relationship
 
-                    //a filtering mechanism to remove duplicate users and listify them
-                    if (usersInMyGroups.hasOwnProperty(record.user.id))
-                    {
-                      usersInMyGroups[record.user.id].group.push(record.group)
-                    }
-                    else{
-                      usersInMyGroups[record.user.id] = record
-                      usersInMyGroups[record.user.id].group = [record.group]
-                    }
-                    return record
-                })
-                return userList
+              //a filtering mechanism to remove duplicate users and listify them
+              if (usersInMyGroups.hasOwnProperty(record.user.id))
+              {
+                usersInMyGroups[record.user.id].group.push(record.group)
+              }
+              else{
+                usersInMyGroups[record.user.id] = record
+                usersInMyGroups[record.user.id].group = [record.group]
+              }
+              return record
             })
-            resolve(usersInMyGroups)
-            return userLists
+            return userList
+          })
+          resolve(usersInMyGroups)
+          return userLists
         })
         .catch(err => reject(err))
         return groupRecords
-        })
+      })
     })
   }
 
+//should really be named 'get all projects'
+//gets all projects with their most recent file data.
 export function getRecentProjects(count=1000) {
   return new Promise((resolve, reject) => {
     const now = moment();
@@ -140,9 +113,8 @@ export function getRecentProjects(count=1000) {
       order: { field: MODEL_FIELDS.NAME },
       pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
     })
-      .then(response => response.data)
-      .then(projects => {
-
+      .then(response => {
+        const projects = response.data
         const promises = []
 
         projects.map(project => {
@@ -158,7 +130,7 @@ export function getRecentProjects(count=1000) {
           }).then((data) => {
             if (data.files.length > 0){
               const newProject = project
-              newProject.recentFile = data.files[0] //TODO:  this is available to us but not currently used.
+              newProject.recentFile = data.files[0]
               newProject.nbFiles = data.nbFiles
 
               //TODO: move down to the component level?
@@ -184,12 +156,13 @@ export function getRecentProjects(count=1000) {
       }).catch(err => {
         reject(err)
       })
+      return response
     });
   })
 };
 
+//determine the user's highest permission level - used for warning / info cards on the front page.
 export function getMaxUserRole(){
-
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   if (user){
     if (user.is_admin){
@@ -210,6 +183,7 @@ export function getMaxUserRole(){
   }
 }
 
+//react-admin doesnt have enough toasty popups - this function is used to replace areas where it is lacking.
 export function toastErrors(data) {
   if (isObject(data)) {
     for (var key in data) {
@@ -231,7 +205,7 @@ export function toastErrors(data) {
   }
 }
 
-//TODO: this can be reused elsewhere in the map views.
+//retrieve the first coordinate of the geojson data to help us centre the map
 export function getFirstCoordinate(layer) {
   if (layer && layer.feature) {
     const layerGeo = layer.feature.geometry;
@@ -273,16 +247,15 @@ export function getFirstCoordinate(layer) {
   return false
 }
 
+
+//given a parent path in a project, find all files in that directory.
 export function getFolderFiles(
   params,
   type,
-  dataType="projects"
+  dataType="projects",
 ) {
-
-  //TODO: we need some way to get a list of root-level folders without querying the entire set of files at /search.  this does not yet exist and is required before this element can be implemented.
   const queryParams = {
-    //folderPath may or may not contain an item itself.
-    filter: { path_parent: params.folderPath, type:type },
+    filter: { path_parent: params.folderPath, type:type, location:params.location },
     pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: params.sortBy, order: params.order },
     q: params.q,
@@ -296,9 +269,10 @@ export function getFolderFiles(
     )
       .then(response => {
         let fileList = [];
+
+        console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
-          newFile.children = [];
           newFile.key = file.id;
           fileList = [...fileList, newFile];
           return file;
@@ -311,12 +285,12 @@ export function getFolderFiles(
         });
       })
       .catch(err => {
-        console.log("folder files data error: ", err)
         reject(err);
       });
   });
 }
 
+//get all datasets related to a project.  Would be strange to require pagination on this.
 export function getRelatedDatasets(projectID) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.DATASETS, {
@@ -324,65 +298,186 @@ export function getRelatedDatasets(projectID) {
       pagination: { page: 1, perPage: 1000 },
       sort: { field: MODEL_FIELDS.TITLE, order: "DESC" },
     })
-      .then(response => response.data)
-      .then(assocDatasets => {
-        resolve(assocDatasets);
-      })
+      .then(response => resolve(response.data))
       .catch(err => reject(err));
   });
 }
 
-//gets the root folder paths for a given project
-export function getRootPaths(projectID, dataType="projects") {
-  const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
-    sort: { field: "last_modified", order: "" },
-    filter: { type: "directory" },
-  };
+//given a project and a location, find the root directory.
+export function findRootPath(projectID, location=null, path=null, dataType="projects" ){
 
   return new Promise((resolve, reject) => {
-    dataProvider(
-      "GET_FILES",
-      dataType + "/" + projectID,
-      params
-    )
-      .then(response => {
-        let rootList = {};
+    
+    const params = {
+      pagination: {page: 1, perPage: 1},
+      sort: {field: "path_parent.keyword", order: "DESC"},
+      filter: { location: location, path_parent: path}
+    }
 
-        response.data.map(file => {
-          //find the root paths by taking the smallest length parent paths at each location
-          if (typeof file.location !== "undefined") {
-            if (!rootList || !rootList[file.location]) {
-              rootList[file.location] = file.path_parent;
-            } else {
-              
-              if (rootList[file.location].length > file.path_parent.length) {
-                rootList[file.location] = file.path_parent;
-              }
-            }
-          }
-          return file;
-        });
+    dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
+      console.log("files in path, location, ", path, location, "are: ", projectFiles)
+      resolve(projectFiles.data)
+    }).catch(err => reject(err))
+  })
+}
 
-        let rootPaths = [];
 
-        //create dummy root folder items for display
-        for (var key in rootList) {
-          rootPaths.push({
-            id: key,
-            key: `${key}${rootList[key]}`,
-            path_parent: rootList[key],
-            path: rootList[key],
-            location: key,
-          });
-        }
-        console.log("root paths being returned are: ", rootPaths)
-        resolve(rootPaths);
+  //options:
+  //1. if there is a sort implemented, sort by path parent for each location 
+      //(Locations * Sort for each - LNlogN
+  //2. for each location, get some arbitrary file and crawl up the file path tree (potentially long depending on how deep the file path is)
+    //L * K (K is number of splits per path_parent, Q is query time)
+  //3. for each location, get some arbitrary file and bisect the path_parent until we find the first query where path_parent = 0
+    //should be faster than 2 in general = logN queries on split, L locations
+    //LlogN // this should be the best option
+  //4. for each location, query all files and do a comparison to find root paths (PROBABLY NO, 5 SHOULD BE FASTER)
+  //5. query all files and for each location keep the shortest length path (current, should be faster than 4 due to response time from api)
+export function getRootPathsBetter(projectID, dataType="projects"){
+  return new Promise((resolve, reject) => {
+    const params = {
+      pagination: {page: 1, perPage: 1000},
+      sort: {field: "project", order: ""},
+      filter: { project: projectID },
+    }
+    dataProvider(GET_LIST, "locationprojects", params).then(response => {
+      console.log("getlist of locationprojects response: ", response)
+      //sadly there are duplicates in this endpoint curretly - filter them out.
+
+      let locationSet = new Set()
+      response.data.map(locationproject => {
+        locationSet.add(locationproject.location)
       })
-      .catch(error => {
-        reject(error);
-      });
+      locationSet = [...locationSet]
+      return locationSet
+    })
+    .then(data => {
+      console.log("grpb data is: ", data)
+
+      data.map( location => {
+
+        const projectParams = {
+          pagination: {page: 1, perPage: 1},
+          sort: {field: "path_parent.keyword", order: "DESC"},
+          filter: { location: location}
+        }
+        //list of locations
+        //
+        dataProvider("GET_FILES", `${dataType}/${projectID}`, projectParams).then(projectFiles => {
+          console.log("projectFiles are: ", projectFiles)
+          const files = projectFiles.data
+
+
+
+          if (files && files.length > 0){
+            //this is where we would split depending on the count / path length.
+            if (projectFiles.total > 1){
+              const path_parent = files[0].path_parent
+
+
+              findRootPath(projectID, location, path_parent, dataType).then(rootPath => {
+                console.log("rootpath found is : ", rootPath)
+              })
+              .catch(err => console.log("findRootPath err: ", err))
+            }
+            
+          }
+
+          //we now have some file - walk its path_parent up in a binary search
+
+
+          resolve(projectFiles)
+          return projectFiles
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+      return data
+    }).catch(err => reject(err))
+  })
+}
+
+//gets the root folder paths for a given project's files by finding the smallest path_parent
+//TODO: do this better by continually requesting path_parent = file's path_parent to preform a walk up to root.
+export function getRootPaths(projectID, dataType="projects") {
+
+  return new Promise((resolve, reject) => {
+   
+    const params = {
+      pagination: {page: 1, perPage: 1000},
+      sort: {field: dataType, order: ""},
+      filter: { project: projectID },
+    }
+
+    dataProvider(GET_LIST, "locationprojects", params).then(response => {
+      console.log("getlist of locationprojects response: ", response)
+      //sadly there are duplicates in this endpoint curretly - filter them out.
+
+      let locationSet = new Set()
+      response.data.map(locationproject => {
+        locationSet.add(locationproject.location)
+      })
+      locationSet = [...locationSet]
+      return locationSet
+    }).then(locations => {
+
+      const rootPathPromises = []
+
+      locations.map(location => {
+        console.log("from locationset, location is: ", location)
+        
+          const fileParams = {
+            pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
+            sort: { field: "last_modified", order: "" },
+            filter: { type: "directory", location: location },
+          };
+
+          //TODO: refactor this - we no longer have multiple locations in our query here.
+          rootPathPromises.push( dataProvider(
+            "GET_FILES",
+            dataType + "/" + projectID,
+            fileParams
+          )
+            .then(response => {
+
+              //response currently gives us all files
+              //get the shortest path_parent
+
+              let shortestPathItem = null
+
+              response.data.map(file => {
+                if (!shortestPathItem || shortestPathItem.path_parent.length > file.path_parent){
+                  shortestPathItem = file
+                }
+              })
+
+              shortestPathItem.location = location
+              return shortestPathItem
+            })
+            .catch(error => {
+              reject(error);
+            }));
+      })
+
+      //wait to get all root paths
+      Promise.all(rootPathPromises).then(data => {
+        resolve(data)
+      })
+    })
   });
+}
+
+export function getAllProjectData(projectID){
+  const params = {
+    pagination: { page: 1, perPage: 10000 },
+    type: "file"
+  }
+  return new Promise((resolve, reject) => {
+    dataProvider("GET_FILES", "projects" + "/" + projectID, params).then(response => {
+      console.log("response from getallprojectdata is: ", response)
+      resolve(response.data)
+    })
+  })
 }
 
 export function getProjectData(params, dataType="projects") {
@@ -403,7 +498,7 @@ export function getProjectData(params, dataType="projects") {
   });
 }
 
-//given some group, return all of its parent groups.
+//given some group, return all of its parent groups.  used to mark access to certain buttons / forms.
 export function getParentGroupList(group_id, groupList = []){
   return new Promise((resolve, reject) => {
     //resolve upon having all parent groups
@@ -492,13 +587,10 @@ export function getUsersInGroup(record) {
       sort: { field: MODEL_FIELDS.USER, order: "DESC" },
     })
       .then(response => {
-        
-        if (response && response.total === 0) {
-          resolve([]);
+        if (response.total === 0) {
+          resolve([])
         }
-        return response.data;
-      })
-      .then(groupMembers => {
+        const groupMembers = response.data
         const promises = []
         groupMembers.map(groupMember => {
           promises.push(getUserDetails(groupMember.user).then(user => {
@@ -526,8 +618,8 @@ export function getUsersInGroup(record) {
 export function getGroupMembers(record) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.ROLES)
-      .then(response => response.data)
-      .then(groupRoles => {
+      .then(response => {
+        const groupRoles = response.data
         const { id, is_active } = record;
 
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
@@ -535,11 +627,8 @@ export function getGroupMembers(record) {
           pagination: { page: 1, perPage: 1000 },
           sort: { field: MODEL_FIELDS.USER, order: "DESC" },
         })
-          .then(response => {
-            return response.data;
-          })
-          .then(groupMembers => {
-
+          .then(response2 => {
+            const groupMembers = response2.data
             const promises = []
 
             groupMembers.map(groupMember => {
@@ -590,8 +679,8 @@ export function getMyGroupIDs(){
 export function getUserGroups(record) {
   return new Promise((resolve, reject) => {
     dataProvider(GET_LIST, MODELS.ROLES)
-      .then(response => response.data)
-      .then(groupRoles => {
+      .then(response => {
+        const groupRoles = response.data
         const { id, is_active } = record;
         
         dataProvider(GET_LIST, MODELS.GROUPMEMBERS, {
@@ -599,11 +688,8 @@ export function getUserGroups(record) {
           pagination: { page: 1, perPage: 1000 },
           sort: { field: MODEL_FIELDS.GROUP, order: "DESC" },
         })
-        .then(response => {
-          return response.data;
-        })
-        .then(groupMembers => {
-
+        .then(response2 => {
+          const groupMembers = response2.data
           const promises = []
           groupMembers.map(groupMember => {
 
@@ -619,7 +705,7 @@ export function getUserGroups(record) {
           Promise.all(promises).then(data => {
             resolve(groupMembers)
           }).catch(err => reject(err))
-          return groupMembers;
+          return response2;
         })
         .catch(err => {
           reject("error in in get groupmembers: ", err);
@@ -970,6 +1056,10 @@ export const truncatePath = (path) => {
   if (tempPathArr.length > 4){
     tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
     tempPath = ".../" + tempPathArr.join("/")
+  }
+  else if (tempPath.length > 30){
+    //truncate anyways, keep the start - if there are no slashes, its just a long title.
+    tempPath = `${tempPath.slice(0, 30)}...`
   }
   return tempPath
 }
