@@ -184,7 +184,7 @@ OR by configuring the SendGrid backend with an API Key:
 ```
 # SendGrid Mail Service
 EMAIL_BACKEND = 'sgbackend.SendGridBackend'
-SENDGRID_API_KEY = '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'
+SENDGRID_API_KEY = 'PUT_YOUR_SENDGRID_API_KEY_HERE'
 ```
 
 Developers may want to use the console email backend, which simply prints out the Email content to the console/application logs.
@@ -198,7 +198,7 @@ Developers can also specify DEV_EMAIL_ADDRESSES = [ ] if they want to send to em
 
 ```
 # Dev email addresses
-DEV_EMAIL_ADDRESSES = ['joel.farthing@usask.ca','joel.farthing@computecanada.ca']
+DEV_EMAIL_ADDRESSES = ['someone1@somewhere.edu','someone2@somewhere.edu']
 ```
 
 

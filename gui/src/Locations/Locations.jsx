@@ -213,7 +213,6 @@ export const LocationDisplay = props =>
           </ReferenceField>
         </SingleFieldList>
       </ArrayField>
-
       <GlobusEndpointShow />
       <GlobusPathShow />
       <PortalUrlShow />

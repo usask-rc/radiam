@@ -3,9 +3,13 @@ import React, { useState, useEffect } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { translate } from 'react-admin';
+import { translate, ReferenceField, TextField, } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData, getRootPathsBetter } from '../../_tools/funcs';
+import { getRootPaths, getProjectData, getAllProjectData } from '../../_tools/funcs';
+import { LocationShow } from '../../_components/_fields/LocationShow';
+import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS } from "../../_constants/index"
+import LocationOn from "@material-ui/icons/LocationOn"
+
 
 const styles = theme => ({
   main: {
@@ -15,6 +19,28 @@ const styles = theme => ({
   },
   loading: {
     textAlign: 'left',
+  },
+  locationDisplay: {
+    display: "flex",
+
+    float: 'left',
+  },
+  locationIconLink: {    
+    display: "flex",
+  },
+  globusIDDisplay: {
+    display: "flex",
+    marginLeft: "1em",
+  },
+  globusIDDisplayLabel: {
+    marginRight: "1em",
+  },
+  globusPathDisplay: {
+    display: "flex",
+    marginLeft: "1em",
+  },
+  globusPathDisplayLabel: {
+    marginRight: "1em",
   },
 });
 
@@ -26,10 +52,10 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     let _isMounted = true
     setStatus({loading: true})
 
-    getRootPathsBetter(projectID, dataType).then(data => {
-      console.log("GRPB data: ", data)
+    getAllProjectData(projectID).then(data => {
+      console.log("getallprojectdata: ", data)
     })
-    
+
     getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
@@ -38,6 +64,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
           pagination: { page: 1, perPage: 1 },
           type: "file",
         };
+
         getProjectData(params, dataType=dataType).then(data => {
 
           if (data && data.files && data.files.length > 0){ //else there are no project files
@@ -58,13 +85,14 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
         })
       }
       else{
-        if (_isMounted){      
+        if (_isMounted){ 
+          console.log("getrootpaths in browsetab retrieves data: ", data)
+
           setListOfRootPaths(data)
           setStatus({loading: false, error: false})
         }
         return data
       }
-
     }).catch(err => {
       setStatus({ loading: false, error: err })
     })
@@ -84,15 +112,68 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
       
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
-          return <FolderView
+          console.log("listofrootpaths item: ", item)
+
+          return (<div key={`${item.location}_div`}>
+            <div className={classes.locationDisplay}>
+              <div className={classes.locationIconLink}>
+                <LocationOn />
+                <ReferenceField
+                  label={'en.models.agents.location'}
+                  source={MODEL_FK_FIELDS.LOCATION}
+                  reference={MODELS.LOCATIONS}
+                  link={RESOURCE_OPERATIONS.SHOW}
+                  basePath={`/${MODELS.LOCATIONS}`}
+                  resource={MODELS.PROJECTS}
+                  key={item.location}
+                  record={item}
+                >
+                  <LocationShow />
+                </ReferenceField>
+              </div>
+              <div className={classes.globusIDDisplay}>
+                <Typography className={classes.globusIDDisplayLabel}>{`Globus ID: `}</Typography>
+                <ReferenceField
+                  label={'en.models.agents.location'}
+                  source={MODEL_FK_FIELDS.LOCATION}
+                  reference={MODELS.LOCATIONS}
+                  link={RESOURCE_OPERATIONS.SHOW}
+                  basePath={`/${MODELS.LOCATIONS}`}
+                  resource={MODELS.PROJECTS}
+                  key={item.location}
+                  record={item}
+                >
+                  <TextField source={"globus_endpoint"} />
+                </ReferenceField>
+              </div>
+              <div className={classes.globusPathDisplay}>
+              <Typography className={classes.globusPathDisplayLabel}>{`Globus Path: `}</Typography>
+                <ReferenceField
+                  label={'en.models.agents.location'}
+                  source={MODEL_FK_FIELDS.LOCATION}
+                  reference={MODELS.LOCATIONS}
+                  link={RESOURCE_OPERATIONS.SHOW}
+                  basePath={`/${MODELS.LOCATIONS}`}
+                  resource={MODELS.PROJECTS}
+                  key={item.location}
+                  record={item}
+                >
+                  <TextField source={"globus_path"} />
+                </ReferenceField>
+              </div>
+          </div>
+
+          <FolderView
             expanded={"true"}
             item={item}
             projectName={projectName}
             projectID={projectID}
-            key={item.key}
+            key={`${item.location}_folderView`}
             dataType={dataType}
+            projectLocation={item.location}
             groupID={props.record.group || null}
           />
+          </div>)
         }
       )
     }
