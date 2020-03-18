@@ -924,6 +924,20 @@ class ExportRequestViewSet(RadiamViewSet):
     search_fields = ['id', 'status', 'export_reference']
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
+    @action(methods=['post'],
+            detail=True,
+            url_name='download',
+            permission_classes=(IsAuthenticated,))
+    def download(self, request, pk=None):
+        export = ExportRequest.objects.get(id=pk)
+        if export.status == 'In progress':
+            return Response("Export is in progress, cannot export data")
+        elif export.status == 'Complete':
+            return Response("Downloading data")
+        else:
+            return Response("Export request has unknown status")
+
+
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
     """
     API endpoint that allows the association of datasets with multiple data collection methods.
