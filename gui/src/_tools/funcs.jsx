@@ -438,14 +438,14 @@ export function getRootPaths(projectID, dataType="projects") {
             fileParams
           )
             .then(response => {
-
-              //response currently gives us all files
-              //get the shortest path_parent
+              if (response.data && response.data.length === 0){
+                resolve("") //no files in this location - and that's just fine.
+              }
 
               let shortestPathItem = null
 
               response.data.map(file => {
-                if (!shortestPathItem || shortestPathItem.path_parent.length > file.path_parent){
+                if (shortestPathItem === null || shortestPathItem.path_parent.length > file.path_parent){
                   shortestPathItem = file
                 }
               })
