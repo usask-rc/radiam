@@ -517,7 +517,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <ArrowBack />
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<Root Folder>` }`}</div></Typography>
+            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</div></Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Typography className={classes.curFolderText}>{truncatePath(`${parents[parents.length - 1].path_parent}`).length > 2 ? `${parents[parents.length - 1].path_parent}` : getParentNameList() }</Typography>
@@ -541,7 +541,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
-              {folder.name ? folder.name : `<Root Folder>`}
+              {folder.name ? folder.name : `<No Folder Name>`}
             </TableCell>
             <TableCell className={classes.fileCountCell} onClick={() => addParent(folder)}>
               <DisplayFileIcons folder={folder} classes={classes} />
