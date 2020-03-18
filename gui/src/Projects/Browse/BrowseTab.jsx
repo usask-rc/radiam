@@ -5,7 +5,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData, getRootPathsBetter } from '../../_tools/funcs';
+import { getRootPaths, getProjectData, getAllProjectData } from '../../_tools/funcs';
+import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
+import { LocationShow } from '../../_components/_fields/LocationShow';
+import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS } from "../../_constants/index"
 
 const styles = theme => ({
   main: {
@@ -26,10 +29,14 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     let _isMounted = true
     setStatus({loading: true})
 
+    getAllProjectData(projectID).then(data => {
+      console.log("getallprojectdata: ", data)
+    })
+/*
     getRootPathsBetter(projectID, dataType).then(data => {
       console.log("GRPB data: ", data)
     })
-    
+  */  
     getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
@@ -38,6 +45,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
           pagination: { page: 1, perPage: 1 },
           type: "file",
         };
+
         getProjectData(params, dataType=dataType).then(data => {
 
           if (data && data.files && data.files.length > 0){ //else there are no project files
@@ -58,13 +66,14 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
         })
       }
       else{
-        if (_isMounted){      
+        if (_isMounted){ 
+          console.log("getrootpaths in browsetab retrieves data: ", data)
+
           setListOfRootPaths(data)
           setStatus({loading: false, error: false})
         }
         return data
       }
-
     }).catch(err => {
       setStatus({ loading: false, error: err })
     })
@@ -84,15 +93,33 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
       
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
-          return <FolderView
+          console.log("listofrootpaths item: ", item)
+
+          return (<div key={`${item.id}_div`}>
+          <ReferenceField
+            label={'en.models.agents.location'}
+            source={MODEL_FK_FIELDS.LOCATION}
+            reference={MODELS.LOCATIONS}
+            link={RESOURCE_OPERATIONS.SHOW}
+            basePath={`/${MODELS.PROJECTS}`}
+            resource={MODELS.PROJECTS}
+            key={item.id}
+          >
+            <LocationShow 
+            key={`${item.id}_location`}
+            />
+          </ReferenceField>
+          <FolderView
             expanded={"true"}
             item={item}
             projectName={projectName}
             projectID={projectID}
-            key={item.key}
+            key={`${item.id}_folderView`}
             dataType={dataType}
+            projectLocation={item.location}
             groupID={props.record.group || null}
           />
+          </div>)
         }
       )
     }

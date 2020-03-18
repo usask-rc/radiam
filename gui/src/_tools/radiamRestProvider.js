@@ -36,7 +36,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         let query = {
           query: {
             bool: {
-              filter:[]
+              must: [],
             }
           }
         }
@@ -47,11 +47,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //`filter` can only hold path_parent or type right now, so its probably not necessary to loop this
         if (filter){
           if (filter.path_parent && !params.q){ //no search item?  Then we only want the current folder.
-            query.query.bool.filter.push({"term": {"path_parent.keyword":filter.path_parent}})
+            query.query.bool.must.push({"match": {"path_parent.keyword":filter.path_parent}})
           }
 
           if (filter.type){
-            query.query.bool.filter.push({"term": {"type":filter.type}})
+            query.query.bool.must.push({"match": {"type":filter.type}})
+          }
+
+          if (filter.location){
+            query.query.bool.must.push({"match": {"location":filter.location}})
           }
 
           //add here as needed

@@ -222,14 +222,13 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, ...props }) {
+function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
-  //the contents of `/search/{projectID}/search/?path_parent={itemPath}`
 
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState([item.path_parent]); //base level is simply a path
+  const [parents, setParents] = useState(item.name ? [item.path_parent] : [item.name]); //base level is simply a path
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -246,10 +245,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
+
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
     if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
-      console.log("user groupadminships: ", user.groupAdminships, groupID)
       return true
     }
     return false
@@ -297,6 +296,23 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     setParents(tempParents)
   }
 
+  const getParentNameList = () => {
+    //for all parents, append their names together with "/"
+    const parentNames = []
+    
+    parents.map(parent => {
+      if (parent && parent.name){
+        parentNames.push(parent.name)
+      }
+      else{
+        parentNames.push(`<Project Folder>`)
+      }
+
+      return parent
+    })
+    return `..${parentNames.join("/")}`
+  }
+
   function getJsonKeys(json) {
     const keys = [];
     Object.keys(json).forEach(function (key) {
@@ -325,9 +341,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     e.preventDefault()
   }
 
-  //TODO: honestly i just dont really feel like doing this rn
-  //const debouncedSearch = useDebounce()
-
   useEffect(() => {
     //search the given project with the appropriate location and search param
 
@@ -344,6 +357,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         page: 1, //TODO: affix this to some other panel
         order: order === "desc" ? "-" : "",
         sortBy: sortBy,
+        location: projectLocation,
         q: search
       }
 
@@ -361,10 +375,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (_isMounted){
           setFolders(data.files)
           setLoading(false)
-
-          if (!data.files && !files){
-            
-          }
         }
       }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
@@ -393,12 +403,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       page: filePage,
       sortBy: sortBy,
+      location: projectLocation,
       order: order === "desc" ? "-" : "",
       //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
       //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
-
-    
 
     let folderParams = {
         folderPath: folderPath,
@@ -406,6 +415,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         page: folderPage,
         sortBy: sortBy,
+        location: projectLocation,
         order: order === "desc" ? "-" : "",
         //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
         //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
@@ -425,10 +435,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           if (folderPage > 1){
             if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id)
             {
+              console.log("folders being set to 1: ", ...prevFolders, ...data.files)
               setFolders([...prevFolders, ...data.files])
             }
           }
           else{
+            console.log("folders being set to 2: ", ...data.files)
+
             setFolders([...data.files]) 
           }
           setLoading(false)
@@ -504,10 +517,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <ArrowBack />
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name}`}</div></Typography>
+            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<Root Folder>` }`}</div></Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}>{truncatePath(`${parents[parents.length - 1].path_parent}`)}</Typography>
+            <Typography className={classes.curFolderText}>{truncatePath(`${parents[parents.length - 1].path_parent}`).length > 2 ? `${parents[parents.length - 1].path_parent}` : getParentNameList() }</Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Tooltip title={`${parents[parents.length - 1].last_modified}`}>
@@ -528,7 +541,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
-              {folder.name}
+              {folder.name ? folder.name : `<Root Folder>`}
             </TableCell>
             <TableCell className={classes.fileCountCell} onClick={() => addParent(folder)}>
               <DisplayFileIcons folder={folder} classes={classes} />

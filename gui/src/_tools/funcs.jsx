@@ -12,6 +12,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
+  return "https://dev2.radiam.ca/api"
   return `/${API_ENDPOINT}`;
 }
 
@@ -246,14 +247,15 @@ export function getFirstCoordinate(layer) {
   return false
 }
 
+
 //given a parent path in a project, find all files in that directory.
 export function getFolderFiles(
   params,
   type,
-  dataType="projects"
+  dataType="projects",
 ) {
   const queryParams = {
-    filter: { path_parent: params.folderPath, type:type },
+    filter: { path_parent: params.folderPath, type:type, location:params.location },
     pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: params.sortBy, order: params.order },
     q: params.q,
@@ -267,6 +269,8 @@ export function getFolderFiles(
     )
       .then(response => {
         let fileList = [];
+
+        console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -299,8 +303,23 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
-//for each Location associated with this projectID (search in table locationProject) 
-  //walk up from whatever file we get to its root
+//given a project and a location, find the root directory.
+export function findRootPath(projectID, location=null, path=null, dataType="projects" ){
+
+  return new Promise((resolve, reject) => {
+    
+    const params = {
+      pagination: {page: 1, perPage: 1},
+      sort: {field: "path_parent.keyword", order: "DESC"},
+      filter: { location: location, path_parent: path}
+    }
+
+    dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
+      console.log("files in path, location, ", path, location, "are: ", projectFiles)
+      resolve(projectFiles.data)
+    }).catch(err => reject(err))
+  })
+}
 
 
   //options:
@@ -335,15 +354,37 @@ export function getRootPathsBetter(projectID, dataType="projects"){
       console.log("grpb data is: ", data)
 
       data.map( location => {
-        
+
         const projectParams = {
           pagination: {page: 1, perPage: 1},
           sort: {field: "path_parent.keyword", order: "DESC"},
           filter: { location: location}
         }
         //list of locations
-        dataProvider("GET_FILES", `projects/${projectID}`, projectParams).then(projectFiles => {
+        //
+        dataProvider("GET_FILES", `${dataType}/${projectID}`, projectParams).then(projectFiles => {
           console.log("projectFiles are: ", projectFiles)
+          const files = projectFiles.data
+
+
+
+          if (files && files.length > 0){
+            //this is where we would split depending on the count / path length.
+            if (projectFiles.total > 1){
+              const path_parent = files[0].path_parent
+
+
+              findRootPath(projectID, location, path_parent, dataType).then(rootPath => {
+                console.log("rootpath found is : ", rootPath)
+              })
+              .catch(err => console.log("findRootPath err: ", err))
+            }
+            
+          }
+
+          //we now have some file - walk its path_parent up in a binary search
+
+
           resolve(projectFiles)
           return projectFiles
         })
@@ -359,53 +400,84 @@ export function getRootPathsBetter(projectID, dataType="projects"){
 //gets the root folder paths for a given project's files by finding the smallest path_parent
 //TODO: do this better by continually requesting path_parent = file's path_parent to preform a walk up to root.
 export function getRootPaths(projectID, dataType="projects") {
-  const params = {
-    pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
-    sort: { field: "last_modified", order: "" },
-    filter: { type: "directory" },
-  };
 
   return new Promise((resolve, reject) => {
-    dataProvider(
-      "GET_FILES",
-      dataType + "/" + projectID,
-      params
-    )
-      .then(response => {
-        let rootList = {};
+   
+    const params = {
+      pagination: {page: 1, perPage: 1000},
+      sort: {field: dataType, order: ""},
+      filter: { project: projectID },
+    }
 
-        response.data.map(file => {
-          //find the root paths by taking the smallest length parent paths at each location
-          if (typeof file.location !== "undefined") {
-            if (!rootList || !rootList[file.location]) {
-              rootList[file.location] = file.path_parent;
-            } else {
-              if (rootList[file.location].length > file.path_parent.length) {
-                rootList[file.location] = file.path_parent;
-              }
-            }
-          }
-          return file;
-        });
+    dataProvider(GET_LIST, "locationprojects", params).then(response => {
+      console.log("getlist of locationprojects response: ", response)
+      //sadly there are duplicates in this endpoint curretly - filter them out.
 
-        let rootPaths = [];
-
-        //create dummy root folder items for display
-        for (var key in rootList) {
-          rootPaths.push({
-            id: key,
-            key: `${key}${rootList[key]}`,
-            path_parent: rootList[key],
-            path: rootList[key],
-            location: key,
-          });
-        }
-        resolve(rootPaths);
+      let locationSet = new Set()
+      response.data.map(locationproject => {
+        locationSet.add(locationproject.location)
       })
-      .catch(error => {
-        reject(error);
-      });
+      locationSet = [...locationSet]
+      return locationSet
+    }).then(locations => {
+
+      const rootPathPromises = []
+
+      locations.map(location => {
+        console.log("from locationset, location is: ", location)
+        
+          const fileParams = {
+            pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
+            sort: { field: "last_modified", order: "" },
+            filter: { type: "directory", location: location },
+          };
+
+          //TODO: refactor this - we no longer have multiple locations in our query here.
+          rootPathPromises.push( dataProvider(
+            "GET_FILES",
+            dataType + "/" + projectID,
+            fileParams
+          )
+            .then(response => {
+
+              //response currently gives us all files
+              //get the shortest path_parent
+
+              let shortestPathItem = null
+
+              response.data.map(file => {
+                if (!shortestPathItem || shortestPathItem.path_parent.length > file.path_parent){
+                  shortestPathItem = file
+                }
+              })
+
+              shortestPathItem.location = location
+              return shortestPathItem
+            })
+            .catch(error => {
+              reject(error);
+            }));
+      })
+
+      //wait to get all root paths
+      Promise.all(rootPathPromises).then(data => {
+        resolve(data)
+      })
+    })
   });
+}
+
+export function getAllProjectData(projectID){
+  const params = {
+    pagination: { page: 1, perPage: 10000 },
+    type: "file"
+  }
+  return new Promise((resolve, reject) => {
+    dataProvider("GET_FILES", "projects" + "/" + projectID, params).then(response => {
+      console.log("response from getallprojectdata is: ", response)
+      resolve(response.data)
+    })
+  })
 }
 
 export function getProjectData(params, dataType="projects") {
