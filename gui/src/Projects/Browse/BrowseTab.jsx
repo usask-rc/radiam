@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate, ReferenceField, TextField, } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData, getAllProjectData } from '../../_tools/funcs';
+import { getRootPaths, getProjectData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
@@ -51,10 +51,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
   useEffect(() => {
     let _isMounted = true
     setStatus({loading: true})
-
-    getAllProjectData(projectID).then(data => {
-      console.log("getallprojectdata: ", data)
-    })
 
     getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
