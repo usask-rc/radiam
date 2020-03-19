@@ -907,7 +907,7 @@ class DatasetExportViewSet(viewsets.GenericViewSet):
     """
 
     def list(self, request, dataset_id):
-        export_request = ExportRequest.objects.create(status="Complete", export_reference=dataset_id)
+        export_request = ExportRequest.objects.create(status="In progress", export_reference=dataset_id)
         export_request.save()
         return Response(export_request.id)
 
@@ -934,9 +934,7 @@ class ExportRequestViewSet(RadiamViewSet):
             permission_classes=(IsAuthenticated,))
     def download(self, request, pk=None):
         export = ExportRequest.objects.get(id=pk)
-        if export.status == 'In progress':
-            return Response("Export is in progress, cannot export data")
-        elif export.status == 'Complete':
+        if export.status == 'In progress' or export.status == 'Complete':
 
             #TODO Bagit then zip
             # Download cached file data instead of generating new file each time
