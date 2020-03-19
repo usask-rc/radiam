@@ -437,6 +437,7 @@ export default {
         display_name: 'Display Name',
         globus_endpoint: 'Globus Endpoint UUID',
         globus_path: 'Globus Path',
+        globus_link_label: 'Globus Endpoint',
         host_name: 'Host Name',
         name: 'Name',
         notes: 'Notes',
@@ -595,7 +596,7 @@ export default {
       },
       locations: {
         globus_endpoint:
-          'A Globus Endpoint UUID should look something like c99fd40c-5545-11e7-beb6-22000b9a448b. You can find the Globus Endpoint by going to https://globus.computecanada.ca/endpoints.',
+          'A Globus Endpoint UUID should look like: c99fd40c-5545-11e7-beb6-22000b9a448b',
         host_name: 'A host name is required for a location.',
         location_type: 'A type is required for a location',
       },

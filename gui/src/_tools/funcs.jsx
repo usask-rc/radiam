@@ -260,6 +260,8 @@ export function getFolderFiles(
     q: params.q,
   };
 
+  console.log("queryParams in getfolderfiles: ", queryParams)
+
   return new Promise((resolve, reject) => {
     dataProvider(
       "GET_FILES",
@@ -320,84 +322,7 @@ export function findRootPath(projectID, location=null, path=null, dataType="proj
   })
 }
 
-
-  //options:
-  //1. if there is a sort implemented, sort by path parent for each location 
-      //(Locations * Sort for each - LNlogN
-  //2. for each location, get some arbitrary file and crawl up the file path tree (potentially long depending on how deep the file path is)
-    //L * K (K is number of splits per path_parent, Q is query time)
-  //3. for each location, get some arbitrary file and bisect the path_parent until we find the first query where path_parent = 0
-    //should be faster than 2 in general = logN queries on split, L locations
-    //LlogN // this should be the best option
-  //4. for each location, query all files and do a comparison to find root paths (PROBABLY NO, 5 SHOULD BE FASTER)
-  //5. query all files and for each location keep the shortest length path (current, should be faster than 4 due to response time from api)
-export function getRootPathsBetter(projectID, dataType="projects"){
-  return new Promise((resolve, reject) => {
-    const params = {
-      pagination: {page: 1, perPage: 1000},
-      sort: {field: "project", order: ""},
-      filter: { project: projectID },
-    }
-    dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      console.log("getlist of locationprojects response: ", response)
-      //sadly there are duplicates in this endpoint curretly - filter them out.
-
-      let locationSet = new Set()
-      response.data.map(locationproject => {
-        locationSet.add(locationproject.location)
-      })
-      locationSet = [...locationSet]
-      return locationSet
-    })
-    .then(data => {
-      console.log("grpb data is: ", data)
-
-      data.map( location => {
-
-        const projectParams = {
-          pagination: {page: 1, perPage: 1},
-          sort: {field: "path_parent.keyword", order: "DESC"},
-          filter: { location: location}
-        }
-        //list of locations
-        //
-        dataProvider("GET_FILES", `${dataType}/${projectID}`, projectParams).then(projectFiles => {
-          console.log("projectFiles are: ", projectFiles)
-          const files = projectFiles.data
-
-
-
-          if (files && files.length > 0){
-            //this is where we would split depending on the count / path length.
-            if (projectFiles.total > 1){
-              const path_parent = files[0].path_parent
-
-
-              findRootPath(projectID, location, path_parent, dataType).then(rootPath => {
-                console.log("rootpath found is : ", rootPath)
-              })
-              .catch(err => console.log("findRootPath err: ", err))
-            }
-            
-          }
-
-          //we now have some file - walk its path_parent up in a binary search
-
-
-          resolve(projectFiles)
-          return projectFiles
-        })
-        .catch(err => {
-          reject(err)
-        })
-      })
-      return data
-    }).catch(err => reject(err))
-  })
-}
-
-//gets the root folder paths for a given project's files by finding the smallest path_parent
-//TODO: do this better by continually requesting path_parent = file's path_parent to preform a walk up to root.
+//assumption: "path_parent" of all locations is ".." with the current agent as of 03/18/2020
 export function getRootPaths(projectID, dataType="projects") {
 
   return new Promise((resolve, reject) => {
@@ -419,64 +344,11 @@ export function getRootPaths(projectID, dataType="projects") {
       locationSet = [...locationSet]
       return locationSet
     }).then(locations => {
-
-      const rootPathPromises = []
-
-      locations.map(location => {
-        console.log("from locationset, location is: ", location)
-        
-          const fileParams = {
-            pagination: { page: 1, perPage: 1000 }, //TODO: we may want some sort of expandable option for folders, but I"m not sure this is necessary.
-            sort: { field: "last_modified", order: "" },
-            filter: { type: "directory", location: location },
-          };
-
-          //TODO: refactor this - we no longer have multiple locations in our query here.
-          rootPathPromises.push( dataProvider(
-            "GET_FILES",
-            dataType + "/" + projectID,
-            fileParams
-          )
-            .then(response => {
-              if (response.data && response.data.length === 0){
-                resolve("") //no files in this location - and that's just fine.
-              }
-
-              let shortestPathItem = null
-
-              response.data.map(file => {
-                if (shortestPathItem === null || shortestPathItem.path_parent.length > file.path_parent){
-                  shortestPathItem = file
-                }
-              })
-
-              shortestPathItem.location = location
-              return shortestPathItem
-            })
-            .catch(error => {
-              reject(error);
-            }));
+      return locations.map(location => {
+        return {location: location, path_parent: ".."}
       })
-
-      //wait to get all root paths
-      Promise.all(rootPathPromises).then(data => {
-        resolve(data)
-      })
-    })
+    }).then(data => resolve(data))
   });
-}
-
-export function getAllProjectData(projectID){
-  const params = {
-    pagination: { page: 1, perPage: 10000 },
-    type: "file"
-  }
-  return new Promise((resolve, reject) => {
-    dataProvider("GET_FILES", "projects" + "/" + projectID, params).then(response => {
-      console.log("response from getallprojectdata is: ", response)
-      resolve(response.data)
-    })
-  })
 }
 
 export function getProjectData(params, dataType="projects") {

@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { translate } from 'react-admin';
+import { translate, ReferenceField, TextField, } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData, getAllProjectData } from '../../_tools/funcs';
-import ReferenceField from 'ra-ui-materialui/lib/field/ReferenceField';
+import { getRootPaths, getProjectData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
-import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS } from "../../_constants/index"
+import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
+import LocationOn from "@material-ui/icons/LocationOn"
+
 
 const styles = theme => ({
   main: {
@@ -18,6 +19,28 @@ const styles = theme => ({
   },
   loading: {
     textAlign: 'left',
+  },
+  locationDisplay: {
+    display: "flex",
+
+    float: 'left',
+  },
+  locationIconLink: {    
+    display: "flex",
+  },
+  globusIDDisplay: {
+    display: "flex",
+    marginLeft: "1em",
+  },
+  globusIDDisplayLabel: {
+    marginRight: "1em",
+  },
+  globusPathDisplay: {
+    display: "flex",
+    marginLeft: "1em",
+  },
+  globusPathDisplayLabel: {
+    marginRight: "1em",
   },
 });
 
@@ -29,14 +52,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     let _isMounted = true
     setStatus({loading: true})
 
-    getAllProjectData(projectID).then(data => {
-      console.log("getallprojectdata: ", data)
-    })
-/*
-    getRootPathsBetter(projectID, dataType).then(data => {
-      console.log("GRPB data: ", data)
-    })
-  */  
     getRootPaths(projectID, dataType).then(data => {
       if (data.length === 0){
         //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
@@ -95,26 +110,39 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
         listOfRootPaths.map(item => {
           console.log("listofrootpaths item: ", item)
 
-          return (<div key={`${item.id}_div`}>
-          <ReferenceField
-            label={'en.models.agents.location'}
-            source={MODEL_FK_FIELDS.LOCATION}
-            reference={MODELS.LOCATIONS}
-            link={RESOURCE_OPERATIONS.SHOW}
-            basePath={`/${MODELS.PROJECTS}`}
-            resource={MODELS.PROJECTS}
-            key={item.id}
-          >
-            <LocationShow 
-            key={`${item.id}_location`}
-            />
-          </ReferenceField>
+          return (<div key={`${item.location}_div`}>
+            <div className={classes.locationDisplay}>
+              <div className={classes.locationIconLink}>
+                <LocationOn />
+                <ReferenceField
+                  label={'en.models.agents.location'}
+                  source={MODEL_FK_FIELDS.LOCATION}
+                  reference={MODELS.LOCATIONS}
+                  link={RESOURCE_OPERATIONS.SHOW}
+                  basePath={`/${MODELS.LOCATIONS}`}
+                  resource={MODELS.PROJECTS}
+                  key={item.location}
+                  record={item}
+                >
+                  <LocationShow />
+                </ReferenceField>
+              </div>
+              <div className={classes.globusIDDisplay}>
+                <Typography className={classes.globusIDDisplayLabel}>{translate('en.models.locations.globus_link_label')}:</Typography>
+                <Typography className={classes.link} component="a"
+                  href={`${LINKS.GLOBUSWEBAPP}?origin_id=${item.globus_endpoint}&origin_path=${item.globus_path}`} 
+                  target="_blank" rel="noopener noreferrer">
+                    {`${item.globus_endpoint}`}
+                </Typography>
+              </div>
+          </div>
+
           <FolderView
             expanded={"true"}
             item={item}
             projectName={projectName}
             projectID={projectID}
-            key={`${item.id}_folderView`}
+            key={`${item.location}_folderView`}
             dataType={dataType}
             projectLocation={item.location}
             groupID={props.record.group || null}

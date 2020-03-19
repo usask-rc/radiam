@@ -20,7 +20,6 @@ const Dashboard = ({classes, permissions, ...rest}) => {
   const [hasFiles, setHasFiles] = useState(null)
   const [relatedUsers, setRelatedUsers] = useState(null)
   const [recentProjects, setRecentProjects] = useState(null)
-  const user = JSON.parse(localStorage.getItem(ROLES.USER));
 
   useEffect(() => {
 

@@ -225,10 +225,12 @@ function EnhancedTableHead(props) {
 function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
 
+  console.log("item in folderview is: ", item)
+
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState(item.name ? [item.path_parent] : [item.name]); //base level is simply a path
+  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be ".."
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -256,6 +258,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const addParent = (folder) => {
     let tempParents = [...parents, folder]
+
+    console.log("adding parent, tempParents is: ", tempParents)
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -299,18 +303,14 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const getParentNameList = () => {
     //for all parents, append their names together with "/"
     const parentNames = []
-    
+
     parents.map(parent => {
       if (parent && parent.name){
         parentNames.push(parent.name)
       }
-      else{
-        parentNames.push(`<Project Folder>`)
-      }
-
       return parent
     })
-    return `..${parentNames.join("/")}`
+    return `...${parentNames.join("\\")}`
   }
 
   function getJsonKeys(json) {
@@ -346,8 +346,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     //folderpath is probably irrelevant
     _isMounted = true
-    let folderPath = parents[0] //TODO: this is fine for now - parents[0] is always a path itself.  will have to change.
 
+    let folderPath = parents[parents.length - 1].path
+    if (parents.length === 1){
+      folderPath = ".."
+    }
 
     if (search && search.length > 0){
       let fileParams = {
@@ -386,15 +389,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   }, [search, order])
 
   useEffect(() => {
-
-    let folderPath
-
-    if (parents.length > 1){
-      folderPath = parents[parents.length - 1].path
+    let folderPath = parents[parents.length - 1].path
+    if (parents.length === 1){
+      folderPath = ".."
     }
-    else{
-      folderPath = parents[0]
-    }
+    
     _isMounted = true
 
     let fileParams = {
@@ -425,10 +424,8 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
         console.log("folder files data: ", data.files)
         if (_isMounted){
-          //TODO:will have to change when pagination comes
+
           setFolderTotal(data.total)
-          //cases for where we want to add more files via `...`
-          //TODO: sort functionality adds duplicates in - the logic has to change here.
           const prevFolders = folders
 
           //first page, set the values, otherwise append
@@ -441,7 +438,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           }
           else{
             console.log("folders being set to 2: ", ...data.files)
-
             setFolders([...data.files]) 
           }
           setLoading(false)
@@ -476,16 +472,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     }
   }, [parents, sortBy, order, filePage, folderPage, perPage, search]);
 
-  //needs different UE for both folder and files
-
-  //folder UE
-  /* What do we want from this?
-    At this level (PATH / parents?) get X (perFolderPage / perPage) Folders on Page (folderPage), sorted by (sortBy), ordered by (order)
-  useEffect(() => {
-
-  }, [folderPage, sortBy, order, folderPage, ])
-   */
-
   return(
   <div>
     <Table size={"small"} className={classes.table}>
@@ -517,10 +503,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             <ArrowBack />
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}><div>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</div></Typography>
+            <Typography className={classes.curFolderText}>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}>{truncatePath(`${parents[parents.length - 1].path_parent}`).length > 2 ? `${parents[parents.length - 1].path_parent}` : getParentNameList() }</Typography>
+            <Typography className={classes.curFolderText}>{getParentNameList()}</Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Tooltip title={`${parents[parents.length - 1].last_modified}`}>
@@ -547,7 +533,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               <DisplayFileIcons folder={folder} classes={classes} />
             </TableCell>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
-              {truncated_path}
+              <Typography>{truncated_path}</Typography>
             </TableCell>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
               <Tooltip title={`${folder.last_modified}`}>
@@ -592,7 +578,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             {formatBytes(file.filesize)}
           </TableCell>
           <TableCell className={classes.nameCell}>
-            {truncated_path}
+            <Typography>{truncated_path}</Typography>
           </TableCell>
             <TableCell className={classes.nameCell}>
               <Tooltip title={file.last_modified}>

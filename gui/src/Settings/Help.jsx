@@ -63,34 +63,34 @@ const Help = ({ classes, translate }) => (
                 <HelpOutline className={classes.titleIcon} />
                 {translate('en.help.title')}
             </Typography>
-            <Typography className={classes.subheader} variant="p" component="p">
+            <Typography className={classes.subheader} component="p">
                 {translate('en.help.agentinstallation')}
             </Typography>
             
             <div className={classes.inlineText}>
-                <Typography className={classes.content} variant="p" component="p">
+                <Typography className={classes.content} component="p">
                     {translate('en.help.download.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={LINKS.RADIAMAGENTURL} target="_blank" rel="noopener noreferrer">
+                <Typography  className={classes.link} component="a" href={LINKS.RADIAMAGENTURL} target="_blank" rel="noopener noreferrer">
                     {LINKS.RADIAMAGENTURL}
                 </Typography>
             </div>
 
-            <Typography className={classes.subheader} variant="p" component="p">
+            <Typography className={classes.subheader} component="p">
                 {translate('en.help.email.title')}
             </Typography>
             
             <div className={classes.inlineText}>
-                <Typography className={classes.content} variant="p" component="p">
+                <Typography className={classes.content} component="p">
                     {translate('en.help.email.text')}
                 </Typography>
-                <Typography  className={classes.link} variant="a" component="a" href={`mailto:${LINKS.SUPPORTEMAIL}`} target="_blank" rel="noopener noreferrer" >
+                <Typography  className={classes.link} component="a" href={`mailto:${LINKS.SUPPORTEMAIL}`} target="_blank" rel="noopener noreferrer" >
                     {LINKS.SUPPORTEMAIL}
                 </Typography>
             </div>
             
             <div className={classes.inlineText}>
-                <Typography className={classes.subheader} variant="p" component="p">
+                <Typography className={classes.subheader} component="p">
                     {translate('en.help.usermanual.title')}
                 </Typography>
                 <a href={`..${LINKS.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
@@ -98,16 +98,16 @@ const Help = ({ classes, translate }) => (
                 </a>
             </div>
 
-            <Typography className={classes.subheader} variant="p" component="p">
+            <Typography className={classes.subheader} component="p">
                 {translate('en.help.developers.title')}
             </Typography>
 
             <div className={classes.inlineText}>
-                <Typography className={classes.content} variant="p" component="p">
+                <Typography className={classes.content} component="p">
                     {translate('en.help.developers.text')}
                 </Typography>
 
-                <Typography  className={classes.link} variant="a" component="a" href={LINKS.RADIAMAGENTREADMEURL} target="_blank" rel="noopener noreferrer" >
+                <Typography  className={classes.link} component="a" href={LINKS.RADIAMAGENTREADMEURL} target="_blank" rel="noopener noreferrer" >
                     {LINKS.RADIAMAGENTREADMEURL}
                 </Typography>
             </div>
