@@ -41,6 +41,7 @@ module.exports = Object.freeze({
     RADIAMAGENTURL: "https://github.com/usask-rc/radiam-agent-releases",
     USERMANUALPATH: "/staticfiles/Radiam_user_manual.pdf",
     USERMANUALFILENAME: "Radiam_user_manual.pdf",
+    GLOBUSWEBAPP: "https://app.globus.org/file-manager"
   },
   LOGIN_DETAILS: {
     EMAIL: "email",

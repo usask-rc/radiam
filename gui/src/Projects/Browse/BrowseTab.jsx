@@ -7,7 +7,7 @@ import { translate, ReferenceField, TextField, } from 'react-admin';
 import FolderView from './FolderView';
 import { getRootPaths, getProjectData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
-import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS } from "../../_constants/index"
+import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
 
 
@@ -128,34 +128,12 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
                 </ReferenceField>
               </div>
               <div className={classes.globusIDDisplay}>
-                <Typography className={classes.globusIDDisplayLabel}>{`Globus ID: `}</Typography>
-                <ReferenceField
-                  label={'en.models.agents.location'}
-                  source={MODEL_FK_FIELDS.LOCATION}
-                  reference={MODELS.LOCATIONS}
-                  link={RESOURCE_OPERATIONS.SHOW}
-                  basePath={`/${MODELS.LOCATIONS}`}
-                  resource={MODELS.PROJECTS}
-                  key={item.location}
-                  record={item}
-                >
-                  <TextField source={"globus_endpoint"} />
-                </ReferenceField>
-              </div>
-              <div className={classes.globusPathDisplay}>
-              <Typography className={classes.globusPathDisplayLabel}>{`Globus Path: `}</Typography>
-                <ReferenceField
-                  label={'en.models.agents.location'}
-                  source={MODEL_FK_FIELDS.LOCATION}
-                  reference={MODELS.LOCATIONS}
-                  link={RESOURCE_OPERATIONS.SHOW}
-                  basePath={`/${MODELS.LOCATIONS}`}
-                  resource={MODELS.PROJECTS}
-                  key={item.location}
-                  record={item}
-                >
-                  <TextField source={"globus_path"} />
-                </ReferenceField>
+                <Typography className={classes.globusIDDisplayLabel}>{translate('en.models.locations.globus_link_label')}:</Typography>
+                <Typography className={classes.link} component="a"
+                  href={`${LINKS.GLOBUSWEBAPP}?origin_id=${item.globus_endpoint}&origin_path=${item.globus_path}`} 
+                  target="_blank" rel="noopener noreferrer">
+                    {`${item.globus_endpoint}`}
+                </Typography>
               </div>
           </div>
 
