@@ -12,6 +12,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
+  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -349,6 +350,19 @@ export function getRootPaths(projectID, dataType="projects") {
       })
     }).then(data => resolve(data))
   });
+}
+
+export function getAllProjectData(projectID){
+  const params = {
+    pagination: { page: 1, perPage: 10000 },
+    type: "file"
+  }
+  return new Promise((resolve, reject) => {
+    dataProvider("GET_FILES", "projects" + "/" + projectID, params).then(response => {
+      console.log("response from getallprojectdata is: ", response)
+      resolve(response.data)
+    })
+  })
 }
 
 export function getProjectData(params, dataType="projects") {
@@ -924,6 +938,11 @@ export const truncatePath = (path) => {
   }
   let tempPath = path
   let tempPathArr = tempPath.split("/")
+
+  if (!tempPathArr){
+    tempPathArr = tempPath.split("\\")
+  }
+  
   if (tempPathArr.length > 4){
     tempPathArr = tempPathArr.slice(tempPathArr.length - 4)
     tempPath = ".../" + tempPathArr.join("/")

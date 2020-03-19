@@ -45,10 +45,11 @@ const styles = theme => ({
   },
   createDatasetCell: {
     margin: "0px",
-    padding: "0px"
+    padding: "0px",
+    float: "right",
   },
   searchForm: {
-
+    float: "right",
   },
   searchFormTextField: {
     verticalAlign: "middle",
@@ -103,7 +104,6 @@ const styles = theme => ({
   },
   table: {
     marginBottom: "2em",
-    borderRadius: "16",
   },
   folderRow: {
     backgroundColor: "beige",
@@ -247,6 +247,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
   const [folderTotal, setFolderTotal] = useState(0)
+  const fileTypes = ["file", "directory"]
 
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
@@ -338,6 +339,18 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       setFiles([])
       setSearch(e.target.elements.search.value)
     }
+    //on search clear, reset to base
+    else if (e.target.elements.search.value === ""){
+      setLoading(true)
+      setFilePage(1)
+      setFolderPage(1)
+      setFileTotal(0)
+      setFolderTotal(0)
+      setFolders([])
+      setFiles([])
+      setParents([item])
+      setSearch("")
+    }
     e.preventDefault()
   }
 
@@ -349,44 +362,75 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".."
+      folderPath = ".." //root is `..`
     }
 
     if (search && search.length > 0){
       let fileParams = {
         folderPath: folderPath,
         projectID: projectID,
-        numFiles: 1000,  //TODO: paginate the file search component
-        page: 1, //TODO: affix this to some other panel
+        numFiles: perPage, 
+        page: filePage,
         order: order === "desc" ? "-" : "",
         sortBy: sortBy,
         location: projectLocation,
         q: search
       }
 
-      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
-        console.log("search files data: ", data)
-        if (_isMounted){
-          setFiles(data.files)
-          setLoading(false)
-        }
-      }).catch((err => {console.error("error in getFiles is: ", err)}))
+      fileTypes.map(type => {
 
-      
-      getFolderFiles(fileParams, "directory", dataType=dataType).then((data) => {
-        console.log("search files data: ", data)
-        if (_isMounted){
-          setFolders(data.files)
-          setLoading(false)
+        fileParams.page = filePage
+        if (type === "directory"){
+          fileParams.page = folderPage
         }
-      }).catch((err => {console.error("error in getFiles is: ", err)}))
+        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
+          if (_isMounted){
+            if (type === "file"){
+              setFileTotal(data.total)
+              const prevFiles = files
+              if (filePage > 1){
+                //append only if necessary
+                if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id){
+                  setFiles([...prevFiles, ...data.files])
+                }
+                else{
+                  console.error("unhandled case in set files in search")
+                }
+              }
+              else{
+                setFiles([...data.files])
+              }
+            }
+            else if (type === "directory"){
+              setFolderTotal(data.total)
+              const prevFolders = folders
+              if (folderPage > 1){
+                if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id){
+                  console.log("new folder list being set to: ", [...prevFolders, ...data.files])
+                  setFolders([...prevFolders, ...data.files])
+                }
+                else{
+                  console.error("unhandled case in set folders in search")
+                }
+              }
+              else{
+                setFolders([...data.files])
+              }
+            }
+            else{
+              console.error("unknown file requested as data: ", type, data)
+            }
+            setLoading(false)
+          }
+        }).catch((err => {console.error("error in getFiles (search) is: ", err)}))
+      })
     }
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
-  }, [search, order])
+  }, [search, filePage, folderPage, order])
 
   useEffect(() => {
     let folderPath = parents[parents.length - 1].path
@@ -399,71 +443,63 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     let fileParams = {
       folderPath: folderPath,
       projectID: projectID,
-      numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
+      numFiles: perPage,  
       page: filePage,
       sortBy: sortBy,
       location: projectLocation,
       order: order === "desc" ? "-" : "",
-      //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-      //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
-    }
-
-    let folderParams = {
-        folderPath: folderPath,
-        projectID: projectID,
-        numFiles: perPage,  //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-        page: folderPage,
-        sortBy: sortBy,
-        location: projectLocation,
-        order: order === "desc" ? "-" : "",
-        //TODO: both of the following queries need pagination components.  I don't quite know how to best implement this yet.  Until then, we'll just display all files in a folder with a somewhat unreasonable limit on them.
-        //we by default want to show all of the data. when we 'change pages', we should be appending the new data onto what we already have, not removing what we have.
     }
 
     if (!search){ //TODO: there is a better way to separate this out
-      getFolderFiles(folderParams, "directory", dataType=dataType).then((data) => {
-        console.log("folder files data: ", data.files)
-        if (_isMounted){
 
-          setFolderTotal(data.total)
-          const prevFolders = folders
-
-          //first page, set the values, otherwise append
-          if (folderPage > 1){
-            if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id)
-            {
-              console.log("folders being set to 1: ", ...prevFolders, ...data.files)
-              setFolders([...prevFolders, ...data.files])
-            }
-          }
-          else{
-            console.log("folders being set to 2: ", ...data.files)
-            setFolders([...data.files]) 
-          }
-          setLoading(false)
+      fileTypes.map(type => {
+        fileParams.page = filePage
+        if (type === "directory"){
+          fileParams.page = folderPage
         }
-        return data
+        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
+          console.log(`${type} data: ${data.files}`)
+          if (_isMounted){
+
+            if (type === "file"){
+              
+              setFileTotal(data.total)
+              const prevFiles = files
+
+              console.log("prevFiles, data.files: ", [...prevFiles, ...data.files])
+              if (filePage > 1){
+                if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
+                {
+                  setFiles([...prevFiles, ...data.files])
+                }
+              }
+              else{
+                setFiles([...data.files]) 
+              }
+            }
+            else if (type === "directory"){
+              setFolderTotal(data.total)
+              const prevFolders = folders
+              //first page, set the values, otherwise append
+              if (folderPage > 1){
+                if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id)
+                {
+                  setFolders([...prevFolders, ...data.files])
+                }
+              }
+              else{
+                setFolders([...data.files]) 
+              }
+            }
+            else{
+              console.error("unknown file type requested from data: ", type, data)
+            }
+            setLoading(false)
+          }
+          return data
+        })
+        .catch((err => {console.error("error in getFiles (no search) is: ", err)}))
       })
-      .catch((err => {console.error("error in getFiles (folder) is: ", err)}))
-
-      getFolderFiles(fileParams, "file", dataType=dataType).then((data) => {
-        console.log("files data: ", data)
-        if (_isMounted){
-          setFileTotal(data.total)
-
-          const prevFiles = files
-          if (filePage > 1){
-            if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
-            {
-              setFiles([...prevFiles, ...data.files])
-            }
-          }
-          else{
-            setFiles([...data.files]) 
-          }
-          setLoading(false)
-        }
-      }).catch((err => {console.error("error in getFiles is: ", err)}))
     }
 
     //if we unmount, lock out the component from being able to use the state
@@ -523,7 +559,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       <>
         {folders.map( folder => {
           //split to 3 folders up
-          let truncated_path = truncatePath(folder.path_parent)
+          let truncated_path = truncatePath(folder.path)
 
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
@@ -568,7 +604,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       }
       {!loading && files && files.length > 0 && 
         files.map( file => {
-          let truncated_path = truncatePath(file.path_parent)
+          let truncated_path = truncatePath(file.path)
 
           return <TableRow className={classes.fileRow} key={file.id} onClick={() => setFile(file)}>
           <TableCell className={classes.nameCell}>
