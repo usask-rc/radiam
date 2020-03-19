@@ -1,5 +1,5 @@
 //BrowseTab.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -22,32 +22,70 @@ const styles = theme => ({
   },
   locationDisplay: {
     display: "flex",
-
     float: 'left',
   },
   locationIconLink: {    
     display: "flex",
   },
-  globusIDDisplay: {
+  locationLinkDisplay: {
     display: "flex",
     marginLeft: "1em",
-  },
-  globusIDDisplayLabel: {
-    marginRight: "1em",
-  },
-  globusPathDisplay: {
-    display: "flex",
-    marginLeft: "1em",
-  },
-  globusPathDisplayLabel: {
-    marginRight: "1em",
   },
 });
+
+class LocationLinkout extends Component {
+  // A component that accepts a Promise for later data rerendering, then shows the best link to where the data lives
+  state = { data: null, error: null };
+
+  componentDidMount() {
+    this.translate = this.props.t;
+    this.classes = this.props.c;
+    this.props.promise
+      .then(data => this.setState({ data: data }))
+      .catch(error => this.setState({ error: error }));
+  }
+
+  render() {
+    if (!this.state.data) { return null }
+    if (this.state.data.globus_endpoint != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.globus_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${LINKS.GLOBUSWEBAPP}?origin_id=${this.state.data.globus_endpoint}&origin_path=${this.state.data.globus_path}`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.globus_endpoint}`}
+        </Typography></div>
+      );
+    } else if (this.state.data.osf_project != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.osf_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${LINKS.OSFWEBAPP}/${this.state.data.osf_project}/`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.globus_endpoint}`}
+        </Typography></div>
+      );
+    }else if (this.state.data.portal_url != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.portal_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${this.state.data.portal_url}`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.portal_url}`}
+        </Typography></div>
+      );
+    } else {
+        return null
+    }
+  }
+}
 
 function BrowseTab({ projectID, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
-  const [locationDetails, setLocationDetails] = useState(null)
 
   useEffect(() => {
     let _isMounted = true
@@ -83,11 +121,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
           console.log("listofrootpaths item: ", item)
           let globus_path = "path"
           let globus_endpoint = null
-          item.locationpromise.then( data => {
-              console.log("***** PROMISE DONE ***** Endpoint is: " + data.globus_endpoint)
-              globus_endpoint = data.globus_endpoint
-            }
-          )
 
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
@@ -106,14 +139,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
                   <LocationShow />
                 </ReferenceField>
               </div>
-              <div className={classes.globusIDDisplay}>
-                <Typography className={classes.globusIDDisplayLabel}>{translate('en.models.locations.globus_link_label')}:</Typography>
-                <Typography className={classes.link} component="a"
-                  href={`${LINKS.GLOBUSWEBAPP}?origin_id=${globus_endpoint}&origin_path=${globus_path}`} 
-                  target="_blank" rel="noopener noreferrer">
-                    {`${globus_endpoint}`}
-                </Typography>
-              </div>
+              <LocationLinkout key={item.location} promise={item.locationpromise} t={translate} c={classes} />
           </div>
 
           <FolderView
