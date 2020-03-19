@@ -12,7 +12,6 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -336,7 +335,7 @@ export function getRootPaths(projectID, dataType="projects") {
 
     dataProvider(GET_LIST, "locationprojects", params).then(response => {
       console.log("getlist of locationprojects response: ", response)
-      //sadly there are duplicates in this endpoint curretly - filter them out.
+      //sadly there are duplicates in this endpoint currently - filter them out.
 
       let locationSet = new Set()
       response.data.forEach(locationproject => {
