@@ -1,6 +1,5 @@
 //RelatedUsers.jsx
-import React, { useState, useEffect } from 'react'
-import {ROLE_GROUP_ADMIN, ROLE_DATA_MANAGER, ROLE_MEMBER} from "../_constants/index";
+import React from 'react'
 import '../_components/components.css';
 import Chip from "@material-ui/core/Chip"
 import Tooltip from "@material-ui/core/Tooltip"

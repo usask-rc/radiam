@@ -1,11 +1,11 @@
 //BrowseTab.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { translate, ReferenceField, TextField, } from 'react-admin';
+import { translate, ReferenceField, TextField, useQuery, Loading, Error } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData } from '../../_tools/funcs';
+import { getRootPaths, getProjectData, getLocationData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
@@ -22,27 +22,66 @@ const styles = theme => ({
   },
   locationDisplay: {
     display: "flex",
-
     float: 'left',
   },
   locationIconLink: {    
     display: "flex",
   },
-  globusIDDisplay: {
+  locationLinkDisplay: {
     display: "flex",
     marginLeft: "1em",
-  },
-  globusIDDisplayLabel: {
-    marginRight: "1em",
-  },
-  globusPathDisplay: {
-    display: "flex",
-    marginLeft: "1em",
-  },
-  globusPathDisplayLabel: {
-    marginRight: "1em",
   },
 });
+
+class LocationLinkout extends Component {
+  // A component that accepts a Promise for later data rerendering, then shows the best link to where the data lives
+  state = { data: null, error: null };
+
+  componentDidMount() {
+    this.translate = this.props.t;
+    this.classes = this.props.c;
+    this.props.promise
+      .then(data => this.setState({ data: data }))
+      .catch(error => this.setState({ error: error }));
+  }
+
+  render() {
+    if (!this.state.data) { return null }
+    if (this.state.data.globus_endpoint != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.globus_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${LINKS.GLOBUSWEBAPP}?origin_id=${this.state.data.globus_endpoint}&origin_path=${this.state.data.globus_path}`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.globus_endpoint}`}
+        </Typography></div>
+      );
+    } else if (this.state.data.osf_project != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.osf_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${LINKS.OSFWEBAPP}/${this.state.data.osf_project}/`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.globus_endpoint}`}
+        </Typography></div>
+      );
+    }else if (this.state.data.portal_url != "") {
+      return (
+        <div className={this.classes.locationDisplay}>
+        <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.portal_link_label')}:</Typography>
+        <Typography component="a" className={this.classes.locationLinkDisplay}
+          href={`${this.state.data.portal_url}`} 
+          target="_blank" rel="noopener noreferrer">
+            {`${this.state.data.portal_url}`}
+        </Typography></div>
+      );
+    } else {
+        return null
+    }
+  }
+}
 
 function BrowseTab({ projectID, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -53,34 +92,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     setStatus({loading: true})
 
     getRootPaths(projectID, dataType).then(data => {
-      if (data.length === 0){
-        //there are no folders to get a root path off of.  We have to get it off of a file instead.  we only need 1 file.
-        const params = {
-          id: projectID,
-          pagination: { page: 1, perPage: 1 },
-          type: "file",
-        };
-
-        getProjectData(params, dataType=dataType).then(data => {
-
-          if (data && data.files && data.files.length > 0){ //else there are no project files
-          let folderItem = { 
-            id: `${data.files[0].id}`, 
-            key: `${data.files[0].key}`, 
-            path_parent: data.files[0].path_parent, 
-            path: data.files[0].path,
-            location: data.files[0].location
-          }
-
-          setListOfRootPaths([folderItem])
-          setStatus({loading: false, error: false})
-          }
-          else{
-            setStatus({loading: false, error: "No files were found"})
-          }
-        })
-      }
-      else{
         if (_isMounted){ 
           console.log("getrootpaths in browsetab retrieves data: ", data)
 
@@ -88,7 +99,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
           setStatus({loading: false, error: false})
         }
         return data
-      }
     }).catch(err => {
       setStatus({ loading: false, error: err })
     })
@@ -109,6 +119,8 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
           console.log("listofrootpaths item: ", item)
+          let globus_path = "path"
+          let globus_endpoint = null
 
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
@@ -127,14 +139,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
                   <LocationShow />
                 </ReferenceField>
               </div>
-              <div className={classes.globusIDDisplay}>
-                <Typography className={classes.globusIDDisplayLabel}>{translate('en.models.locations.globus_link_label')}:</Typography>
-                <Typography className={classes.link} component="a"
-                  href={`${LINKS.GLOBUSWEBAPP}?origin_id=${item.globus_endpoint}&origin_path=${item.globus_path}`} 
-                  target="_blank" rel="noopener noreferrer">
-                    {`${item.globus_endpoint}`}
-                </Typography>
-              </div>
+              <LocationLinkout key={item.location} promise={item.locationpromise} t={translate} c={classes} />
           </div>
 
           <FolderView

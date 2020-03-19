@@ -1,6 +1,6 @@
 //FewUsers.jsx
 import React from "react";
-import { CardContent, Card, Typography, Button, Chip, Grid } from "@material-ui/core";
+import { CardContent, Card, Typography, Chip } from "@material-ui/core";
 import { Link } from  "react-router-dom";
 import compose from "recompose/compose";
 import { translate } from "react-admin";
