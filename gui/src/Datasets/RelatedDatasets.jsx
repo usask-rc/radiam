@@ -51,10 +51,10 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
                     const dcmList = []
                     const slList = []
 
-                    dataset.data_collection_method.map(item => {
+                    dataset.data_collection_method.forEach(item => {
                       dcmList.push(item.id)
                     })
-                    dataset.sensitivity_level.map(item => {
+                    dataset.sensitivity_level.forEach(item => {
                       slList.push(item.id)
                     })
 

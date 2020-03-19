@@ -87,7 +87,6 @@ const styles = theme => ({
     float: "right",
   },
   modalTitle: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     display: "inline",
@@ -237,10 +236,10 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [perPage, setPerPage] = useState(50)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState(
-    props &&
+    (props &&
       props.location &&
       props.location.state &&
-      props.location.state.search ||
+      props.location.state.search) ||
     null
   ); //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
   const [order, setOrder] = useState("desc")

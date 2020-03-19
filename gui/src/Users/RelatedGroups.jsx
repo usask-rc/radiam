@@ -45,7 +45,7 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         let tempM = []
         let tempU = []
         //sort groupmembers into different categories
-        groupMembers.map(groupMember => {
+        groupMembers.forEach(groupMember => {
             if (groupMember.group_role.id === ROLE_GROUP_ADMIN){
                 tempGA.push(groupMember)
             }

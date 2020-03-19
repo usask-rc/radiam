@@ -48,7 +48,7 @@ const getUsersInMyGroups = (groups) => {
 
             //
             userLists.map(userList => {
-                userList.map(record => {
+                userList.forEach(record => {
                     console.log("record in userList: ", record)
                     usersInMyGroups[record.user.id] = record
                 })

@@ -271,7 +271,7 @@ class MapForm extends Component {
   //this occurs when we hit 'Save' after editing
   _onEdited = e => {
     const { features } = this.state
-    Object.keys(e.layers._layers).map(item => {
+    Object.keys(e.layers._layers).forEach(item => {
       let layer = e.layers._layers[item]; //this specific edited item
       //preform a lookup for the previous properties of this object and throw them into state if they exist
       let newFeature = this._generateFeature(layer);

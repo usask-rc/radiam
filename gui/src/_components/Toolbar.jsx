@@ -1,6 +1,6 @@
 //Toolbar.jsx
 import React from 'react';
-import { Toolbar, SaveButton, DeleteButton } from 'react-admin';
+import { Toolbar, SaveButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
 import { getCurrentUserID } from '../_tools/funcs';
 import { DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';

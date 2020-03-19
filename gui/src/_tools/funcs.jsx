@@ -1,5 +1,5 @@
 //funcs.jsx
-import { API_ENDPOINT, ROLE_USER, ROLES, ROLE_ANONYMOUS, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from "../_constants/index";
+import { API_ENDPOINT, ROLE_USER, ROLES, MODELS, MODEL_FIELDS, WARNINGS, WEBTOKEN, RESOURCE_OPERATIONS, METHODS, I18N_TLE, FK_FIELDS } from "../_constants/index";
 import { isObject, isString, isArray } from "util";
 import { toast } from "react-toastify";
 import radiamRestProvider from "./radiamRestProvider";
@@ -338,14 +338,14 @@ export function getRootPaths(projectID, dataType="projects") {
       //sadly there are duplicates in this endpoint curretly - filter them out.
 
       let locationSet = new Set()
-      response.data.map(locationproject => {
+      response.data.forEach(locationproject => {
         locationSet.add(locationproject.location)
       })
       locationSet = [...locationSet]
       return locationSet
     }).then(locations => {
       return locations.map(location => {
-        return {location: location, path_parent: ".."}
+        return {location: location, path_parent: "..", locationpromise: getLocationData(location)}
       })
     }).then(data => resolve(data))
   });
@@ -360,8 +360,20 @@ export function getProjectData(params, dataType="projects") {
       dataType + "/" + params.id,
       params
     )
+    .then(response => {
+      resolve({ files: response.data, nbFiles: response.total });
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
+}
+
+export function getLocationData(location_id) {
+  return new Promise((resolve, reject) => {
+    dataProvider(GET_ONE, MODELS.LOCATIONS, { id: location_id })
       .then(response => {
-        resolve({ files: response.data, nbFiles: response.total });
+        resolve(response.data);
       })
       .catch(err => {
         reject(err);
@@ -463,7 +475,7 @@ export function getUsersInGroup(record) {
         }
         const groupMembers = response.data
         const promises = []
-        groupMembers.map(groupMember => {
+        groupMembers.forEach(groupMember => {
           promises.push(getUserDetails(groupMember.user).then(user => {
             groupMember.user = user
             user.group = [record]
@@ -502,7 +514,7 @@ export function getGroupMembers(record) {
             const groupMembers = response2.data
             const promises = []
 
-            groupMembers.map(groupMember => {
+            groupMembers.forEach(groupMember => {
               promises.push(getUserDetails(groupMember.user).then(user => {
                 groupMember.user = user
                 groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
@@ -538,7 +550,7 @@ export function getMyGroupIDs(){
     sort: { field: MODEL_FIELDS.USER, order: "DESC" },
   }).then(response => {
     const groupList = []
-    response.data.map(groupMember => {
+    response.data.forEach(groupMember => {
       groupList.push(groupMember.group)
     })
     resolve(groupList)

@@ -48,8 +48,6 @@ const Welcome = ({ classes, translate }) => (
       </Typography><br/>
       <Typography variant={"body2"} component="p">
         {translate("en.dashboard.welcome.content2")}
-        <a href={LINKS.USERMANUALPATH}></a>
-
         <a href={`..${LINKS.USERMANUALPATH}`} className={classes.link} target="_blank" rel="noopener noreferrer" >
           {translate("en.dashboard.welcome.usermanual")}
         </a>

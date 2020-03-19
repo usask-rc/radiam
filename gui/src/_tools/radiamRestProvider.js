@@ -131,7 +131,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
               perPage: perPage,
             };
             if (params.hasOwnProperty("query")) {
-                Object.keys(params["query"]).map(function(key) {
+                Object.keys(params["query"]).forEach(function(key) {
                     query[key] = params["query"][key];
                 });
             }
