@@ -35,6 +35,7 @@ from radiam.api.serializers import (
     ESDatasetSerializer,
     EntitySerializer,
     EntitySchemaFieldSerializer,
+    ExportRequestSerializer,
     FieldSerializer,
     GeoDataSerializer,
     GroupMemberSerializer,
@@ -74,6 +75,7 @@ from .models import (
     DatasetDataCollectionMethod,
     DistributionRestriction,
     Entity,
+    ExportRequest,
     Field,
     GeoData,
     GroupMember,
@@ -137,6 +139,10 @@ from django_rest_passwordreset.serializers import EmailSerializer, PasswordToken
 from django_rest_passwordreset.models import ResetPasswordToken, clear_expired, get_password_reset_token_expiry_time
 from django_rest_passwordreset.signals import reset_password_token_created, pre_password_reset, post_password_reset
 
+from django.http import HttpResponse
+
+from io import BytesIO
+from zipfile import ZipFile
 from itertools import chain
 # end
 
@@ -893,6 +899,71 @@ class DatasetViewSet(RadiamViewSet, GeoSearchMixin, MetadataViewset):
     #     serializer = self.get_serializer(page, many=True)
     #
     #     return self.get_paginated_response(serializer.data)
+
+
+class DatasetExportViewSet(viewsets.GenericViewSet):
+    """
+    API endpoint for exporting metadata related to datasets
+    """
+
+    def list(self, request, dataset_id):
+        export_request = ExportRequest.objects.create(status="In progress", export_reference=dataset_id)
+        export_request.save()
+        return Response(export_request.id)
+
+
+class ExportRequestViewSet(RadiamViewSet):
+    """
+    API endpoint for request for exporting metadata
+    """
+    queryset = ExportRequest.objects.all().order_by('status')
+    serializer_class = ExportRequestSerializer
+
+    filter_backends = (
+        filters.SearchFilter,
+        DjangoFilterBackend,
+        RadiamAuthDatasetDetailFilter,
+    )
+
+    search_fields = ['id', 'status', 'export_reference']
+    permission_classes = (IsAuthenticated, DRYPermissions,)
+
+    @action(methods=['get'],
+            detail=True,
+            url_name='download',
+            permission_classes=(IsAuthenticated,))
+    def download(self, request, pk=None):
+        export = ExportRequest.objects.get(id=pk)
+        if export.status == 'In progress' or export.status == 'Complete':
+
+            #TODO Bagit then zip
+            # Download cached file data instead of generating new file each time
+            dataset = Dataset.objects.get(id=export.export_reference)
+            content = "project_name = " + str(dataset.project.name)
+            filename = str(dataset.project.name) + "_dataset_export.txt"
+            zipfilename = str(dataset.project.id) + "_radiam_download.zip"
+
+            in_memory = BytesIO()
+            zip = ZipFile(in_memory, "a")
+
+            zip.writestr(filename, content)
+
+            # read in Windows
+            for file in zip.filelist:
+                file.create_system = 0
+
+            zip.close()
+
+            response = HttpResponse(content_type="application/zip")
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(zipfilename)
+
+            in_memory.seek(0)
+            response.write(in_memory.read())
+
+            return response
+
+        else:
+            return Response("Export request has unknown status")
 
 
 class DatasetDataCollectionMethodViewSet(RadiamViewSet):
