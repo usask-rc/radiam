@@ -62,6 +62,7 @@ const getUsersInMyGroups = (groups) => {
     }
 
 const WarningCards = ({classes, ...props}) => {
+    // eslint-disable-next-line no-unused-vars
     const [userManagedGroups, setUserManagedGroups] = useState([])
     const user = JSON.parse(localStorage.getItem(ROLES.USER));
 

@@ -376,12 +376,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         q: search
       }
 
-      fileTypes.map(type => {
+      fileTypes.forEach(type => {
 
         fileParams.page = filePage
         if (type === "directory"){
           fileParams.page = folderPage
         }
+        // eslint-disable-next-line no-self-assign
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           if (_isMounted){
             if (type === "file"){
@@ -451,11 +452,12 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     if (!search){ //TODO: there is a better way to separate this out
 
-      fileTypes.map(type => {
+      fileTypes.forEach(type => {
         fileParams.page = filePage
         if (type === "directory"){
           fileParams.page = folderPage
         }
+        // eslint-disable-next-line no-self-assign
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           console.log(`${type} data: ${data.files}`)
           if (_isMounted){

@@ -2,6 +2,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/styles";
 import { Typography, Card, CardContent } from "@material-ui/core";
+// eslint-disable-next-line no-unused-vars
 import { classes } from "istanbul-lib-coverage";
 
 const styles = () => ({

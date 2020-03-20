@@ -323,7 +323,7 @@ class BaseProjectEdit extends Component {
   }
   render() {
     const { classes, permissions, record, translate, ...others } = this.props;
-    const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
+    getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     return (<Edit actions={<MetadataEditActions />} {...others}>
       <ProjectForm classes={classes} translate={translate} {...this.props} />
     </Edit>);

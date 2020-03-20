@@ -82,7 +82,7 @@ class Login extends Component {
   }
 
   handleSubmit(data) {
-    const ret = this.login({username: data.username, password: data.password})
+    this.login({username: data.username, password: data.password})
   }
 
   handleSubmitEmail(data){
@@ -130,7 +130,7 @@ class Login extends Component {
   };
 
   render() {
-    const { classes, handleSubmit, loading } = this.props;
+    const { classes, loading } = this.props;
     const { forgotPassword } = this.state
     return (
       <div className={classes.main}>

@@ -65,6 +65,7 @@ const UserFilter = withStyles(filterStyles)(({ classes, ...props }) => (
 
 const userListRowClick = (id, basePath, record) => record.is_active ? `${basePath}/${record.id}/show?is_active=true` : `${basePath}/${record.id}/show?is_active=false`
 
+// eslint-disable-next-line no-unused-vars
 const PostBulkActionButtons = props => (
   <>
     <ToggleActiveButton label="Toggle Active" {...props} />

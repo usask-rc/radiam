@@ -353,7 +353,7 @@ export function getAllProjectData(projectID){
     type: "file"
   }
   return new Promise((resolve, reject) => {
-    dataProvider("GET_FILES", "projects" + "/" + projectID, params).then(response => {
+    dataProvider("GET_FILES", "projects/" + projectID, params).then(response => {
       console.log("response from getallprojectdata is: ", response)
       resolve(response.data)
     })

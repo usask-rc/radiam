@@ -6,7 +6,6 @@ import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
 import WarningCards from './Welcome/WarningCards';
-import {ROLES} from "../_constants/index"
 import RelatedUsersDisplay from './RelatedUsersDisplay';
 
 

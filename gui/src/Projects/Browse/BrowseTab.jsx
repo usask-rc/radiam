@@ -3,9 +3,9 @@ import React, { useState, useEffect, Component } from 'react';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { translate, ReferenceField, TextField, useQuery, Loading, Error } from 'react-admin';
+import { translate, ReferenceField } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths, getProjectData, getLocationData } from '../../_tools/funcs';
+import { getRootPaths } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
@@ -47,7 +47,7 @@ class LocationLinkout extends Component {
 
   render() {
     if (!this.state.data) { return null }
-    if (this.state.data.globus_endpoint != "") {
+    if (this.state.data.globus_endpoint !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.globus_link_label')}:</Typography>
@@ -57,7 +57,7 @@ class LocationLinkout extends Component {
             {`${this.state.data.globus_endpoint}`}
         </Typography></div>
       );
-    } else if (this.state.data.osf_project != "") {
+    } else if (this.state.data.osf_project !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.osf_link_label')}:</Typography>
@@ -67,7 +67,7 @@ class LocationLinkout extends Component {
             {`${this.state.data.globus_endpoint}`}
         </Typography></div>
       );
-    }else if (this.state.data.portal_url != "") {
+    }else if (this.state.data.portal_url !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.portal_link_label')}:</Typography>
@@ -107,7 +107,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     return function cleanup() {
       _isMounted = false;
     }
-  }, [projectID]);
+  }, [projectID, dataType]);
 
   //console.log("browsetab rendering")
   return (
@@ -119,9 +119,6 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
           //console.log("listofrootpaths item: ", item)
-          let globus_path = "path"
-          let globus_endpoint = null
-
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
               <div className={classes.locationIconLink}>
