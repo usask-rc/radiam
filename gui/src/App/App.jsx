@@ -328,7 +328,7 @@ const App = props => {
             list={UserAgentList}
             show={UserAgentShow}
             create={UserAgentCreate}
-            edit={UserAgentEdit} //update: all users can now edit agent configs
+            edit={UserAgentEdit}
           />,
 
           <Resource name={MODELS.PROJECTDATACOLLECTIONMETHOD} />,
