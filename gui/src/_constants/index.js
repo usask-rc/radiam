@@ -34,7 +34,7 @@ module.exports = Object.freeze({
     RESEARCHGROUPS: ["parent_group"],
     USERAGENTS: ["user", "location"],
   },
-  LINKS: { //TODO: these were previously global, need to be re-imported properly
+  LINKS: {
     SUPPORTEMAIL: "developers@frdr.ca",
     OSMTILEURL: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     RADIAMAGENTREADMEURL: "https://github.com/usask-rc/radiam",

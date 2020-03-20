@@ -109,16 +109,14 @@ const MapView = ({classes, record }) => {
         
     }
 
-    //latitude should never require normalizing, but a bug exists in Leaflet that causes the map to repeat itself longitudinally.
+    //leaflet maps repeat longitudinally, so they must be normalized
     function normLng(lng){
         //this only works in javascript because it takes modded negative values in a specific way.
         return lng % 180
     }
 
-    //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
     function success(pos) {
-        //if there are no features, default our location to the user's location.
-
+        //if we have some geometry already, default to the first location given.
         if (mapLoading){
             let latLng = [pos.coords.latitude, pos.coords.longitude]
 
@@ -128,21 +126,17 @@ const MapView = ({classes, record }) => {
                 if (firstFeature.geometry.type === 'Point'){
                     latLng = [firstFeature.geometry.coordinates[1], firstFeature.geometry.coordinates[0]]
                 }
-                else if (firstFeature.geometry.type === 'LineString' || firstFeature.geometry.type === 'MultiPoint'){
+                else if (firstFeature.geometry.type === 'LineString'){
                     latLng = [firstFeature.geometry.coordinates[0][1], firstFeature.geometry.coordinates[0][0]]
                 }
-                else if (firstFeature.geometry.type === 'Polygon' || firstFeature.geometry.type === 'MultiLineString'){
+                else if (firstFeature.geometry.type === 'Polygon'){
                     latLng = [firstFeature.geometry.coordinates[0][0][1], firstFeature.geometry.coordinates[0][0][0]]
                 }
-                else if (firstFeature.geometry.type === 'MultiPolygon'){
-                    latLng = [firstFeature.geometry.coordinates[0][0][0][1], firstFeature.geometry.coordinates[0][0][0][0]]
-                }
                 else{
-                    console.error("Unknown feature type loaded, defaulting map to user location.  Feature: ", firstFeature)
+                    console.error("Invalid feature type loaded, defaulting map to user location.  Feature: ", firstFeature)
                 }
             }
 
-            //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
             latLng[1] = normLng(latLng[1])
 
             if (_isMounted){
@@ -150,14 +144,13 @@ const MapView = ({classes, record }) => {
                 setMapLoading(false)
             }
         }
-
     }
 
     function error(err) {
         console.warn(`ERROR(${err.code}): ${err.message}`);
     }
 
-    //TODO: is this necessary?  Should we just centre in a generic location in canada rather than the user's location?
+    //get the user's current location if they allow us.
     navigator.geolocation.getCurrentPosition(success, error, {
         enableHighAccuracy: true,
         timeout: 5000,

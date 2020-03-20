@@ -27,7 +27,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     switch (type) {
       
       //for getting all files in a project/dataset and filtering said files
-      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+      case "GET_FILES": {
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
@@ -78,13 +78,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }] 
           query.query.bool.minimum_should_match = 1
         }
-
-        //TODO: ordering and pagination do not yet exist satisfactorily (everything is a single page dump)
         options.body = JSON.stringify(query);
 
-        //console.log("stringified query: ", options.body)
-
-        //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort && params.sort.field && params.sort.field.length > 0){
           let sortOrder = ""
           if (params.sort.order){
@@ -385,10 +380,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           ),
         };
 
-      //TODO: there's an inconsistency here between create and update - i dont know which one I should be using, but both work for now.  one will likely have to change at some point.
       case CREATE:
         params.data = translateResource(resource, params.data);
-
         return {
           data: {
             ...json,
@@ -398,7 +391,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case UPDATE:
         params.data = translateResource(resource, params.data);
-
         return {
           data: {
             ...params.data,
@@ -406,9 +398,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           },
         };
 
-      //TODO: what is this?  Why is there a 'fake' here?
       case DELETE:
-        return { data: { id: 'fake' } };
+        //NOTE: there is a `fake` here because no JSON data is sent back from the API on delete.
+        return { data: { id: 'temp' } };
 
       default:
         return { data: json };

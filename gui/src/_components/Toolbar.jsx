@@ -38,7 +38,6 @@ const BaseToolbar = ({classes, ...props}) => {
     <Toolbar {...rest}>
       <SaveButton />
       {
-        //TODO: there remains a bug here where props.record exists in the parent component (in Location only) but not here.
         record && 
         <DeleteWithConfirmButton className={classes.deleteButton}
         confirmTitle={`Delete ${record.name || record.title || record.display_name} ?`}

@@ -2,8 +2,6 @@ import { getAPIEndpoint } from "../_tools/funcs";
 import { httpClient } from "../_tools/httpClient";
 import {METHODS, MODEL_FIELDS} from "../_constants/index"
 
-//TODO:we need another validator for updates - if Names are unique, we want to be able to maintain the same name on an item that we are updating.  This is not currently possible.
-
 export function getAsyncValidateNotExists(checkField, endpoint_path) {
   return function asyncValidate(data, middleware, context, field) {
     return new Promise(async (resolve, reject) => {
