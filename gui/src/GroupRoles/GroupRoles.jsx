@@ -62,6 +62,7 @@ const GroupRoleForm = props => {
       props.save(data)
     }
     return function cleanup() {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       _isMounted = false
     }
   }, [data, props])

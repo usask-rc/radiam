@@ -3,7 +3,7 @@ import { Typography } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import React, { Component, useCallback, useState } from "react";
+import React, { Component, useCallback } from "react";
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import RelatedUsers from "../Groups/RelatedUsers";
@@ -22,7 +22,6 @@ import {
   NullableBooleanInput,
   NumberField,
   NumberInput,
-  RefreshButton,
   required,
   SaveButton,
   ShowButton,
@@ -1455,6 +1454,7 @@ class BaseEditMetadata extends MetadataComponent {
 
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
+    // eslint-disable-next-line
     const { addSave, classes, id, record, translate } = this.props;
 
     if (error) {
@@ -1528,6 +1528,7 @@ class BaseMetadataEditActions extends Component {
   };
   
   render() {
+    // eslint-disable-next-line
     const { basePath, bulkActions, cancel, data, displayedFilters, filters, filterValues, onUnselectItems, record, resource, selectedIds, showFilter, showRelatedUsers, translate } = this.props;
     const { groupMembers } = this.state
     let cancelButton = null;

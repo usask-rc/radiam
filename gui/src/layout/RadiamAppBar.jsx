@@ -63,6 +63,7 @@ const CustomAppBar = ({ classes, ...props }) => {
   let _isMounted = false
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     _isMounted = true
     getCurrentUserDetails().then(data => 
       {

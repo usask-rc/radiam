@@ -82,8 +82,11 @@ const filterStyles = {
   },
 };
 
+// eslint-disable-next-line no-unused-vars
 const validateGroup = required('en.validate.project.group');
+// eslint-disable-next-line no-unused-vars
 const validateName = required('en.validate.project.name');
+// eslint-disable-next-line no-unused-vars
 const validatePrimaryContactUser = required('en.validate.project.primary_contact_user');
 
 //This does a search SERVER-side, not client side.  However, it currently only works for exact matches.
@@ -169,7 +172,7 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEdi
       
       )
     }
-  }, [data])
+  }, [data,showEdit,setCanEditModal])
 
   if (showEdit){
     return(
@@ -199,6 +202,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     let _isMounted = false
     useEffect(() => {
       //console.log("projectshow record, props:", props)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       _isMounted = true
       if (props.id){
         getRelatedDatasets(props.id).then(data => {
@@ -210,6 +214,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
         }).catch(err => console.error(err))
       }  
       return function cleanup() {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         _isMounted = false;
       }
     }, [createModal, editModal, viewModal])

@@ -233,6 +233,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
+  // eslint-disable-next-line no-unused-vars
   const [perPage, setPerPage] = useState(50)
   const [sortBy, setSortBy] = useState("name.keyword")
   const [search, setSearch] = useState(
@@ -357,6 +358,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     //search the given project with the appropriate location and search param
 
     //folderpath is probably irrelevant
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     _isMounted = true
 
     let folderPath = parents[parents.length - 1].path
@@ -382,7 +384,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        // eslint-disable-next-line no-self-assign
+        // eslint-disable-next-line
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           if (_isMounted){
             if (type === "file"){
@@ -428,6 +430,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       _isMounted = false;
     }
   }, [search, filePage, folderPage, order])
@@ -438,6 +441,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       folderPath = ".."
     }
     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     _isMounted = true
 
     let fileParams = {
@@ -457,7 +461,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        // eslint-disable-next-line no-self-assign
+        // eslint-disable-next-line
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           console.log(`${type} data: ${data.files}`)
           if (_isMounted){

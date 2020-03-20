@@ -43,6 +43,7 @@ const MapView = ({classes, record }) => {
     let _isMounted = true
     useEffect(() => {
         return function cleanup() {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             _isMounted = false
         }
     }, [])
