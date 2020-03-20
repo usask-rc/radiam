@@ -25,7 +25,7 @@ const Dashboard = ({classes, permissions, ...rest}) => {
 
 
     getRecentProjects().then(data => {
-      console.log("getrecentprojects returned: ", data)
+      //console.log("getrecentprojects returned: ", data)
       setRecentProjects(data.projects)
       setHasFiles(data.hasFiles)
     })
@@ -35,9 +35,9 @@ const Dashboard = ({classes, permissions, ...rest}) => {
 
     getMyGroupIDs().then(myGroups => {
       getUsersInMyGroups(myGroups).then(data => {
-        console.log("getusersinmygroups data: ", data)
+        //console.log("getusersinmygroups data: ", data)
         setRelatedUsers(data)
-      }).catch(err => console.log("users in my groups err: ", err))
+      }).catch(err => console.error("users in my groups err: ", err))
       return myGroups
     })
   }, [])

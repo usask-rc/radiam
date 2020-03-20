@@ -133,7 +133,7 @@ const actionsStyles = theme => ({
 
 const UserDetailsActions = ({permissions, basePath, data, resource, classes}) => {
 
-  console.log("permissions, basepath, etc: ", permissions, basePath, data, resource)
+  //console.log("permissions, basepath, etc: ", permissions, basePath, data, resource)
   //only superuser can modify user data - users must go via the User Edit page.
   if (permissions && permissions.is_admin){
     return(<Toolbar className={classes.root}>
@@ -150,7 +150,7 @@ const UserDetailsActions = ({permissions, basePath, data, resource, classes}) =>
 const EnhancedUserDetailsActions = withStyles(actionsStyles)(UserDetailsActions)
 
 export const UserShow = props => {
-  console.log("usershow props: ", props)
+  //console.log("usershow props: ", props)
 
   return (
     <Show actions={<EnhancedUserDetailsActions permissions={props.permissions} {...props} />} {...props}>

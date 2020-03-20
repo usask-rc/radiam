@@ -65,7 +65,7 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         setUnknown(tempU)
     }, [groupMembers])
 
-    console.log("RelatedGroups props: ", props, "inmodal: ", inModal)
+    //console.log("RelatedGroups props: ", props, "inmodal: ", inModal)
     return (
         <div className={classes.container}>   
             {groupAdmins.length > 0 &&

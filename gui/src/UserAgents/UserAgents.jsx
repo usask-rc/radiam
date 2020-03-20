@@ -174,8 +174,8 @@ return(
     {controllerProps => 
     {
 
-      console.log("controllerProps is: ", controllerProps)
-      console.log("in controllerprops, props: ", props)
+      //console.log("controllerProps is: ", controllerProps)
+      //console.log("in controllerprops, props: ", props)
 
     return(
   <Show actions={<UserAgentShowActions />} {...props} {...controllerProps}>
@@ -330,7 +330,7 @@ export const UserAgentEdit = props => {
           {formDataProps => 
             {
               const record = formDataProps.record
-              console.log("in fdc, formData is: ", record)
+              //console.log("in fdc, formData is: ", record)
               //if record has an api token and username, it is an OSF agent and we want to allow modification of this
               if (record && record.remote_api_token && record.remote_api_username && record.project_config_list && record.project_config_list.length > 0){
                 record.project_config_list.map(project => {

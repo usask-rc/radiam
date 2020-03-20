@@ -443,7 +443,7 @@ class MetadataComponent extends Component {
           this.getFileParentEntitySchemaFields(id);
           break;
         default:
-          console.log("Unhandled parents for type " + type);
+          console.error("Unhandled parents for type " + type);
       }
     }
   };
@@ -1511,7 +1511,7 @@ class BaseMetadataEditActions extends Component {
       if (id) {
         const params={id: id, is_active: true}
         getGroupMembers(params).then((data) => {
-        console.log("getGroupMembers returned data: ", data)
+        //console.log("getGroupMembers returned data: ", data)
         this.setState({groupMembers: data})
         return data
       }).catch(err => console.error("err: ", err))

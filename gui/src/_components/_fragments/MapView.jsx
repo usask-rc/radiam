@@ -83,7 +83,7 @@ const MapView = ({classes, record }) => {
                 
                     leafletGeoJSON.eachLayer(layer => 
                         {
-                            console.log("loading feature layer: ", layer)
+                            //console.log("loading feature layer: ", layer)
                             //add layer to the map
                             output = leafletFG.addLayer(layer)
 

@@ -23,7 +23,7 @@ const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid or
 //this exists to combine the User Creation form and the GroupMember Association form into a single page.
 class UserForm extends Component {
     constructor(props) {
-        console.log("UserForm props: ", props)
+        //console.log("UserForm props: ", props)
         super(props);
         this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location ? props.location.group : "", group_role: "", date_expires: null, redirect: false }
     }
@@ -64,13 +64,13 @@ class UserForm extends Component {
             return fetch(request).then(response => {
 
                 if (response.status === 400 || response.status === 500 || (response.status >= 200 && response.status < 300)) {
-                    console.log("response after user create: ", response)
+                    //console.log("response after user create: ", response)
                     return response.json();
                 }
                 throw new Error(response.statusText);
             })
             .then(data => {
-                console.log("data after user create: ", data)
+                //console.log("data after user create: ", data)
                 if (data.id) {
                     //create a groupmember with these details
                     const groupMemberRequest = new Request(getAPIEndpoint() + "/groupmembers/", {
@@ -79,12 +79,12 @@ class UserForm extends Component {
                         headers: headers
                     })
 
-                    console.log("groupmemberrequest group_role and group: ", group_role, group)
+                    //console.log("groupmemberrequest group_role and group: ", group_role, group)
 
                     if (group_role && group) {
 
                         return fetch(groupMemberRequest).then(response => {
-                            console.log("groupmemberrequest response:", response)
+                            //console.log("groupmemberrequest response:", response)
                             if (response.status >= 200 && response.status < 300) {
                                 return response.json();
                             }
@@ -95,7 +95,7 @@ class UserForm extends Component {
                             })
                             .catch(err => {
                                 toastErrors(err)
-                                console.log("Error in groupmember creation after new user is: ", err)
+                                console.error("Error in groupmember creation after new user is: ", err)
                             })
                     }
                     else if (group_role || group) {
@@ -115,7 +115,7 @@ class UserForm extends Component {
 
                 //we should never reach this point
                 else {
-                    console.log("Something went wrong with groupmember association")
+                    console.error("Something went wrong with groupmember association")
                     toastErrors("GroupMember not created.  Please proceed to the GroupMember page to associate this user with a group.");
                 }
             })

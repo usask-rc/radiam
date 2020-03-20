@@ -147,10 +147,10 @@ const GroupShowActions = withStyles(actionStyles)(({basePath, data, classes, ...
   }, [data, showEdit])
 
   const {hasCreate, hasShow, hasEdit, hasList, ...rest} = props
-  console.log("GroupShowActions props: ", props)
+  //console.log("GroupShowActions props: ", props)
 
   if (showEdit){
-    console.log("in groupShowActions, data is: ", data)
+    //console.log("in groupShowActions, data is: ", data)
     return(
     <Toolbar className={classes.toolbar}>
       <EditButton basePath={basePath} id={props.id} record={data} {...rest} />
@@ -187,7 +187,7 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
     if (props.id){
       const params={id: props.id, is_active: true}
       getGroupMembers(params).then((data) => {
-        console.log("getGroupMembers returned data: ", data)
+        //console.log("getGroupMembers returned data: ", data)
         if (_isMounted){
           setGroupMembers(data)
         }
@@ -234,8 +234,8 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
       {/** Needs a ShowController to get the record into the ShowMetadata **/}
       <ShowController translate={translate} {...props}>
         { controllerProps => {
-          console.log("controllerprops in group: ", controllerProps)
-          console.log("editModal is: ", editModal)
+          //console.log("controllerprops in group: ", controllerProps)
+          //console.log("editModal is: ", editModal)
         return(
           <>
             <ShowMetadata
@@ -247,20 +247,20 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
               id={controllerProps.record.id}
               props={props}
             />
-            {createModal && <Dialog fullWidth open={createModal} onClose={() => {console.log("dialog close"); setCreateModal(false)}} aria-label="Add User">
+            {createModal && <Dialog fullWidth open={createModal} onClose={() => {setCreateModal(false)}} aria-label="Add User">
               <DialogTitle>{`Add User`}</DialogTitle>
               <DialogContent>
                 <GroupMemberForm group={controllerProps.record.id} setCreateModal={setCreateModal} {...props} />
               </DialogContent>
             </Dialog>
             }
-            {editModal && <Dialog fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
+            {editModal && <Dialog fullWidth open={editModal} onClose={() => {setEditModal(false)}} aria-label="Add User">
               <DialogContent>
                 <GroupMemberForm basePath="/groupmembers" resource="groupmembers" setEditModal={setEditModal} record={{id: editModal.id, user: editModal.user.id, group: editModal.group.id, group_role: editModal.group_role.id}} />
               </DialogContent>
             </Dialog>
             }
-            {viewModal && <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
+            {viewModal && <Dialog fullWidth open={viewModal} onClose={() => {setViewModal(false)}} aria-label="Add User">
               <DialogContent>
                 <UserDetails basePath="/users" resource="users" setViewModal={setViewModal} record={{...viewModal.user}} />
               </DialogContent>

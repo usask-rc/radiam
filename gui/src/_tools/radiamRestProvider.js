@@ -23,7 +23,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     let formData = new FormData();
     const options = {};
 
-    console.log("data request is: ", type, resource, params)
+    //console.log("data request is: ", type, resource, params)
     switch (type) {
       
       //for getting all files in a project/dataset and filtering said files
@@ -42,7 +42,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         }
         const {filter} = params
 
-        console.log("params.filter in get_files are: ", params.filter)
+        //console.log("params.filter in get_files are: ", params.filter)
 
         //`filter` can only hold path_parent or type right now, so its probably not necessary to loop this
         if (filter){
@@ -61,7 +61,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           //add here as needed
           if (filter.length > 2){
             //then my assumption is wrong
-            console.log("more than 2 Param Filters found: ", filter)
+            console.error("more than 2 Param Filters found: ", filter)
           }
         }
 
@@ -82,7 +82,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         //TODO: ordering and pagination do not yet exist satisfactorily (everything is a single page dump)
         options.body = JSON.stringify(query);
 
-        console.log("stringified query: ", options.body)
+        //console.log("stringified query: ", options.body)
 
         //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort && params.sort.field && params.sort.field.length > 0){
@@ -93,14 +93,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           sort = `ordering=${sortOrder}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-        console.log("url before get_files request: ", url)
+        //console.log("url before get_files request: ", url)
         break;
       }
 
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
 
-        console.log("params sent to get_list are: ", params, url)
+        //console.log("params sent to get_list are: ", params, url)
 
 
         if (params)
@@ -113,7 +113,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           ) {
             const { page, perPage } = params.pagination;
 
-            console.log("params sort: ", params.sort)
+            //console.log("params sort: ", params.sort)
             let { field, order } = params.sort;
             if (order === "DESC"){
               order = "-"
@@ -139,7 +139,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
           //should be all other cases.  I don't see why we would ever have use for a page designation.
           else if (params.pagination || params.sort) {
-            console.log("params in else: ", params)
+            //console.log("params in else: ", params)
             let { page, perPage } = params.pagination;
 
             let query = {};
@@ -167,7 +167,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }
         }
 
-        console.log("url receiving get_list query is: ", url)
+        //console.log("url receiving get_list query is: ", url)
         break;
       }
     
@@ -203,7 +203,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       //it will have no parameters and so as a result we cannot send the ?is_active=false flag onclick.
       case GET_ONE:
 
-        console.log("in get_one, data is: ", type, resource, params)
+        //console.log("in get_one, data is: ", type, resource, params)
 
         if (params && params.is_active === false) {
           url = `${apiUrl}/${resource}/${params.id}/?is_active=false`;
@@ -234,7 +234,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case UPDATE:
         url = `${apiUrl}/${resource}/${params.id}/`;
 
-        console.log("params and options in update are: ", params, options)
+        //console.log("params and options in update are: ", params, options)
 
         options.method = 'PUT';
         if (
@@ -244,7 +244,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           formData.append('avatar_image', params.data.avatar_image.rawFile);
           options.body = formData;
         } else {
-          console.log("params data before update is: ", params.data)
+          //console.log("params data before update is: ", params.data)
           params.data = translateResource(resource, params.data, 1);
           options.body = JSON.stringify(params.data);
         }
@@ -252,9 +252,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case CREATE:
-        console.log("formdata in create: ", formData)
+        //console.log("formdata in create: ", formData)
 
-        console.log("CREATE type, resource, params: ", type, resource, params)
+        //console.log("CREATE type, resource, params: ", type, resource, params)
         url = `${apiUrl}/${resource}/`;
         options.method = METHODS.POST;
         if (
@@ -272,7 +272,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case DELETE:
 
-        console.log("params in delete: ", params)
+        //console.log("params in delete: ", params)
         url = `${apiUrl}/${resource}/${params.id}/`;
 
         options.method = 'DELETE';
@@ -320,7 +320,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           previous: json.previous,
         };
 
-        console.log("GET_FILES ret: ", ret)
+        //console.log("GET_FILES ret: ", ret)
         ret.data.map(item => (item.key = item.id));
         return ret;
 
@@ -335,11 +335,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         };
 
         ret.data.map(item => (item.key = item.id));
-        console.log("ret in get_list is: ", ret)
+        //console.log("ret in get_list is: ", ret)
         return ret;
 
       case GET_ONE:
-          console.log("fields in get_one: ", resource, json)
+          //console.log("fields in get_one: ", resource, json)
 
         let fields = translateResource(resource, json);
 

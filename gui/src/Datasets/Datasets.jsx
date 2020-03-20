@@ -100,9 +100,9 @@ const actionStyles = theme => ({
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
   let _isMounted = true
-  console.log("datasetshowactions data: ", data)
+  //console.log("datasetshowactions data: ", data)
 
-  //TODO: i hate that i have to do this.  It's not that inefficient, but I feel like there must be a better way.
+  //TODO: Improve efficiency of this
   useEffect(() => {
     if (data && !showEdit){
 
@@ -369,7 +369,7 @@ const validateSearchModel = (value) => {
     //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
-    console.log("json parse error e: ", value)
+    console.error("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
 }
@@ -380,7 +380,7 @@ const CustomLabel = ({classes, translate, labelText} ) => {
 
 const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
-  console.log("basedatasetform props: ", props)
+  //console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [redirect, setRedirect] = useState(null)
   const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
@@ -391,7 +391,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
   function handleChange(e){
     if (e.target && e.target.name === "search_model"){
-      console.log("handlechange setsearchmodel to value: ", e.target.value)
+      //console.log("handlechange setsearchmodel to value: ", e.target.value)
       setSearchModel(e.target.value)
     }
   }
@@ -400,7 +400,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     //this is necessary instead of using the default react-admin save because there is no RA form that supports geoJSON
     //data_collection_method and sensitivity_level require some preprocessing due to how react-admin and the api treat multi entry fields.
 
-    console.log("datasetform handleSubmit sent data: ", data)
+    //console.log("datasetform handleSubmit sent data: ", data)
     let dcmList = []
     let slList = []
     let newData = {...data}
@@ -410,7 +410,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       newData.search_model.search = JSON.stringify(parseJSON)
     }
     catch(e){
-      console.log(`error parsing data to json: ${searchModel}` , e)
+      console.error(`error parsing data to json: ${searchModel}` , e)
     }
 
     //TODO: refactor this shit
@@ -420,14 +420,14 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
     
-    console.log("handlesubmit of datasets form is: ", newData, props, geo)
+    //console.log("handlesubmit of datasets form is: ", newData, props, geo)
 
     //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
     props.resource = "datasets"
 
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
       data => {
-        console.log("submitobjectwithgeo success, returned data: ", data)
+        //console.log("submitobjectwithgeo success, returned data: ", data)
         setRedirect("/datasets")
       }
     ).catch(err => console.error("submitobjectwithgeo dataset error", err))
@@ -442,7 +442,7 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
   };
 
-  console.log("props record after editmodal transofmration: ", props.record)
+  //console.log("props record after editmodal transofmration: ", props.record)
 
 
   const { record } = props

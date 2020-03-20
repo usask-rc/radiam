@@ -160,7 +160,7 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEdi
   const [showEdit, setShowEdit] = useState(user ? user.is_admin : false)
 
   useEffect(() => {
-    console.log("data in useeffect projectshowactions: ", data)
+    //console.log("data in useeffect projectshowactions: ", data)
     if (data && !showEdit){
       isAdminOfAParentGroup(data.group).then(data => {
         setShowEdit(data)
@@ -186,7 +186,7 @@ const ProjectShowActions = withStyles(actionStyles)(({ basePath, data, setCanEdi
 
 export const ProjectShow = withTranslate(withStyles(styles)(
   ({ classes, permissions, translate, ...props }) => {
-    console.log("ProjectShow props: ", props)
+    //console.log("ProjectShow props: ", props)
     //select all datasets where project = project id
 
     const [projectDatasets, setProjectDatasets] = useState([])
@@ -198,11 +198,11 @@ export const ProjectShow = withTranslate(withStyles(styles)(
 
     let _isMounted = false
     useEffect(() => {
-      console.log("projectshow record, props:", props)
+      //console.log("projectshow record, props:", props)
       _isMounted = true
       if (props.id){
         getRelatedDatasets(props.id).then(data => {
-          console.log("getrelateddatasets returns: ", data)
+          //console.log("getrelateddatasets returns: ", data)
           if (_isMounted){
             setProjectDatasets(data)
           }
@@ -253,16 +253,15 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                     props={props}
                   />
                   {createModal && 
-                    <Dialog className={classes.modalContainer}fullWidth open={createModal} onClose={() => {console.log("dialog close"); setCreateModal(false)}} aria-label="Add User">
+                    <Dialog className={classes.modalContainer}fullWidth open={createModal} onClose={() => {setCreateModal(false)}} aria-label="Add User">
                       <DialogTitle>{`Add Dataset`}</DialogTitle>
                       <DialogContent>
                         <DatasetForm project={props.id} setCreateModal={setCreateModal} {...props} />
                       </DialogContent>
                     </Dialog>
                   }
-                  {console.log("editModal: ", editModal)}
                   {editModal && 
-                  <Dialog className={classes.modalContainer}fullWidth open={editModal} onClose={() => {console.log("dialog close"); setEditModal(false)}} aria-label="Add User">
+                  <Dialog className={classes.modalContainer}fullWidth open={editModal} onClose={() => {setEditModal(false)}} aria-label="Add User">
                     <DialogTitle>{`Update Dataset`}</DialogTitle>
                     <DialogContent>
                       <DatasetForm basePath="/datasets" resource="datasets" project={props.id} setEditModal={setEditModal} record={{...editModal}} />
@@ -270,7 +269,7 @@ export const ProjectShow = withTranslate(withStyles(styles)(
                   </Dialog>
                   }
 
-                  {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {console.log("dialog close"); setViewModal(false)}} aria-label="Add User">
+                  {viewModal && <Dialog className={classes.modalContainer}fullWidth open={viewModal} onClose={() => {setViewModal(false)}} aria-label="Add User">
                     <DialogContent>
                       <DatasetModalShow basePath="/datasets" resource="datasets" id={viewModal.id} setViewModal={setViewModal} record={{...viewModal}} />
                     </DialogContent>

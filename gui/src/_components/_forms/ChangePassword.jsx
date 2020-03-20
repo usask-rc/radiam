@@ -65,7 +65,7 @@ class ChangePassword extends Component {
 
     const token = localStorage.getItem(WEBTOKEN);
 
-    console.log("token and userid are: ", token, userID)
+    //console.log("token and userid are: ", token, userID)
     if (token) {
       const parsedToken = JSON.parse(token);
       headers.set("Authorization", `Bearer ${parsedToken.access}`);
@@ -145,7 +145,7 @@ class ChangePassword extends Component {
   render() {
     const {classes} = this.props
     const { redirect } = this.state
-    console.log("state in changepassword is: ", this.state)
+    //console.log("state in changepassword is: ", this.state)
     return (
       <>
       <Responsive

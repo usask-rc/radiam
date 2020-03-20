@@ -70,7 +70,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
           setRedirect("/projects")
         })
         .catch(err => {
-          console.log("error in creating geo: ", err)
+          console.error("error in creating geo: ", err)
           toast.error("Error Updating Project, please ensure the form is fully completed.")
 
         })
@@ -83,7 +83,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
         })
         .catch(err => 
           {
-            console.log("error in updating geo: ", err)
+            console.error("error in updating geo: ", err)
             toast.error("Error Updating Project, please ensure the form is fully completed.")
           })
       }
@@ -99,7 +99,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
         setLoading(true)
         getUsersInGroup({id: group, is_active: true}).then(contacts => {
           if (_isMounted){
-            console.log("getusersingroup result: ", contacts)
+            //console.log("getusersingroup result: ", contacts)
             setGroupContactList(contacts)
             setLoading(false)
           }
@@ -115,7 +115,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
     const { record } = props
 
-    console.log("record project: ", record)
+    //console.log("record project: ", record)
 
     return(
       <SimpleForm

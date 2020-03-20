@@ -24,7 +24,7 @@ const getUsersInMyGroups = (groups) => {
         const promises = []
         groups.map(group => {
 
-            console.log("group being checked for users is: ", group)
+            //console.log("group being checked for users is: ", group)
 
             let params = {
                 is_active: true,
@@ -34,7 +34,7 @@ const getUsersInMyGroups = (groups) => {
             promises.push(
                 getGroupMembers(params)
                 .then(data => {
-                    console.log("getusersingroup : ", group, "is: ", data)
+                    //console.log("getusersingroup : ", group, "is: ", data)
                     return data
                 })
                 .catch(err => reject(err))
@@ -49,7 +49,7 @@ const getUsersInMyGroups = (groups) => {
             //
             userLists.map(userList => {
                 userList.forEach(record => {
-                    console.log("record in userList: ", record)
+                    //console.log("record in userList: ", record)
                     usersInMyGroups[record.user.id] = record
                 })
                 return userList
@@ -82,7 +82,7 @@ const WarningCards = ({classes, ...props}) => {
                     //receive a list of users underneath me
                     //TODO: determine user count in each group, probably on the next level up
                     //do we care about user permission levels?
-                    console.log("users in my managed groups: ", data)
+                    //console.log("users in my managed groups: ", data)
                 })
                 getUsersInMyGroups(user.dataManagerships)
                 .then(data => {
@@ -92,7 +92,6 @@ const WarningCards = ({classes, ...props}) => {
         
         else{
             //punt to front page - no user cookie available
-            console.error("No User Cookie Detected - Returning to front page")
             window.location.hash = "#/login"
         }
     }, [user])

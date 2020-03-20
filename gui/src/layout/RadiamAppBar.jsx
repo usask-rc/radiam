@@ -66,7 +66,7 @@ const CustomAppBar = ({ classes, ...props }) => {
     _isMounted = true
     getCurrentUserDetails().then(data => 
       {
-        console.log("data returned from get current user details is: ", data)
+        //console.log("data returned from get current user details is: ", data)
         if (_isMounted){
           setUser(data)
         }

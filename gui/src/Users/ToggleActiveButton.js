@@ -7,7 +7,7 @@ class ToggleActiveButton extends Component{
     handleClick = () => {
       const {basePath, crudUpdateMany, resource, filterValues, selectedIds} = this.props;
 
-      console.log("props in toggleactivebutton are: ", this.props)
+      //console.log("props in toggleactivebutton are: ", this.props)
       
       if (filterValues && filterValues.is_active)
       {

@@ -93,7 +93,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
 
     getRootPaths(projectID, dataType).then(data => {
         if (_isMounted){ 
-          console.log("getrootpaths in browsetab retrieves data: ", data)
+          //console.log("getrootpaths in browsetab retrieves data: ", data)
 
           setListOfRootPaths(data)
           setStatus({loading: false, error: false})
@@ -109,7 +109,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     }
   }, [projectID]);
 
-  console.log("browsetab rendering")
+  //console.log("browsetab rendering")
   return (
     <div className={classes.main}>
     {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :
@@ -118,7 +118,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
       
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
-          console.log("listofrootpaths item: ", item)
+          //console.log("listofrootpaths item: ", item)
           let globus_path = "path"
           let globus_endpoint = null
 

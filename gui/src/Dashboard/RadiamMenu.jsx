@@ -45,7 +45,7 @@ const RadiamMenu = ({
     logout,
     ...rest
 }) => {
-    console.log("radiammenu ...rest is: ", rest)
+    //console.log("radiammenu ...rest is: ", rest)
     return(
     <div className={classnames(classes.main)} {...rest}>
         <CustomDashboardMenuItem onClick={onMenuClick} />

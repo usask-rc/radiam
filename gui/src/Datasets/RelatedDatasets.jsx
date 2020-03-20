@@ -36,7 +36,7 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
             //truncate unreasonably long dataset names - these will usually be caused by auto creation via browse
             let displayTitle = truncatePath(dataset.title)
 
-            console.log("displayTitle is: ", displayTitle)
+            //console.log("displayTitle is: ", displayTitle)
             
             return( //TODO: display number of files in each dataset in the chip
               <Tooltip title={dataset.title}>

@@ -26,7 +26,7 @@ const styles = {
 class MapForm extends Component {
   constructor(props) {
     super(props);
-    console.log('imported props from parent in MapForm is: ', this.props);
+    //console.log('imported props from parent in MapForm is: ', this.props);
     this.state = {
       geo: props.recordGeo ? props.recordGeo : {},
       mapRef: null,
@@ -109,7 +109,7 @@ class MapForm extends Component {
       return {};
     }
 
-    console.log('layer in _generateFeature is: ', layer);
+    //console.log('layer in _generateFeature is: ', layer);
 
     let newFeature = {
       id: layer._leaflet_id, //may have to remove before submission to API
@@ -154,10 +154,7 @@ class MapForm extends Component {
         geo.geojson.features &&
         geo.geojson.features.length > 0
       ) {
-        console.log(
-          'geojson before feature parse is: ',
-          geo.geojson
-        );
+        //console.log('geojson before feature parse is: ', geo.geojson);
         const firstFeature = geo.geojson.features[0];
 
         if (firstFeature.geometry.type === 'Point') {
@@ -197,14 +194,14 @@ class MapForm extends Component {
       latLng[1] = this._normLng(latLng[1]);
       this.setState({ location: latLng });
 
-      console.log("set location to: ", latLng)
+      //console.log("set location to: ", latLng)
     }
   };
 
   _updateFeatures = feature => {
     const { features } = this.state
     this.setState({ ...features, features: feature });
-    console.log('in _updateFeatures, state is now: ', this.state);
+    //console.log('in _updateFeatures, state is now: ', this.state);
     this.updateGeo();
   };
 
@@ -219,7 +216,7 @@ class MapForm extends Component {
       return key;
     });
 
-    console.log('full featureslist before push is:', featuresList);
+    //console.log('full featureslist before push is:', featuresList);
     let localGeo = {};
     if (featuresList.length > 0) {
       localGeo = {
@@ -252,7 +249,7 @@ class MapForm extends Component {
   };
 
   _onDeleted = e => {
-    console.log('ondeleted event e:', e);
+    //console.log('ondeleted event e:', e);
     Object.keys(e.layers._layers).map(key => {
       this.featuresCallback(key);
       return key;
@@ -288,7 +285,7 @@ class MapForm extends Component {
       ? features[layer._leaflet_id].properties
       : {};
 
-    console.log('layer clicked with value e: ', e, 'and state: ', this.state);
+    //console.log('layer clicked with value e: ', e, 'and state: ', this.state);
 
     if (!blockPopup) {
       this.setState({ location: [e.latlng.lat, e.latlng.lng] });
@@ -361,8 +358,8 @@ class MapForm extends Component {
         alert(
           "There is at least one Multi feature in your geoJSON dataset This information will not be Editable or Viewable on this Edit page, but may be viewed on this item's Show page."
         );
-        console.log('notdisplayedfeatures prompt is: ', notDisplayedFeatures);
-        console.log('localfeatures prompt is: ', localFeatures);
+        //console.log('notdisplayedfeatures prompt is: ', notDisplayedFeatures);
+        //console.log('localfeatures prompt is: ', localFeatures);
       }
       this.setState({ features: localFeatures }, () =>
         this.setState({ notDisplayedFeatures: notDisplayedFeatures })

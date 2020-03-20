@@ -176,7 +176,6 @@ export function getMaxUserRole(){
     return ROLES.USER
   }else{
     //punt to front page - no user cookie available
-    console.error("No User Cookie Detected - Returning to front page")
     window.location.hash = "/#/login"
     return ROLES.ANONYMOUS
   }
@@ -236,10 +235,7 @@ export function getFirstCoordinate(layer) {
           }
           break;
         default:
-          console.error(
-            "Invalid feature sent to getFirstCoordinate. Layer: ",
-            layer
-          );
+          console.error("Invalid feature sent to getFirstCoordinate. Layer: ", layer);
       }
     }
   }
@@ -260,7 +256,7 @@ export function getFolderFiles(
     q: params.q,
   };
 
-  console.log("queryParams in getfolderfiles: ", queryParams)
+  //console.log("queryParams in getfolderfiles: ", queryParams)
 
   return new Promise((resolve, reject) => {
     dataProvider(
@@ -271,7 +267,7 @@ export function getFolderFiles(
       .then(response => {
         let fileList = [];
 
-        console.log("getfolderfiles files: ", response.data)
+        //console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -316,7 +312,7 @@ export function findRootPath(projectID, location=null, path=null, dataType="proj
     }
 
     dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
-      console.log("files in path, location, ", path, location, "are: ", projectFiles)
+      //console.log("files in path, location, ", path, location, "are: ", projectFiles)
       resolve(projectFiles.data)
     }).catch(err => reject(err))
   })
@@ -334,8 +330,8 @@ export function getRootPaths(projectID, dataType="projects") {
     }
 
     dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      console.log("getlist of locationprojects response: ", response)
-      //sadly there are duplicates in this endpoint currently - filter them out.
+      //console.log("getlist of locationprojects response: ", response)
+      //Filter possible duplicates using a set
 
       let locationSet = new Set()
       response.data.forEach(locationproject => {
@@ -411,7 +407,7 @@ export function getParentGroupList(group_id, groupList = []){
       return response.data
     })
     .catch(err => {
-      console.log("getparentgrouplist err: ", err)
+      console.error("getparentgrouplist err: ", err)
       reject(err)
     })
   })
@@ -498,7 +494,6 @@ export function getUsersInGroup(record) {
         });
 
         Promise.all(promises).then(data => {
-          console.log("promise all data is: ", data)
           resolve(groupUsers)
           return data
         })
@@ -536,7 +531,6 @@ export function getGroupMembers(record) {
               }))
             });
             Promise.all(promises).then(data => {
-              console.log("in promise all data is: ", data, "groupmembers is: ", groupMembers)
               resolve(groupMembers)
               return data
             }).catch(err => reject(err))
@@ -590,7 +584,6 @@ export function getUserGroups(record) {
           groupMembers.map(groupMember => {
 
             promises.push(getGroupData(groupMember.group).then(researchgroup => {
-              console.log("data returned from getgroupdata in getusergroups is: ", researchgroup)
               groupMember.group = researchgroup
               groupMember.group_role = groupRoles.filter(role => role.id === groupMember.group_role)[0];
               return researchgroup
@@ -622,7 +615,6 @@ export function submitObjectWithGeo(
 ) {
 
   return new Promise((resolve, reject) => {
-    console.log("formData heading into submitobjectwithgeo is: ", formData);
     if (formData.id) {
       updateObjectWithGeo(formData, geo, props, redirect).then(data => resolve(data)).catch(err => reject(err));
     } else {
@@ -634,7 +626,6 @@ export function submitObjectWithGeo(
 function updateObjectWithGeo(formData, geo, props) {
 
   return new Promise((resolve, reject) => {
-    console.log("formData, geo in updateobjectwithgeo: ", formData, geo)
     if (geo && Object.keys(geo).length > 0) {
       formData.geo = geo;
       formData.geo.object_id = formData.id
@@ -691,7 +682,6 @@ export function postObjectWithoutSaveProp(formData, resource){
 export function createObjectWithGeo(formData, geo, props, inModal) {
 
   return new Promise((resolve, reject) => {
-    console.log("createobjectwithgeo called with parameters: ", formData, geo, props, inModal)
     let headers = new Headers({ "Content-Type": "application/json" });
     const token = localStorage.getItem(WEBTOKEN);
 
@@ -715,7 +705,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
           throw new Error(response.statusText); //error here when creating dataset nested in project
         })
         .then(data => {
-          console.log("data in createobjectwithgeo is: ", data);
           //some data exists - add in the object ID before submission
           if (geo && geo.content_type) {
             data.geo = geo;
@@ -756,13 +745,12 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
               resolve(data)
 
               //TODO: test thoroughly what happens in modals
-              console.log("Data from geoJSON update: ", data);
               if (!inModal){ //stop redirect if in a modal
                 props.history.push(`/${props.resource}`);
               }
             });
         }).catch(err => {
-          console.log("err in POST new object with geo: ", err, formData, geo, props)
+          console.error("err in POST new object with geo: ", err, formData, geo, props)
           reject(err)
         })
         ;
@@ -832,7 +820,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
         FK_FIELDS[resource].map(field => {
           //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
           if (item[field] && isObject(item[field])) {
-            //TODO: something has to be done here, but I don"t quite know what yet.
+            //TODO: something has to be done here, but I don't quite know what yet.
           }
           return field;
         });
@@ -840,7 +828,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
       });
     }
 
-    //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further on monday.
+    //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further
     else {
       if (direction !== 1) {
         FK_FIELDS[resource].map(field => {
@@ -848,12 +836,7 @@ export function translateResource(resource, untranslatedData, direction = 0) {
             //currently this only holds single nested objects - the ID we want is in that URL.
             if (data[field] && isObject(data[field])) {
               //TODO: again, something has to be done here - i dont know what yet.
-              console.log(
-                "Single Object is Resource: ",
-                resource,
-                "field: ",
-                field
-              );
+              console.log("Single Object is Resource: ",resource," field: ",field);
             }
           }
           return field;
