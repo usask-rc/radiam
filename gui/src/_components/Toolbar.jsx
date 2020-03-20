@@ -48,7 +48,6 @@ const BaseToolbar = ({classes, ...props}) => {
 }
 
 //for anything that is a model of foreign keys with no name/title
-
 const BaseFKToolbar = ({classes, ...props}) => {
   //console.log("FKToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props

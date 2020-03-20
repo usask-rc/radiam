@@ -407,10 +407,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     }
   };
 
-  //TODO: these functions are (i think) unused, but will need to be updated now that we have a proper ID field.
-  return (type, resource, params) => {
-    // json-server doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
 
+  //NOTE:  these functions are not used by our application as we have no update or delete many calls.
+  //however, I've left them in as they in theory could be used for mass update/deletes if someone wanted to.
+  return (type, resource, params) => {
     if (type === UPDATE_MANY) {
       return Promise.all(
         params.ids.map(id =>
@@ -423,8 +423,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         data: responses.map(response => response.json),
       }));
     }
-
-    // json-server doesn't handle filters on DELETE route, so we fallback to calling DELETE n times instead
     if (type === DELETE_MANY) {
       return Promise.all(
         params.ids.map(id =>

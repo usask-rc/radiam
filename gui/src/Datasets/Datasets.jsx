@@ -379,9 +379,8 @@ const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
-const BaseDatasetForm = ({ basePath, classes, ...props }) => {
+const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
 
-  //console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [redirect, setRedirect] = useState(null)
   const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
@@ -447,10 +446,9 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
 
 
   const { record } = props
-
   return(
     <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
-    toolbar={<DefaultToolbar {...props} />}>
+    toolbar={mode && mode === "edit" ? <DefaultToolbar {...props} /> : null}>
       <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
       <TextInput      
         label="Title"
@@ -598,5 +596,4 @@ BaseDatasetEdit.propTypes = {
 
 export const CustomFormLabel = translate(CustomLabel)
 export const DatasetForm = enhance(BaseDatasetForm)
-
 export const DatasetEdit = enhance(BaseDatasetEdit);
