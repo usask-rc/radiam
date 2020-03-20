@@ -15,15 +15,7 @@ describe("getAPIEndpoint", () => {
     const res = getAPIEndpoint()
 
     test("returns correct endpoint", () => {
-        //because I'm using a local standup to test, this test differs locally from on dev.
-        if (window && window.location && window.location.port === '3000') {
-            expect(res).toEqual(`https://dev2.radiam.ca/api`)
-        }
-        else{
-            expect(res).toEqual(
-                `/${API_ENDPOINT}`
-            )
-        }
+        expect(res).toEqual(`/${API_ENDPOINT}`)
     }) 
 })
 
@@ -31,11 +23,17 @@ describe("getAPIEndpoint", () => {
 //TODO: these functions would require a live server to test on, and need mocks generated instead prior to being elaborated on
 
 describe("isAdminOfParentGroup", () => {
+
+    test("User not authenticated", () => {
+        expect(isAdminOfAParentGroup()).rejects.toEqual("User Not Authenticated")
+    })
+
+    /* Cannot run these without a valid user cookie
+
     test("rejects when called without group id", () => {
         expect(isAdminOfAParentGroup()).rejects.toEqual("No Group ID")
     })
     
-    /*cannot run this without a valid user cookie
     test("rejects with no user cookie", () => {
         expect(isAdminOfAParentGroup("NO_COOKIE")).rejects.toEqual("No User Cookie")
     })
@@ -47,9 +45,11 @@ describe("isAdminOfParentGroup", () => {
 //given a group ID, determine the current user's status in said group
 describe ("getUserRoleInGroup(group)", () => {
 
+    /* this function got changed or removed - need a new test for it
     test("returns `user` when called without group id (or cookie)", () => {
         expect(getUserRoleInGroup()).toEqual("anonymous")
     })
+    */
 })
 
 describe("getRecentProjects()", () => {
@@ -63,7 +63,10 @@ describe("getmaxuserrole", () => {
 })
 
 describe("getFirstCoordinate", () => {
-    //NOTE: getfirstcoordinates returns a reversed list of the coordinates - this is required for leaflet to display in [lng, lat]
+    /* 
+     * getfirstcoordinates returns a reversed list of the coordinates - this is required 
+     * for leaflet to display in [lng, lat]
+     */
     test("returns coordinate of Point object", () => {
         expect(getFirstCoordinate(dummyPoint)).toEqual(dummyPoint.feature.geometry.coordinates.reverse())
     })
