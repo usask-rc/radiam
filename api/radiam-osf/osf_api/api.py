@@ -1,5 +1,6 @@
 from .core import OSFCore
 from .project import Project
+from .exceptions import OSFException
 
 
 class OSF(OSFCore):

@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0018_add_hubzero_locationtype'),
+        ('api', '0019_update_toplevel_group'),
     ]
 
     operations = [

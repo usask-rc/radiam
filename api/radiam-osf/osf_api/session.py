@@ -34,7 +34,7 @@ class OSFSession(requests.Session):
         parts = [self.base_url]
         parts.extend(args)
         # canonical OSF URLs end with a slash
-        return '/'.join(parts) + '/'
+        return '/'.join(str(v) for v in parts) + '/'
 
     def put(self, url, *args, **kwargs):
         response = super(OSFSession, self).put(url, *args, **kwargs)
