@@ -2039,13 +2039,10 @@ const SaveEditMetadataFormButton = ({doc, onSave, projectID, ...rest}) => {
     }, [
         formState.valid,
         formState.values,
-        /**
-        create,
-        notify,
-        redirectTo,
-        redirect,
-        basePath,
-        **/
+        doc,
+        onSave,
+        projectID,
+        dataProvider
     ]);
 
     return <SaveButton {...rest} handleSubmitWithRedirect={handleSaveClick} />
