@@ -224,8 +224,6 @@ function EnhancedTableHead(props) {
 function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
 
-  console.log("item in folderview is: ", item)
-
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -242,7 +240,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       props.location.state &&
       props.location.state.search) ||
     null
-  ); //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
+  );
   const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
@@ -454,8 +452,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       order: order === "desc" ? "-" : "",
     }
 
-    if (!search){ //TODO: there is a better way to separate this out
-
+    if (!search){ 
       fileTypes.forEach(type => {
         fileParams.page = filePage
         if (type === "directory"){

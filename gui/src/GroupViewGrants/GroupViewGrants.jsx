@@ -174,37 +174,6 @@ export const GroupViewGrantShow = withStyles(styles)(({ classes, ...props }) => 
 const validateDataset = required('en.validate.viewgrants.dataset');
 const validateGroup = required('en.validate.viewgrants.group');
 const validateDateStarts = required("en.validate.viewgrants.date_start");
-/*
-const validateSearchModel = (value) => {
-
-  //return true if searchModel is not yet loaded - this is to get around the fact that the parse arrives after initial validation
-  //after initial load, this value should be either valid or invalid JSON, but never undef again
-  if (value === undefined){
-    return
-  }
-  
-  if (!value){
-    //we've been sent no value
-    return `Enter a search model in valid JSON`
-  }
-
-  try {
-    let result
-    if (value.search){
-      result = JSON.stringify(value.search)
-    }
-    else{
-      result = JSON.parse(value)
-    }
-    //TODO: check here for anything we don't want / invalid Elastic queries
-  }
-  catch(e){
-    console.error("json parse error e: ", value)
-    return `Entry is not valid JSON`
-  }
-}
-*/
-
 
 const GroupViewGrantForm = ({translate, classes, ...props}) => {
   const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")

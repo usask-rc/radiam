@@ -100,9 +100,7 @@ const actionStyles = theme => ({
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
   let _isMounted = true
-  //console.log("datasetshowactions data: ", data)
 
-  //TODO: Improve efficiency of this
   useEffect(() => {
     if (data && !showEdit){
 
@@ -367,7 +365,6 @@ const validateSearchModel = (value) => {
     else{
       JSON.parse(value)
     }
-    //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
     console.error("json parse error e: ", value)
@@ -413,16 +410,10 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
       console.error(`error parsing data to json: ${searchModel}` , e)
     }
 
-    //TODO: refactor this shit
-
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-    
-    //console.log("handlesubmit of datasets form is: ", newData, props, geo)
-
-    //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
     props.resource = "datasets"
 
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
@@ -431,19 +422,7 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
         setRedirect("/datasets")
       }
     ).catch(err => console.error("submitobjectwithgeo dataset error", err))
-
-    //TODO: what is this
-    if (props.setCreateModal){
-      props.setCreateModal(false)
-    }
-    else if (props.setEditModal){
-      props.setEditModal(false)
-    }
-
   };
-
-  //console.log("props record after editmodal transofmration: ", props.record)
-
 
   const { record } = props
   return(

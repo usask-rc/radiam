@@ -191,9 +191,6 @@ class LocationForm extends Component {
     const { staticContext, id, classes, record, mode, basePath, ...rest } = this.props;
     const { geo, showMap } = this.state;
 
-    //TODO: there is a discrepancy between how we separate `record` from rest and props and how it `should` be done
-    //this is likely the cause of the loading error - investigate tomorrow
-
     return (
       <SimpleForm
         {...rest}

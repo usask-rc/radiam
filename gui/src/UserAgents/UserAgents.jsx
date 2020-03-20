@@ -121,21 +121,6 @@ export const UserAgentList = withStyles(listStyles)(({ classes, ...props }) => (
   </List>
 ));
 
-/*
-<ArrayField source={"projects"} label={"Projects"}>
-        <SingleFieldList>
-          <ReferenceField source={"id"} reference={"projects"} link="show">
-            <ChipField source={MODEL_FIELDS.NAME} />
-          </ReferenceField>
-        </SingleFieldList>
-      </ArrayField>
-<SingleFieldList>
-        <ReferenceField source={"id"} reference={"projects"} link="show">
-          <ChipField source={MODEL_FIELDS.NAME} />
-        </ReferenceField>
-      </SingleFieldList>
-*/
-
 const actionStyles = theme => ({
   toolbar:{
     float: "right",
@@ -143,7 +128,7 @@ const actionStyles = theme => ({
   }
 })
 
-const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, resource, classes}) => 
+const UserAgentShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => 
 {
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
@@ -174,36 +159,30 @@ return(
   <ShowController toolbar={null} {...props}>
     {controllerProps => 
     {
-
-      //console.log("controllerProps is: ", controllerProps)
-      //console.log("in controllerprops, props: ", props)
-
-    return(
-      <Show actions={<UserAgentShowActions />} {...props} {...controllerProps}>
-        <SimpleShowLayout toolbar={null}>
-          <UserAgentTitle prefix={"Viewing Agent"} />
-        
-          <ReferenceField
-            link={false}
-            label={"en.models.agents.user"}
-            source={MODEL_FK_FIELDS.USER}
-            reference={MODELS.USERS}
-          >
-            <UserShow />
-          </ReferenceField>
-          <TextField
-            label={"en.models.agents.version"}
-            source={"version"}
-          />
-          <ReferenceField
-            link={false}
-            label={"en.models.agents.location"}
-            source={MODEL_FK_FIELDS.LOCATION}
-            reference={MODELS.LOCATIONS}
-          >
-            <LocationShow />
-          </ReferenceField>
-          {controllerProps.record && controllerProps.record.project_config_list && 
+      return(
+        <Show actions={<UserAgentShowActions />} {...props} {...controllerProps}>
+          <SimpleShowLayout toolbar={null}>
+            <UserAgentTitle prefix={"Viewing Agent"} />
+            <ReferenceField
+              link={false}
+              label={"en.models.agents.location"}
+              source={MODEL_FK_FIELDS.LOCATION}
+              reference={MODELS.LOCATIONS}
+            >
+              <LocationShow />
+            </ReferenceField>
+            <ReferenceField
+              link={false}
+              label={"en.models.agents.user"}
+              source={MODEL_FK_FIELDS.USER}
+              reference={MODELS.USERS}
+            >
+              <UserShow />
+            </ReferenceField>
+            <TextField
+              label={"en.models.agents.version"}
+              source={"version"}
+            />
             <ArrayField source={MODEL_FIELDS.PROJECT_CONFIG_LIST} label={"Target Projects"}>
               <SingleFieldList>
                 <ReferenceField source={MODEL_FK_FIELDS.PROJECT} reference={MODELS.PROJECTS} link="show">
@@ -211,26 +190,22 @@ return(
                 </ReferenceField>
               </SingleFieldList>
             </ArrayField>
-          }
-          {controllerProps.record && controllerProps.record.remote_api_username && controllerProps.record.remote_api_token && 
-          <>
-          <TextField
-            label={"en.models.agents.remote_api_username"}
-            source={MODEL_FIELDS.REMOTE_API_USERNAME}
-          />
-          
-          <TextField
-            label={"en.models.agents.remote_api_token"}
-            source={MODEL_FIELDS.REMOTE_API_TOKEN}
-          />
-          </>
-          }
-          <BooleanField
-            label={"en.models.generic.active"}
-            source={MODEL_FIELDS.ACTIVE}
-          />
-        </SimpleShowLayout>
-      </Show>)}
+            <TextField
+              label={"en.models.agents.remote_api_username"}
+              source={"remote_api_username"}
+            />
+            <TextField
+              label={"en.models.agents.remote_api_token"}
+              source={"remote_api_token"}
+            />
+            <BooleanField
+              label={"en.models.generic.active"}
+              source={MODEL_FIELDS.ACTIVE}
+            />
+          </SimpleShowLayout>
+        </Show>
+      )
+    }
     }
   </ShowController>
 )};
@@ -301,7 +276,6 @@ export const UserAgentCreate = props => {
   )
 };
 
-//TODO: Config can be EMPTY / nonexistent, but it CANNOT be `null` on submission
 export const UserAgentEdit = props => {
   return (
     <Edit {...props}>

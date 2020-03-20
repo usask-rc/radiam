@@ -170,7 +170,6 @@ export const UserCreate = props => {
   )
 };
 
-//TODO: refactor all these goddamn user edit forms into one
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
     return(
@@ -180,8 +179,6 @@ export const UserEdit = props => {
     
 };
 
-//TODO: add "are you sure?" prompt.
-//a form for superusers, this is gated in App.jsx.
 export const UserEditWithDeletion = props => {
   const user = JSON.parse(localStorage.getItem(ROLE_USER))
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props

@@ -124,7 +124,6 @@ const styles = {
 
     function desc(a, b, orderBy) {
 
-        //TODO: handle separately - 'group' sits outside of the user object
         if (orderBy === "group"){
             return 0
         }

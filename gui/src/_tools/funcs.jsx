@@ -30,10 +30,8 @@ export function isAdminOfAParentGroup(group_id){
 
     getParentGroupList(group_id).then(data => {
       data.map(group => {
-        //iterate through groups we know the user to be an admin in.
-        //TODO: this should fail if the user is made admin of a parent group and then accesses said page without logging out and back in
-        //the alternative is to regularly update this or to make a query for each parent group - i don't think either is valid
-        //workaround is that the user will have to log out / back in.
+
+        //NOTE: this should fail if the user is made admin of a parent group and then accesses said page without logging out and back in
         for (var i = 0; i < user.groupAdminships.length; i++){
           if (group.id === user.groupAdminships[i]){
             resolve(true)
@@ -111,7 +109,7 @@ export function getRecentProjects(count=1000) {
     const now = moment();
     dataProvider(GET_LIST, MODELS.PROJECTS, {
       order: { field: MODEL_FIELDS.NAME },
-      pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
+      pagination: { page: 1, perPage: count },
     })
       .then(response => {
         const projects = response.data
@@ -427,8 +425,6 @@ export function getGroupData(group_id) {
   });
 }
 
-//get a single user
-//TODO: merge into a greater `get one item` function
 export function getUserDetails(userID){
   return new Promise((resolve, reject) => {
     dataProvider("GET_ONE", MODELS.USERS, {id: userID})
@@ -467,8 +463,7 @@ export function getCurrentUserDetails() {
   });
 }
 
-//TODO: this can probably be consolidated with getGroupMembers
-//returns a list of users in said group
+//TODO: Consolidate with getGroupMembers
 export function getUsersInGroup(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = [];
@@ -605,8 +600,6 @@ export function getUserGroups(record) {
   });
 }
 
-//TODO: convert to promise / callback system
-//TODO: do the above
 export function submitObjectWithGeo(
   formData,
   geo,
@@ -679,7 +672,6 @@ export function postObjectWithoutSaveProp(formData, resource){
   })
 }
 
-//TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
 
   return new Promise((resolve, reject) => {
@@ -690,7 +682,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
       const parsedToken = JSON.parse(token);
       headers.set("Authorization", `Bearer ${parsedToken.access}`);
 
-      //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
       const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
         method: METHODS.POST,
         body: JSON.stringify({ ...formData }),
@@ -756,7 +747,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
         })
         ;
     } else {
-      //TODO: logout the user.
       toastErrors(WARNINGS.NO_AUTH_TOKEN);
       reject({error: WARNINGS.NO_AUTH_TOKEN})
     }
@@ -819,27 +809,15 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     if (Array.isArray(data)) {
       data.map(item => {
         FK_FIELDS[resource].map(field => {
-          //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
-          if (item[field] && isObject(item[field])) {
-            //TODO: something has to be done here, but I don't quite know what yet.
-          }
           return field;
         });
         return item;
       });
     }
 
-    //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further
     else {
       if (direction !== 1) {
         FK_FIELDS[resource].map(field => {
-          if (data[field]) {
-            //currently this only holds single nested objects - the ID we want is in that URL.
-            if (data[field] && isObject(data[field])) {
-              //TODO: again, something has to be done here - i dont know what yet.
-              console.log("Single Object is Resource: ",resource," field: ",field);
-            }
-          }
           return field;
         });
       }
@@ -881,9 +859,6 @@ export function translateResource(resource, untranslatedData, direction = 0) {
           });
         }
       }
-      //the data format that is expected in the "multi select array" fields is just an array of items, which then are queried to the server for full details.
-      //django sends us objects instead of this, and as a result these values must be filtered out.
-      //TODO: this needs to be tested thoroughly.
       else {
         if (data.sensitivity_level && isObject(data.sensitivity_level[0])) {
           data.sensitivity_level = data.sensitivity_level.map(item => item.id);
@@ -914,7 +889,6 @@ export function translateResource(resource, untranslatedData, direction = 0) {
   return data;
 }
 
-//TODO: this is meant to replace the date section of translateResource above
 export function translateDates(date, type, direction = 1) {
   if (direction) {
     if (type === "date_expires" && date.length < 11) {
@@ -923,7 +897,6 @@ export function translateDates(date, type, direction = 1) {
       date += appendTimestamp(true);
     }
   }
-  //TODO: need to do something downstream later.
   return date;
 }
 

@@ -28,9 +28,6 @@ const styles = theme => ({
 });
 
 
-//TODO: refactor these chips to display `group admin` instead of `admin` and potentially change the labeling of `member`.
-//if this is displaying in modal form, we want to redirect to go to open that page
-//if this is NOT displaying in modal form, we want groups clicked on to display in a modal.
 const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null, ...props }) => {
 
     const [groupAdmins, setGroupAdmins] = useState([])
