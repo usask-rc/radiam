@@ -43,6 +43,7 @@ const MapView = ({classes, record }) => {
     let _isMounted = true
     useEffect(() => {
         return function cleanup() {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             _isMounted = false
         }
     }, [])
@@ -83,7 +84,7 @@ const MapView = ({classes, record }) => {
                 
                     leafletGeoJSON.eachLayer(layer => 
                         {
-                            console.log("loading feature layer: ", layer)
+                            //console.log("loading feature layer: ", layer)
                             //add layer to the map
                             output = leafletFG.addLayer(layer)
 

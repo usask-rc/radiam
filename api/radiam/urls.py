@@ -35,6 +35,7 @@ router.register(r'datasetsensitivity', views.DatasetSensitivityViewSet)
 router.register(r'distributionrestriction', views.DistributionRestrictionViewSet)
 router.register(r'entities', views.EntityViewSet)
 router.register(r'entityschemafields', views.EntitySchemaFieldViewSet)
+router.register(r'exportrequests', views.ExportRequestViewSet)
 router.register(r'fields', views.FieldViewSet)
 router.register(r'groupmembers', views.GroupMemberViewSet)
 router.register(r'grouproles', views.GroupRoleViewSet)
@@ -75,6 +76,10 @@ router.register(r'datasets/(?P<dataset_id>[-\w]+)/docs',
 router.register(r'datasets/(?P<dataset_id>[-\w]+)/search',
                 views.DatasetSearchViewSet,
                 basename='radiamdatasetsearch')
+
+router.register(r'datasets/(?P<dataset_id>[-\w]+)/export',
+                views.DatasetExportViewSet,
+                basename='radiamdatasetexport')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

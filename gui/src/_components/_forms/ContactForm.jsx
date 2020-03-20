@@ -8,7 +8,7 @@ const styles = {
 }
 handleSubmit = (data) => {
     event.preventDefault();
-    console.log("email, name, message: ", email, name, message)
+    //console.log("email, name, message: ", email, name, message)
 }
 
 const ContactForm = ({ classes }) => {

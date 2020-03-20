@@ -64,7 +64,7 @@ const validatePassword = [required()];
 const validateConfirmPassword = values => {
   const errors = {}
 
-  console.log("validateconfirmpassword values are: ", values)
+  //console.log("validateconfirmpassword values are: ", values)
 
   return errors
 }
@@ -97,7 +97,7 @@ class ResetPassword extends Component {
         completed: false
       });
     }
-    console.log("this props is: ", this.props)
+    //console.log("this props is: ", this.props)
 
   }
   handleChange = name => event => {

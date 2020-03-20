@@ -82,11 +82,11 @@ class Login extends Component {
   }
 
   handleSubmit(data) {
-    const ret = this.login({username: data.username, password: data.password})
+    this.login({username: data.username, password: data.password})
   }
 
   handleSubmitEmail(data){
-    console.log("handlesubmitemail: ", data)
+    //console.log("handlesubmitemail: ", data)
   }
 
 
@@ -122,7 +122,7 @@ class Login extends Component {
 
   login = auth =>{
     const {userLogin, location} = this.props
-    console.log("login props: ", this.props)
+    //console.log("login props: ", this.props)
     return userLogin(
       auth,
       location.state ? location.state.nextPathname : "/"
@@ -130,7 +130,7 @@ class Login extends Component {
   };
 
   render() {
-    const { classes, handleSubmit, loading } = this.props;
+    const { classes, loading } = this.props;
     const { forgotPassword } = this.state
     return (
       <div className={classes.main}>
@@ -170,7 +170,7 @@ const enhance = compose(
     form: "signIn",
     validate: (values, props) => {
       const errors = {};
-      console.log("values, props in rff: ", values, props)
+      //console.log("values, props in rff: ", values, props)
       const { translate } = props;
       if (props.anyTouched){
         if (!values.username) {

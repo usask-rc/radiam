@@ -158,7 +158,7 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
-            console.log("in stablesort, comparing a, b: ", a, b)
+            //console.log("in stablesort, comparing a, b: ", a, b)
             const order = cmp(a[0], b[0]);
             if (order !== 0) return order;
             return a[1] - b[1];
@@ -231,7 +231,7 @@ const RelatedUsersList = ({classes, translate, relatedUsers, ...rest}) => {
                             const groups = userObj.group
                             const isItemSelected = isSelected(user.username)
                             
-                            console.log("userObj being mapped: ", userObj, groups)
+                            //console.log("userObj being mapped: ", userObj, groups)
                             return(
                                 <TableRow key={user.id}
                                 className={classes.projectRow}

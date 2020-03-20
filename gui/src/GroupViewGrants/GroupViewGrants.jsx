@@ -199,7 +199,7 @@ const validateSearchModel = (value) => {
     //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
-    console.log("json parse error e: ", value)
+    console.error("json parse error e: ", value)
     return `Entry is not valid JSON`
   }
 }
@@ -225,12 +225,12 @@ const GroupViewGrantForm = ({translate, classes, ...props}) => {
   }
 
   const handleSubmit=(data) => {
-    console.log("gvg handlesubmit: ", data)
+    //console.log("gvg handlesubmit: ", data)
     data.fields = grantedFields ? grantedFields.join(",") : ""
     props.save(data)
   }
 
-  console.log("props in groupviewgrantform: ", props)
+  //console.log("props in groupviewgrantform: ", props)
   return(
   <SimpleForm {...props} 
     redirect={RESOURCE_OPERATIONS.LIST}

@@ -95,7 +95,6 @@ function getGroupRoles() {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
         return response.json();
       } else {
-        console.log("response from group roles fetch is: ", response);
         throw new Error(response.statusText);
       }
     })
@@ -128,18 +127,15 @@ function getUser(groupRoles) {
 
 function getGroupMemberships(user) {
   const request = getRequest("/groupmembers/?user=" + user.id);
-  console.log("getGroupMemberships firing on user: ", user)
   return fetch(request)
     .then(response => {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
         return response.json();
       } else {
-        console.log("response from group roles fetch is: ", response);
         throw new Error(response.statusText);
       }
     })
     .then(result => {
-      console.log("result from groupmemberships query: ", result)
       var groupMemberships = [];
       var groupAdminships = [];
       var dataManagerships = [];
@@ -171,11 +167,10 @@ function getGroupMemberships(user) {
       user.dataManagerships = dataManagerships
       user.groupUserships = groupUserships
 
-      console.log("prior to set to cookie, user is: ", user)
       localStorage.setItem(ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {
-      console.log("Unable to get memberships", error);
+      console.error("Unable to get memberships", error);
       Promise.reject();
     });
 }
@@ -187,7 +182,6 @@ function getGroups(user) {
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
         return response.json();
       } else {
-        console.log("response from groups fetch is: ", response);
         throw new Error(response.statusText);
       }
     })
@@ -206,35 +200,29 @@ function getGroups(user) {
       localStorage.setItem(ROLE_USER, JSON.stringify(user));
       return Promise.resolve(user);
     }).catch(error => {
-      console.log("Unable to get groups", error);
+      console.error("Unable to get groups", error);
       Promise.reject();
     });
 }
 
 export default (type, params, ...rest) => {
-  console.log("type, params: ", type, params, rest)
   if (type === AUTH_LOGIN) {
 
     return new Promise((resolve, reject) => 
     {
 
     const { username, password } = params;
-    console.log("params are: ", params)
     localStorage.setItem(LOGIN_DETAILS.USERNAME, username);
     const request = new Request(getAPIEndpoint() + "/token/", {
       method: METHODS.POST,
       body: JSON.stringify({ username, password }),
       headers: new Headers({ "Content-Type": "application/json" })
     });
-    console.log("request is: ", request)
     return fetch(request)
       .then(response => {
         if (response.status < 200 || response.status >= 300) {
-          console.log("response statustext is: ", response.statusText);
           throw new Error(response.statusText);
         }
-        console.log("response statustext is: ", response.statusText);
-
         return response.json();
       })
       .then(curTok => {
@@ -248,27 +236,10 @@ export default (type, params, ...rest) => {
       .then(user => getGroups(user)).then(data => resolve(data))
 
       .catch(function (error) {
-        console.log("Error thrown from response is: ", error)
+        console.error("Error thrown from response is: ", error)
         toast.error("Could not log in.  Please ensure your credentials are correct.")
         reject(error)
       })
-      /*
-      .catch(function (error) {
-        console.log("Couldn't get token", error)
-      })
-      .catch(function (error) {
-        console.log("Couldn't get group roles", error)
-      })
-      .catch(function (error) {
-        console.log("Couldn't get user", error)
-      })
-      .catch(function (error) {
-        console.log("Couldn't get group memberships", error)
-      })
-      .catch(function (error) {
-        console.log("Couldn't get groups", error)
-      });
-      */
     })
   }
   if (type === AUTH_LOGOUT) {
@@ -307,10 +278,6 @@ export default (type, params, ...rest) => {
       }
     }
     else{
-
-      //I'm confident that the same thing can be achieved with withRouter from react-router
-      //get the model and ID from the URL and check for user authorization on this page.
-
       return validateToken(JSON.parse(getToken).access)
         .then(() => {
             Promise.resolve()

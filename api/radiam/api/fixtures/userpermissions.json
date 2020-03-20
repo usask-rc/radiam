@@ -162,6 +162,22 @@
 },
 {
     "model": "api.researchgroup",
+    "pk": "75d7597f-8508-46f2-8650-45fde7e9db56",
+    "fields": {
+        "parent_group": null,
+        "name": "Admin Group",
+        "description": "The admin group",
+        "date_created": "2020-01-14T20:26:31.352Z",
+        "date_updated": "2020-02-14T20:29:53.903Z",
+        "is_active": true,
+        "lft": 1,
+        "rght": 10,
+        "tree_id": 2,
+        "level": 0
+    }
+},
+{
+    "model": "api.researchgroup",
     "pk": "13bdaa4d-e200-419a-b8ef-466b1355cb79",
     "fields": {
         "parent_group": null,

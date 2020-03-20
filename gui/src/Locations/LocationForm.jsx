@@ -63,12 +63,12 @@ class LocationForm extends Component {
       showMap: props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false,
     };
 
-    console.log("props record locform: ", props.record)
+    //console.log("props record locform: ", props.record)
     if (props.record && props.record.projects){
       props.record.projects = this.fixProjectList(props.record.projects)
     }
 
-    console.log("props.record.projects in locationform is: ", props.record.projects)
+    //console.log("props.record.projects in locationform is: ", props.record.projects)
   }
 
   componentDidMount() {
@@ -124,7 +124,7 @@ class LocationForm extends Component {
     this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
         .then(data => {
-          console.log("locationform submitobjectwithgeo data: ", data)
+          //console.log("locationform submitobjectwithgeo data: ", data)
 
           this.setState({redirect: "/locations"})
         }).catch(err => {
@@ -136,7 +136,7 @@ class LocationForm extends Component {
 
   handleChange = data => {
     //start marking form as dirty only when the user makes changes.  This property is case sensitive.
-    console.log("handlechange data: ", data)
+    //console.log("handlechange data: ", data)
     if (data && data.timeStamp){
       this.setState({isFormDirty: true})
     }
@@ -147,9 +147,8 @@ class LocationForm extends Component {
   };
 
   mapTextToGeo = event => {
-    console.log('text to geo button pressed');
+    //console.log('text to geo button pressed');
     let parseGeoText;
-
     const { record } = this.props
 
     const { geoText, mapFormKey} = this.state
@@ -174,37 +173,17 @@ class LocationForm extends Component {
       parseGeoText = JSON.parse(JSON.stringify(geoObject));
 
       if (parseGeoText && GJV.valid(geoObject.geojson)){
-        //check for unsupported types - Multi____
-
-        //TODO: the belong code doesn't belong on the text validator, it belongs on the map prior to a display attempt.
-        //1. parse for validity (already done by this point)
-        //2.  send to the map display for processing
-          //a. Update State
-          //b. Modify Key to force a refresh
-          //c. Map Values are now imported.  Scan them for these irregularities.
-        //3.  display alert
-        //4.  check to ensure data still exists in map when exported.
-        /*
-        parseGeoText.geojson.features.map(feature => {
-          const type = feature.geometry.type
-          //TODO:could just do a splice on the first 5 letters honestly
-          if (type === "MultiPolygon" || type === "MultiPoint" || type === "MultiLineString"){
-
-          }
-        })*/
-
-        //TODO: non-feature values should not be in the text form.
         this.setState({ geo: geoObject }, this.setState({mapFormKey: mapFormKey + 1}));
       }
       else{
-        console.log("Invalid geoJSON provided to form - If there's a plugin that identifies the mistake in-page, please insert it here.")
+        console.error("Invalid geoJSON provided to form - If there's a plugin that identifies the mistake in-page, please insert it here.")
         //toastErrors("Invalid JSON given to Text Entry Field")
         alert(`Invalid geoJSON provided.  Check out a site like http://geojsonlint.com/ to find the error.  GeoJSON:${JSON.stringify(parseGeoText.geojson)}`)
       }
 
     } catch (e) {
       toastErrors("Invalid JSON given to Text Entry: ", e)
-      console.log("e in try catch geoObject failure is: ", e)
+      console.error("e in try catch geoObject failure is: ", e)
     }
   };
 
@@ -249,7 +228,7 @@ class LocationForm extends Component {
         <FormDataConsumer>
           {formDataProps => {
 
-            console.log("formDataProps in locform is: ", formDataProps)
+            //console.log("formDataProps in locform is: ", formDataProps)
             
             const {formData} = formDataProps
 
@@ -264,7 +243,7 @@ class LocationForm extends Component {
 
             //somehow still need to translate this shit
             if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
-              console.log("translating projlist into a list: ", projList)
+              //console.log("translating projlist into a list: ", projList)
               const temp = []
               projList.map(item => {
                 temp.push(item.id)
@@ -272,7 +251,7 @@ class LocationForm extends Component {
               })
               projList = temp
             }
-            console.log("projList being rendered: ", projList)
+            //console.log("projList being rendered: ", projList)
               return(<ReferenceArrayInput
                 resource={"projects"}
                 label={"en.models.locations.projects"}

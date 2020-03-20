@@ -59,7 +59,7 @@ def list_difference(list1,list2):
 
 def update_info(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id):
     global logger
-    logger.info("Crawling OSF project %s" % project_name)
+    logger.info("Crawling OSF project {}".format(project_name))
     metadata = list_(osf_token, project_name, agent_id , location_id)
     path_list = [i['path'] for i in metadata]
     config_project_endpoint = AgentAPI.get_project_endpoint(radiam_project_id)
@@ -103,14 +103,17 @@ def main():
             radiam_project_id = osf_project['project_id']
             radiam_tokens["access"] = osf_project['local_access_token']
             radiam_tokens["refresh"] = osf_project['local_refresh_token']
-            agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
-            AgentAPI = RadiamAPI(**agent_config)
-            AgentAPI.setLogger(logger)
-            p = multiprocessing.Process(
-                target=update_info,
-                args=(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id))
-            processes.append(p)
-            p.start()
+            if agent_id and osf_token and location_id and project_name and radiam_project_id:
+                agent_config = {"authtokens": radiam_tokens, "useragent": agent_id, "osf": True}
+                AgentAPI = RadiamAPI(**agent_config)
+                AgentAPI.setLogger(logger)
+                p = multiprocessing.Process(
+                    target=update_info,
+                    args=(osf_token, project_name, AgentAPI, agent_id, location_id, radiam_project_id))
+                processes.append(p)
+                p.start()
+            else:
+                logger.error("OSF agent {} is not properly configured".format(agent_id))
         for process in processes:
             process.join()
         time.sleep(3600)

@@ -1,6 +1,6 @@
 //Toolbar.jsx
 import React from 'react';
-import { Toolbar, SaveButton, DeleteButton } from 'react-admin';
+import { Toolbar, SaveButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
 import { getCurrentUserID } from '../_tools/funcs';
 import { DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';
@@ -14,7 +14,7 @@ const styles = {
 
 //separate entry for deleting users - we don't want users to be able to delete themselves.
 const BaseUserToolbar = ({classes, ...props}) => {
-  console.log("BaseUserToolbar props: ", props)
+  //console.log("BaseUserToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
   const { record } = props.record
   return(
@@ -31,7 +31,7 @@ const BaseUserToolbar = ({classes, ...props}) => {
 
 //for anything with `name` as a field - Groups, Projects, display_name (Locations) title (datasets) 
 const BaseToolbar = ({classes, ...props}) => {
-  console.log("BaseToolbar props: ", props)
+  //console.log("BaseToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
   const { record } = props
   return(
@@ -51,7 +51,7 @@ const BaseToolbar = ({classes, ...props}) => {
 //for anything that is a model of foreign keys with no name/title
 
 const BaseFKToolbar = ({classes, ...props}) => {
-  console.log("FKToolbar props: ", props)
+  //console.log("FKToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
   const { record, id, resource} = props
   return(

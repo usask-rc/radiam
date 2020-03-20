@@ -1,17 +1,12 @@
 import React, { Children, cloneElement } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import classNames from 'classnames';
+//import { useDispatch } from 'react-redux';
 import MuiAppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import MenuIcon from '@material-ui/icons/Menu';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { toggleSidebar } from 'ra-core';
 import HideOnScroll from "./HideOnScroll.tsx"
-import DefaultUserMenu from './RAMenu';
 import { CustomUserMenu } from './RadiamAppBar';
 import RadiamLogo from './RadiamLogo';
 
@@ -65,7 +60,7 @@ const AppBar = ({
     ...rest
 }) => {
     const classes = useStyles({ classes: classesOverride });
-    const dispatch = useDispatch();
+    //const dispatch = useDispatch();
     const isXSmall = useMediaQuery(theme => theme.breakpoints.down('xs'));
 
     return (

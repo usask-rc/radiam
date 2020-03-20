@@ -181,7 +181,7 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
 
 export const LocationDisplay = props => 
   {
-    console.log("LocationDisplay data: ", props)
+    //console.log("LocationDisplay data: ", props)
   return(
   <Show {...props}>
     <SimpleShowLayout>
@@ -213,7 +213,6 @@ export const LocationDisplay = props =>
           </ReferenceField>
         </SingleFieldList>
       </ArrayField>
-
       <GlobusEndpointShow />
       <GlobusPathShow />
       <PortalUrlShow />

@@ -125,7 +125,7 @@ const styles = {
 
     function desc(a, b, orderBy) {
 
-        console.log("in desc, comparison is: ", a[orderBy], b[orderBy], "a, b: ", a, b)
+        //console.log("in desc, comparison is: ", a[orderBy], b[orderBy], "a, b: ", a, b)
 
         let p1 = a[orderBy]
         let p2 = b[orderBy]
@@ -154,7 +154,7 @@ const ProjectList = ({classes, projects}) => {
     function stableSort(array, cmp) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
-            console.log("in stablesort, comparing a, b: ", a, b)
+            //console.log("in stablesort, comparing a, b: ", a, b)
             const order = cmp(a[0], b[0]);
             if (order !== 0) return order;
             return a[1] - b[1];
@@ -265,7 +265,6 @@ const ProjectList = ({classes, projects}) => {
                                     }
                                 </TableCell>
                                 <TableCell className={classes.lastFileCell}>
-                                {console.log("recentFile is: ", project.recentFile)}
                                     {project.recentFile ? 
                                         <Typography className={classes.lastFileCellText}>{project.recentFile.timeAgo}</Typography>
                                         :

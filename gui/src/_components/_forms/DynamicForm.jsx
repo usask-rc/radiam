@@ -2,17 +2,19 @@ import React, { useState } from 'react'
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import RemoveCircleOutline from "@material-ui/icons/RemoveCircleOutline"
 import Button from "@material-ui/core/Button"
-import Divider from "@material-ui/core/Divider"
 import FormControl from "@material-ui/core/FormControl"
 import IconButton from "@material-ui/core/IconButton"
 import TextField from "@material-ui/core/TextField"
 import { withStyles } from "@material-ui/core/styles"
-//a form that can contain an indefinite number of inputs, expanded and contracted with + and -, made to be displayed in a Modal.
 
+//a form that can contain an indefinite number of inputs, expanded and contracted with + and -, made to be displayed in a Modal.
 const styles = {
     featureItem: {
         display: "flex",
         flexDirection: "row",
+    },
+    submitButton: {
+        marginTop: "1em",
     }
   };
 
@@ -53,30 +55,29 @@ const DynamicForm = ({classes, prevProperties, setProperties}) => {
     }
 
     return(
-    <FormControl>
-        <div className={classes.featureItem}>
-            <TextField key="addFeatureField" type="text" onChange={handleFeatureParamChange} value={featureParamLabel} placeholder="eg: Last Visited" />        
-            <IconButton name={"addIconFeatureField"} aria-label="add" onClick={(e) => addLabel(e)}>
-                <AddCircleOutline/>
-            </IconButton>
-        </div>
+        <FormControl>
+            <div className={classes.featureItem}>
+                <TextField key="addFeatureField" type="text" onChange={handleFeatureParamChange} value={featureParamLabel} placeholder="eg: Last Visited" />        
+                <IconButton name={"addIconFeatureField"} aria-label="add" onClick={(e) => addLabel(e)}>
+                    <AddCircleOutline/>
+                </IconButton>
+            </div>
 
-        {featureParams && 
-        Object.keys(featureParams).map(key => {
-            return (
-                    <div className={classes.featureItem} key={key}>
-                        <TextField type="text" label={key} name={key} key={key} defaultValue={featureParams[key]} onChange={handleChange} />
-                        <IconButton name={key} aria-label="remove" onClick={(e) => removeLabel(e, key)}>
-                            <RemoveCircleOutline />
-                        </IconButton>
-                    </div>
-                )
-            })
-        }
-
-        <Divider/>
-        <Button variant="contained" color="primary" onClick={e => setProperties(featureParams)}>Confirm</Button>  
-    </FormControl>)
+            {featureParams && 
+            Object.keys(featureParams).map(key => {
+                return (
+                        <div className={classes.featureItem} key={key}>
+                            <TextField type="text" label={key} name={key} key={key} defaultValue={featureParams[key]} onChange={handleChange} />
+                            <IconButton name={key} aria-label="remove" onClick={(e) => removeLabel(e, key)}>
+                                <RemoveCircleOutline />
+                            </IconButton>
+                        </div>
+                    )
+                })
+            }
+            <Button className={classes.submitButton} variant="contained" color="primary" onClick={() => setProperties(featureParams)}>{`Confirm`}</Button>  
+        </FormControl>
+    )
 };
 
 export default withStyles(styles)(DynamicForm)

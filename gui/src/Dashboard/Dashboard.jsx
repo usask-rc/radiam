@@ -6,7 +6,6 @@ import ProjectsCard from "./ProjectCards/ProjectsCard"
 import WelcomeCards from './Welcome/WelcomeCards';
 import { withStyles } from '@material-ui/styles';
 import WarningCards from './Welcome/WarningCards';
-import {ROLES} from "../_constants/index"
 import RelatedUsersDisplay from './RelatedUsersDisplay';
 
 
@@ -20,13 +19,12 @@ const Dashboard = ({classes, permissions, ...rest}) => {
   const [hasFiles, setHasFiles] = useState(null)
   const [relatedUsers, setRelatedUsers] = useState(null)
   const [recentProjects, setRecentProjects] = useState(null)
-  const user = JSON.parse(localStorage.getItem(ROLES.USER));
 
   useEffect(() => {
 
 
     getRecentProjects().then(data => {
-      console.log("getrecentprojects returned: ", data)
+      //console.log("getrecentprojects returned: ", data)
       setRecentProjects(data.projects)
       setHasFiles(data.hasFiles)
     })
@@ -36,9 +34,9 @@ const Dashboard = ({classes, permissions, ...rest}) => {
 
     getMyGroupIDs().then(myGroups => {
       getUsersInMyGroups(myGroups).then(data => {
-        console.log("getusersinmygroups data: ", data)
+        //console.log("getusersinmygroups data: ", data)
         setRelatedUsers(data)
-      }).catch(err => console.log("users in my groups err: ", err))
+      }).catch(err => console.error("users in my groups err: ", err))
       return myGroups
     })
   }, [])

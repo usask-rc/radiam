@@ -25,14 +25,14 @@ class UserEditForm extends Component {
         super(props);
         this.state = { ...props.record, groupMembers: [], isFormDirty: false, redirect:false, viewModal: false}
 
-        console.log("props in UserEditForm: ", props)
+        //console.log("props in UserEditForm: ", props)
     }
 
     componentDidMount() {
         const { record } = this.props
-        console.log("usereditform cdm state: ", this.state)
+        //console.log("usereditform cdm state: ", this.state)
         getUserGroups(record).then(data => {
-            console.log("user groups are: ", data)
+            //console.log("user groups are: ", data)
             this.setState({groupMembers: data})
             return data
         })
@@ -69,7 +69,7 @@ class UserEditForm extends Component {
                 }
                 throw new Error(response.statusText);
             }).then(data => {
-                console.log("data on return : ", data)
+                //console.log("data on return : ", data)
                 toast.success("User Successfully Updated")
                 if (history){
                     history.push(`/${MODELS.USERS}`)
@@ -97,7 +97,7 @@ class UserEditForm extends Component {
             this.setState({isFormDirty: true})
         }
 
-        console.log("value of e in handlechange is: ", e)
+        //console.log("value of e in handlechange is: ", e)
     };
 
     //strangely, the selects and date need a different change handler.
@@ -178,7 +178,7 @@ class UserEditForm extends Component {
                     onChange={this.handleSelectChange}
                 />
                 {viewModal &&
-                    <Dialog fullWidth open={viewModal} onClose={() => {console.log("dialog close"); this.setState({viewModal:false})}} aria-label="Add User">
+                    <Dialog fullWidth open={viewModal} onClose={() => {this.setState({viewModal:false})}} aria-label="Add User">
                         <DialogContent>
                             <GroupShow id={viewModal.group.id} basePath="/researchgroups" resource="researchgroups" setViewModal={(data) => {this.setState({viewModal: data})}} inModal={true} record={{...viewModal.group}} />
                         </DialogContent>

@@ -30,6 +30,7 @@ import { isAdminOfAParentGroup, postObjectWithoutSaveProp, putObjectWithoutSaveP
 import { Toolbar } from "@material-ui/core";
 import { EditButton } from "ra-ui-materialui/lib/button";
 import { FKToolbar } from "../_components/Toolbar";
+import { groupSelect } from "../_components/_fields/GroupShow";
 
 
 const listStyles = {
@@ -274,13 +275,13 @@ export const GroupMemberForm = props => {
       }
       //accessing in modal form
       else{
-        console.log("data is: ", data, "props are: ", props)
+        //console.log("data is: ", data, "props are: ", props)
         
 
         //if data previously existed, PUT instead
         if (data.id){
           putObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
-            console.log("data after updating groupmember: ", data)
+            //console.log("data after updating groupmember: ", data)
             if (props.setEditModal){
               if (_isMounted){
                 props.setEditModal(false)
@@ -290,7 +291,7 @@ export const GroupMemberForm = props => {
         }
         else{
           postObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
-            console.log("data after posting new groupmember: ", data)
+            //console.log("data after posting new groupmember: ", data)
             if (props.setCreateModal){
               if (_isMounted){
                 props.setCreateModal(false)
@@ -307,7 +308,7 @@ export const GroupMemberForm = props => {
   }, [data, props])
 
   function handleSubmit(formData) {
-    console.log("handleSubmit in groupmembers is submitting formData: ", formData)
+    //console.log("handleSubmit in groupmembers is submitting formData: ", formData)
     setIsFormDirty(false)
     setData(formData)
   }
@@ -315,7 +316,7 @@ export const GroupMemberForm = props => {
   function handleChange(data){
     setIsFormDirty(true)
   }
-  console.log("groupmemberform props: ", props)
+  //console.log("groupmemberform props: ", props)
   //given some chosen group, we only want to be able to add users who are not already members of said group in some form
   //if the primary way we're going to be accessing this form is via Groups, we already have this data for Create.
   return(
@@ -345,11 +346,11 @@ export const GroupMemberForm = props => {
       source={MODEL_FK_FIELDS.GROUP}
       reference={MODELS.GROUPS}
       resource={MODELS.GROUPS}
-      defaultValue={props.group ? props.group : null}
+      defaultValue={props.record && props.record.group ? props.record.group : null}
       disabled={((props.record && props.record.group) || props.group) ? true : false}
       validate={validateGroup}
     >
-      <SelectInput optionText={MODEL_FIELDS.NAME} />
+      <SelectInput optionText={groupSelect} />
     </ReferenceInput>
     <ReferenceInput
       label={"en.models.groupmembers.role"}

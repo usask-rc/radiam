@@ -35,6 +35,8 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
 
             //truncate unreasonably long dataset names - these will usually be caused by auto creation via browse
             let displayTitle = truncatePath(dataset.title)
+
+            //console.log("displayTitle is: ", displayTitle)
             
             return( //TODO: display number of files in each dataset in the chip
               <Tooltip title={dataset.title}>
@@ -49,10 +51,10 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
                     const dcmList = []
                     const slList = []
 
-                    dataset.data_collection_method.map(item => {
+                    dataset.data_collection_method.forEach(item => {
                       dcmList.push(item.id)
                     })
-                    dataset.sensitivity_level.map(item => {
+                    dataset.sensitivity_level.forEach(item => {
                       slList.push(item.id)
                     })
 
