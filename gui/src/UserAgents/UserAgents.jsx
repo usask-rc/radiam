@@ -347,9 +347,9 @@ export const UserAgentEdit = props => {
                         label={"en.models.agents.projects"}
                         source={MODEL_FK_FIELDS.PROJECT}
                         reference={MODELS.PROJECTS}>
-                          <SelectInput optionText={MODEL_FIELDS.NAME} disabled/>
+                          <SelectInput optionText={MODEL_FIELDS.NAME}/>
                         </ReferenceInput>
-                        {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir" disabled/>}
+                        {record.project_config_list && record.project_config_list.length > 0 && record.project_config_list[0] && record.project_config_list[0].config && <TextInput source="config.rootdir"/>}
                       </SimpleFormIterator>
                     </ArrayInput>
                   </>)
@@ -365,7 +365,7 @@ export const UserAgentEdit = props => {
         
         <Grid container direction="row">
           <Grid item xs={12}>
-            <TextInput disabled source="version" label={"en.models.agents.version"} validate={validateVersion} />
+            <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
           </Grid>
         </Grid>
       </SimpleForm>
