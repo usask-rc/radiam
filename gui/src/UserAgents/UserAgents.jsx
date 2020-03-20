@@ -363,6 +363,15 @@ export const UserAgentEdit = props => {
           }
         </FormDataConsumer>
         
+        <TextInput
+          label={"en.models.agents.remote_api_username"}
+          source={"remote_api_username"}
+        />
+        <TextInput
+          label={"en.models.agents.remote_api_token"}
+          source={"remote_api_token"}
+        />
+        
         <Grid container direction="row">
           <Grid item xs={12}>
             <TextInput source="version" label={"en.models.agents.version"} validate={validateVersion} />
