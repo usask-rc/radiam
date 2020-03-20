@@ -328,7 +328,7 @@ const App = props => {
             list={UserAgentList}
             show={UserAgentShow}
             create={UserAgentCreate}
-            edit={permissions.is_admin || permissions.is_group_admin ? UserAgentEdit : null} //users can only edit if they can also delete.
+            edit={UserAgentEdit} //update: all users can now edit agent configs
           />,
 
           <Resource name={MODELS.PROJECTDATACOLLECTIONMETHOD} />,
