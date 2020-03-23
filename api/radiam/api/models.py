@@ -259,7 +259,7 @@ def send_password_reset_email(sender, reset_password_token, *args, **kwargs):
             send_mail(password_reset_subj,
                       render_to_string('password_reset_email.txt',
                                        context=context,),
-                      'noreply@radiam.ca',
+                      settings.FROM_EMAIL,
                       email_addresses,
                       html_message=render_to_string('password_reset_email.html',
                                                     context=context)
@@ -309,7 +309,7 @@ def send_user_welcome_email(sender, user, reset_password_token, *args, **kwargs)
             send_mail(user_welcome_subj,
                       render_to_string('user_welcome_email.txt',
                                        context=context, ),
-                      'noreply@radiam.ca',
+                      settings.FROM_EMAIL,
                       email_addresses,
                       html_message=render_to_string('user_welcome_email.html',
                                                     context=context)
@@ -348,7 +348,7 @@ def send_user_update_email(sender, email, username, first_name, *args, **kwargs)
             send_mail(user_update_subj,
                       render_to_string('notify_user_update_email.txt',
                                        context=context, ),
-                      'noreply@radiam.ca',
+                      settings.FROM_EMAIL,
                       email_addresses,
                       html_message=render_to_string('notify_user_update_email.html',
                                                     context=context)
