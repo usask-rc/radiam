@@ -1,6 +1,6 @@
-# radiam-hubzero
+# Radiam HubZero Agent
 
-Radiam component, module and plugin for HubZero
+The Radiam component, module and plugin on HubZero are designed for harvesting metadata from the HubZero Platform.
 
 ## Installation
 
@@ -30,23 +30,38 @@ php muse migration -f
 
 ## Configuration
 
-### Component Configuration
+There are two types of roles for a HubZero instance, registered user and administrator. The site pages for them are shown below, respectively.
+![Radiam Projects](hubzero_images/hubzero-site.png)
+![Radiam Projects](hubzero_images/hubzero-admin.png)
 
-The component is installed and available to administrators after running the migration above.  
+The Radiam HubZero Agent runs on the HubZero Platform, therefore it is configured from the HubZero admin interface. 
+
+### Administrators Configure Radiam Component
+
+A component called Radiam has been developed to link HubZero projects to Radiam projects and send data to Radiam Server. A component is the largest and most complex of the HubZero extension types. You can think of a component as something that has its own functionality, its own database tables and its own presentation. The component is installed and available to administrators after running the migration above.  
 
 - Log into your HubZero administration section
 - Click on the menu for Components and find Radiam in the list and click on it
-- Edit the `radiam_host_url` setting to match where your Radiam instance is
-- After the regular HubZero user log into the Radiam on HubZero, add new project to associate a Radiam project and a HubZero project
+- Edit the `radiam_host_url` setting to match where your Radiam instance is  
+  - It should use https and be in this format: https://radiam.somewhere.edu/
+  - If it is running on a non-standard port, then include the port: https://radiam.somwehere.edu:8100/
+  - For now, only `radiam_host_url` has to be set up manually
 
-### Module Configuration
+![Radiam Projects](hubzero_images/hubzero-admin-component-radiam.png)
 
-The module is installed but not available until you create an instance of it. There is an installed instance of the module. Administrator can publish it to make it available for endusers. 
+
+### Administrators Configure Radiam Module
+
+Modules are lightweight and flexible extensions used for page rendering. A module type named mod_radiam has been developed so that the end user can add an “box“ to the end user dashboard, displaying Radiam projects.
+
+The module is installed but not available until you create an instance of it. To make administrators' life easier, a default Radiam module instance is created when installing radiam on HubZero. Administrator can publish it to make it available for end users to install. 
 
 - Log into your HubZero administration section
 - Click on the menu Extensions -> Module Manager
-- Select "mod_radiam" for the Type
+- Select `mod_radiam` for the Type
 - Click the check mark to publish the module instance
+
+![Radiam Projects](hubzero_images/hubzero-admin-module-radiam.png)
 
 Administrator is free to edit the default Radiam module instance or delete it and create a new one. 
 
@@ -59,10 +74,38 @@ Administrator is free to edit the default Radiam module instance or delete it an
     - Position = memberDashboard
     - Status = published
     - Access = public
+  
+Now the end user can add this Radiam Module to his dashboard. 
+![Radiam Projects](hubzero_images/hubzero-site-add-module.png)
+![Radiam Projects](hubzero_images/hubzero-site-install-module-radiam.png)
+
+### Regular Users Log into Radiam Server
+
+With the `radiam_host_url` set up by the administrator, regular users
+- Click the `Radiam Login` Button in the Radiam Module on the Dashboard
+- Log into the Radiam Sever with Radiam username and password
+![Radiam Projects](hubzero_images/hubzero-site-module-radiam.png)
+![Radiam Projects](hubzero_images/hubzero-site-radiam-login.png)
+
+Once the user logs into the Radiam successfully, a token is created for this user. This token is required to send data to the Radiam API.
+
+### Regular Users Create HubZero Porjects
+![Radiam Projects](hubzero_images/hubzero-site-create-project.png)
+
+### Administrators Configure Radiam Component
+Now the administrator is ready to finish up the configuration under “Projects“ on the Radiam Component page. 
+- Log into your HubZero administration section
+- Click on the menu for Components and find Radiam in the list and click on it
+- Edit the example project or add a new one
+  - Select a HubZero project among all active projects from a dropdown list 
+  - Select a Radiam project among all available projects under the login Radaim user from a dropdown list
+
+![Radiam Projects](hubzero_images/hubzero-admin-component-radiam-projects.png)
+
 
 ### Plugin Configuration
 
-There two radiam plugins installed, one for the cron type and one for the projects type. The plugins are installed and available to administrators after running the migration above. The projects/radiam plugin is used to monitor file system events. The cron/radiam plugsin is used to create a cron job to send metadata to the radiam server periodically. 
+There are two radiam plugins installed, one for the cron type and one for the projects type. The plugins are installed and available to administrators after running the migration above. The projects/radiam plugin is used to monitor file system events. The cron/radiam plugsin is used to create a cron job to send metadata to the radiam server periodically. 
 
 There is nothing to configure for the radiam plugin of the projects type.
 
@@ -73,12 +116,14 @@ For the radiam plugin of the cron type,
 - Edit the `Post data to Radiam API` cron job to meet your needs 
 - Publish the `Post data to Radiam API` cron job to start running the Radiam Agent on HubZero
 
+![Radiam Projects](hubzero_images/hubzero-admin-component-cron.png)
+
+
 ## Viewing
 
-As a regular HubZero user, navigate to your dashboard.  Add the Radiam module in your dashboard.
-
-- Click on the Radiam Login button
-- Log into Radiam with Radiam username and password
+As a regular HubZero user, navigate to your dashboard. Radiam projects under the radiam username are shown in the Radiam Module. By clicking on a radiam project, files in this radiam project are listed in a new page. 
+![Radiam Projects](hubzero_images/hubzero-site-module-radiam-projects.png)
+![Radiam Projects](hubzero_images/hubzero-site-radiam-display.png)
 
 ## Removal
 

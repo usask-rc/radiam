@@ -47,7 +47,7 @@ class LocationLinkout extends Component {
 
   render() {
     if (!this.state.data) { return null }
-    if (this.state.data.globus_endpoint !== "") {
+    if (this.state.data.globus_endpoint !== null && this.state.data.globus_endpoint !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.globus_link_label')}:</Typography>
@@ -57,17 +57,17 @@ class LocationLinkout extends Component {
             {`${this.state.data.globus_endpoint}`}
         </Typography></div>
       );
-    } else if (this.state.data.osf_project !== "") {
+    } else if (this.state.data.osf_project !== null && this.state.data.osf_project !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.osf_link_label')}:</Typography>
         <Typography component="a" className={this.classes.locationLinkDisplay}
           href={`${LINKS.OSFWEBAPP}/${this.state.data.osf_project}/`} 
           target="_blank" rel="noopener noreferrer">
-            {`${this.state.data.globus_endpoint}`}
+            {`${this.state.data.osf_project}`}
         </Typography></div>
       );
-    }else if (this.state.data.portal_url !== "") {
+    }else if (this.state.data.portal_url !== null && this.state.data.portal_url !== "") {
       return (
         <div className={this.classes.locationDisplay}>
         <Typography className={this.classes.locationLinkDisplay}>{this.translate('en.models.locations.portal_link_label')}:</Typography>
