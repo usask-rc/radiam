@@ -25,7 +25,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes, truncatePath, getAllProjectData } from '../../_tools/funcs';
 import FileDetails from './FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
@@ -227,7 +227,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be ".."
+  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be "."
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -361,7 +361,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".." //root is `..`
+      folderPath = "." //root is `.`
     }
 
     if (search && search.length > 0){
@@ -382,7 +382,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        // eslint-disable-next-line
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           if (_isMounted){
             if (type === "file"){
@@ -436,7 +435,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   useEffect(() => {
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".."
+      folderPath = "."
     }
     
     // eslint-disable-next-line react-hooks/exhaustive-deps

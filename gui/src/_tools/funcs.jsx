@@ -263,13 +263,13 @@ export function getFirstCoordinate(layer) {
   return false
 }
 
-
 //given a parent path in a project, find all files in that directory.
 export function getFolderFiles(
   params,
   type,
   dataType="projects",
 ) {
+
   const queryParams = {
     filter: { path_parent: params.folderPath, type:type, location:params.location },
     pagination: { page: params.page, perPage: params.numFiles },
@@ -277,7 +277,7 @@ export function getFolderFiles(
     q: params.q,
   };
 
-  //console.log("queryParams in getfolderfiles: ", queryParams)
+  console.log("queryParams in getfolderfiles: ", queryParams)
 
   return new Promise((resolve, reject) => {
     dataProvider(
@@ -288,7 +288,7 @@ export function getFolderFiles(
       .then(response => {
         let fileList = [];
 
-        //console.log("getfolderfiles files: ", response.data)
+        console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -339,19 +339,18 @@ export function findRootPath(projectID, location=null, path=null, dataType="proj
   })
 }
 
-//assumption: "path_parent" of all locations is ".." with the current agent as of 03/18/2020
+//assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
 export function getRootPaths(projectID, dataType="projects") {
 
   return new Promise((resolve, reject) => {
    
     const params = {
       pagination: {page: 1, perPage: 1000},
-      sort: {field: dataType, order: ""},
       filter: { project: projectID },
     }
 
     dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      //console.log("getlist of locationprojects response: ", response)
+      console.log("getlist of locationprojects response: ", response)
       //Filter possible duplicates using a set
 
       let locationSet = new Set()
@@ -362,12 +361,13 @@ export function getRootPaths(projectID, dataType="projects") {
       return locationSet
     }).then(locations => {
       return locations.map(location => {
-        return {location: location, path_parent: "..", locationpromise: getLocationData(location)}
+        return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
       })
     }).then(data => resolve(data))
   });
 }
 
+//a test func to get all files
 export function getAllProjectData(projectID){
   const params = {
     pagination: { page: 1, perPage: 10000 },

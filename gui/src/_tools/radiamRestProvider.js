@@ -34,7 +34,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case "DOWNLOAD": {
         url = `${apiUrl}/exportrequests/${params.id}/download/`
         window.open(url)
-        console.log("download request url: ", url)
         break;
       }
       
@@ -106,8 +105,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
-
-        //console.log("params sent to get_list are: ", params, url)
+        console.log("params sent to get_list are: ", params, url)
 
 
         if (params)
