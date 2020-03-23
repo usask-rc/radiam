@@ -13,7 +13,29 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
   return `https://dev2.radiam.ca/api`
-  return `/${API_ENDPOINT}`;
+  //return `/${API_ENDPOINT}`;
+}
+
+//for some datawset key, return a generated export value
+export function getExportKey(id, type){
+  return new Promise((resolve, reject) => {
+    const params = {id: id}
+    dataProvider("EXPORT", type, params).then(data => {
+      console.log("ret from export call is: ", data)
+      resolve(data)
+    }).catch(err => reject(err))
+  })
+}
+
+export function requestDownload(data){
+  console.log("requestdownload data: ", data)
+  return new Promise((resolve, reject) => {
+    const params={id: data}
+    dataProvider("DOWNLOAD", "", params).then(data => {
+      console.log("ret from download call is: ", data)
+      resolve(data)
+    }).catch(err => reject(err))
+  })
 }
 
 //there are various pages across the app that use this to have their edit button gated off.

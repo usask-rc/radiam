@@ -25,6 +25,18 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
     //console.log("data request is: ", type, resource, params)
     switch (type) {
+
+      //for batch export of data
+      case "EXPORT": {
+        url = `${apiUrl}/${resource}/${params.id}/export/`
+        break;
+      }
+      case "DOWNLOAD": {
+        url = `${apiUrl}/exportrequests/${params.id}/download/`
+        window.open(url)
+        console.log("download request url: ", url)
+        break;
+      }
       
       //for getting all files in a project/dataset and filtering said files
       case "GET_FILES": {
@@ -304,6 +316,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return { data: json };
       }
 
+      case "EXPORT":
+        return {
+          data: json //NOTE: api is set to return it as just a single result instead of in `json.results`.
+        }
+      case "DOWNLOAD":
+        console.log("DOWNLOAD json: ", json)
+        return{
+          data: json
+        } //hoping this works?
       case "GET_FILES":
 
         json.results = translateResource(resource, json.results);
