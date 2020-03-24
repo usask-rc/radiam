@@ -320,26 +320,6 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
-//this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
-export function getRootPaths_old(projectID, dataType="projects" ){
-
-  //first, try to see if we can operate with base assumption of path_parent == "."
-
-  return new Promise((resolve, reject) => {
-    
-    const params = {
-      pagination: {page: 1, perPage: 1},
-      sort: {field: "path_parent.keyword", order: "DESC"},
-      filter: { path_parent: "."}
-    }
-
-    dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
-      console.log("projectfiles returned in getrootpaths_old: ", projectFiles)
-      resolve(projectFiles.data)
-    }).catch(err => reject(err))
-  })
-}
-
 //assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
 export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
