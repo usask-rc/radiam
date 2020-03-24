@@ -182,3 +182,14 @@ cd /var/www/hubname/app/plugins
 rm -rf cron
 rm -rf projects
 ```
+
+## Troubleshooting
+### Link Projects after Agent Created
+As mentioned in the Component Configuration session, only `radiam_host_url` is required to configure by the administrator for now. Three more configuration values will be created automatically the first time the Cron job runs. They will be displayed on the Configuration page of the Radiam Component. Please do not touch these configuration values. 
+![Radiam Component Configuration](hubzero_images/hubzero-admin-component-radiam-configs.png)
+
+Useragent and location are linked to configured Radiam projects when they are created on the Radiam server. Therefore, if administrators link new projects after useragent and location created, Radiam server knows nothing about it. In this case, you should go into Radiam and add that additional project to the HubZero location. 
+![Update Location on Radiam](hubzero_images/radiam-add-locationproject.png)
+
+### Existed Files Not Indexed after Linking to Radiam Project
+Go to the Radiam Component page, delete the linking of that project and add it again. 
