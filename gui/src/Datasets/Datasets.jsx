@@ -113,10 +113,10 @@ const actionStyles = theme => ({
     console.log("exportdataset id: ", id)
       getExportKey(id, MODELS.DATASETS).then(data => {
         console.log("exportdataset data: ", data)
+        requestDownload(data).then(response => {
+          console.log("response from requestdownload is: ", response)
+        })
         return data
-      }).then(data => {
-        setExportLink(`${getAPIEndpoint()}/exportrequests/${data.data}/download/`)
-      return data
       })
   }
 

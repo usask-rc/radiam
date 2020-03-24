@@ -12,6 +12,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
+  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -29,10 +30,23 @@ export function getExportKey(id, type){
 export function requestDownload(data){
   console.log("requestdownload data: ", data)
   return new Promise((resolve, reject) => {
-    const params={id: data}
-    dataProvider("DOWNLOAD", "", params).then(data => {
-      console.log("ret from download call is: ", data)
-      resolve(data)
+    const params={id: data.data}
+    dataProvider("DOWNLOAD", "", params).then(response => {
+      console.log("response from download call is: ", response)
+      return new Blob([response.data.body])
+    }).then(blob => {
+      console.log("response blob is: ", blob)
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sample.zip`);
+      // 3. Append to html page
+      document.body.appendChild(link);
+      // 4. Force download
+      link.click();
+      // 5. Clean up and remove the link
+      link.parentNode.removeChild(link);
     }).catch(err => reject(err))
   })
 }
