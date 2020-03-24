@@ -355,11 +355,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
   }
 
   useEffect(() => {
-    
-    getAllProjectData(datasetID, "datasets").then(data => {
-      console.log("project data for projectid: ", projectID, "is: ", data)
-    })
-    
     //search the given project with the appropriate location and search param
 
     //folderpath is probably irrelevant
@@ -368,7 +363,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
 
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = "." //root is `.`
+      folderPath = parents[0].path_parent
     }
 
     if (search && search.length > 0){
@@ -442,7 +437,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
   useEffect(() => {
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = "."
+      folderPath = parents[0].path_parent
     }
     
     // eslint-disable-next-line react-hooks/exhaustive-deps

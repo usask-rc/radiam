@@ -107,7 +107,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         url = `${apiUrl}/${resource}/`;
         console.log("params sent to get_list are: ", params, url)
 
-
         if (params)
         {
           let query = {};
