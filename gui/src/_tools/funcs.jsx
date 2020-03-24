@@ -320,8 +320,6 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
-<<<<<<< HEAD
-=======
 //this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
 export function getRootPaths_old(projectID, dataType="projects" ){
 
@@ -360,7 +358,6 @@ export function getRootPaths_old(projectID, dataType="projects" ){
   })
 }
 
->>>>>>> ADM-2260_styling_and_bugfixes
 //assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
 export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
