@@ -221,8 +221,10 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
+function FolderView({ projectID, datasetID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
+
+  console.log("FolderView item: ", item)
 
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
@@ -249,7 +251,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
-    if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
+    if (user && (user.is_admin || (groupID && user.groupAdminships.includes(groupID)))){
       return true
     }
     return false
@@ -353,6 +355,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   }
 
   useEffect(() => {
+    
+    getAllProjectData(datasetID, "datasets").then(data => {
+      console.log("project data for projectid: ", projectID, "is: ", data)
+    })
+    
     //search the given project with the appropriate location and search param
 
     //folderpath is probably irrelevant
@@ -367,7 +374,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     if (search && search.length > 0){
       let fileParams = {
         folderPath: folderPath,
-        projectID: projectID,
+        projectID: datasetID ? datasetID : projectID,
         numFiles: perPage, 
         page: filePage,
         order: order === "desc" ? "-" : "",
@@ -443,7 +450,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let fileParams = {
       folderPath: folderPath,
-      projectID: projectID,
+      projectID: datasetID ? datasetID : projectID,
       numFiles: perPage,  
       page: filePage,
       sortBy: sortBy,
@@ -581,7 +588,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
-                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`, location: projectLocation}}}}>
                   <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>

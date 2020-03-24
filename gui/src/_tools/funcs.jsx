@@ -340,41 +340,42 @@ export function findRootPath(projectID, location=null, path=null, dataType="proj
 }
 
 //assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
-export function getRootPaths(projectID, dataType="projects") {
+export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
-  return new Promise((resolve, reject) => {
-   
-    const params = {
-      pagination: {page: 1, perPage: 1000},
-      filter: { project: projectID },
-    }
+    return new Promise((resolve, reject) => {
+    
+      const params = {
+        pagination: {page: 1, perPage: 1000},
+        filter: { project: projectID },
+      }
 
-    dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      console.log("getlist of locationprojects response: ", response)
-      //Filter possible duplicates using a set
+      dataProvider(GET_LIST, "locationprojects", params).then(response => {
+        console.log("getlist of locationprojects response: ", response)
+        //Filter possible duplicates using a set
 
-      let locationSet = new Set()
-      response.data.forEach(locationproject => {
-        locationSet.add(locationproject.location)
-      })
-      locationSet = [...locationSet]
-      return locationSet
-    }).then(locations => {
-      return locations.map(location => {
-        return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
-      })
-    }).then(data => resolve(data))
+        let locationSet = new Set()
+        response.data.forEach(locationproject => {
+          locationSet.add(locationproject.location)
+        })
+        locationSet = [...locationSet]
+        return locationSet
+      }).then(locations => {
+        //if (dataType === "projects"){
+        return locations.map(location => {
+          return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
+        })
+      }).then(data => resolve(data))
   });
 }
 
 //a test func to get all files
-export function getAllProjectData(projectID){
+export function getAllProjectData(projectID, type){
   const params = {
     pagination: { page: 1, perPage: 10000 },
     type: "file"
   }
   return new Promise((resolve, reject) => {
-    dataProvider("GET_FILES", "projects/" + projectID, params).then(response => {
+    dataProvider("GET_FILES", `${type}/` + projectID, params).then(response => {
       console.log("response from getallprojectdata is: ", response)
       resolve(response.data)
     })

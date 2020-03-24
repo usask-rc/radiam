@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate, ReferenceField } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths } from '../../_tools/funcs';
+import { getRootPaths, getLocationData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
@@ -83,7 +83,7 @@ class LocationLinkout extends Component {
   }
 }
 
-function BrowseTab({ projectID, classes, translate, dataType="projects", projectName, ...props }) {
+function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
@@ -91,17 +91,35 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
     let _isMounted = true
     setStatus({loading: true})
 
-    getRootPaths(projectID, dataType).then(data => {
-        if (_isMounted){ 
-          console.log("getrootpaths in browsetab retrieves data: ", data)
+    if (dataType === "projects" || (dataType === "datasets" && Object.keys(searchModel) === 0)){
+      getRootPaths(projectID, dataType, searchModel).then(data => {
+          if (_isMounted){ 
+            console.log("getrootpaths in browsetab retrieves data: ", data)
 
-          setListOfRootPaths(data)
-          setStatus({loading: false, error: false})
-        }
-        return data
-    }).catch(err => {
-      setStatus({ loading: false, error: err })
-    })
+            setListOfRootPaths(data)
+            setStatus({loading: false, error: false})
+          }
+          return data
+      }).catch(err => {
+        setStatus({ loading: false, error: err })
+      })
+    }
+    else if (dataType === "datasets"){
+      //TODO: This assumes that any dataset created matches a specific location/wildcard setup.
+      //dataset search model should include both location and root path.
+      //return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
+      //
+      console.log("searchModel in browsetab is: ", searchModel)
+      //create our dummy item for our dataset
+      const datasetRootPath = {
+        location: searchModel.search.bool.must.match.location,
+        path_parent: searchModel.search.bool.wildcard.path_parent.slice(0, -1),
+        locationpromise: getLocationData(searchModel.search.bool.must.match.location)
+      }
+      setListOfRootPaths([datasetRootPath])
+      setStatus({loading: false, error: false})
+
+    }
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
@@ -144,10 +162,11 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
             item={item}
             projectName={projectName}
             projectID={projectID}
+            datasetID={datasetID}
             key={`${item.location}_folderView`}
             dataType={dataType}
             projectLocation={item.location}
-            groupID={props.record.group || null}
+            groupID={props.record ? props.record.group : null}
           />
           </div>)
         }
