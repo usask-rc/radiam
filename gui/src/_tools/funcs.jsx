@@ -12,8 +12,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
-  //return `/${API_ENDPOINT}`;
+  return `/${API_ENDPOINT}`;
 }
 
 //for some datawset key, return a generated export value
@@ -321,60 +320,63 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
-//given a project and a location, find the root directory.
-export function findRootPath(projectID, location=null, path=null, dataType="projects" ){
+//this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
+export function getRootPaths_old(projectID, dataType="projects" ){
+
+  //first, try to see if we can operate with base assumption of path_parent == "."
 
   return new Promise((resolve, reject) => {
     
     const params = {
       pagination: {page: 1, perPage: 1},
       sort: {field: "path_parent.keyword", order: "DESC"},
-      filter: { location: location, path_parent: path}
+      filter: { path_parent: "."}
     }
 
     dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
-      //console.log("files in path, location, ", path, location, "are: ", projectFiles)
+      console.log("projectfiles returned in getrootpaths_old: ", projectFiles)
       resolve(projectFiles.data)
     }).catch(err => reject(err))
   })
 }
 
 //assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
-export function getRootPaths(projectID, dataType="projects") {
+export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
-  return new Promise((resolve, reject) => {
-   
-    const params = {
-      pagination: {page: 1, perPage: 1000},
-      filter: { project: projectID },
-    }
+    return new Promise((resolve, reject) => {
+    
+      const params = {
+        pagination: {page: 1, perPage: 1000},
+        filter: { project: projectID },
+      }
 
-    dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      console.log("getlist of locationprojects response: ", response)
-      //Filter possible duplicates using a set
+      dataProvider(GET_LIST, "locationprojects", params).then(response => {
+        console.log("getlist of locationprojects response: ", response)
+        //Filter possible duplicates using a set
 
-      let locationSet = new Set()
-      response.data.forEach(locationproject => {
-        locationSet.add(locationproject.location)
-      })
-      locationSet = [...locationSet]
-      return locationSet
-    }).then(locations => {
-      return locations.map(location => {
-        return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
-      })
-    }).then(data => resolve(data))
+        let locationSet = new Set()
+        response.data.forEach(locationproject => {
+          locationSet.add(locationproject.location)
+        })
+        locationSet = [...locationSet]
+        return locationSet
+      }).then(locations => {
+        //if (dataType === "projects"){
+        return locations.map(location => {
+          return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
+        })
+      }).then(data => resolve(data))
   });
 }
 
 //a test func to get all files
-export function getAllProjectData(projectID){
+export function getAllProjectData(projectID, type){
   const params = {
     pagination: { page: 1, perPage: 10000 },
     type: "file"
   }
   return new Promise((resolve, reject) => {
-    dataProvider("GET_FILES", "projects/" + projectID, params).then(response => {
+    dataProvider("GET_FILES", `${type}/` + projectID, params).then(response => {
       console.log("response from getallprojectdata is: ", response)
       resolve(response.data)
     })
