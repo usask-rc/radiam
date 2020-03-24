@@ -143,6 +143,7 @@ from django.http import HttpResponse
 
 from io import BytesIO
 from zipfile import ZipFile
+import hashlib
 from itertools import chain
 # end
 
@@ -935,18 +936,43 @@ class ExportRequestViewSet(RadiamViewSet):
     def download(self, request, pk=None):
         export = ExportRequest.objects.get(id=pk)
         if export.status == 'In progress' or export.status == 'Complete':
-
-            #TODO Bagit then zip
-            # Download cached file data instead of generating new file each time
+            # Fetch data from tables
             dataset = Dataset.objects.get(id=export.export_reference)
-            content = "project_name = " + str(dataset.project.name)
-            filename = str(dataset.project.name) + "_dataset_export.txt"
+
             zipfilename = str(dataset.project.id) + "_radiam_download.zip"
 
             in_memory = BytesIO()
             zip = ZipFile(in_memory, "a")
 
-            zip.writestr(filename, content)
+            # BagIt format
+            # Bag Declaration
+            bagit_name = "bagit.txt"
+            bagit_content = "BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8"
+            zip.writestr(bagit_name, bagit_content)
+            # Bag Metadata
+            bagmeta_name = "bag-info.txt"
+            bagmeta_content = "External-Description: Radiam project and dataset metadata"
+            zip.writestr(bagmeta_name, bagmeta_content)
+
+            # Payload Directory
+            # TODO for every separated piece of metadata: add to data folder w/contents, add to manifest file w/ checksum, write to zipfile
+            data_name = "data/metadata.txt"
+            data_content = "project_name = " + str(dataset.project.name)
+            zip.writestr(data_name, data_content)
+            # Payload Manifest
+            manifest_name = "manifest-sha256.txt"
+            checksum = hashlib.sha256(data_content.encode('utf-8')).hexdigest()
+            manifest_content = checksum + " " + data_name
+            ##
+
+
+            zip.writestr(manifest_name, manifest_content)
+            # Tag Manifest
+            tagman_name = "tagmanifest-sha256.txt"
+            tagman_content = hashlib.sha256(bagit_content.encode('utf-8')).hexdigest() + " " + bagit_name + "\n" \
+                        + hashlib.sha256(bagmeta_content.encode('utf-8')).hexdigest() + " " + bagmeta_name + "\n" \
+                        + hashlib.sha256(manifest_content.encode('utf-8')).hexdigest() + " " + manifest_name
+            zip.writestr(tagman_name, tagman_content)
 
             # read in Windows
             for file in zip.filelist:
