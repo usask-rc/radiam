@@ -93,7 +93,7 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
 
     getRootPaths(projectID, dataType).then(data => {
         if (_isMounted){ 
-          //console.log("getrootpaths in browsetab retrieves data: ", data)
+          console.log("getrootpaths in browsetab retrieves data: ", data)
 
           setListOfRootPaths(data)
           setStatus({loading: false, error: false})

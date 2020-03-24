@@ -25,9 +25,20 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
     //console.log("data request is: ", type, resource, params)
     switch (type) {
+
+      //for batch export of data
+      case "EXPORT": {
+        url = `${apiUrl}/${resource}/${params.id}/export/`
+        break;
+      }
+      case "DOWNLOAD": {
+        url = `${apiUrl}/exportrequests/${params.id}/download/`
+        window.open(url)
+        break;
+      }
       
       //for getting all files in a project/dataset and filtering said files
-      case "GET_FILES": {//TODO: parameters should now be handled in the body rather than the url.
+      case "GET_FILES": {
         //if parameter 'q' exists, our folder search should be an 'includes' rather than a 'matches'.
         let {page, perPage} = params.pagination
         url = `${apiUrl}/${resource}/${PATHS.SEARCH}/`
@@ -78,13 +89,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           }] 
           query.query.bool.minimum_should_match = 1
         }
-
-        //TODO: ordering and pagination do not yet exist satisfactorily (everything is a single page dump)
         options.body = JSON.stringify(query);
 
-        //console.log("stringified query: ", options.body)
-
-        //TODO: sort and pagination will likely move to the POST body eventually.  For now, these controls exist in the URL.
         if (params.sort && params.sort.field && params.sort.field.length > 0){
           let sortOrder = ""
           if (params.sort.order){
@@ -99,8 +105,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
-
-        //console.log("params sent to get_list are: ", params, url)
+        console.log("params sent to get_list are: ", params, url)
 
 
         if (params)
@@ -309,6 +314,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         return { data: json };
       }
 
+      case "EXPORT":
+        return {
+          data: json //NOTE: api is set to return it as just a single result instead of in `json.results`.
+        }
+      case "DOWNLOAD":
+        console.log("DOWNLOAD json: ", json)
+        return{
+          data: json
+        } //hoping this works?
       case "GET_FILES":
 
         json.results = translateResource(resource, json.results);
@@ -385,10 +399,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           ),
         };
 
-      //TODO: there's an inconsistency here between create and update - i dont know which one I should be using, but both work for now.  one will likely have to change at some point.
       case CREATE:
         params.data = translateResource(resource, params.data);
-
         return {
           data: {
             ...json,
@@ -398,7 +410,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
       case UPDATE:
         params.data = translateResource(resource, params.data);
-
         return {
           data: {
             ...params.data,
@@ -406,19 +417,19 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           },
         };
 
-      //TODO: what is this?  Why is there a 'fake' here?
       case DELETE:
-        return { data: { id: 'fake' } };
+        //NOTE: there is a `fake` here because no JSON data is sent back from the API on delete.
+        return { data: { id: 'temp' } };
 
       default:
         return { data: json };
     }
   };
 
-  //TODO: these functions are (i think) unused, but will need to be updated now that we have a proper ID field.
-  return (type, resource, params) => {
-    // json-server doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
 
+  //NOTE:  these functions are not used by our application as we have no update or delete many calls.
+  //however, I've left them in as they in theory could be used for mass update/deletes if someone wanted to.
+  return (type, resource, params) => {
     if (type === UPDATE_MANY) {
       return Promise.all(
         params.ids.map(id =>
@@ -431,8 +442,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         data: responses.map(response => response.json),
       }));
     }
-
-    // json-server doesn't handle filters on DELETE route, so we fallback to calling DELETE n times instead
     if (type === DELETE_MANY) {
       return Promise.all(
         params.ids.map(id =>

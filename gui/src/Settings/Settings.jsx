@@ -22,7 +22,6 @@ const styles = {
   }
 };
 
-//TODO: this file should contain email / password change components.
 const Settings = ({ classes, translate }) => (
   <div className={classes.container}>
     <ExpansionPanel>

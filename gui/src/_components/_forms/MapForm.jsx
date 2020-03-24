@@ -32,10 +32,9 @@ class MapForm extends Component {
       mapRef: null,
       mapLoading: true,
       features: {},
-      notDisplayedFeatures: [],
       popup: { active: false, for: '' },
       prevProperties: {},
-      location: [51.652111, -105.527802], //TODO: map location defaulted to saskatoon for time being, should update to first location
+      location: [51.652111, -105.527802],
     };
     this.updateGeo = this.updateGeo.bind(this);
     this._updateFeatures = this._updateFeatures.bind(this);
@@ -132,14 +131,14 @@ class MapForm extends Component {
     return lng % 180;
   }
   
-  //TODO: there is a bug that will result in multiple map edits before hitting 'save' not updating all item details
+  //NOTE: there is a bug that will result in multiple map edits before hitting 'save' not updating all item details
+  //this is an acceptable bug - its unlikely that multiple location edits occur on lines / polygons at the same time.
   setProperties = featureParams => {
     const { features, popup } = this.state
     const featureList = { ...features };
     featureList[popup.for].properties = featureParams;
     this._updateFeatures(featureList);
-    this.setState({ prevProperties: {} });
-    this.setState({ popup: { active: false, for: '' } });
+    this.setState({ prevProperties: {}, popup: { active: false, for: '' }});
   };
 
   success = pos => {
@@ -193,8 +192,6 @@ class MapForm extends Component {
       //normalize before setting our location - the map coordinate for map location display is [lat, lng], though elsewhere coords are stored [lng, lat].
       latLng[1] = this._normLng(latLng[1]);
       this.setState({ location: latLng });
-
-      //console.log("set location to: ", latLng)
     }
   };
 
@@ -232,19 +229,15 @@ class MapForm extends Component {
     geoDataCallback(localGeo);
   };
 
+  //TODO: Refactor this
   _onCreated = e => {
     let layer = e.layer;
-
-    //maybe should change from collecting features to collecting layers instead, but this does in fact work.
     layer.on({
       click: this._onLayerClick.bind(this),
     });
     layer.feature = this._generateFeature(layer);
-    this.setState({ location: getFirstCoordinate(layer) }); //TODO: there has to be a way to remove this one as well.
-    this.setState({ prevProperties: {} });
-    this.setState(
-      { popup: { active: true, for: layer.feature.id } },
-      this.featuresCallback(layer.feature)
+    this.setState({ location: getFirstCoordinate(layer), prevProperties: {}, popup: { active: true, for: layer.feature.id }},
+    this.featuresCallback(layer.feature)
     );
   };
 
@@ -288,9 +281,7 @@ class MapForm extends Component {
     //console.log('layer clicked with value e: ', e, 'and state: ', this.state);
 
     if (!blockPopup) {
-      this.setState({ location: [e.latlng.lat, e.latlng.lng] });
-      this.setState({ prevProperties: prevProperties });
-      this.setState({ popup: { active: true, for: layer._leaflet_id } });
+      this.setState({ location: [e.latlng.lat, e.latlng.lng], prevProperties: prevProperties, popup: { active: true, for: layer._leaflet_id } });
     }
   };
 
@@ -310,7 +301,6 @@ class MapForm extends Component {
       //features must be loaded in one at a time, not in bulk.
       let localFeatures = {};
       let output = {};
-      let notDisplayedFeatures = [];
 
       geo.geojson.features.map(feature => {
         let leafletGeoJSON = new L.GeoJSON(feature);
@@ -318,7 +308,6 @@ class MapForm extends Component {
         leafletGeoJSON.eachLayer(layer => {
           const layerType = layer.feature.geometry.type;
 
-          //TODO: some contants can likely be created here / this function can largely be exported to funcs.jsx
           if (
             layerType === 'LineString' ||
             layerType === 'Polygon' ||
@@ -329,19 +318,6 @@ class MapForm extends Component {
             layer.on({
               click: this._onLayerClick.bind(this),
             });
-          } else {
-            //alert(`Map does not support feature type ${layerType} for feature: ${layer.feature.id} in data.  This value will be stored but not displayed on the map.`)
-            //multi___ are unsupported by Leaflet.js itself, but maybe we can patch it on top?
-            //when a multipoint is created,
-            notDisplayedFeatures = [...notDisplayedFeatures, layer.feature];
-
-            //console.log("layer to not be editable is: ", layer)
-            //console.log("feature to not display is: ", layer.feature.properties.name)
-            //output = ref.leafletElement.addLayer(layer)
-            /*
-                                layer.on({
-                                    click: this._onLayerClick.bind(this)
-                                })*/
           }
         });
         return feature;
@@ -353,24 +329,13 @@ class MapForm extends Component {
         localFeatures[key] = output._layers[key].feature;
         return key;
       });
-
-      if (notDisplayedFeatures.length > 0) {
-        alert(
-          "There is at least one Multi feature in your geoJSON dataset This information will not be Editable or Viewable on this Edit page, but may be viewed on this item's Show page."
-        );
-        //console.log('notdisplayedfeatures prompt is: ', notDisplayedFeatures);
-        //console.log('localfeatures prompt is: ', localFeatures);
-      }
-      this.setState({ features: localFeatures }, () =>
-        this.setState({ notDisplayedFeatures: notDisplayedFeatures })
-      );
+      this.setState({ features: localFeatures });
     }
     this.setState({ mapLoading: false });
   };
 
   _onPopupClose = () => {
-    this.setState({ prevProperties: {} });
-    this.setState({ popup: { active: false, for: '' } });
+    this.setState({ prevProperties: {}, popup: { active: false, for: '' }  });
   };
 
   _setMapRef = ref => {

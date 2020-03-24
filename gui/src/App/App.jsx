@@ -234,7 +234,6 @@ const App = props => {
             }
           />,
 
-          //TODO: what are the access permissions for datasets?
           <Resource
             name={'datasets'}
             icon={InsertChart}

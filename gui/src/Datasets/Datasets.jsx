@@ -27,26 +27,32 @@ import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
 import ProjectName from "../_components/_fields/ProjectName";
 import PropTypes from 'prop-types';
-import { submitObjectWithGeo, isAdminOfAParentGroup } from '../_tools/funcs';
+import { submitObjectWithGeo, isAdminOfAParentGroup, getExportKey, requestDownload } from '../_tools/funcs';
 import TranslationChipField from "../_components/_fields/TranslationChipField";
 import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import TranslationSelectArray from "../_components/_fields/TranslationSelectArray";
 import { withStyles } from '@material-ui/core/styles';
 import { GET_ONE } from 'ra-core';
-import { Toolbar, Button } from '@material-ui/core';
+import { Toolbar, Button, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@material-ui/core';
 import { EditButton } from 'ra-ui-materialui/lib/button';
+import CloudDownload from "@material-ui/icons/CloudDownload"
 import { radiamRestProvider, getAPIEndpoint, httpClient } from '../_tools/index.js';
-import DatasetTitle from './DatasetTitle.jsx';
-import ExportButton from 'ra-ui-materialui/lib/button/ExportButton';
 import BrowseTab from '../Projects/Browse/BrowseTab.jsx';
 import { DefaultToolbar } from '../_components/index.js';
 import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 import { Redirect } from 'react-router';
+import DatasetTitle from './DatasetTitle.jsx';
 
 const styles = {
   actions: {
     backgroundColor: 'inherit',
+  },
+  buttonIcon: {
+    marginRight: "0.5em",
+  },
+  buttonText: {
+    fontSize: "0.55em",
   },
   abstractField: {
     width: "50em",
@@ -95,14 +101,24 @@ const actionStyles = theme => ({
   }
 })
 
- export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, classes}) => {
+ export const DatasetShowActions = withStyles(actionStyles)(({ basePath, data, setExportLink, classes}) => {
 
   const user = JSON.parse(localStorage.getItem(ROLE_USER));
   const [showEdit, setShowEdit] = useState(user.is_admin)
   let _isMounted = true
-  //console.log("datasetshowactions data: ", data)
 
-  //TODO: Improve efficiency of this
+
+  const exportDataset = (id) => {
+    console.log("exportdataset id: ", id)
+      getExportKey(id, MODELS.DATASETS).then(data => {
+        console.log("exportdataset data: ", data)
+        return data
+      }).then(data => {
+        setExportLink(`${getAPIEndpoint()}/exportrequests/${data.data}/download/`)
+      return data
+      })
+  }
+
   useEffect(() => {
     if (data && !showEdit){
 
@@ -123,7 +139,10 @@ const actionStyles = theme => ({
   if (showEdit && data){
     return(
     <Toolbar className={classes.toolbar}>
-      <ExportButton resource={`datasets/${data.id}/export`} />
+      <IconButton color={"primary"} name={"exportButton"} aria-label={"EXPORT"} label={"Export"} onClick={() => exportDataset(data.id)}>
+        <CloudDownload className={classes.buttonIcon} />
+        <Typography className={classes.buttonText}>{`EXPORT`}</Typography>
+      </IconButton>
       <EditButton basePath={basePath} record={data} />
     </Toolbar>
     )
@@ -238,10 +257,20 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
 ))
 
 
-export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
-  <Show actions={<DatasetShowActions/>} {...props}>
+export const BaseDatasetShow = withTranslate(({ classes, translate, ...props }) => {
+  const [exportLink, setExportLink] = useState(null)
+
+  console.log("exportLink in basedatasetshow is: ", exportLink)
+  return(
+  <Show actions={<DatasetShowActions setExportLink={setExportLink} classes={classes}/>} {...props}>
     <TabbedShowLayout>
       <Tab label={'Summary'}>
+        <Dialog  open={exportLink} onClose={() => {setExportLink(false)}} aria-label="Download Data">
+          <DialogTitle>{`Download Metadata`}</DialogTitle>
+          <DialogContent>
+            <a href={exportLink} download={exportLink}>{`${exportLink}`}</a>
+          </DialogContent>
+        </Dialog>
         <DatasetTitle prefix="Viewing" />
         <TextField
           label={"en.models.datasets.title"}
@@ -337,7 +366,8 @@ export const DatasetShow = withTranslate(({ classes, translate, ...props }) => (
       </Tab>
     </TabbedShowLayout>
   </Show>
-));
+)
+          });
 
 
 const validateProject = required('A project is required for a dataset');
@@ -367,7 +397,6 @@ const validateSearchModel = (value) => {
     else{
       JSON.parse(value)
     }
-    //TODO: check here for anything we don't want / invalid Elastic queries
   }
   catch(e){
     console.error("json parse error e: ", value)
@@ -379,9 +408,8 @@ const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
-const BaseDatasetForm = ({ basePath, classes, ...props }) => {
+const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
 
-  //console.log("basedatasetform props: ", props)
   const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
   const [redirect, setRedirect] = useState(null)
   const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
@@ -414,16 +442,10 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
       console.error(`error parsing data to json: ${searchModel}` , e)
     }
 
-    //TODO: refactor this shit
-
     data.data_collection_method.map(item => {dcmList.push({id: item}); return item})
     data.sensitivity_level.map(item => {slList.push({id: item}); return item;})
     newData.data_collection_method = dcmList
     newData.sensitivity_level = slList
-    
-    //console.log("handlesubmit of datasets form is: ", newData, props, geo)
-
-    //when submitting from a modal, react-admin treats resource as the projects page instead of the dataset page.
     props.resource = "datasets"
 
     submitObjectWithGeo(newData, geo, props, null, props.setCreateModal || props.setEditModal ? true : false).then(
@@ -432,25 +454,12 @@ const BaseDatasetForm = ({ basePath, classes, ...props }) => {
         setRedirect("/datasets")
       }
     ).catch(err => console.error("submitobjectwithgeo dataset error", err))
-
-    //TODO: what is this
-    if (props.setCreateModal){
-      props.setCreateModal(false)
-    }
-    else if (props.setEditModal){
-      props.setEditModal(false)
-    }
-
   };
 
-  //console.log("props record after editmodal transofmration: ", props.record)
-
-
   const { record } = props
-
   return(
     <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
-    toolbar={<DefaultToolbar {...props} />}>
+    toolbar={mode && mode === "edit" ? <DefaultToolbar {...props} /> : null}>
       <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
       <TextInput      
         label="Title"
@@ -598,5 +607,5 @@ BaseDatasetEdit.propTypes = {
 
 export const CustomFormLabel = translate(CustomLabel)
 export const DatasetForm = enhance(BaseDatasetForm)
-
 export const DatasetEdit = enhance(BaseDatasetEdit);
+export const DatasetShow = enhance(BaseDatasetShow)

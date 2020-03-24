@@ -38,7 +38,6 @@ const BaseToolbar = ({classes, ...props}) => {
     <Toolbar {...rest}>
       <SaveButton />
       {
-        //TODO: there remains a bug here where props.record exists in the parent component (in Location only) but not here.
         record && 
         <DeleteWithConfirmButton className={classes.deleteButton}
         confirmTitle={`Delete ${record.name || record.title || record.display_name} ?`}
@@ -49,7 +48,6 @@ const BaseToolbar = ({classes, ...props}) => {
 }
 
 //for anything that is a model of foreign keys with no name/title
-
 const BaseFKToolbar = ({classes, ...props}) => {
   //console.log("FKToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props

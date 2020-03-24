@@ -25,7 +25,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes, truncatePath, getAllProjectData } from '../../_tools/funcs';
 import FileDetails from './FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
@@ -224,12 +224,10 @@ function EnhancedTableHead(props) {
 function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
 
-  console.log("item in folderview is: ", item)
-
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be ".."
+  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be "."
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -242,7 +240,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       props.location.state &&
       props.location.state.search) ||
     null
-  ); //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
+  );
   const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
@@ -363,7 +361,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".." //root is `..`
+      folderPath = "." //root is `.`
     }
 
     if (search && search.length > 0){
@@ -384,7 +382,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        // eslint-disable-next-line
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
           if (_isMounted){
             if (type === "file"){
@@ -438,7 +435,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   useEffect(() => {
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".."
+      folderPath = "."
     }
     
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,8 +451,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       order: order === "desc" ? "-" : "",
     }
 
-    if (!search){ //TODO: there is a better way to separate this out
-
+    if (!search){ 
       fileTypes.forEach(type => {
         fileParams.page = filePage
         if (type === "directory"){
