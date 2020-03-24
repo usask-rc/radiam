@@ -583,7 +583,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
-                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`, location: projectLocation}}}}>
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
                   <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>
