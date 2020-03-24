@@ -43,6 +43,7 @@ import { DefaultToolbar } from '../_components/index.js';
 import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 import { Redirect } from 'react-router';
 import DatasetTitle from './DatasetTitle.jsx';
+import SaveButton from 'ra-ui-materialui/lib/button/SaveButton';
 
 const styles = {
   actions: {
@@ -362,7 +363,16 @@ export const BaseDatasetShow = withTranslate(({ classes, translate, ...props }) 
         </ShowController>
       </Tab>
       <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
-        <BrowseTab projectID={props.id} dataType="datasets" projectName={`ds_`} />
+        <ShowController {...props}>
+          {controllerProps => {
+            console.log("controllerProps: " , controllerProps)
+          if (controllerProps && controllerProps.record){
+            return <BrowseTab projectID={controllerProps.record.project} searchModel={controllerProps.record.search_model} datasetID={controllerProps.record.id} dataType="datasets" projectName={`ds_`} {...controllerProps} />
+          }
+          return <Typography>{`Loading...`}</Typography>;
+
+          }}
+        </ShowController>
       </Tab>
     </TabbedShowLayout>
   </Show>
@@ -459,7 +469,7 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
   const { record } = props
   return(
     <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
-    toolbar={mode && mode === "edit" ? <DefaultToolbar {...props} /> : null}>
+    toolbar={mode && mode === "edit" && <DefaultToolbar {...props} />}>
       <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
       <TextInput      
         label="Title"

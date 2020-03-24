@@ -320,6 +320,47 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
+<<<<<<< HEAD
+=======
+//this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
+export function getRootPaths_old(projectID, dataType="projects" ){
+
+  //first, try to see if we can operate with base assumption of path_parent == "."
+
+  return new Promise((resolve, reject) => {
+    
+    const params_allFiles={
+      pagination: { page: 1, perPage: 1000000},
+      sort: {field: "path_parent.keyword", order: "DESC"},
+    }
+    dataProvider("GET_FILES", `${dataType}/${projectID}`, params_allFiles).then(allFiles => {
+      //get root paths by location
+
+      const rootPaths = {}
+      allFiles.data.map(file => {
+        if (file.location in rootPaths){
+          if (file.path_parent.length < rootPaths[file.location].path_parent.length){
+            rootPaths[file.location] = file
+          }
+        }else{
+          rootPaths[file.location] = file
+        }
+        return file
+      })
+      //return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
+      const rootPathList = []
+      Object.keys(rootPaths).map(key => {
+        rootPathList.push({
+          location: key, path_parent: rootPaths[key].path_parent, locationpromise: getLocationData(key)
+        })
+      })
+
+      resolve(rootPathList)
+    }).catch(err => reject(err))
+  })
+}
+
+>>>>>>> ADM-2260_styling_and_bugfixes
 //assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
 export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
