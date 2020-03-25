@@ -115,15 +115,13 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
     const { record } = props
 
-    //console.log("record project: ", record)
-
     return(
       <SimpleForm
       asyncValidate={asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
       asyncBlurFields={[MODEL_FIELDS.NAME]}
       save={handleSubmit}
       >
-        <ProjectTitle prefix={record ? `Updating Project` : `Creating Project`} />
+        <ProjectTitle prefix={record && record.name ? `Updating Project` : `Creating Project`} />
         <TextInput
           className="input-small"
           label={"en.models.projects.name"}

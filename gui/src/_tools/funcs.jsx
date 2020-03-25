@@ -337,10 +337,8 @@ export function getRelatedDatasets(projectID) {
 }
 
 //this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
+//TODO: implement dataset query the same way as Projects Files are queried - this should now be possible, supposing that the dataset's searchmodel contains both a location and a wildcard for path_parent.
 export function getRootPaths_old(projectID, dataType="projects" ){
-
-  //first, try to see if we can operate with base assumption of path_parent == "."
-
   return new Promise((resolve, reject) => {
     
     const params_allFiles={

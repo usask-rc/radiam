@@ -26,6 +26,7 @@ import LocationTitle from './LocationTitle';
 import { SingleFieldList } from 'ra-ui-materialui/lib/list';
 import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
 import { ShowController } from 'ra-core';
+import { DefaultToolbar } from '../_components';
 
 
 const listStyles = {

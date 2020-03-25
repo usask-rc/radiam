@@ -63,18 +63,14 @@ class LocationForm extends Component {
       showMap: props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false,
     };
 
-    //console.log("props record locform: ", props.record)
     if (props.record && props.record.projects){
       props.record.projects = this.fixProjectList(props.record.projects)
     }
-
-    //console.log("props.record.projects in locationform is: ", props.record.projects)
   }
 
   componentDidMount() {
     const { geo } = this.state
     this.setState({ geoText: geo && geo.geojson ? JSON.stringify(geo.geojson.features, null, 2) : '[]' });
-
   }
 
   fixProjectList(projects) {
@@ -196,9 +192,8 @@ class LocationForm extends Component {
         {...rest}
         save={this.handleSubmit}
         name={`locationForm`}
-        toolbar={this.props.record && <DefaultToolbar {...this.props}/> }
-        //TODO: there is definitely a better way to do this - I just can't figure it out.  Any HOC using redux-form `isDirty` seems to fail.
         onChange={this.handleChange}
+        toolbar={this.props.record && <DefaultToolbar />} 
       >
         <Typography className={classes.titleText}>{record && Object.keys(record).length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
         <TextInput
@@ -277,7 +272,6 @@ class LocationForm extends Component {
           multiline
         />
         <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record ? record.osf_project : ""} required />
-
         <TextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"

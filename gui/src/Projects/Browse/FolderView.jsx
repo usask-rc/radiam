@@ -165,7 +165,6 @@ function EnhancedTableHead(props) {
       onRequestSort(event, property);
   };
 
-  console.log("EnhancedTableHead order: ", order, "props: ", props)
   return (
       <TableHead className={classes.tableHead}>
       <TableRow>
@@ -224,8 +223,6 @@ function EnhancedTableHead(props) {
 function FolderView({ projectID, datasetID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
 
-  console.log("FolderView item: ", item)
-
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -260,7 +257,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
   const addParent = (folder) => {
     let tempParents = [...parents, folder]
 
-    console.log("adding parent, tempParents is: ", tempParents)
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -283,7 +279,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
     setFolderTotal(0)
     setFiles([])
     setFolders([])
-    console.log("sort property: ", property)
     setSortBy(property);
 };
 
@@ -327,7 +322,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
   }
 
   const handleSearch = (e) => {
-    console.log("handlesearch: ", e.target.elements.search.value)
 
     if (search !== e.target.elements.search.value){
       setLoading(true)
@@ -407,19 +401,12 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
               const prevFolders = folders
               if (folderPage > 1){
                 if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id){
-                  console.log("new folder list being set to: ", [...prevFolders, ...data.files])
                   setFolders([...prevFolders, ...data.files])
-                }
-                else{
-                  console.error("unhandled case in set folders in search")
                 }
               }
               else{
                 setFolders([...data.files])
               }
-            }
-            else{
-              console.error("unknown file requested as data: ", type, data)
             }
             setLoading(false)
           }
@@ -461,7 +448,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
         }
         // eslint-disable-next-line
         getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
-          console.log(`${type} data: ${data.files}`)
           if (_isMounted){
 
             if (type === "file"){
@@ -469,7 +455,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
               setFileTotal(data.total)
               const prevFiles = files
 
-              console.log("prevFiles, data.files: ", [...prevFiles, ...data.files])
               if (filePage > 1){
                 if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
                 {

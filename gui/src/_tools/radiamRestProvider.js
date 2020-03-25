@@ -99,13 +99,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           sort = `ordering=${sortOrder}${params.sort.field}`
         }
         url = url + `?page=${page}&page_size=${perPage}&${sort}`;
-        console.log("url before get_files request: ", url)
         break;
       }
 
       case GET_LIST: {
         url = `${apiUrl}/${resource}/`;
-        console.log("params sent to get_list are: ", params, url)
 
         if (params)
         {

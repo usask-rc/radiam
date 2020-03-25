@@ -3,7 +3,9 @@ import englishMessages from 'ra-language-english';
 
 export default {
   ...englishMessages,
+  'Internal Server error': "Internal Server Error", //TODO: this is a bad place to put this but react-admin wants it here.
   en: {
+    Unauthorized: "",
     Type1: 'Temporary Type 1', //these two `type` values exist in a default db load
     Type2: 'Temporary Type 2',
     metadata: {
