@@ -4,6 +4,7 @@ import { Toolbar, SaveButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
 import { getCurrentUserID } from '../_tools/funcs';
 import { DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';
+import {ROLE_USER } from "../_constants/index"
 //This custom toolbar exists in order to cut the Deletion button out of certain models.
 //To 'delete' these models, the user must go into the Edit function for them and deactivate them, after which they (will eventually) stop being pulled from the API except under certain circumstances.
 const styles = {
@@ -20,7 +21,7 @@ const BaseUserToolbar = ({classes, ...props}) => {
       <Toolbar {...rest}>
         <SaveButton />
           {props.record.id !== getCurrentUserID() && <DeleteWithConfirmButton className={classes.deleteButton} 
-            confirmTitle={`Delete User ${props.record.username}?`}
+            confirmTitle={`Delete User?`}
             confirmContent={`Are you sure you want to delete this user?`}
            {...props} />
           }
@@ -30,18 +31,20 @@ const BaseUserToolbar = ({classes, ...props}) => {
 
 //for anything with `name` as a field - Groups, Projects, display_name (Locations) title (datasets) 
 const BaseToolbar = ({classes, ...props}) => {
-  //console.log("BaseToolbar props: ", props)
-  const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
-  const { record } = props
+  console.log("basetoolbar props: ", props)
+  const user = JSON.parse(localStorage.getItem(ROLE_USER));
+
   return(
-    <Toolbar {...rest}>
+    <Toolbar {...props}>
       <SaveButton />
-      {
-        record && 
-        <DeleteWithConfirmButton className={classes.deleteButton}
-        confirmTitle={`Delete ${record.name || record.title || record.display_name} ?`}
-        confirmContent={`Are you sure you would like to delete this record?`}/>
-      }
+      {//TODO: for some reason this is only broken in Locations - it can't receive props record for some reason.
+      user.is_admin && props.resource !== `locations` && 
+      <DeleteWithConfirmButton className={classes.deleteButton}
+      confirmTitle={`Delete Record?`}
+      confirmContent={`Are you sure you would like to delete this record?`} 
+      record={props}
+      />
+  }
     </Toolbar>
   )
 }
