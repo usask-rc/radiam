@@ -19,10 +19,11 @@ const BaseUserToolbar = ({classes, ...props}) => {
     return(
       <Toolbar {...rest}>
         <SaveButton />
-          <DeleteWithConfirmButton className={classes.deleteButton} 
-            confirmTitle={`Delete User?`}
+          {props.record.id !== getCurrentUserID() && <DeleteWithConfirmButton className={classes.deleteButton} 
+            confirmTitle={`Delete User ${props.record.username}?`}
             confirmContent={`Are you sure you want to delete this user?`}
            {...props} />
+          }
       </Toolbar>
     )  
 }
