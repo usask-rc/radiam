@@ -93,7 +93,6 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
     if (dataType === "projects"){
       getRootPaths(projectID, dataType, searchModel).then(data => {
           if (_isMounted){ 
-            console.log("getrootpaths in browsetab retrieves data: ", data)
             setListOfRootPaths(data)
             setStatus({loading: false, error: false})
           }
@@ -103,26 +102,14 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
       })
     }
     else if (dataType === "datasets"){
+      //TODO: check location and search model - if we have the data we need, use that info instead to get files.
       getRootPaths_old(datasetID, "datasets").then(data => {
-        console.log("getrootpaths old data: ", data)
         setListOfRootPaths(data)
         setStatus({loading: false, error: false})
       })
-      /*
-      //TODO: This assumes that any dataset created matches a specific location/wildcard setup.
-      //dataset search model should include both location and root path.
-      //return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
-      //TODO: critical error!!! backup solution has to iterate through all files in dataset search model!!!!
-      console.log("searchModel in browsetab is: ", searchModel)
-      //create our dummy item for our dataset
-      const datasetRootPath = {
-        location: searchModel.search.bool.must.match.location,
-        path_parent: searchModel.search.bool.wildcard.path_parent.slice(0, -1),
-        locationpromise: getLocationData(searchModel.search.bool.must.match.location)
-      }
-      setListOfRootPaths([datasetRootPath])
-      setStatus({loading: false, error: false})
-*/
+    }
+    else{
+      console.error("invalid model type given to browse tab")
     }
 
     //if we unmount, lock out the component from being able to use the state
@@ -140,7 +127,6 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
       
       : listOfRootPaths.length > 0 &&
         listOfRootPaths.map(item => {
-          console.log("listofrootpaths item: ", item)
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
               <div className={classes.locationIconLink}>

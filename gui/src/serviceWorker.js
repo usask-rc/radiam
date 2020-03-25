@@ -100,7 +100,7 @@ function registerValidSW(swUrl, config) {
 
 function checkValidServiceWorker(swUrl, config) {
 
-  console.log("MMMMMMMin checkvalidserviceworker, swUrl is: ", swUrl)
+  console.log("in checkvalidserviceworker, swUrl is: ", swUrl)
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
     .then(response => {

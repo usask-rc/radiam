@@ -277,7 +277,6 @@ class LocationForm extends Component {
           multiline
         />
         <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record ? record.osf_project : ""} required />
-
         <TextInput
           label={'en.models.locations.portal_url'}
           source="portal_url"
