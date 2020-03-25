@@ -4,7 +4,7 @@ import { Toolbar, SaveButton } from 'react-admin';
 import { withStyles } from '@material-ui/styles';
 import { getCurrentUserID } from '../_tools/funcs';
 import { DeleteWithConfirmButton } from 'ra-ui-materialui/lib/button';
-import {ROLE_USER } from "../_constants/index"
+import { ROLE_USER } from "../_constants/index"
 //This custom toolbar exists in order to cut the Deletion button out of certain models.
 //To 'delete' these models, the user must go into the Edit function for them and deactivate them, after which they (will eventually) stop being pulled from the API except under certain circumstances.
 const styles = {
@@ -38,13 +38,13 @@ const BaseToolbar = ({classes, ...props}) => {
     <Toolbar {...props}>
       <SaveButton />
       {//TODO: for some reason this is only broken in Locations - it can't receive props record for some reason.
-      user.is_admin && props.resource !== `locations` && 
-      <DeleteWithConfirmButton className={classes.deleteButton}
-      confirmTitle={`Delete Record?`}
-      confirmContent={`Are you sure you would like to delete this record?`} 
-      record={props}
+        user.is_admin && props.resource !== `locations` && 
+        <DeleteWithConfirmButton className={classes.deleteButton}
+        confirmTitle={`Delete Record?`}
+        confirmContent={`Are you sure you would like to delete this record?`} 
+        record={props}
       />
-  }
+      }
     </Toolbar>
   )
 }

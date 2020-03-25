@@ -22,15 +22,14 @@ const validateOrcid = [regex(/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}/g, "invalid or
 
 //this exists to combine the User Creation form and the GroupMember Association form into a single page.
 class UserForm extends Component {
+    
     constructor(props) {
-        //console.log("UserForm props: ", props)
         super(props);
-        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", isFormDirty: false, is_active: true, group: props.location ? props.location.group : "", group_role: "", date_expires: null, redirect: false }
+        this.state = { username: "", first_name: "", last_name: "", email: "", notes: "", is_active: true, group: props.location ? props.location.group : "", group_role: "", date_expires: null, redirect: false }
     }
 
     handleSubmit = event => {
         const { history } = this.props
-        this.setState({isFormDirty: false}, () => { 
 
         let headers = new Headers({ "Content-Type": "application/json" });
         const token = localStorage.getItem(WEBTOKEN);
@@ -139,19 +138,16 @@ class UserForm extends Component {
                 toastErrors("Please select a group")
             }
         }
-    })
     };
 
     handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
 
-        if (e && e.timeStamp){
-            this.setState({isFormDirty: true})
-        }
     };
 
     render() {
-        const { group, group_role, redirect, isFormDirty} = this.state
+        const { group, group_role, redirect} = this.state
+        
         return (<>
             <SimpleForm
                 onSubmit={this.handleSubmit}
@@ -240,8 +236,6 @@ class UserForm extends Component {
                     handleSubmitWithRedirect={this.handleSubmit}
                 />
             </Toolbar>
-            <Prompt when={isFormDirty} message={WARNINGS.UNSAVED_CHANGES}/>
-            {redirect && <Redirect to="/login"/>}
         </>
         );
     }

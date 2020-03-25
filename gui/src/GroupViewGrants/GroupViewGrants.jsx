@@ -28,6 +28,7 @@ import { GroupShow } from "../_components/_fields/GroupShow";
 import { FKToolbar } from "../_components/Toolbar";
 import FieldsChip from "./FieldsChip";
 import ChipInput from "material-ui-chip-input";
+import moment from "moment";
 
 const styles = {
   actions: {
@@ -177,7 +178,7 @@ const validateDateStarts = required("en.validate.viewgrants.date_start");
 
 const GroupViewGrantForm = ({translate, classes, ...props}) => {
   const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")
-
+  const now = moment()
 
   const handleChipChange = (data) => {
     setGrantedFields(data)
@@ -198,6 +199,8 @@ const GroupViewGrantForm = ({translate, classes, ...props}) => {
     data.fields = grantedFields ? grantedFields.join(",") : ""
     props.save(data)
   }
+
+
 
   //console.log("props in groupviewgrantform: ", props)
   return(
@@ -237,6 +240,7 @@ const GroupViewGrantForm = ({translate, classes, ...props}) => {
     <DateInput
       source={MODEL_FIELDS.DATE_STARTS}
       label={"en.models.generic.date_starts"}
+      defaultValue={now}
       validate={validateDateStarts}
     />
     <DateInput
