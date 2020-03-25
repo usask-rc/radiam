@@ -564,6 +564,21 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
           //split to 3 folders up
           let truncated_path = truncatePath(folder.path)
 
+          const dsSearchModel={
+            bool: {
+              must: {
+                wildcard: {
+                  [`path_parent.keyword`]: `${folder.path}*`
+                },
+              },
+              filter: {
+                term: {
+                  [`location.keyword`]: `${folder.location}`
+                }
+              }
+            }
+          }
+
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
               {folder.name ? folder.name : `<No Folder Name>`}
@@ -583,7 +598,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
-                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: dsSearchModel}}>
                   <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>
