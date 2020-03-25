@@ -401,7 +401,6 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
               const prevFolders = folders
               if (folderPage > 1){
                 if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id){
-                  ("new folder list being set to: ", [...prevFolders, ...data.files])
                   setFolders([...prevFolders, ...data.files])
                 }
               }
