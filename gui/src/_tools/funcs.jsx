@@ -41,11 +41,11 @@ export function requestDownload(key, data){
         Authorization: `Bearer ${parsedToken.access}`,
         'Content-Type': 'application/zip',
       }}).then(response => response.blob()).then(blob => {
-      const now = moment()
+      const now = moment().format("YYYY-MM-DD")
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${title}_${id}_${now}`);
+      link.setAttribute('download', `${title}_${now}.zip`);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
