@@ -14,20 +14,18 @@ const styles = {
 
 //separate entry for deleting users - we don't want users to be able to delete themselves.
 const BaseUserToolbar = ({classes, ...props}) => {
-  //console.log("BaseUserToolbar props: ", props)
+  console.log("BaseUserToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
-  const { record } = props.record
-  return(
-  <Toolbar {...rest}>
-    <SaveButton />
-    {record && record.id !== getCurrentUserID() && 
-      <DeleteWithConfirmButton className={classes.deleteButton} 
-        confirmTitle={`Delete User ${record.username} <${record.first_name} ${record.last_name}> ?`}
-        confirmContent={`Are you sure you want to delete this user?`}
-       {...props} />
-    }
-  </Toolbar>
-)}
+    return(
+      <Toolbar {...rest}>
+        <SaveButton />
+          <DeleteWithConfirmButton className={classes.deleteButton} 
+            confirmTitle={`Delete User?`}
+            confirmContent={`Are you sure you want to delete this user?`}
+           {...props} />
+      </Toolbar>
+    )  
+}
 
 //for anything with `name` as a field - Groups, Projects, display_name (Locations) title (datasets) 
 const BaseToolbar = ({classes, ...props}) => {

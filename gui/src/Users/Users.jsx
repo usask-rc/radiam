@@ -184,7 +184,7 @@ export const UserEditWithDeletion = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
   if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
-      <Edit toolbar={<UserToolbar />} {...props}>
+      <Edit toolbar={<UserToolbar {...props} />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )
