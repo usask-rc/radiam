@@ -44,6 +44,7 @@ import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 import { Redirect } from 'react-router';
 import DatasetTitle from './DatasetTitle.jsx';
 import SaveButton from 'ra-ui-materialui/lib/button/SaveButton';
+import moment from "moment"
 
 const styles = {
   actions: {
@@ -108,16 +109,17 @@ const actionStyles = theme => ({
   const [showEdit, setShowEdit] = useState(user.is_admin)
   let _isMounted = true
 
+  console.log("in datasetshowactions, data is: ", data)
 
-  const exportDataset = (id) => {
-    console.log("exportdataset id: ", id)
-      getExportKey(id, MODELS.DATASETS).then(data => {
-        console.log("exportdataset data: ", data)
-        requestDownload(data).then(response => {
-          console.log("response from requestdownload is: ", response)
-        })
-        return data
-      })
+  const exportDataset = (data) => {
+    const {id, title} = data
+
+    getExportKey(id, MODELS.DATASETS).then(exportKey => {
+      requestDownload(exportKey, {id, title} ).then(response => {
+        return response //nothing to report upon success.
+      }).catch(err => console.error(err))
+      return data
+    })
   }
 
   useEffect(() => {
@@ -140,7 +142,7 @@ const actionStyles = theme => ({
   if (showEdit && data){
     return(
     <Toolbar className={classes.toolbar}>
-      <IconButton color={"primary"} name={"exportButton"} aria-label={"EXPORT"} label={"Export"} onClick={() => exportDataset(data.id)}>
+      <IconButton color={"primary"} name={"exportButton"} aria-label={"EXPORT"} label={"Export"} onClick={() => exportDataset(data)}>
         <CloudDownload className={classes.buttonIcon} />
         <Typography className={classes.buttonText}>{`EXPORT`}</Typography>
       </IconButton>

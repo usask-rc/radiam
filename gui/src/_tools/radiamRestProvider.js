@@ -34,7 +34,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
       case "DOWNLOAD": {
         url = `${apiUrl}/exportrequests/${params.id}/download/`
         options.method = "GET"
-        options.responseType = 'zip'
         break;
       }
       
@@ -319,8 +318,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
           data: json //NOTE: api is set to return it as just a single result instead of in `json.results`.
         }
       case "DOWNLOAD":
+
+        console.log("download 2 response: ", response)
         return{
-          data: response
+          data: response.body.blob()
         } 
       case "GET_FILES":
 

@@ -6,47 +6,49 @@ import radiamRestProvider from "./radiamRestProvider";
 import { httpClient } from ".";
 import { GET_LIST, GET_ONE, CREATE, UPDATE } from "ra-core";
 import moment from "moment";
+
 var cloneDeep = require("lodash.clonedeep");
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
-//for some datawset key, return a generated export value
+//for some dataset key, return a generated export value
 export function getExportKey(id, type){
   return new Promise((resolve, reject) => {
     const params = {id: id}
     dataProvider("EXPORT", type, params).then(data => {
-      console.log("ret from export call is: ", data)
       resolve(data)
     }).catch(err => reject(err))
   })
 }
 
-export function requestDownload(data){
-  console.log("requestdownload data: ", data)
-  return new Promise((resolve, reject) => {
-    const params={id: data.data}
-    dataProvider("DOWNLOAD", "", params).then(response => {
-      console.log("response from download call is: ", response)
-      return new Blob([response.data.body])
-    }).then(blob => {
-      console.log("response blob is: ", blob)
+//for some export key and dataset values, request a download from the API.
+export function requestDownload(key, data){
+  const {id, title} = data
 
+  return new Promise((resolve, reject) => {
+      const token = localStorage.getItem(WEBTOKEN);
+      const parsedToken = JSON.parse(token);
+
+      //TODO: I couldn't grok a way to do this with the dataprovider. this is probably something to change - but it works.
+      fetch(`${getAPIEndpoint()}/exportrequests/${key.data}/download`, 
+      {method: "GET", headers: {
+        Authorization: `Bearer ${parsedToken.access}`,
+        'Content-Type': 'application/zip',
+      }}).then(response => response.blob()).then(blob => {
+      const now = moment()
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `sample.zip`);
-      // 3. Append to html page
+      link.setAttribute('download', `${title}_${id}_${now}`);
       document.body.appendChild(link);
-      // 4. Force download
       link.click();
-      // 5. Clean up and remove the link
       link.parentNode.removeChild(link);
+      resolve()
     }).catch(err => reject(err))
   })
 }
