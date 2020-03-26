@@ -40,11 +40,11 @@ export function requestDownload(key, data){
         Authorization: `Bearer ${parsedToken.access}`,
         'Content-Type': 'application/zip',
       }}).then(response => response.blob()).then(blob => {
-      const now = moment()
+      const now = moment().format("YYYY-MM-DD")
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${title}_${id}_${now}`);
+      link.setAttribute('download', `${title}_${now}.zip`);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
@@ -338,16 +338,14 @@ export function getRelatedDatasets(projectID) {
 
 //this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
 //TODO: implement dataset query the same way as Projects Files are queried - this should now be possible, supposing that the dataset's searchmodel contains both a location and a wildcard for path_parent.
-export function getRootPaths_old(projectID, dataType="projects" ){
+export function getRootPaths_old(projectID, dataType="datasets"){
+
   return new Promise((resolve, reject) => {
-    
     const params_allFiles={
       pagination: { page: 1, perPage: 1000000},
       sort: {field: "path_parent.keyword", order: "DESC"},
     }
     dataProvider("GET_FILES", `${dataType}/${projectID}`, params_allFiles).then(allFiles => {
-      //get root paths by location
-
       const rootPaths = {}
       allFiles.data.map(file => {
         if (file.location in rootPaths){
@@ -359,14 +357,12 @@ export function getRootPaths_old(projectID, dataType="projects" ){
         }
         return file
       })
-      //return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
       const rootPathList = []
       Object.keys(rootPaths).map(key => {
         rootPathList.push({
           location: key, path_parent: rootPaths[key].path_parent, locationpromise: getLocationData(key)
         })
       })
-
       resolve(rootPathList)
     }).catch(err => reject(err))
   })

@@ -58,6 +58,9 @@ const styles = theme => ({
     display: "flex",
     flexDirection: "row",
   },
+  backArrow: {
+    marginRight: "0.5em",
+  },
   fileIcons: {
     display: "flex",
     verticalAlign: "middle",
@@ -125,11 +128,10 @@ const styles = theme => ({
 
 const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
-  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
+  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
   {id : "last_modified", numeric: false, disablePadding: false, canOrder: true, label: "Last Modified"},
   {id : "create_dataset", numeric: false, disablePadding: true, canOrder: false, label: ""} //a column for an icon to create a dataset out of this folder on click
-  //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
 const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
@@ -524,10 +526,11 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
       {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
         <TableRow className={classes.showFolderRow}>
           <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
-            <ArrowBack />
+            <ArrowBack className={classes.backArrow} />
+            <Typography className={classes.curFolderText}>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</Typography>
+            <DisplayFileIcons folder={parents[parents.length - 1]} classes={classes} />
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Typography className={classes.curFolderText}>{getParentNameList()}</Typography>

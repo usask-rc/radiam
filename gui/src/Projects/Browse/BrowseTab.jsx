@@ -16,6 +16,9 @@ const styles = theme => ({
     marginRight: '2em',
     textAlign: 'right',
   },
+  noFiles: {
+    textAlign: "left",
+  },
   loading: {
     textAlign: 'left',
   },
@@ -85,12 +88,51 @@ class LocationLinkout extends Component {
 function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
+/*
+const dsSearchModel={
+            bool: {
+              must: {
+                wildcard: {
+                  [`path_parent.keyword`]: `${folder.path}*`
+                },
+              },
+              filter: {
+                term: {
+                  [`location.keyword`]: `${folder.location}`
+                }
+              }
+            }
+          }
+*/
 
   useEffect(() => {
     let _isMounted = true
     setStatus({loading: true})
+    let path_parent
+    let location
 
-    if (dataType === "projects"){
+    if (dataType === "datasets"){
+      try{
+        //validate that these exist.
+        path_parent = searchModel.search.bool.must.wildcard['path_parent.keyword'].slice(0, -1)
+        location = searchModel.search.bool.filter.term['location.keyword'] 
+
+        setListOfRootPaths([{
+          location: location, path_parent: path_parent, locationpromise: getLocationData(location)
+        }])
+        setStatus({loading: false, error: false})
+        
+      }
+      catch(e){
+        console.log("in catch of tc, :", e)
+        //if the above fails, this will work but be slow.
+        getRootPaths_old(datasetID, "datasets").then(data => {
+          setListOfRootPaths(data)
+          setStatus({loading: false, error: false})
+        })
+      }
+    }
+    else if (dataType === "projects"){
       getRootPaths(projectID, dataType, searchModel).then(data => {
           if (_isMounted){ 
             setListOfRootPaths(data)
@@ -99,13 +141,6 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
           return data
       }).catch(err => {
         setStatus({ loading: false, error: err })
-      })
-    }
-    else if (dataType === "datasets"){
-      //TODO: check location and search model - if we have the data we need, use that info instead to get files.
-      getRootPaths_old(datasetID, "datasets").then(data => {
-        setListOfRootPaths(data)
-        setStatus({loading: false, error: false})
       })
     }
     else{
@@ -118,14 +153,13 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
     }
   }, [projectID, dataType]);
 
-  //console.log("browsetab rendering")
   return (
     <div className={classes.main}>
     {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :
     !status.loading && status.error ? 
       <Typography className={classes.loading}>{`${status.error}`}</Typography>
       
-      : listOfRootPaths.length > 0 &&
+      : listOfRootPaths.length > 0 ?
         listOfRootPaths.map(item => {
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
@@ -146,7 +180,7 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
               </div>
               <LocationLinkout key={item.location} promise={item.locationpromise} t={translate} c={classes} />
           </div>
-
+          
           <FolderView
             expanded={"true"}
             item={item}
@@ -160,7 +194,7 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
           />
           </div>)
         }
-      )
+      ): <Typography className={classes.noFiles}>{`No Files were found`}</Typography>
     }
     </div>
   );

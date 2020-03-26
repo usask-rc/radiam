@@ -367,7 +367,6 @@ export const BaseDatasetShow = withTranslate(({ classes, translate, ...props }) 
       <Tab label={MODEL_FIELDS.FILES} path={MODEL_FIELDS.FILES}>    
         <ShowController {...props}>
           {controllerProps => {
-            console.log("controllerProps: " , controllerProps)
           if (controllerProps && controllerProps.record){
             return <BrowseTab projectID={controllerProps.record.project} searchModel={controllerProps.record.search_model} datasetID={controllerProps.record.id} dataType="datasets" projectName={`ds_`} {...controllerProps} />
           }
