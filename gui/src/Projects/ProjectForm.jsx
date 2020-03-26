@@ -182,8 +182,8 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
           />
         { record && (
           <>
-            <EditMetadata record={record} type={MODEL_FK_FIELDS.PROJECT}/>
-            <ConfigMetadata record={record} type={MODEL_FK_FIELDS.PROJECT}/>
+            <EditMetadata id={record.id} record={record} type={MODEL_FK_FIELDS.PROJECT}/>
+            <ConfigMetadata id={record.id} record={record} type={MODEL_FK_FIELDS.PROJECT}/>
           </>
         )}
         <FormDataConsumer>
