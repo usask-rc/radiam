@@ -822,6 +822,20 @@ class Migration(migrations.Migration):
                 null, \
                 2);"),
 
+        # 1.10.1.2.1 identificationInfo -> MD_DataIdentification -> abstract -> CharacterString
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'f6e04925-83a2-4b7d-bf72-e00a248866dd', \
+                'ea4f5ef3-4b0e-4c63-941d-eee2ee4f7eb0', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.abstract.CharacterString', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.abstract.CharacterString.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                True, \
+                null, \
+                1);"),
+
         # 1.10.1.3 identificationInfo -> MD_DataIdentification -> purpose
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
             VALUES ( \
@@ -835,6 +849,20 @@ class Migration(migrations.Migration):
                 True, \
                 null, \
                 3);"),
+
+        # 1.10.1.3.1 identificationInfo -> MD_DataIdentification -> purpose -> CharacterString
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'db55f75a-771a-4c00-ab68-e239d28ee3d5', \
+                '37413041-932b-4888-8b5b-94442b63fe6b', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.purpose.CharacterString', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.purpose.CharacterString,help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
 
         # 1.10.1.4 identificationInfo -> MD_DataIdentification -> status
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
@@ -850,6 +878,62 @@ class Migration(migrations.Migration):
                 null, \
                 4);"),
 
+        # 1.10.1.4.1 identificationInfo -> MD_DataIdentification -> status -> MD_ProgressCode
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '6b2a2575-41d5-4d3d-a76c-348b2e809a42', \
+                '4cf5f746-6e7e-4fb1-847f-e2de10d07305', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.4.1.1 identificationInfo -> MD_DataIdentification -> status -> MD_ProgressCode -> codeList
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '4cf5f746-6e7e-4fb1-847f-e2de10d07305', \
+                '6f6512ad-aa3b-48fb-961c-7ab09cb5083c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.codeList', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.codeList.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.4.1.2 identificationInfo -> MD_DataIdentification -> status -> MD_ProgressCode -> codeListValue
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '4cf5f746-6e7e-4fb1-847f-e2de10d07305', \
+                '28358e27-f310-4292-b0bb-02e7ee7a9179', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.codeListValue', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode..help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.4.1.3 identificationInfo -> MD_DataIdentification -> status -> MD_ProgressCode -> codeSpace
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '4cf5f746-6e7e-4fb1-847f-e2de10d07305', \
+                '1a426580-daad-44db-b1b8-7d32892b59c8', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.codeSpace', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.status.MD_ProgressCode.codeSpace.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                3);"),
+
         # 1.10.1.5 identificationInfo -> MD_DataIdentification -> pointOfContact
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
             VALUES ( \
@@ -863,6 +947,76 @@ class Migration(migrations.Migration):
                 True, \
                 null, \
                 5);"),
+
+        # 1.10.1.5.1 identificationInfo -> MD_DataIdentification -> pointOfContact -> CI_ResponsibleParty
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '4965e36a-623f-4141-83f5-75f5624090b6', \
+                'f1083c08-f3c7-4dd6-a31d-65f99356ff6c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                True, \
+                null, \
+                1);"),
+
+        # 1.10.1.5.1.1 identificationInfo -> MD_DataIdentification -> pointOfContact -> CI_ResponsibleParty -> individualName
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'f1083c08-f3c7-4dd6-a31d-65f99356ff6c', \
+                'a2091851-67be-4ca5-a613-bece6a5a0694', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.individualName', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.individualName.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.5.1.2 identificationInfo -> MD_DataIdentification -> pointOfContact -> CI_ResponsibleParty -> organisationName
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'f1083c08-f3c7-4dd6-a31d-65f99356ff6c', \
+                '91614cec-9fb5-4613-a1a8-212e0083d42c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.organisationName', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.organisationName.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.5.1.3 identificationInfo -> MD_DataIdentification -> pointOfContact -> CI_ResponsibleParty -> contactInfo
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'f1083c08-f3c7-4dd6-a31d-65f99356ff6c', \
+                '8a1dfd5e-ff29-4767-8b12-7e82bda7e446', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.contactInfo', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.contactInfo.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.5.1.4 identificationInfo -> MD_DataIdentification -> pointOfContact -> CI_ResponsibleParty -> role
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'f1083c08-f3c7-4dd6-a31d-65f99356ff6c', \
+                '681d0205-92bd-4169-9d99-73be645b6699', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.role', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.pointOfContact.CI_ResponsibleParty.role.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                4);"),
 
         # 1.10.1.6 identificationInfo -> MD_DataIdentification -> descriptiveKeywords
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
@@ -878,6 +1032,133 @@ class Migration(migrations.Migration):
                 null, \
                 6);"),
 
+        # 1.10.1.6.1 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '258680d8-c753-4083-9a28-30839c44adee', \
+                '378ba8c7-f6a4-480e-880f-9c4c5609a64b', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                True, \
+                null, \
+                1);"),
+
+
+        # 1.10.1.6.1.1 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> keyword
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '378ba8c7-f6a4-480e-880f-9c4c5609a64b', \
+                '6cb535e3-739b-44c9-892a-979e48c3df86', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.keyword', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.keyword.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                True, \
+                null, \
+                1);"),
+
+        # 1.10.1.6.1.1.1 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> keyword -> CharacterString
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '6cb535e3-739b-44c9-892a-979e48c3df86', \
+                '8c47d4c5-bec3-43e6-bf7c-8c2b3d3bb8db', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.keyword.CharacterString', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.keyword.CharacterString.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.6.1.2 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> type
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '378ba8c7-f6a4-480e-880f-9c4c5609a64b', \
+                'b58ca5ea-cacb-41ba-aad5-0e95dfe762cc', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.6.1.2.1 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> type -> MD_KeywordTypeCode
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'b58ca5ea-cacb-41ba-aad5-0e95dfe762cc', \
+                'df8b51c8-cef4-42b4-bae0-dee3c5652019', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.6.1.2.1.1 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> type -> MD_KeywordTypeCode -> codeList
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'df8b51c8-cef4-42b4-bae0-dee3c5652019', \
+                'bbafadf5-2e6e-4d74-b4c2-6a17773a6251', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeList', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeList.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.6.1.2.1.2 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> type -> MD_KeywordTypeCode -> codeListValue
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'df8b51c8-cef4-42b4-bae0-dee3c5652019', \
+                'ae72ed43-7812-4ff2-9ffb-3e689f6790cf', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeListValue', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeListValue.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.6.1.2.1.3 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> type -> MD_KeywordTypeCode -> codeSpace
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'df8b51c8-cef4-42b4-bae0-dee3c5652019', \
+                'a510a2a9-e85c-4ba0-a3e9-991120f6f37e', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeSpace', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.type.MD_KeywordTypeCode.codeSpace.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.6.1.3 identificationInfo -> MD_DataIdentification -> descriptiveKeywords -> MD_Keywords -> thesaurusName
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '378ba8c7-f6a4-480e-880f-9c4c5609a64b', \
+                '6a1d1b75-fb64-494c-99d6-ed569929cc2f', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.thesaurusName', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.descriptiveKeywords.MD_Keywords.thesaurusName.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                3);"),
+
         # 1.10.1.7 identificationInfo -> MD_DataIdentification -> resourceConstraints
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
             VALUES ( \
@@ -891,6 +1172,188 @@ class Migration(migrations.Migration):
                 True, \
                 null, \
                 7);"),
+
+        # 1.10.1.7.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'c479021a-d64d-419c-b3d2-d0c8b5dc9458', \
+                '586a202d-9e97-4215-8efc-f7b9356d90da', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> accessConstraints
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '586a202d-9e97-4215-8efc-f7b9356d90da', \
+                '5942b0e2-04d9-495c-bc0a-f7cbf95c93c2', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.1.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> accessConstraints -> MD_RestrictionCode
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '5942b0e2-04d9-495c-bc0a-f7cbf95c93c2', \
+                '2626accb-5a6c-4c5e-9638-3dd577d8bb11', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.1.1.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> accessConstraints -> MD_RestrictionCode -> codeList
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '2626accb-5a6c-4c5e-9638-3dd577d8bb11', \
+                '4ec2731c-8908-4318-a1df-e87dea49a1f1', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeList', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeList.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.1.1.2 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> accessConstraints -> MD_RestrictionCode -> codeListValue
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '2626accb-5a6c-4c5e-9638-3dd577d8bb11', \
+                '3e5cc97d-483e-494f-9a53-7a9d5420aa56', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeListValue', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeListValue.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.7.1.1.1.3 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> accessConstraints -> MD_RestrictionCode -> codeSpace
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '2626accb-5a6c-4c5e-9638-3dd577d8bb11', \
+                '3c3d2e33-9f5f-4e8e-b62d-4db242d7719c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeSpace', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.accessConstraints.MD_RestrictionCode.codeSpace.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.7.1.2 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> useConstraints
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '586a202d-9e97-4215-8efc-f7b9356d90da', \
+                '78729779-d7b2-4377-99dd-1ddc88701678', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.7.1.2.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> useConstraints -> MD_RestrictionCode
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '78729779-d7b2-4377-99dd-1ddc88701678', \
+                '91270f06-9305-4670-ba56-d24e1dd382fd', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.2.1.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> useConstraints -> MD_RestrictionCode -> codeList
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '91270f06-9305-4670-ba56-d24e1dd382fd', \
+                '87a303fb-5eff-4046-81ed-457c7c1b5bff', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeList', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeList.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.7.1.2.1.2 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> useConstraints -> MD_RestrictionCode -> codeListValue
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '91270f06-9305-4670-ba56-d24e1dd382fd', \
+                '0d0e04d8-9d5f-4f97-8c89-823f106f8994', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeListValue', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeListValue.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.7.1.2.1.3 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> useConstraints -> MD_RestrictionCode -> codeSpace
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '91270f06-9305-4670-ba56-d24e1dd382fd', \
+                'f03572ff-ea71-4651-91e7-5552773cb0e1', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeSpace', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.useConstraints.MD_RestrictionCode.codeSpace.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.7.1.3 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> otherConstraints
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '586a202d-9e97-4215-8efc-f7b9356d90da', \
+                '152296d2-cdda-477d-bb5a-10b89d69bb21', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.otherConstraints', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.otherConstraints.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.7.1.3.1 identificationInfo -> MD_DataIdentification -> resourceConstraints -> MD_LegalConstraints -> otherConstraints -> CharacterString
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '152296d2-cdda-477d-bb5a-10b89d69bb21', \
+                '60927576-7113-4037-8746-3ba8e81b71e1', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.otherConstraints.CharacterString', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.resourceConstraints.MD_LegalConstraints.otherConstraints.CharacterString.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
 
         # 1.10.1.8 identificationInfo -> MD_DataIdentification -> language
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
@@ -906,6 +1369,20 @@ class Migration(migrations.Migration):
                 null, \
                 8);"),
 
+        # 1.10.1.8.1 identificationInfo -> MD_DataIdentification -> language -> CharacterString
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'a5001044-a34c-4458-9ce3-2055078ce68d', \
+                '74dd1e36-d54d-4740-b535-fe5829e03b28', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.language.CharacterString', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.language.CharacterString.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                True, \
+                null, \
+                1);"),
+
         # 1.10.1.9 identificationInfo -> MD_DataIdentification -> topicCategory
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
             VALUES ( \
@@ -920,6 +1397,20 @@ class Migration(migrations.Migration):
                 null, \
                 9);"),
 
+        # 1.10.1.9.1 identificationInfo -> MD_DataIdentification -> topicCategory -> MD_TopicCategoryCode
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd2f4a6c0-5927-4e4e-9491-96f85635eeb7', \
+                '8fd5dd16-8705-4664-8a3c-7b3fe508be47', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.topicCategory.MD_TopicCategoryCode', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.topicCategory.MD_TopicCategoryCode.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                True, \
+                null, \
+                1);"),
+
         # 1.10.1.10 identificationInfo -> MD_DataIdentification -> extent
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
             VALUES ( \
@@ -930,9 +1421,177 @@ class Migration(migrations.Migration):
                 'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.help', \
                 'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
                 '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
-                True, \
+                False, \
                 null, \
                 10);"),
+
+        # 1.10.1.10.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'e7164399-396b-4cd3-b496-31c3242406ce', \
+                '67b596af-e458-4cad-8dda-7d77646e2d4c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.10.1.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> id
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '67b596af-e458-4cad-8dda-7d77646e2d4c', \
+                '565377d3-578f-4074-b133-79a424aceb88', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.id', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.id.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.10.1.2 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '67b596af-e458-4cad-8dda-7d77646e2d4c', \
+                'c0fa731c-73aa-45c7-bd06-86da2f6a283d', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.10.1.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'c0fa731c-73aa-45c7-bd06-86da2f6a283d', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.10.1.1.1.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> id
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                'eae5c5d3-3b66-4821-83f0-cf95ae2f9510', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.id', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.id.help', \
+                '9a8b45b0-ed13-4524-8f7d-0059ec3c156e', \
+                'e079c97d-9f5c-4dbc-8acb-b21c21827f1b', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.10.1.1.1.2 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> westBoundLongitude
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                'cd16d98d-51a4-448f-98e4-ec335c8be22c', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.westBoundLongitude', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.westBoundLongitude.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.10.1.1.1.2.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> westBoundLongitude -> Decimal
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'cd16d98d-51a4-448f-98e4-ec335c8be22c', \
+                '033a1642-5a5b-4150-af4f-d8791171d63f', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.westBoundLongitude.Decimal', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.westBoundLongitude.Decimal.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                2);"),
+
+        # 1.10.1.10.1.1.1.3 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> eastBoundLongitude
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                '38a69b85-5a49-4a85-a9ae-3114323ba2cb', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.eastBoundLongitude', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.eastBoundLongitude.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                3);"),
+
+        # 1.10.1.10.1.1.1.3.1 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> eastBoundLongitude -> Decimal
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '38a69b85-5a49-4a85-a9ae-3114323ba2cb', \
+                '99235e74-e4d7-4793-9dbb-422eafcc7e14', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.eastBoundLongitude.Decimal', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.eastBoundLongitude.Decimal.help', \
+                '4de681a6-0462-41bf-8151-8d58e047b67e', \
+                '3b0f0c91-f5fd-4d5c-aaa8-40a61d822e97', \
+                False, \
+                null, \
+                1);"),
+
+        # 1.10.1.10.1.1.1.4 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> southBoundLatitude
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                '62c42b4b-6165-465c-83c3-d7393c090110', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.southBoundLatitude', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.southBoundLatitude.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                4);"),
+
+        # 1.10.1.10.1.1.1.5 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> geographicElement -> EX_GeographicBoundingBox -> southBoundLatitude
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                'd5ba5379-42d5-4ebb-9e8d-7b8f843f4135', \
+                '647811d6-f323-4e81-ba89-45d6fd707d32', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.northBoundLatitude', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.geographicElement.EX_GeographicBoundingBox.northBoundLatitude.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                5);"),
+
+        # 1.10.1.10.1.3 identificationInfo -> MD_DataIdentification -> extent -> EX_Extent -> temporalElement
+        migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \
+            VALUES ( \
+                'b36b79b2-55bd-4e90-ad0e-b1b72086c2d6', \
+                '67b596af-e458-4cad-8dda-7d77646e2d4c', \
+                '2e14a90b-0e59-41cf-b0e4-79d638931dc6', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.temporalElement', \
+                'en.metadata.iso.19115.gmd.identificationInfo.MD_DataIdentification.extent.EX_Extent.temporalElement.help', \
+                'e2c6f819-5ef3-4104-ae04-480f3fd48d73', \
+                '03bf8631-94a1-41e5-b91d-e8c7c4902125', \
+                False, \
+                null, \
+                3);"),
 
         # 1.10.1.11 identificationInfo -> MD_DataIdentification -> supplementalInformation
         migrations.RunSQL("INSERT INTO rdm_fields (schema_id, parent_id, id, label, help, metadata_ui_type_id, metadata_value_type_id, many_values, choice_list_id, default_order) \

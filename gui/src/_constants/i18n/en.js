@@ -248,6 +248,316 @@ export default {
         version: {
           label: 'Version',
         },
+      },
+      iso: {
+        19115 : {
+            2014: {
+              label: 'ISO 19115:2014',
+              short: '19115'
+            },
+            gmd : {
+                characterSet : {
+                    label: 'Character Set'
+                },
+                CI_ResponsibleParty : {
+                    label: 'Responsible Party'
+                },
+                codeList : {
+                    label : 'Code List'
+                },
+                codeListValue : {
+                    label : 'Code List Value'
+                },
+                codeSpace : {
+                    label : 'Code Space'
+                },
+                contact : {
+                    label: 'Contact'
+                },
+                contactInfo: {
+                    label: 'Contact Info',
+                    CI_Contact: {
+                        label: 'Contact',
+                        address: {
+                            label: "Address",
+                            CI_Address: {
+                                label: 'CI Address',
+                                administrativeArea: {
+                                    label: 'Administrative Area Container',
+                                    CharacterString: {
+                                        label: 'Administrative Area'
+                                    }
+                                },
+                                city: {
+                                    label: 'City Container',
+                                    CharacterString: {
+                                        label: 'City'
+                                    }
+                                },
+                                country: {
+                                    label: 'Country Container',
+                                    CharacterString: {
+                                        label: 'Country'
+                                    }
+                                },
+                                deliveryPoint: {
+                                    label: 'Delivery Point Container',
+                                    CharacterString : {
+                                        label: 'Delivery Point'
+                                    }
+                                },
+                                electronicMailAddress: {
+                                    label: 'Email Container',
+                                    CharacterString : {
+                                        label: 'Email'
+                                    }
+                                },
+                                postalCode: {
+                                    label: 'Postal Code Container',
+                                    CharacterString: {
+                                        label: 'Postal Code'
+                                    }
+                                },
+                            },
+                        },
+                        phone: {
+                            label: 'Phone',
+                            CI_Telephone: {
+                                label: 'Telephone',
+                                voice: {
+                                    label: 'Voice Container',
+                                    CharacterString: {
+                                        label: 'Voice'
+                                    }
+                                }
+                            },
+                        }
+                    }
+                },
+                dataSetURI : {
+                    label: 'Dataset URI Container',
+                    CharacterString: {
+                        label: 'Dataset URI'
+                    },
+                },
+                dateStamp: {
+                    label: 'Date Stamp',
+                    'Date': {
+                        label: "Date"
+                    },
+                },
+                fileIdentifier : {
+                    label : 'File Identifier'
+                },
+                hierarchyLevel : {
+                    label: 'Hierarchy Level',
+                    MD_ScopeCode : {
+                        label : 'Hierarchy Level Scope Code',
+                        codeList: {
+                            label: 'Hierarchy Level Code List'
+                        },
+                        codeListValue: {
+                            label: 'Hierarchy Level Code List Value'
+                        },
+                        codeSpace: {
+                            label: 'Hierarchy Level Code Space'
+                        },
+                    },
+                },
+                identificationInfo : {
+                    label: 'Identification Information',
+                    MD_DataIdentification: {
+                        label: 'MD_DataIdentification',
+                        'abstract': {
+                            label: 'Abstract Container',
+                            CharacterString: {
+                                label: 'Abstract'
+                            },
+                        },
+                        citation: {
+                            label: 'Citation'
+                        },
+                        descriptiveKeywords: {
+                            label: 'Descriptive Keywords',
+                            MD_Keywords: {
+                                label: 'MD Keywords',
+                                keyword: {
+                                    label: 'Keyword Container',
+                                    CharacterString: {
+                                        label: 'Keyword'
+                                    },
+                                },
+                                thesaurusName: {
+                                    label: "Thesaurus Name"
+                                },
+                                type: {
+                                    label: 'Type',
+                                    MD_KeywordTypeCode: {
+                                        label: 'MD Keyword Type Code',
+                                        codeList: {
+                                            label: 'Code List'
+                                        },
+                                        codeListValue: {
+                                            label: 'Code List Value'
+                                        },
+                                        codeSpace: {
+                                            label: 'Code Space'
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        extent: {
+                            label: 'Extent'
+                        },
+                        language: {
+                            label: 'Language'
+                        },
+                        pointOfContact: {
+                            label: 'Point of Contact',
+                            CI_ResponsibleParty: {
+                                label: 'Responsible Party',
+                                contactInfo: {
+                                    label: 'Contact Info'
+                                },
+                                individualName: {
+                                    label: 'Individual Name'
+                                },
+                                organisationName:  {
+                                    label: 'Organization Name'
+                                },
+                                role:  {
+                                    label: 'Role'
+                                },
+                            },
+                        },
+                        purpose: {
+                            label: 'Purpose Container',
+                            CharacterString: {
+                                label: 'Purpose'
+                            },
+                        },
+                        resourceConstraints: {
+                            label: 'Resource Constraints',
+                            MD_LegalConstraints: {
+                                label: 'MD Legal Constraints',
+                                accessConstraints: {
+                                    label: 'Access Constraints',
+                                    MD_RestrictionCode: {
+                                        label: 'MD Restriction Code',
+                                        codeList: {
+                                            label: "Code List"
+                                        },
+                                        codeListValue: {
+                                            label: "Code List Value"
+                                        },
+                                        codeSpace: {
+                                            label: "Code Space"
+                                        },
+                                    },
+                                },
+                                useConstraints: {
+                                    label: 'Use Constraints',
+                                },
+                                otherConstraints: {
+                                    label: 'Other Constraints',
+                                },
+                            },
+                        },
+                        'status': {
+                            label: 'Status',
+                            MD_ProgressCode: {
+                                label: 'Progress Code',
+                                codeList: {
+                                    label: 'Code List'
+                                },
+                                codeListValue: {
+                                    label: 'Code List Value'
+                                },
+                                codeSpace: {
+                                    label: 'Code Space'
+                                },
+                            },
+                        },
+                        supplementalInformation: {
+                            label: 'Supplemental Information'
+                        },
+                        topicCategory: {
+                            label: 'Topic Category'
+                        },
+                    },
+                },
+                individualName : {
+                    label: 'Individual Name Container',
+                    CharacterString: {
+                        label: 'Individual Name'
+                    },
+                },
+                language : {
+                    label: 'Language'
+                },
+                MD_CharacterSetCode : {
+                    label: 'Character Set Code',
+                    CharacterSetCode: {
+                        codeList: {
+                            label: 'Character Set Code List'
+                        },
+                        codeListValue: {
+                            label: 'Character Set Code List Value'
+                        },
+                        codeSpace: {
+                            label: 'Character Set Code Space'
+                        },
+                    }
+                },
+                MD_Metadata : {
+                    label : 'MD Metadata'
+                },
+                metadataStandardName: {
+                    label: "Metadata Standard Name Container",
+                    CharacterString: {
+                        label: 'Metadata Standard Name'
+                    },
+                },
+                metadataStandardVersion: {
+                    label: "Metadata Standard Version Container",
+                    CharacterString: {
+                        label: 'Metadata Standard Version'
+                    },
+                },
+                organisationName: {
+                    label: 'Organisation Name Container',
+                    CharacterString: {
+                        label: 'Organisation Name'
+                    },
+                },
+                role: {
+                    label: 'Role',
+                    CI_RoleCode: {
+                        label: 'Role Code',
+                        codeList: {
+                            label: 'Code List',
+                        },
+                        codeListValue: {
+                            label: 'Code List Value',
+                        },
+                        codeSpace: {
+                            label: 'Code Space',
+                        },
+                    }
+                },
+            },
+            gco : {
+                CharacterString : {
+                    fileIdentifier : {
+                        label : 'File Identifier'
+                    },
+                    language : {
+                        label : 'Language Value'
+                    },
+                }
+            },
+        },
       }
     },
     search: 'Search',
