@@ -132,7 +132,6 @@ const headCells = [
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
   {id : "last_modified", numeric: false, disablePadding: false, canOrder: true, label: "Last Modified"},
   {id : "create_dataset", numeric: false, disablePadding: true, canOrder: false, label: ""} //a column for an icon to create a dataset out of this folder on click
-  //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
 const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
