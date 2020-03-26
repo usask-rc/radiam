@@ -30,7 +30,7 @@ const styles = () => ({
 const LoginForm = ({classes, translate, loading, handleSubmit, renderInput, toggleForgotPassword, login}) => {
 
     return(
-        <MuiThemeProvider>
+        <MuiThemeProvider theme={null}>
             <Form onSubmit={(values) => handleSubmit(values)}
             
             validate = {(values, props) => {

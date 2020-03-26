@@ -26,8 +26,6 @@ import LocationTitle from './LocationTitle';
 import { SingleFieldList } from 'ra-ui-materialui/lib/list';
 import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
 import { ShowController } from 'ra-core';
-import { DefaultToolbar } from '../_components';
-
 
 const listStyles = {
   actions: {
@@ -179,10 +177,8 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
     : null
 );
 
-
 export const LocationDisplay = props => 
   {
-    //console.log("LocationDisplay data: ", props)
   return(
   <Show {...props}>
     <SimpleShowLayout>

@@ -62,13 +62,12 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         setUnknown(tempU)
     }, [groupMembers])
 
-    //console.log("RelatedGroups props: ", props, "inmodal: ", inModal)
     return (
         <div className={classes.container}>   
             {groupAdmins.length > 0 &&
                 <div className={classes.roleContainer}>
                     {groupAdmins.map(groupMember => {
-                        return <Tooltip title="Group Admin">
+                        return <Tooltip title="Group Admin" key={`tooltip_${groupMember.id}`}>
                             <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
                             label={`${groupMember.group.name}`}
                             onClick={() => {

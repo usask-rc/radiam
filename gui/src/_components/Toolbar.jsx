@@ -15,12 +15,15 @@ const styles = {
 
 //separate entry for deleting users - we don't want users to be able to delete themselves.
 const BaseUserToolbar = ({classes, ...props}) => {
-  console.log("BaseUserToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
+  console.log("BaseUserToolbar props: ", props)
+
     return(
       <Toolbar {...rest}>
         <SaveButton />
-          {props.record.id !== getCurrentUserID() && <DeleteWithConfirmButton className={classes.deleteButton} 
+        {//TODO: / NOTE: there is a react-admin error with DeleteWithConfirmButton about onSave.  this is react-admin's fault - it happens whenever this tag is used, regardless of props passed into it.
+        }
+          {props.record.id !== getCurrentUserID() && <DeleteWithConfirmButton className={classes.deleteButton}
             confirmTitle={`Delete User?`}
             confirmContent={`Are you sure you want to delete this user?`}
            {...props} />
@@ -51,16 +54,18 @@ const BaseToolbar = ({classes, ...props}) => {
 
 //for anything that is a model of foreign keys with no name/title
 const BaseFKToolbar = ({classes, ...props}) => {
-  //console.log("FKToolbar props: ", props)
-  const { hasCreate, hasEdit, hasShow, hasList, ...rest } = props
-  const { record, id, resource} = props
+  console.log("FKToolbar props: ", props)
+  const { hasCreate, hasEdit, hasShow, hasList, save, ...rest } = props
+  const { record, id, resource } = props
   return(
     <Toolbar {...rest}>
       <SaveButton />
+      {//TODO: / NOTE: there is a react-admin error with DeleteWithConfirmButton about onSave.  this is react-admin's fault - it happens whenever this tag is used, regardless of props passed into it.
+      }
       {record && 
         <DeleteWithConfirmButton className={classes.deleteButton}
         confirmTitle={`Delete record in table ${resource}?`}
-        confirmContent={`Delete ${resource} record ID: ${id}?`}
+        confirmContent={`Delete ${resource} record?`}
         />
       }
 

@@ -13,7 +13,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import {MODEL_FIELDS, ROLE_USER} from "../_constants/index";
+import {MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
@@ -180,7 +180,6 @@ export const UserEdit = props => {
 };
 
 export const UserEditWithDeletion = props => {
-  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
     return (
       <Edit toolbar={<UserToolbar {...props} />} {...props}>

@@ -268,8 +268,6 @@ export const GroupShow = withStyles(styles)(withTranslate(({ classes, permission
           </>
         )}}
       </ShowController>
-
-      
     </SimpleShowLayout>
   </Show>
 )}));
@@ -370,7 +368,7 @@ class BaseGroupEdit extends Component {
           label={"en.models.groups.description"}
           source={MODEL_FIELDS.DESCRIPTION}
           validate={validateDescription}
-          style={{"max-width": "80%"}}
+          style={{"maxWidth": "80%"}}
           multiline
         />
         <BooleanInput

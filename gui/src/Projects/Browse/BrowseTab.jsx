@@ -188,7 +188,7 @@ const dsSearchModel={
             projectID={projectID}
             datasetID={datasetID}
             key={`${item.location}_folderView`}
-            dataType={dataType}
+            modelType={dataType}
             projectLocation={item.location}
             groupID={props.record ? props.record.group : null}
           />

@@ -5,20 +5,27 @@ import {RESOURCE_OPERATIONS, WARNINGS, MODEL_FIELDS} from "../_constants/index";
 import TranslationField from "../_components/_fields/TranslationField";
 import CustomPagination from "../_components/CustomPagination";
 import { Prompt } from 'react-router';
+import { withStyles } from "@material-ui/styles";
 
-export const LocationTypeList = props => (
+const styles = theme => ({
+  columnHeaders: {
+    fontWeight: "bold",
+  },
+})
+
+export const LocationTypeList = withStyles(styles)(({classes, ...props}) => (
   <List {...props} exporter={false}
     bulkActionButtons={false}
     pagination={<CustomPagination />}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <TranslationField
         label={"en.models.locationtypes.label"}
         source={MODEL_FIELDS.LABEL}
       />
     </Datagrid>
   </List>
-);
+));
 
 export const LocationTypeShow = props => (
   <Show title={<LocationTypeTitle />} {...props}>
