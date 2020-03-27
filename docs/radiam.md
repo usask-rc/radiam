@@ -119,7 +119,7 @@ The instructions and code for using Ansible to deploy Radiam via docker stack ar
 
 https://github.com/usask-rc/radiam-deploy/
 
-## Radiam Agent
+### Radiam Agent
 
 The Radiam agent is needed to crawl research data and submit metadata to the Radiam service.  Please see these repositories:
 

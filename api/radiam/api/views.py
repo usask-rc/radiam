@@ -144,6 +144,7 @@ from django.http import HttpResponse
 from io import BytesIO
 from zipfile import ZipFile
 import hashlib
+from datetime import datetime
 from itertools import chain
 # end
 
@@ -929,6 +930,24 @@ class ExportRequestViewSet(RadiamViewSet):
     search_fields = ['id', 'status', 'export_reference']
     permission_classes = (IsAuthenticated, DRYPermissions,)
 
+    def get_bag_metadata(self, contact_name, contact_email, project_name, abstract, dataset_title, sensitivity_level,
+                         restrictions, status, site, method):
+
+        bag_metadata = "Contact-Name: " + contact_name + "\n" \
+        + "Contact-Email: " + contact_email + "\n" \
+        + "Bag-Software-Agent: Radiam" + "\n" \
+        + "Package-Time: " + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + "\n" \
+        + "Contact-Organization: " + project_name + "\n" \
+        + "External-Description: " + abstract + "\n" \
+        + "External-Identifier: " + dataset_title + "\n" \
+        + "Sensitivity-Level: " + sensitivity_level + "\n" \
+        + "Dataset-Restrictions: " + restrictions + "\n" \
+        + "Dataset-Status: " + status + "\n" \
+        + "Dataset-Site: " + site + "\n" \
+        + "Dataset-Method: " + method + "\n"
+
+        return bag_metadata
+
     @action(methods=['get'],
             detail=True,
             url_name='download',
@@ -936,10 +955,20 @@ class ExportRequestViewSet(RadiamViewSet):
     def download(self, request, pk=None):
         export = ExportRequest.objects.get(id=pk)
         if export.status == 'In progress' or export.status == 'Complete':
-            # Fetch data from tables
+            # Fetch data from tables as strings
+            user = User.objects.get(id=request.user.id)
             dataset = Dataset.objects.get(id=export.export_reference)
-
-            zipfilename = str(dataset.project.id) + "_radiam_download.zip"
+            sensitivity_levels = ""
+            if dataset.get_sensitivity_levels():
+                for s in dataset.get_sensitivity_levels():
+                    sensitivity_levels += s.label + ", "
+                sensitivity_levels = sensitivity_levels[:-2]
+            collection_methods = ""
+            if dataset.get_data_collection_methods():
+                for m in dataset.get_data_collection_methods():
+                    collection_methods += m.label + ", "
+                collection_methods = collection_methods[:-2]
+            ##
 
             in_memory = BytesIO()
             zip = ZipFile(in_memory, "a")
@@ -951,7 +980,10 @@ class ExportRequestViewSet(RadiamViewSet):
             zip.writestr(bagit_name, bagit_content)
             # Bag Metadata
             bagmeta_name = "bag-info.txt"
-            bagmeta_content = "External-Description: Radiam project and dataset metadata"
+            bagmeta_content = self.get_bag_metadata(user.first_name + " " + user.last_name, user.email, dataset.project.name,
+                                                    dataset.abstract, dataset.title, sensitivity_levels,
+                                                    dataset.distribution_restriction.label, dataset.data_collection_status.label,
+                                                    dataset.study_site, collection_methods)
             zip.writestr(bagmeta_name, bagmeta_content)
 
             # Payload Directory
@@ -980,6 +1012,7 @@ class ExportRequestViewSet(RadiamViewSet):
 
             zip.close()
 
+            zipfilename = str(dataset.project.id) + "_radiam_download.zip"
             response = HttpResponse(content_type="application/zip")
             response['Content-Disposition'] = 'attachment; filename={0}'.format(zipfilename)
 
