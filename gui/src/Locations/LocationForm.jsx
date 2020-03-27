@@ -184,7 +184,7 @@ class LocationForm extends Component {
   };
 
   render() {
-    const { staticContext, id, classes, record, mode, basePath, ...rest } = this.props;
+    const { staticContext, id, classes, record, mode, ...rest } = this.props;
     const { geo, showMap } = this.state;
 
     return (
@@ -220,8 +220,6 @@ class LocationForm extends Component {
         <FormDataConsumer>
           {formDataProps => {
 
-            //console.log("formDataProps in locform is: ", formDataProps)
-            
             const {formData} = formDataProps
 
             let projList = []
@@ -232,18 +230,6 @@ class LocationForm extends Component {
             else if (record.projects && record.projects.length > 0){
               projList = record.projects
             }
-
-            //somehow still need to translate this shit
-            if (projList && projList.length > 0 && typeof projList[0] === 'object'  ){
-              //console.log("translating projlist into a list: ", projList)
-              const temp = []
-              projList.map(item => {
-                temp.push(item.id)
-                return item
-              })
-              projList = temp
-            }
-            //console.log("projList being rendered: ", projList)
               return(<ReferenceArrayInput
                 resource={"projects"}
                 label={"en.models.locations.projects"}
@@ -252,8 +238,8 @@ class LocationForm extends Component {
                 reference={"projects"}
                 required>
                 <SelectArrayInput 
-                defaultValue={projList}
-                optionText="name" />
+                  defaultValue={projList}
+                  optionText="name" />
               </ReferenceArrayInput>)
             }
           }

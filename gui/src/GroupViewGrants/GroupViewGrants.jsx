@@ -16,7 +16,6 @@ import {
   SimpleForm,
   SimpleShowLayout,
   TextField,
-  TextInput,
   withTranslate,
 } from "react-admin";
 import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
@@ -63,11 +62,6 @@ const filterStyles = {
 const GroupViewGrantFilter = withStyles(filterStyles)(
   ({ classes, ...props }) => (
     <Filter classes={classes} {...props}>
-      <TextInput
-        label={"en.models.filters.search"}
-        source="search"
-        alwaysOn
-      />
       <ReferenceInput
         label={"en.models.grants.dataset"}
         source={MODEL_FK_FIELDS.DATASET}
@@ -177,7 +171,7 @@ const validateGroup = required('en.validate.viewgrants.group');
 const validateDateStarts = required("en.validate.viewgrants.date_start");
 
 const GroupViewGrantForm = ({translate, classes, ...props}) => {
-  const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")
+  const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : [])
   const now = moment()
 
   const handleChipChange = (data) => {

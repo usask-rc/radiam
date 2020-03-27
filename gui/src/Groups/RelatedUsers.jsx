@@ -54,7 +54,7 @@ const RelatedUsers = ({translate, classes, setCreateModal, groupMembers, setEdit
                   {groupMembers.map(groupMember => {
                     const roleDisplay = roleTooltip(translate, groupMember)
                     return(
-                      <Tooltip title={roleDisplay}>
+                      <Tooltip title={roleDisplay} key={`tooltip_${groupMember.id}`}>
                       <Chip className={classes.chipDisplay} aria-label={"admin"} variant="outlined" key={groupMember.id} avatar={
                             <UserAvatar size={"24"} name={`${groupMember.user.first_name} ${groupMember.user.last_name}`}/>
                         }

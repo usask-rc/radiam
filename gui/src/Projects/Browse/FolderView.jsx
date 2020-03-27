@@ -25,7 +25,7 @@ import { LocationShow } from '../../_components/_fields/LocationShow';
 import { ReferenceField } from 'ra-ui-materialui/lib/field';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { getFolderFiles, formatBytes, truncatePath, getAllProjectData } from '../../_tools/funcs';
+import { getFolderFiles, formatBytes, truncatePath } from '../../_tools/funcs';
 import FileDetails from './FileDetails';
 import { Chip, Tooltip, IconButton } from '@material-ui/core';
 import { Link } from  "react-router-dom";
@@ -222,7 +222,7 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, datasetID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
+function FolderView({ projectID, datasetID, item, classes, modelType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
 
   //TODO: consolidate these into something nicer
@@ -380,7 +380,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
+        getFolderFiles(fileParams, type, modelType).then((data) => {
           if (_isMounted){
             if (type === "file"){
               setFileTotal(data.total)
@@ -449,7 +449,7 @@ function FolderView({ projectID, datasetID, item, classes, dataType="projects", 
           fileParams.page = folderPage
         }
         // eslint-disable-next-line
-        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
+        getFolderFiles(fileParams, type, modelType).then((data) => {
           if (_isMounted){
 
             if (type === "file"){
