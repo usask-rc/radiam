@@ -171,7 +171,7 @@ const validateGroup = required('en.validate.viewgrants.group');
 const validateDateStarts = required("en.validate.viewgrants.date_start");
 
 const GroupViewGrantForm = ({translate, classes, ...props}) => {
-  const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : "")
+  const [grantedFields, setGrantedFields] = useState(props.record && props.record.fields ? props.record.fields.split(",") : [])
   const now = moment()
 
   const handleChipChange = (data) => {

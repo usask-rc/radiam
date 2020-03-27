@@ -10,7 +10,7 @@ const TranslationSelect = translate(({ translate, ...props }) => {
       optionText={(record) => {
         return getTranslation(translate, record.label)
       }
-      } />
+    }/>
   );
 });
 

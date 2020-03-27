@@ -13,7 +13,6 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -29,7 +28,7 @@ export function getExportKey(id, type){
 
 //for some export key and dataset values, request a download from the API.
 export function requestDownload(key, data){
-  const {id, title} = data
+  const { title } = data
 
   return new Promise((resolve, reject) => {
       const token = localStorage.getItem(WEBTOKEN);
@@ -293,8 +292,6 @@ export function getFolderFiles(
     q: params.q,
   };
 
-  console.log("queryParams in getfolderfiles: ", queryParams)
-
   return new Promise((resolve, reject) => {
     dataProvider(
       "GET_FILES",
@@ -303,8 +300,6 @@ export function getFolderFiles(
     )
       .then(response => {
         let fileList = [];
-
-        console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -363,6 +358,7 @@ export function getRootPaths_old(projectID, dataType="datasets"){
         rootPathList.push({
           location: key, path_parent: rootPaths[key].path_parent, locationpromise: getLocationData(key)
         })
+        return key
       })
       resolve(rootPathList)
     }).catch(err => reject(err))

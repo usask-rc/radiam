@@ -56,7 +56,7 @@ const BaseToolbar = ({classes, ...props}) => {
 const BaseFKToolbar = ({classes, ...props}) => {
   console.log("FKToolbar props: ", props)
   const { hasCreate, hasEdit, hasShow, hasList, save, ...rest } = props
-  const { record, id, resource } = props
+  const { record, resource } = props
   return(
     <Toolbar {...rest}>
       <SaveButton />
