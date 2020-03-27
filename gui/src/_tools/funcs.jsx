@@ -13,7 +13,6 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
