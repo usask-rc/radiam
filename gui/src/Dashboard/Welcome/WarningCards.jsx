@@ -70,7 +70,6 @@ const WarningCards = ({classes, ...props}) => {
     useEffect(() => {
         //GOAL: find how many users are in each group, if our user is not a base level user
         //if i'm the superuser, I don't care if a group doesn't have a user.  This is up to a Group Admin or a Data Manager to rectify.
-        //TODO: protect against memory leakage
         if (user){
 
             let userRole = getMaxUserRole()
@@ -80,10 +79,6 @@ const WarningCards = ({classes, ...props}) => {
             else{
                 getUsersInMyGroups(user.groupAdminships)
                 .then(data => {
-                    //receive a list of users underneath me
-                    //TODO: determine user count in each group, probably on the next level up
-                    //do we care about user permission levels?
-                    //console.log("users in my managed groups: ", data)
                 })
                 getUsersInMyGroups(user.dataManagerships)
                 .then(data => {
@@ -98,7 +93,6 @@ const WarningCards = ({classes, ...props}) => {
     }, [user])
 
     return(
-        //TODO: there is an issue relating to permissions that causes fewusers to not display
         <Grid className={classes.container} container>
             {user && (user.is_admin || user.is_group_admin ) && userManagedGroups && userManagedGroups.length > 0 && 
                 <Grid item xs={4}>

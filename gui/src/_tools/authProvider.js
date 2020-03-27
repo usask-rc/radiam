@@ -21,7 +21,6 @@ function validateToken(checkToken) {
     .then(response => {
       //if unauthorized, give the client a chance to refresh the token.
       if ((response.status >= 200 && response.status < 300) || (response.status === 401 || response.status === 403)) {
-        //TODO:there is an error between here and the Resolve.  I don't quite know what it is - error is 'uncaught exception: undefined'
         return response.json();
       } else {
         throw new Error(response.statusText);
@@ -52,7 +51,7 @@ function refreshAccessToken(curTok) {
 
   return validateToken(curTok.refresh).then(fetch(request)
     .then(response => {
-      if (response.status < 200 || response.status >= 300) {  //TODO: this should force the user to the login screen.
+      if (response.status < 200 || response.status >= 300) {
         localStorage.removeItem(WEBTOKEN)
         window.location.hash = "#/login"
         console.error(response.statusText);
@@ -62,13 +61,9 @@ function refreshAccessToken(curTok) {
     .then(token => {
       curTok.access = token.access;
       localStorage.setItem(WEBTOKEN, JSON.stringify(curTok));
-      return Promise.resolve();
+      return Promise.resolve()
     })
-    .catch(Promise.reject()))
-    .catch(
-      //TODO: refresh token is expired if it doesn't validate.  The user should be logged out here, but I haven't figured this out yet.
-      Promise.reject()
-    );
+    .catch(e => Promise.reject(e)))
 }
 
 function getRequest(url, suppliedToken) {
@@ -146,11 +141,10 @@ function getGroupMemberships(user) {
           if (user.groupRoles[rolesIndex].id === groupMembership.group_role) {
             groupMembership.group_role = user.groupRoles[rolesIndex];
             if (user.groupRoles[rolesIndex].id === ROLE_DATA_MANAGER) {
-              user.is_data_manager = true; //TODO: this should be a list of project IDs i'm a data manager of
+              user.is_data_manager = true;
               dataManagerships.push(groupMembership.group)
             } else if (user.groupRoles[rolesIndex].id === ROLE_GROUP_ADMIN) {
-
-              user.is_group_admin = true; //TODO: this should be list of project IDs i'm a group admin of.
+              user.is_group_admin = true;
               groupAdminships.push(groupMembership.group)
             }
             else{
@@ -280,13 +274,15 @@ export default (type, params, ...rest) => {
     else{
       return validateToken(JSON.parse(getToken).access)
         .then(() => {
-            Promise.resolve()
+            return Promise.resolve()
           }
         )
-        .catch(
+        .catch(e =>{ //refresh the access token if current one is invalid
           refreshAccessToken(JSON.parse(getToken))
             .then(Promise.resolve())
             .catch(Promise.reject())
+          Promise.reject(e)
+        }
         );
     }
   }

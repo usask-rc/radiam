@@ -5,17 +5,19 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { translate, ReferenceField } from 'react-admin';
 import FolderView from './FolderView';
-import { getRootPaths } from '../../_tools/funcs';
+import { getRootPaths, getRootPaths_old, getLocationData } from '../../_tools/funcs';
 import { LocationShow } from '../../_components/_fields/LocationShow';
 import { MODELS, MODEL_FK_FIELDS, RESOURCE_OPERATIONS, LINKS } from "../../_constants/index"
 import LocationOn from "@material-ui/icons/LocationOn"
-
 
 const styles = theme => ({
   main: {
     flex: '1',
     marginRight: '2em',
     textAlign: 'right',
+  },
+  noFiles: {
+    textAlign: "left",
   },
   loading: {
     textAlign: 'left',
@@ -83,42 +85,66 @@ class LocationLinkout extends Component {
   }
 }
 
-function BrowseTab({ projectID, classes, translate, dataType="projects", projectName, ...props }) {
+function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
 
   useEffect(() => {
     let _isMounted = true
     setStatus({loading: true})
+    let path_parent
+    let location
 
-    getRootPaths(projectID, dataType).then(data => {
-        if (_isMounted){ 
-          //console.log("getrootpaths in browsetab retrieves data: ", data)
+    if (dataType === "datasets"){
+      try{
+        //validate that these exist.
+        path_parent = searchModel.search.bool.must.wildcard['path_parent.keyword'].slice(0, -1)
+        location = searchModel.search.bool.filter.term['location.keyword'] 
 
+        setListOfRootPaths([{
+          location: location, path_parent: path_parent, locationpromise: getLocationData(location)
+        }])
+        setStatus({loading: false, error: false})
+        
+      }
+      catch(e){
+        console.log("in catch of tc, :", e)
+        //if the above fails, this will work but be slow.
+        getRootPaths_old(datasetID, "datasets").then(data => {
           setListOfRootPaths(data)
           setStatus({loading: false, error: false})
-        }
-        return data
-    }).catch(err => {
-      setStatus({ loading: false, error: err })
-    })
+        })
+      }
+    }
+    else if (dataType === "projects"){
+      getRootPaths(projectID, dataType, searchModel).then(data => {
+          if (_isMounted){ 
+            setListOfRootPaths(data)
+            setStatus({loading: false, error: false})
+          }
+          return data
+      }).catch(err => {
+        setStatus({ loading: false, error: err })
+      })
+    }
+    else{
+      console.error("invalid model type given to browse tab")
+    }
 
     //if we unmount, lock out the component from being able to use the state
     return function cleanup() {
       _isMounted = false;
     }
-  }, [projectID, dataType]);
+  }, [projectID, dataType, datasetID, searchModel]);
 
-  //console.log("browsetab rendering")
   return (
     <div className={classes.main}>
     {status.loading ? <Typography className={classes.loading}>{`Loading...`}</Typography> :
     !status.loading && status.error ? 
       <Typography className={classes.loading}>{`${status.error}`}</Typography>
       
-      : listOfRootPaths.length > 0 &&
+      : listOfRootPaths.length > 0 ?
         listOfRootPaths.map(item => {
-          //console.log("listofrootpaths item: ", item)
           return (<div key={`${item.location}_div`}>
             <div className={classes.locationDisplay}>
               <div className={classes.locationIconLink}>
@@ -138,20 +164,21 @@ function BrowseTab({ projectID, classes, translate, dataType="projects", project
               </div>
               <LocationLinkout key={item.location} promise={item.locationpromise} t={translate} c={classes} />
           </div>
-
+          
           <FolderView
             expanded={"true"}
             item={item}
             projectName={projectName}
             projectID={projectID}
+            datasetID={datasetID}
             key={`${item.location}_folderView`}
-            dataType={dataType}
+            modelType={dataType}
             projectLocation={item.location}
-            groupID={props.record.group || null}
+            groupID={props.record ? props.record.group : null}
           />
           </div>)
         }
-      )
+      ): <Typography className={classes.noFiles}>{`No Files were found`}</Typography>
     }
     </div>
   );
@@ -161,5 +188,6 @@ const enhance = compose(
   withStyles(styles),
   translate
 );
+
 
 export default enhance(BrowseTab);

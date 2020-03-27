@@ -28,9 +28,6 @@ const styles = theme => ({
 });
 
 
-//TODO: refactor these chips to display `group admin` instead of `admin` and potentially change the labeling of `member`.
-//if this is displaying in modal form, we want to redirect to go to open that page
-//if this is NOT displaying in modal form, we want groups clicked on to display in a modal.
 const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null, ...props }) => {
 
     const [groupAdmins, setGroupAdmins] = useState([])
@@ -65,13 +62,12 @@ const RelatedGroups = ({ classes, groupMembers, inModal=false, setViewModal=null
         setUnknown(tempU)
     }, [groupMembers])
 
-    //console.log("RelatedGroups props: ", props, "inmodal: ", inModal)
     return (
         <div className={classes.container}>   
             {groupAdmins.length > 0 &&
                 <div className={classes.roleContainer}>
                     {groupAdmins.map(groupMember => {
-                        return <Tooltip title="Group Admin">
+                        return <Tooltip title="Group Admin" key={`tooltip_${groupMember.id}`}>
                             <Chip className={classes.chipDisplay} variant="outlined" key={groupMember.group.id}
                             label={`${groupMember.group.name}`}
                             onClick={() => {

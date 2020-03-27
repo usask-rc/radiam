@@ -38,7 +38,7 @@ const RelatedDatasets = ({classes, setCreateModal, projectDatasets, inModal=fals
 
             //console.log("displayTitle is: ", displayTitle)
             
-            return( //TODO: display number of files in each dataset in the chip
+            return(
               <Tooltip title={dataset.title}>
                 <Chip className={classes.chipDisplay} variant="outlined" key={dataset.id}
                   label={`${displayTitle}`}

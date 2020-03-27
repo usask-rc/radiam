@@ -6,6 +6,7 @@ import radiamRestProvider from "./radiamRestProvider";
 import { httpClient } from ".";
 import { GET_LIST, GET_ONE, CREATE, UPDATE } from "ra-core";
 import moment from "moment";
+
 var cloneDeep = require("lodash.clonedeep");
 
 const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
@@ -13,6 +14,43 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
   return `/${API_ENDPOINT}`;
+}
+
+//for some dataset key, return a generated export value
+export function getExportKey(id, type){
+  return new Promise((resolve, reject) => {
+    const params = {id: id}
+    dataProvider("EXPORT", type, params).then(data => {
+      resolve(data)
+    }).catch(err => reject(err))
+  })
+}
+
+//for some export key and dataset values, request a download from the API.
+export function requestDownload(key, data){
+  const { title } = data
+
+  return new Promise((resolve, reject) => {
+      const token = localStorage.getItem(WEBTOKEN);
+      const parsedToken = JSON.parse(token);
+
+      //TODO: I couldn't grok a way to do this with the dataprovider. this is probably something to change - but it works.
+      fetch(`${getAPIEndpoint()}/exportrequests/${key.data}/download`, 
+      {method: "GET", headers: {
+        Authorization: `Bearer ${parsedToken.access}`,
+        'Content-Type': 'application/zip',
+      }}).then(response => response.blob()).then(blob => {
+      const now = moment().format("YYYY-MM-DD")
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${title}_${now}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      resolve()
+    }).catch(err => reject(err))
+  })
 }
 
 //there are various pages across the app that use this to have their edit button gated off.
@@ -29,10 +67,8 @@ export function isAdminOfAParentGroup(group_id){
 
     getParentGroupList(group_id).then(data => {
       data.map(group => {
-        //iterate through groups we know the user to be an admin in.
-        //TODO: this should fail if the user is made admin of a parent group and then accesses said page without logging out and back in
-        //the alternative is to regularly update this or to make a query for each parent group - i don't think either is valid
-        //workaround is that the user will have to log out / back in.
+
+        //NOTE: this should fail if the user is made admin of a parent group and then accesses said page without logging out and back in
         for (var i = 0; i < user.groupAdminships.length; i++){
           if (group.id === user.groupAdminships[i]){
             resolve(true)
@@ -110,7 +146,7 @@ export function getRecentProjects(count=1000) {
     const now = moment();
     dataProvider(GET_LIST, MODELS.PROJECTS, {
       order: { field: MODEL_FIELDS.NAME },
-      pagination: { page: 1, perPage: count }, //TODO: Probably needs pagination.
+      pagination: { page: 1, perPage: count },
     })
       .then(response => {
         const projects = response.data
@@ -242,21 +278,19 @@ export function getFirstCoordinate(layer) {
   return false
 }
 
-
 //given a parent path in a project, find all files in that directory.
 export function getFolderFiles(
   params,
   type,
   dataType="projects",
 ) {
+
   const queryParams = {
     filter: { path_parent: params.folderPath, type:type, location:params.location },
     pagination: { page: params.page, perPage: params.numFiles },
     sort: { field: params.sortBy, order: params.order },
     q: params.q,
   };
-
-  //console.log("queryParams in getfolderfiles: ", queryParams)
 
   return new Promise((resolve, reject) => {
     dataProvider(
@@ -266,8 +300,6 @@ export function getFolderFiles(
     )
       .then(response => {
         let fileList = [];
-
-        //console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -300,60 +332,76 @@ export function getRelatedDatasets(projectID) {
   });
 }
 
-//given a project and a location, find the root directory.
-export function findRootPath(projectID, location=null, path=null, dataType="projects" ){
+//this is the backup solution for showing dataset files.  since i dont know where they are rooted, i have to search from root.
+//TODO: implement dataset query the same way as Projects Files are queried - this should now be possible, supposing that the dataset's searchmodel contains both a location and a wildcard for path_parent.
+export function getRootPaths_old(projectID, dataType="datasets"){
 
   return new Promise((resolve, reject) => {
-    
-    const params = {
-      pagination: {page: 1, perPage: 1},
+    const params_allFiles={
+      pagination: { page: 1, perPage: 1000000},
       sort: {field: "path_parent.keyword", order: "DESC"},
-      filter: { location: location, path_parent: path}
     }
-
-    dataProvider("GET_FILES", `${dataType}/${projectID}`, params).then(projectFiles => {
-      //console.log("files in path, location, ", path, location, "are: ", projectFiles)
-      resolve(projectFiles.data)
+    dataProvider("GET_FILES", `${dataType}/${projectID}`, params_allFiles).then(allFiles => {
+      const rootPaths = {}
+      allFiles.data.map(file => {
+        if (file.location in rootPaths){
+          if (file.path_parent.length < rootPaths[file.location].path_parent.length){
+            rootPaths[file.location] = file
+          }
+        }else{
+          rootPaths[file.location] = file
+        }
+        return file
+      })
+      const rootPathList = []
+      Object.keys(rootPaths).map(key => {
+        rootPathList.push({
+          location: key, path_parent: rootPaths[key].path_parent, locationpromise: getLocationData(key)
+        })
+        return key
+      })
+      resolve(rootPathList)
     }).catch(err => reject(err))
   })
 }
 
-//assumption: "path_parent" of all locations is ".." with the current agent as of 03/18/2020
-export function getRootPaths(projectID, dataType="projects") {
+//assumption: "path_parent" of all locations is "." with the current agent as of 03/18/2020
+export function getRootPaths(projectID, dataType="projects", searchModel={}) {
 
-  return new Promise((resolve, reject) => {
-   
-    const params = {
-      pagination: {page: 1, perPage: 1000},
-      sort: {field: dataType, order: ""},
-      filter: { project: projectID },
-    }
+    return new Promise((resolve, reject) => {
+    
+      const params = {
+        pagination: {page: 1, perPage: 1000},
+        filter: { project: projectID },
+      }
 
-    dataProvider(GET_LIST, "locationprojects", params).then(response => {
-      //console.log("getlist of locationprojects response: ", response)
-      //Filter possible duplicates using a set
+      dataProvider(GET_LIST, "locationprojects", params).then(response => {
+        console.log("getlist of locationprojects response: ", response)
+        //Filter possible duplicates using a set
 
-      let locationSet = new Set()
-      response.data.forEach(locationproject => {
-        locationSet.add(locationproject.location)
-      })
-      locationSet = [...locationSet]
-      return locationSet
-    }).then(locations => {
-      return locations.map(location => {
-        return {location: location, path_parent: "..", locationpromise: getLocationData(location)}
-      })
-    }).then(data => resolve(data))
+        let locationSet = new Set()
+        response.data.forEach(locationproject => {
+          locationSet.add(locationproject.location)
+        })
+        locationSet = [...locationSet]
+        return locationSet
+      }).then(locations => {
+        //if (dataType === "projects"){
+        return locations.map(location => {
+          return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
+        })
+      }).then(data => resolve(data))
   });
 }
 
-export function getAllProjectData(projectID){
+//a test func to get all files
+export function getAllProjectData(projectID, type){
   const params = {
     pagination: { page: 1, perPage: 10000 },
     type: "file"
   }
   return new Promise((resolve, reject) => {
-    dataProvider("GET_FILES", "projects/" + projectID, params).then(response => {
+    dataProvider("GET_FILES", `${type}/` + projectID, params).then(response => {
       console.log("response from getallprojectdata is: ", response)
       resolve(response.data)
     })
@@ -426,8 +474,6 @@ export function getGroupData(group_id) {
   });
 }
 
-//get a single user
-//TODO: merge into a greater `get one item` function
 export function getUserDetails(userID){
   return new Promise((resolve, reject) => {
     dataProvider("GET_ONE", MODELS.USERS, {id: userID})
@@ -466,8 +512,7 @@ export function getCurrentUserDetails() {
   });
 }
 
-//TODO: this can probably be consolidated with getGroupMembers
-//returns a list of users in said group
+//TODO: Consolidate with getGroupMembers
 export function getUsersInGroup(record) {
   return new Promise((resolve, reject) => {
     let groupUsers = [];
@@ -604,8 +649,6 @@ export function getUserGroups(record) {
   });
 }
 
-//TODO: convert to promise / callback system
-//TODO: do the above
 export function submitObjectWithGeo(
   formData,
   geo,
@@ -678,7 +721,6 @@ export function postObjectWithoutSaveProp(formData, resource){
   })
 }
 
-//TODO: When creating Projects, there is a failure somewhere here.
 export function createObjectWithGeo(formData, geo, props, inModal) {
 
   return new Promise((resolve, reject) => {
@@ -689,7 +731,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
       const parsedToken = JSON.parse(token);
       headers.set("Authorization", `Bearer ${parsedToken.access}`);
 
-      //POST the new object, then update it immediately afterwards with any geoJSON it carries. //TODO: this props.resource is undefined with the current stepper
       const request = new Request(getAPIEndpoint() + `/${props.resource}/`, {
         method: METHODS.POST,
         body: JSON.stringify({ ...formData }),
@@ -755,7 +796,6 @@ export function createObjectWithGeo(formData, geo, props, inModal) {
         })
         ;
     } else {
-      //TODO: logout the user.
       toastErrors(WARNINGS.NO_AUTH_TOKEN);
       reject({error: WARNINGS.NO_AUTH_TOKEN})
     }
@@ -818,27 +858,15 @@ export function translateResource(resource, untranslatedData, direction = 0) {
     if (Array.isArray(data)) {
       data.map(item => {
         FK_FIELDS[resource].map(field => {
-          //we now have both URLs AND sub-objects in the mix.  This has to be dealt with differently than how we were doing this before.
-          if (item[field] && isObject(item[field])) {
-            //TODO: something has to be done here, but I don't quite know what yet.
-          }
           return field;
         });
         return item;
       });
     }
 
-    //TODO: there is some issue with creation/editing of PARENT_GROUP, but I believe this is server-side, not client-side.  This will have to be researched further
     else {
       if (direction !== 1) {
         FK_FIELDS[resource].map(field => {
-          if (data[field]) {
-            //currently this only holds single nested objects - the ID we want is in that URL.
-            if (data[field] && isObject(data[field])) {
-              //TODO: again, something has to be done here - i dont know what yet.
-              console.log("Single Object is Resource: ",resource," field: ",field);
-            }
-          }
           return field;
         });
       }
@@ -880,9 +908,6 @@ export function translateResource(resource, untranslatedData, direction = 0) {
           });
         }
       }
-      //the data format that is expected in the "multi select array" fields is just an array of items, which then are queried to the server for full details.
-      //django sends us objects instead of this, and as a result these values must be filtered out.
-      //TODO: this needs to be tested thoroughly.
       else {
         if (data.sensitivity_level && isObject(data.sensitivity_level[0])) {
           data.sensitivity_level = data.sensitivity_level.map(item => item.id);
@@ -913,7 +938,6 @@ export function translateResource(resource, untranslatedData, direction = 0) {
   return data;
 }
 
-//TODO: this is meant to replace the date section of translateResource above
 export function translateDates(date, type, direction = 1) {
   if (direction) {
     if (type === "date_expires" && date.length < 11) {
@@ -922,7 +946,6 @@ export function translateDates(date, type, direction = 1) {
       date += appendTimestamp(true);
     }
   }
-  //TODO: need to do something downstream later.
   return date;
 }
 

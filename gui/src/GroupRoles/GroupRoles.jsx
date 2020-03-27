@@ -7,13 +7,25 @@ import { Divider } from "@material-ui/core";
 import { getAsyncValidateNotExists } from "../_tools/asyncChecker";
 import { Prompt } from 'react-router';
 import {RESOURCE_OPERATIONS, MODELS, WARNINGS, MODEL_FIELDS} from "../_constants/index";
+import { withStyles } from "@material-ui/styles";
 
-export const GroupRoleList = props => (
+const styles = theme => ({
+  columnHeaders: {
+    fontWeight: "bold",
+  },
+})
+
+/*
+will need to be updated to look up only groups that the user is in.
+export const ProjectList = withStyles(styles)(({ classes, ...props }) => (
+  <List
+*/
+export const GroupRoleList = withStyles(styles)(({classes, ...props }) => (
   <List {...props} exporter={false}
     pagination={<CustomPagination />}
     bulkActionButtons={false}
   >
-    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW}>
+    <Datagrid rowClick={RESOURCE_OPERATIONS.SHOW} classes={{headerCell: classes.columnHeaders}}>
       <TranslationField
         label={"en.models.roles.label"}
         source={MODEL_FIELDS.LABEL}
@@ -25,7 +37,7 @@ export const GroupRoleList = props => (
       />
     </Datagrid>
   </List>
-);
+));
 
 export const GroupRoleShow = props => (
   <Show title={<GroupRoleTitle />} {...props}>
@@ -101,14 +113,22 @@ const GroupRoleForm = props => {
   )
 };
 
-export const GroupRoleCreate = props => (
-  <Create {...props}>
-    <GroupRoleForm {...props} />
-  </Create>
-);
+export const GroupRoleCreate = props => {
+  const {hasShow, hasEdit, hasCreate, hasList, ...rest } = props
 
-export const GroupRoleEdit = props => (
-  <Edit title={<GroupRoleTitle />} {...props}>
-    <GroupRoleForm {...props} />
+  return(
+    <Create {...rest}>
+      <GroupRoleForm {...rest} />
+    </Create>
+  )
+};
+
+export const GroupRoleEdit = props => {
+  const {hasShow, hasEdit, hasCreate, hasList, ...rest } = props
+
+  return(
+  <Edit {...rest}>
+    <GroupRoleForm {...rest} />
   </Edit>
-);
+  )
+};

@@ -306,11 +306,6 @@ export const ProjectShow = withTranslate(withStyles(styles)(
     }
 }));
 
-//optionText={<ImageField classes={{ image: classes.image }} source={MODEL_FIELDS.AVATAR_IMAGE} />}
-
-//TODO: geojson object does not properly update afterwards.
-//it doesn't send in the appropriate geojson in the PUT - it either doesn't get it from the map, or it doesnt send it properly in the update function.
-//this functionality works in DATASETS but not here.  The data never gets sent to the API, so it must never be scalped from the map.
 export const ProjectCreate = withTranslate(
   withStyles(styles)(({ classes, translate, ...props }) => (
     <Create submitOnEnter={false} {...props}>

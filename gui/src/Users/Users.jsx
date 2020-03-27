@@ -13,7 +13,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import {MODEL_FIELDS, ROLE_USER} from "../_constants/index";
+import {MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from "../_components/CustomPagination";
 import UserDetails from "./UserDetails";
 import UserEditForm from "./UserEditForm";
@@ -170,7 +170,6 @@ export const UserCreate = props => {
   )
 };
 
-//TODO: refactor all these goddamn user edit forms into one
 export const UserEdit = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
     return(
@@ -180,20 +179,11 @@ export const UserEdit = props => {
     
 };
 
-//TODO: add "are you sure?" prompt.
-//a form for superusers, this is gated in App.jsx.
 export const UserEditWithDeletion = props => {
-  const user = JSON.parse(localStorage.getItem(ROLE_USER))
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props
-  if (props.id !== user.id) { //dont allow superusers to delete themselves
     return (
-      <Edit toolbar={<UserToolbar />} {...props}>
+      <Edit toolbar={<UserToolbar {...props} />} {...props}>
         <UserEditForm {...other} />
       </Edit>
     )
-  }
-
-  else {
-    return (<UserEdit {...props} />)
-  }
 }

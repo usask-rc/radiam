@@ -103,7 +103,7 @@ export const GroupMemberList = withStyles(listStyles)(
             label={"en.models.groupmembers.user"}
             source={MODEL_FK_FIELDS.USER}
             reference={MODELS.USERS}
-            allowEmpty //TODO: this `not loading user` issue will be fixed when ADM-1712 is resolved
+            allowEmpty
           >
             <UserShow />
           </ReferenceField>
@@ -263,7 +263,6 @@ const asyncValidate = getAsyncValidateDuplicateNotExists(
   MODELS.GROUPMEMBERS
 );
 
-//TODO: make date_expires_at required - it is currently a required field, for some reason.
 export const GroupMemberForm = props => {
   const [isFormDirty, setIsFormDirty] = useState(false)
   const [data, setData] = useState({})
@@ -273,15 +272,12 @@ export const GroupMemberForm = props => {
       if (props.save){
         props.save(data)
       }
+
       //accessing in modal form
       else{
-        //console.log("data is: ", data, "props are: ", props)
-        
-
         //if data previously existed, PUT instead
         if (data.id){
           putObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
-            //console.log("data after updating groupmember: ", data)
             if (props.setEditModal){
               if (_isMounted){
                 props.setEditModal(false)
@@ -291,7 +287,6 @@ export const GroupMemberForm = props => {
         }
         else{
           postObjectWithoutSaveProp(data, MODELS.GROUPMEMBERS).then(data => {
-            //console.log("data after posting new groupmember: ", data)
             if (props.setCreateModal){
               if (_isMounted){
                 props.setCreateModal(false)
@@ -308,7 +303,6 @@ export const GroupMemberForm = props => {
   }, [data, props])
 
   function handleSubmit(formData) {
-    //console.log("handleSubmit in groupmembers is submitting formData: ", formData)
     setIsFormDirty(false)
     setData(formData)
   }
@@ -316,9 +310,7 @@ export const GroupMemberForm = props => {
   function handleChange(data){
     setIsFormDirty(true)
   }
-  //console.log("groupmemberform props: ", props)
-  //given some chosen group, we only want to be able to add users who are not already members of said group in some form
-  //if the primary way we're going to be accessing this form is via Groups, we already have this data for Create.
+
   return(
   <SimpleForm {...props}
     redirect={RESOURCE_OPERATIONS.LIST}

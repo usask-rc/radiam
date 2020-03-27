@@ -58,6 +58,9 @@ const styles = theme => ({
     display: "flex",
     flexDirection: "row",
   },
+  backArrow: {
+    marginRight: "0.5em",
+  },
   fileIcons: {
     display: "flex",
     verticalAlign: "middle",
@@ -125,11 +128,10 @@ const styles = theme => ({
 
 const headCells = [
   {id: "name.keyword", numeric: false, disablePadding: false, canOrder: true, label: `File Name`},
-  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "File Size"},
+  {id : "filesize", numeric: false, disablePadding: true, canOrder: true, label: "Size"},
   {id : "path_parent", numeric: false, disablePadding: false, canOrder: false, label: "File Path"},
   {id : "last_modified", numeric: false, disablePadding: false, canOrder: true, label: "Last Modified"},
   {id : "create_dataset", numeric: false, disablePadding: true, canOrder: false, label: ""} //a column for an icon to create a dataset out of this folder on click
-  //,{id : "location", numeric: false, dissablePadding: false, canOrder: true, label: "File Location"}
 ]
 
 const DisplayFileIcons = withStyles(styles)(({classes, ...props}) => {
@@ -165,7 +167,6 @@ function EnhancedTableHead(props) {
       onRequestSort(event, property);
   };
 
-  console.log("EnhancedTableHead order: ", order, "props: ", props)
   return (
       <TableHead className={classes.tableHead}>
       <TableRow>
@@ -221,15 +222,13 @@ function EnhancedTableHead(props) {
 }
 
 
-function FolderView({ projectID, item, classes, dataType="projects", projectName, groupID, projectLocation, ...props }) {
+function FolderView({ projectID, datasetID, item, classes, modelType="projects", projectName, groupID, projectLocation, ...props }) {
   let _isMounted = false
-
-  console.log("item in folderview is: ", item)
 
   //TODO: consolidate these into something nicer
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be ".."
+  const [parents, setParents] = useState([item]); //base level is simply path_parent which should be "."
   const [loading, setLoading] = useState(true)
   const [filePage, setFilePage] = useState(1)
   const [folderPage, setFolderPage] = useState(1)
@@ -242,7 +241,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       props.location.state &&
       props.location.state.search) ||
     null
-  ); //TODO: the field holding this search value should be clearable and should clear when going up / down the folder hierarchy
+  );
   const [order, setOrder] = useState("desc")
   const [file, setFile] = useState(null)
   const [fileTotal, setFileTotal] = useState(0)
@@ -251,7 +250,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
   const canCreateDataset = () => {
     const user = JSON.parse(localStorage.getItem(ROLE_USER))
-    if (user && (user.is_admin || user.groupAdminships.includes(groupID))){
+    if (user && (user.is_admin || (groupID && user.groupAdminships.includes(groupID)))){
       return true
     }
     return false
@@ -260,7 +259,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   const addParent = (folder) => {
     let tempParents = [...parents, folder]
 
-    console.log("adding parent, tempParents is: ", tempParents)
     setLoading(true)
     setFilePage(1)
     setFolderPage(1)
@@ -283,7 +281,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
     setFolderTotal(0)
     setFiles([])
     setFolders([])
-    console.log("sort property: ", property)
     setSortBy(property);
 };
 
@@ -327,7 +324,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   }
 
   const handleSearch = (e) => {
-    console.log("handlesearch: ", e.target.elements.search.value)
 
     if (search !== e.target.elements.search.value){
       setLoading(true)
@@ -363,13 +359,13 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".." //root is `..`
+      folderPath = parents[0].path_parent
     }
 
     if (search && search.length > 0){
       let fileParams = {
         folderPath: folderPath,
-        projectID: projectID,
+        projectID: datasetID ? datasetID : projectID,
         numFiles: perPage, 
         page: filePage,
         order: order === "desc" ? "-" : "",
@@ -384,8 +380,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
         if (type === "directory"){
           fileParams.page = folderPage
         }
-        // eslint-disable-next-line
-        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
+        getFolderFiles(fileParams, type, modelType).then((data) => {
           if (_isMounted){
             if (type === "file"){
               setFileTotal(data.total)
@@ -408,19 +403,12 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               const prevFolders = folders
               if (folderPage > 1){
                 if (data.files[0].id !== prevFolders[prevFolders.length - data.files.length].id){
-                  console.log("new folder list being set to: ", [...prevFolders, ...data.files])
                   setFolders([...prevFolders, ...data.files])
-                }
-                else{
-                  console.error("unhandled case in set folders in search")
                 }
               }
               else{
                 setFolders([...data.files])
               }
-            }
-            else{
-              console.error("unknown file requested as data: ", type, data)
             }
             setLoading(false)
           }
@@ -438,7 +426,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
   useEffect(() => {
     let folderPath = parents[parents.length - 1].path
     if (parents.length === 1){
-      folderPath = ".."
+      folderPath = parents[0].path_parent
     }
     
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -446,7 +434,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
 
     let fileParams = {
       folderPath: folderPath,
-      projectID: projectID,
+      projectID: datasetID ? datasetID : projectID,
       numFiles: perPage,  
       page: filePage,
       sortBy: sortBy,
@@ -454,16 +442,14 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       order: order === "desc" ? "-" : "",
     }
 
-    if (!search){ //TODO: there is a better way to separate this out
-
+    if (!search){ 
       fileTypes.forEach(type => {
         fileParams.page = filePage
         if (type === "directory"){
           fileParams.page = folderPage
         }
         // eslint-disable-next-line
-        getFolderFiles(fileParams, type, dataType=dataType).then((data) => {
-          console.log(`${type} data: ${data.files}`)
+        getFolderFiles(fileParams, type, modelType).then((data) => {
           if (_isMounted){
 
             if (type === "file"){
@@ -471,7 +457,6 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
               setFileTotal(data.total)
               const prevFiles = files
 
-              console.log("prevFiles, data.files: ", [...prevFiles, ...data.files])
               if (filePage > 1){
                 if (data.files[0].id !== prevFiles[prevFiles.length - data.files.length].id)
                 {
@@ -541,10 +526,11 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
       {!loading && (parents.length > 1) && //colspan doesnt work apparently, but rowSpan does.
         <TableRow className={classes.showFolderRow}>
           <TableCell align={"left"} colSpan={4} className={classes.backCell} onClick={() => parents.length > 1 ? removeParent() : null}>
-            <ArrowBack />
+            <ArrowBack className={classes.backArrow} />
+            <Typography className={classes.curFolderText}>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</Typography>
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
-            <Typography className={classes.curFolderText}>{`${parents[parents.length - 1].name ? parents[parents.length - 1].name : `<No Folder Name>` }`}</Typography>
+            <DisplayFileIcons folder={parents[parents.length - 1]} classes={classes} />
           </TableCell>
           <TableCell className={classes.curFolderDisplay} onClick={() => setFile(parents[parents.length - 1])}>
             <Typography className={classes.curFolderText}>{getParentNameList()}</Typography>
@@ -566,6 +552,21 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
           //split to 3 folders up
           let truncated_path = truncatePath(folder.path)
 
+          const dsSearchModel={
+            bool: {
+              must: {
+                wildcard: {
+                  [`path_parent.keyword`]: `${folder.path}*`
+                },
+              },
+              filter: {
+                term: {
+                  [`location.keyword`]: `${folder.location}`
+                }
+              }
+            }
+          }
+
           return <TableRow className={classes.folderRow} key={folder.id}>
             <TableCell className={classes.nameCell} onClick={() => addParent(folder)}>
               {folder.name ? folder.name : `<No Folder Name>`}
@@ -585,7 +586,7 @@ function FolderView({ projectID, item, classes, dataType="projects", projectName
             </TableCell>
             <TableCell className={classes.createDatasetCell}>
               {canCreateDataset() ? 
-                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: {wildcard: {path_parent: `${folder.path}*`}}}}>
+                <Link to={{pathname: `/${MODELS.DATASETS}/Create`, title:`${projectName}_${folder.path}`, project: projectID, search_model: dsSearchModel}}>
                   <Tooltip title={`Create Dataset rooted at .../${folder.name}`}>
                     <Chip icon={<InsertChart />} clickable variant="outlined" label={"+"} key={`newDataset_${folder.id}`}/>
                   </Tooltip>

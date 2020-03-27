@@ -62,14 +62,13 @@ const styles = theme => ({
 
 const validatePassword = [required()];
 const validateConfirmPassword = values => {
+  //TODO: validate the confirm passsword against the existing password
   const errors = {}
-
   //console.log("validateconfirmpassword values are: ", values)
 
   return errors
 }
 
-//TODO: this page needs to be integrated into the translation schema.
 class ResetPassword extends Component {
   constructor() {
     super();
@@ -88,7 +87,6 @@ class ResetPassword extends Component {
     if (this.props && match && match.params && match.params.token) {
       this.setState({ token: match.params.token });
     }
-    //TODO: if not token, we have to reject and leave this page.
     else {
       this.setState({
         update: false,
@@ -97,8 +95,6 @@ class ResetPassword extends Component {
         completed: false
       });
     }
-    //console.log("this props is: ", this.props)
-
   }
   handleChange = name => event => {
     this.setState({
@@ -106,7 +102,6 @@ class ResetPassword extends Component {
     });
   };
 
-  //TODO: create a generic component for 'password, confirm password' to use on both this page and elsewhere.
   updatePassword = e => {
     e.preventDefault();
 

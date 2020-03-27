@@ -31,8 +31,8 @@ php muse migration -f
 ## Configuration
 
 There are two types of roles for a HubZero instance, registered user and administrator. The site pages for them are shown below, respectively.
-![Radiam Projects](hubzero_images/hubzero-site.png)
-![Radiam Projects](hubzero_images/hubzero-admin.png)
+![HubZero Users Site](hubzero_images/hubzero-site.png)
+![HubZero Administrators Site](hubzero_images/hubzero-admin.png)
 
 The Radiam HubZero Agent runs on the HubZero Platform, therefore it is configured from the HubZero admin interface. 
 
@@ -47,7 +47,7 @@ A component called Radiam has been developed to link HubZero projects to Radiam 
   - If it is running on a non-standard port, then include the port: https://radiam.somwehere.edu:8100/
   - For now, only `radiam_host_url` has to be set up manually
 
-![Radiam Projects](hubzero_images/hubzero-admin-component-radiam.png)
+![Radiam Component Configuration](hubzero_images/hubzero-admin-component-radiam.png)
 
 
 ### Administrators Configure Radiam Module
@@ -61,7 +61,7 @@ The module is installed but not available until you create an instance of it. To
 - Select `mod_radiam` for the Type
 - Click the check mark to publish the module instance
 
-![Radiam Projects](hubzero_images/hubzero-admin-module-radiam.png)
+![Radiam Module](hubzero_images/hubzero-admin-module-radiam.png)
 
 Administrator is free to edit the default Radiam module instance or delete it and create a new one. 
 
@@ -76,21 +76,21 @@ Administrator is free to edit the default Radiam module instance or delete it an
     - Access = public
   
 Now the end user can add this Radiam Module to his dashboard. 
-![Radiam Projects](hubzero_images/hubzero-site-add-module.png)
-![Radiam Projects](hubzero_images/hubzero-site-install-module-radiam.png)
+![Add Module to Dashboard](hubzero_images/hubzero-site-add-module.png)
+![Install Radiam Module](hubzero_images/hubzero-site-install-module-radiam.png)
 
 ### Regular Users Log into Radiam Server
 
 With the `radiam_host_url` set up by the administrator, regular users
 - Click the `Radiam Login` Button in the Radiam Module on the Dashboard
 - Log into the Radiam Sever with Radiam username and password
-![Radiam Projects](hubzero_images/hubzero-site-module-radiam.png)
-![Radiam Projects](hubzero_images/hubzero-site-radiam-login.png)
+![Radiam Module on Dashboard](hubzero_images/hubzero-site-module-radiam.png)
+![Radiam Login](hubzero_images/hubzero-site-radiam-login.png)
 
 Once the user logs into the Radiam successfully, a token is created for this user. This token is required to send data to the Radiam API.
 
 ### Regular Users Create HubZero Porjects
-![Radiam Projects](hubzero_images/hubzero-site-create-project.png)
+![Create HubZero Projects](hubzero_images/hubzero-site-create-project.png)
 
 ### Administrators Configure Radiam Component
 Now the administrator is ready to finish up the configuration under “Projects“ on the Radiam Component page. 
@@ -116,13 +116,13 @@ For the radiam plugin of the cron type,
 - Edit the `Post data to Radiam API` cron job to meet your needs 
 - Publish the `Post data to Radiam API` cron job to start running the Radiam Agent on HubZero
 
-![Radiam Projects](hubzero_images/hubzero-admin-component-cron.png)
+![Radiam Component Configuration](hubzero_images/hubzero-admin-component-cron.png)
 
 
 ## Viewing
 
 As a regular HubZero user, navigate to your dashboard. Radiam projects under the radiam username are shown in the Radiam Module. By clicking on a radiam project, files in this radiam project are listed in a new page. 
-![Radiam Projects](hubzero_images/hubzero-site-module-radiam-projects.png)
+![Radiam Module](hubzero_images/hubzero-site-module-radiam-projects.png)
 ![Radiam Projects](hubzero_images/hubzero-site-radiam-display.png)
 
 ## Removal
@@ -182,3 +182,14 @@ cd /var/www/hubname/app/plugins
 rm -rf cron
 rm -rf projects
 ```
+
+## Troubleshooting
+### Link Projects after Agent Created
+As mentioned in the Component Configuration session, only `radiam_host_url` is required to configure by the administrator for now. Three more configuration values will be created automatically the first time the Cron job runs. They will be displayed on the Configuration page of the Radiam Component. Please do not touch these configuration values. 
+![Radiam Component Configuration](hubzero_images/hubzero-admin-component-radiam-configs.png)
+
+Useragent and location are linked to configured Radiam projects when they are created on the Radiam server. Therefore, if administrators link new projects after useragent and location created, Radiam server knows nothing about it. In this case, you should go into Radiam and add that additional project to the HubZero location. 
+![Update Location on Radiam](hubzero_images/radiam-add-locationproject.png)
+
+### Existed Files Not Indexed after Linking to Radiam Project
+Go to the Radiam Component page, delete the linking of that project and add it again. 
