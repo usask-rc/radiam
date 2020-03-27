@@ -1,6 +1,19 @@
-# API
+# Developers
 
-## Throttling
+## API Browsing and Docs
+
+To view live data for the Radiam API, point your web browser to your locally installed instance and append /api to the end of the URL.
+
+For example:  https://localhost:8100/api/
+
+You can then log in using your admin credentials.
+
+To view the API docs, append /docs to the above URL.
+
+For example: https://localhost:8100/api/docs/
+
+
+## API Throttling
 
 Based upon:
 
@@ -55,7 +68,7 @@ Example throttled response:
 `{"detail":"Request was throttled. Expected available in 3600 seconds."}`
 
 
-## Caching
+## API Caching
 
 Based upon:
 
@@ -78,12 +91,12 @@ CACHES = {
 
 There is a memcached service running in its own docker container. This is currently only setup to use a single container but we could setup a cluster of them going forward. A cluster is specified by a comma separated list. We might load balance them using docker swarm / kubernetes if necessary.
 
-### Flush Cache
+### Flushing The Cache
 
 `echo "from django.core.cache import cache; cache._cache.flush_all()" | ./manage.py shell [--settings=myapp.settings_live]`
 
 
-## Permissions
+## API Permissions
 
 Based upon:
 
@@ -202,7 +215,7 @@ DEV_EMAIL_ADDRESSES = ['someone1@somewhere.edu','someone2@somewhere.edu']
 ```
 
 
-## Token Auth
+## Token Authentication
 
 ### JWT Tokens
 
@@ -223,14 +236,14 @@ curl \
 
 Response:
 ```
-{"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU0MzAwNzUzMCwianRpIjoiNDM5MTNlNzM0NTc3NDJlZTk1MjA1MGQ1MWZhNGE5NDYiLCJ1c2VyX2lkIjoxfQ.9YavFSy2S1cpiFs7uEUa9LTDZXiBSe_CAVrKOcrpAPa9I6V0Bfseo4BNWrMizyUqxzbq5vSF9H1dLHqr9pZJwDR1Qgj9WF6x2NiaeO4S5Tk0gT481kzuttpnyRmsDGhKwnVJsWuW5WbvzmBNHHxdUo0LlgoEZKFdc2Z1aKiwkDcUHFFs3UnwR5ROvrg8DMTtQPdZ81Q34jNDFaoSEBGvUqHwliGUzSlJcE4y1EEOlYFBCPy6fCJ9BWSEHdyZN0GTIryrznXSH4VRqeIyx5y9EyvstJ6zggn9FTGguw83kSghquHPJlzm4c80vN1_hVWe7bj4NMI4xYsjWT470VjyJA",
-"access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTQyOTIxNDMwLCJqdGkiOiJlY2RhMWJjNDg3ZGY0ODM3ODVkMTQ3MTYzNmQ3ZGNmMiIsInVzZXJfaWQiOjF9.69aOciRUR54pIpO-4qxqrUV_ADXi70Ml3fi2nOilpRfJs7o6yendTeKOt2zJ41FhU-41DN7uFYWsDAZocMj6H4i3C8C7vBdqqs2a53jQFB5j_WQr8asGy4vM_XclxAR_gluZV0ibquCpYzrw3jS-mRpJsTI50sROtugKLKPbjn7GElgSECrZ32l1BwIPApYKMF_QsBqh3XOwIaVy6oklAVJWY-diqfrTxJTQp1m8cP0egcnVcGma7AROeJsS3CxNc2mELXXI41XMwOdSYHIj3tGClVMEAUf9_z9P-JGaIEnyDNY1sNTePJDA5HWN3Hf8lAXyl8X9DNZ8GAqPLjxPcg"}
+{"refresh":"LONG_REFRESH_TOKEN_STRING",
+"access":"LONG_ACCESS_TOKEN_STRING"}
 ```
 
 Use Token:
 ```
 curl \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTQyOTIxNDMwLCJqdGkiOiJlY2RhMWJjNDg3ZGY0ODM3ODVkMTQ3MTYzNmQ3ZGNmMiIsInVzZXJfaWQiOjF9.69aOciRUR54pIpO-4qxqrUV_ADXi70Ml3fi2nOilpRfJs7o6yendTeKOt2zJ41FhU-41DN7uFYWsDAZocMj6H4i3C8C7vBdqqs2a53jQFB5j_WQr8asGy4vM_XclxAR_gluZV0ibquCpYzrw3jS-mRpJsTI50sROtugKLKPbjn7GElgSECrZ32l1BwIPApYKMF_QsBqh3XOwIaVy6oklAVJWY-diqfrTxJTQp1m8cP0egcnVcGma7AROeJsS3CxNc2mELXXI41XMwOdSYHIj3tGClVMEAUf9_z9P-JGaIEnyDNY1sNTePJDA5HWN3Hf8lAXyl8X9DNZ8GAqPLjxPcg" \
+  -H "Authorization: Bearer LONG_ACCESS_TOKEN_STRING" \
   http://localhost:8000/api/some-protected-view/
 ```
 
@@ -242,7 +255,7 @@ curl \
   -v \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTQzNTI2NzQzLCJqdGkiOiJlZGU3ZWNjN2IzMGI0MTZmOTc5NTgyOGI2NDY3NjU0YyIsInVzZXJfaWQiOjF9.bZ5mxqtWGNreF0ocJOpb1FhCE2e7PO6L8bD5bENLDKEttm4j8U2HxrYUKmEUFWkUwSguCN2E7Jm91mX8fhTNl-c-sh994b_Ig09wHhbna1T1eFSmTPEhvgeJnjDNW1y2SBAhGtgcCLN_ZKrwS-YuwIzlnt5cD-tTX2EeitDhz2PW76qr-iYy1B7UaWL22MZBodubNgo_mL6abweLxtgl7tQTpvpvAZusyUMdSXGlb-ziFrKiPrwerKWEL4OgYxt3bhWm9FpoBZAxcRSbMNVSo7PsjvPTzQkEKJ7nqo45nw-BzBgtdjRdnIrv2bWEuUUCuxYsQrt3EpEqpTzH6z3ZEQ"}' \
+  -d '{"token":"LONG_ACCESS_TOKEN_STRING"}' \
   http://localhost:8000/api/token/verify/
 ```
 
@@ -252,7 +265,7 @@ curl \
   -v \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTU0NTM0NDk1NSwianRpIjoiMGUxYWJjNDBiMmU3NDJlYjgwYzg5NjhkNTIzZjhiZGUiLCJ1c2VyX2lkIjoxfQ.ngA7K9PZuSPBDliV-K9ujBL1bAA8dzBP1UBXylw-SdjUvZ0uqykPY7X8ds07s5V3EIGMoLpULT9YfwmbXIJwGQ6lfums0uuvAlJ2pJIJIp51u-PY9yEs7ezRyVHjJSOO6rfcManiku8jGJECfNf3KelL86T-xv2LKqGukzI82hUgaByLYBSzfzdCrz7xz91L8iYtoBuD1IMUcVy4qiD0mLmFfgo-l8mLFn4Bl0ZqBIBqfQtSYh2L0LQZqsZfQkEY71vUnrd1B-asc9XkO5itW4UicrnX1u7RQO6Ypmdhm0_1WDg_WyC81F14OgaPYQm81iikzrVnbEyzmvKXCiK2Ew"}' \
+  -d '{"refresh":"LONG_REFRESH_TOKEN_STRING"}' \
   http://localhost:8000/api/token/refresh/
 ```
 
