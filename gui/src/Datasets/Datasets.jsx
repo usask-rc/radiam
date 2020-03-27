@@ -43,8 +43,6 @@ import { DefaultToolbar } from '../_components/index.js';
 import { SimpleShowLayout } from 'ra-ui-materialui/lib/detail';
 import { Redirect } from 'react-router';
 import DatasetTitle from './DatasetTitle.jsx';
-import SaveButton from 'ra-ui-materialui/lib/button/SaveButton';
-import moment from "moment"
 
 const styles = {
   actions: {
@@ -261,14 +259,14 @@ export const DatasetModalShow = withTranslate(({ classes, translate, ...props}) 
 
 
 export const BaseDatasetShow = withTranslate(({ classes, translate, ...props }) => {
-  const [exportLink, setExportLink] = useState(null)
+  const [exportLink, setExportLink] = useState(false)
 
   console.log("exportLink in basedatasetshow is: ", exportLink)
   return(
   <Show actions={<DatasetShowActions setExportLink={setExportLink} classes={classes}/>} {...props}>
     <TabbedShowLayout>
       <Tab label={'Summary'}>
-        <Dialog  open={exportLink} onClose={() => {setExportLink(false)}} aria-label="Download Data">
+        <Dialog open={exportLink} onClose={() => {setExportLink(false)}} aria-label="Download Data">
           <DialogTitle>{`Download Metadata`}</DialogTitle>
           <DialogContent>
             <a href={exportLink} download={exportLink}>{`${exportLink}`}</a>
@@ -592,7 +590,7 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
 export const DatasetCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Create submitOnEnter={false} {...props}>
+    <Create {...props}>
       <DatasetForm {...other} />
     </Create>
   );
@@ -601,7 +599,7 @@ export const DatasetCreate = props => {
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
+    <Edit actions={<MetadataEditActions />} {...props} >
       <DatasetForm mode={RESOURCE_OPERATIONS.EDIT} {...other} />
     </Edit>
   );
