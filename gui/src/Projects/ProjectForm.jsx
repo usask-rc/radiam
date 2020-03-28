@@ -9,7 +9,7 @@ import {
 } from 'react-admin';
 import { MODEL_FIELDS, MODEL_FK_FIELDS, MODELS, RESOURCE_OPERATIONS} from "../_constants/index";
 import "../_components/components.css";
-import { getUsersInGroup, submitObjectWithGeo } from "../_tools/funcs";
+import { getUsersInGroup, submitObjectWithGeo, deleteItem } from "../_tools/funcs";
 import { Typography, Button } from "@material-ui/core";
 import MapForm from "../_components/_forms/MapForm";
 import { FormDataConsumer, required } from "ra-core";
@@ -19,13 +19,45 @@ import ChipInput from "material-ui-chip-input"
 import {Redirect} from "react-router-dom"
 import { toast } from "react-toastify"
 import { EditMetadata, ConfigMetadata } from "../_components/Metadata";
-
+import { Toolbar } from "ra-ui-materialui/lib/form";
+import SaveButton from "ra-ui-materialui/lib/button/SaveButton";
+import { withStyles } from "@material-ui/styles";
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const validateGroup = required('en.validate.project.group');
 const validateName = required('en.validate.project.name');
 const validatePrimaryContactUser =[required()]
 
-export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
+const toolbarStyles = ({
+  deleteButton: {
+    marginLeft: "0.5em",
+    color: "tomato",
+    fontSize: "0.8em",
+  }
+})
+
+//NOTE: don't try to modularize this, it won't work because react-admin tries to force its way in.
+const CustomDeleteButton = withStyles(toolbarStyles)(({id, resource, setRedirect, classes, ...props}) => {
+  const callDelete = (data) => {
+    deleteItem (id, "projects").then(data => {
+      toast.success("Project Deleted")
+      setRedirect("/projects")
+    }).catch(err => toast.error(`Project not Deleted: ${err}`))
+  }
+
+  return <Button className={classes.deleteButton} startIcon={<DeleteIcon />} onClick={() => callDelete()}>{`DELETE`}
+  </Button>
+})
+
+const ProjectToolbar = ({setRedirect, ...props}) => {
+  console.log("projecttoolbar props: ", props)
+  return(<Toolbar {...props}>
+    <SaveButton />
+    {props.id && <CustomDeleteButton setRedirect={setRedirect} resource={props.resource} id={props.id} />}
+  </Toolbar>)
+}
+
+export const ProjectForm = ({classes, translate, mode, resource="projects", save, ...props}) => {
     const asyncValidate = getAsyncValidateNotExists({ id: MODEL_FIELDS.ID, name: MODEL_FIELDS.NAME, reject: "There is already a project with this name. Please pick another name." }, MODELS.PROJECTS);
     const [groupContactList, setGroupContactList] = useState([])
     const [loading, setLoading] = useState(false)
@@ -35,6 +67,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
     const [redirect, setRedirect] = useState(null)
     const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
     
+
     const handleChipChange = (data) => {
       setKeywords(data)
     }
@@ -51,7 +84,7 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
     const handleSubmit=(data) => {
       const { record } = props
-      props.resource = "projects"
+      props.resource = resource
       data.keywords = keywords ? keywords.join(",") : ""
       data.number = null
 
@@ -115,11 +148,14 @@ export const ProjectForm = ({classes, translate, mode, save, ...props}) => {
 
     const { record } = props
 
+    console.log("props projectform: ", props)
+
     return(
       <SimpleForm
       asyncValidate={asyncValidate} //validation is off on edits for now, as we have no way currently to enforce unique names and allow edits at the same time.
       asyncBlurFields={[MODEL_FIELDS.NAME]}
       save={handleSubmit}
+      toolbar={<ProjectToolbar setRedirect={setRedirect} id={props.id} {...props} />}
       >
         <ProjectTitle prefix={record && record.name ? `Updating Project` : `Creating Project`} />
         <TextInput

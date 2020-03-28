@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from "util";
 import { toast } from "react-toastify";
 import radiamRestProvider from "./radiamRestProvider";
 import { httpClient } from ".";
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from "ra-core";
+import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from "ra-core";
 import moment from "moment";
 
 var cloneDeep = require("lodash.clonedeep");
@@ -13,6 +13,7 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
+  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -21,6 +22,15 @@ export function getExportKey(id, type){
   return new Promise((resolve, reject) => {
     const params = {id: id}
     dataProvider("EXPORT", type, params).then(data => {
+      resolve(data)
+    }).catch(err => reject(err))
+  })
+}
+
+export function deleteItem(id, resource){
+  const params = {id: id}
+  return new Promise((resolve, reject) => {
+    dataProvider(DELETE, resource, params).then(data => {
       resolve(data)
     }).catch(err => reject(err))
   })
