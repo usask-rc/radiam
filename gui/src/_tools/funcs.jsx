@@ -13,7 +13,6 @@ const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
 
 //returns the endpoint set in constants
 export function getAPIEndpoint() {
-  return `https://dev2.radiam.ca/api`
   return `/${API_ENDPOINT}`;
 }
 
@@ -396,7 +395,6 @@ export function getRootPaths(projectID, dataType="projects", searchModel={}) {
         locationSet = [...locationSet]
         return locationSet
       }).then(locations => {
-        //if (dataType === "projects"){
         return locations.map(location => {
           return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
         })
