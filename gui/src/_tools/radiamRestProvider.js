@@ -23,7 +23,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     let formData = new FormData();
     const options = {};
 
-    //console.log("data request is: ", type, resource, params)
+    console.log("data request is: ", type, resource, params)
     switch (type) {
 
       //for batch export of data
@@ -273,8 +273,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         break;
 
       case DELETE:
-
-        //console.log("params in delete: ", params)
+        console.log("params in delete: ", params)
         url = `${apiUrl}/${resource}/${params.id}/`;
 
         options.method = 'DELETE';

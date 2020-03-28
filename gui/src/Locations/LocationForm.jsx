@@ -12,14 +12,18 @@ import {
 import { compose } from 'recompose';
 import {LOCATIONTYPE_OSF, MODELS, MODEL_FIELDS, MODEL_FK_FIELDS} from '../_constants/index';
 import MapForm from '../_components/_forms/MapForm';
-import { submitObjectWithGeo, toastErrors } from '../_tools/funcs';
+import { submitObjectWithGeo, toastErrors, deleteItem } from '../_tools/funcs';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/styles';
 import { FormDataConsumer } from 'ra-core';
 import { SelectArrayInput } from 'ra-ui-materialui/lib/input';
 import { Typography, Button } from '@material-ui/core';
-import { DefaultToolbar } from '../_components';
 import { Redirect } from 'react-router';
+import { toast } from 'react-toastify';
+import DeleteIcon from '@material-ui/icons/Delete';
+import SaveIcon from "@material-ui/icons/Save";
+import Toolbar from 'ra-ui-materialui/lib/form/Toolbar';
+import SaveButton from 'ra-ui-materialui/lib/button/SaveButton';
 
 const validateHostname = required('en.validate.locations.host_name');
 const validateLocationType = required('en.validate.locations.location_type');
@@ -29,10 +33,21 @@ const validateGlobusEndpoint = regex(
 );
 const GJV = require("geojson-validation")
 
+const toolbarStyles = ({
+  deleteButton: {
+    marginLeft: "0.5em",
+    color: "tomato",
+    fontSize: "0.8em",
+  }
+})
+
 const styles = {
   geoTextArea: {
     display: 'flex',
     flexDirection: 'column',
+  },
+  fakeToolbar: {
+    marginTop: "1em",
   },
   preMapArea: {
     marginBottom: "1em",
@@ -49,6 +64,20 @@ const styles = {
     minWidth: "18em",
   },
 };
+
+//NOTE: don't try to modularize this, it won't work because react-admin tries to force its way in.
+const CustomDeleteButton = withStyles(toolbarStyles)(({id, resource, setRedirect, classes, ...props}) => {
+  const callDelete = (data) => {
+    deleteItem (id, "locations").then(data => {
+      toast.success("Location Deleted")
+      setRedirect("/locations")
+    }).catch(err => toast.error(`Location not deleted: ${err}`))
+  }
+
+  return <Button className={classes.deleteButton} startIcon={<DeleteIcon />} onClick={() => callDelete()}>{`DELETE`}
+  </Button>
+})
+
 
 class LocationForm extends Component {
   constructor(props) {
@@ -77,6 +106,7 @@ class LocationForm extends Component {
     const projList = []
 
     projects.map(project => {
+      console.log("fixprojectlist project: ", project)
       projList.push(project.id)
       return project
     })
@@ -109,25 +139,27 @@ class LocationForm extends Component {
     const projList = []
     
     data.projects.map(project => {
-      projList.push({id: project})
+      projList.push({id: project, name: "temp"})
       return project
     })
+    
     data.projects = projList
 
     if (this.props.record && this.props.record.id){
       data.id = this.props.record.id
     }
+    console.log("handlesubmit data: ", data, "geo", geo)
+
     this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
         .then(data => {
-          //console.log("locationform submitobjectwithgeo data: ", data)
+          console.log("locationform submitobjectwithgeo data: ", data)
 
           this.setState({redirect: "/locations"})
         }).catch(err => {
           console.error("error in submitobjectwithgeo in locationform: ", err)
         });
     })
-    
   };
 
   handleChange = data => {
@@ -189,11 +221,11 @@ class LocationForm extends Component {
 
     return (
       <SimpleForm
-        {...rest}
         save={this.handleSubmit}
         name={`locationForm`}
         onChange={this.handleChange}
-        toolbar={this.props.record && <DefaultToolbar />} 
+        {...rest}
+        toolbar={null}
       >
         <Typography className={classes.titleText}>{record && Object.keys(record).length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
         <TextInput
@@ -267,7 +299,7 @@ class LocationForm extends Component {
         <TextInput label={'en.models.locations.notes'} multiline source={MODEL_FIELDS.NOTES}
         defaultValue={record ? record.notes : ""} />
         <div className={classes.preMapArea}>
-          <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
+          <Button variant={"outlined"} color={showMap ? "secondary" : "primary"} onClick={() => this.setState({showMap: !showMap})}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
         </div>
         {showMap && 
           <MapForm
@@ -278,6 +310,17 @@ class LocationForm extends Component {
           />
         }
         {this.state.redirect && <Redirect to={this.state.redirect} /> }
+        <FormDataConsumer>
+        {formDataProps => {
+          const {formData} = formDataProps
+        return( <div className={classes.fakeToolbar}>
+          <Button variant={"contained"} color={"primary"} startIcon={<SaveIcon/>} onClick={() => this.handleSubmit(formData)}>{`SAVE`}</Button>
+          {this.props.id && <CustomDeleteButton setRedirect={() => this.setState({redirect: "/locations" })} resource={"locations"} id={this.props.id} /> } 
+        </div>)
+        }
+      }
+        </FormDataConsumer>
+
       </SimpleForm>
     );
   }
