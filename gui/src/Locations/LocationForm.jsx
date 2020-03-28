@@ -315,7 +315,7 @@ class LocationForm extends Component {
           const {formData} = formDataProps
         return( <div className={classes.fakeToolbar}>
           <Button variant={"contained"} color={"primary"} startIcon={<SaveIcon/>} onClick={() => this.handleSubmit(formData)}>{`SAVE`}</Button>
-        {this.props.id && <CustomDeleteButton setRedirect={() => this.setState({redirect: "/locations" })} resource={"locations"} id={this.props.id} /> }
+          {this.props.id && <CustomDeleteButton setRedirect={() => this.setState({redirect: "/locations" })} resource={"locations"} id={this.props.id} /> } 
         </div>)
         }
       }
