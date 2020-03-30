@@ -148,14 +148,24 @@ class LocationForm extends Component {
     if (this.props.record && this.props.record.id){
       data.id = this.props.record.id
     }
-    console.log("handlesubmit data: ", data, "geo", geo)
 
+    //fill in blank fields that wont otherwise update, for some reason only happens in locationform
+    const fields = [MODEL_FIELDS.GLOBUS_PATH, MODEL_FIELDS.GLOBUS_ENDPOINT, MODEL_FIELDS.DISPLAY_NAME, MODEL_FIELDS.HOST_NAME, MODEL_FIELDS.DISPLAY_NAME, 
+       MODEL_FIELDS.OSF_PROJECT, MODEL_FIELDS.PORTAL_URL, MODEL_FIELDS.NOTES ]
+
+    fields.map(field => {
+      if (!data[`${field}`]){
+        data[`${field}`] = ""
+      }
+    })
+
+    console.log("handlesubmit data locationform: ", data)
     this.setState({isFormDirty: false}, () => {
         submitObjectWithGeo(data, geo, this.props, data.location_type === LOCATIONTYPE_OSF ? `/${MODELS.AGENTS}/create` : `/${MODELS.LOCATIONS}`)
         .then(data => {
           console.log("locationform submitobjectwithgeo data: ", data)
 
-          this.setState({redirect: "/locations"})
+          this.setState({redirect: `${MODELS.LOCATIONS}`})
         }).catch(err => {
           console.error("error in submitobjectwithgeo in locationform: ", err)
         });
@@ -224,8 +234,9 @@ class LocationForm extends Component {
         save={this.handleSubmit}
         name={`locationForm`}
         onChange={this.handleChange}
-        {...rest}
         toolbar={null}
+        {...rest}
+
       >
         <Typography className={classes.titleText}>{record && Object.keys(record).length > 0 ? `Updating ${record && record.display_name ? record.display_name : ""}` : `Creating Location`}</Typography>
         <TextInput
@@ -245,6 +256,7 @@ class LocationForm extends Component {
           source={MODEL_FK_FIELDS.LOCATION_TYPE}
           reference={MODELS.LOCATIONTYPES}
           validate={validateLocationType}
+          required
           defaultValue={record && Object.keys(record).length > 0 ? record.location_type : LOCATIONTYPE_OSF}
         >
           <TranslationSelect optionText={MODEL_FIELDS.LABEL} />
@@ -263,15 +275,15 @@ class LocationForm extends Component {
               projList = record.projects
             }
               return(<ReferenceArrayInput
-                resource={"projects"}
+                resource={MODELS.PROJECTS}
                 label={"en.models.locations.projects"}
                 className={classes.projectList}
-                source={"projects"}
-                reference={"projects"}
+                source={MODEL_FIELDS.PROJECTS}
+                reference={MODELS.PROJECTS}
                 required>
                 <SelectArrayInput 
                   defaultValue={projList}
-                  optionText="name" />
+                  optionText={MODEL_FIELDS.NAME} />
               </ReferenceArrayInput>)
             }
           }
@@ -279,20 +291,20 @@ class LocationForm extends Component {
 
         <TextInput
           label={'en.models.locations.globus_endpoint'}
-          source="globus_endpoint"
+          source={MODEL_FIELDS.GLOBUS_ENDPOINT}
           validate={validateGlobusEndpoint}
           defaultValue={record && record.globus_endpoint}
         />
         <TextInput
           label={'en.models.locations.globus_path'}
-          source="globus_path"
+          source={MODEL_FIELDS.GLOBUS_PATH}
           defaultValue={record && record.globus_path}
           multiline
         />
-        <TextInput label={"en.models.locations.osf_project"} source="osf_project" defaultValue={record ? record.osf_project : ""} />
+        <TextInput label={"en.models.locations.osf_project"} source={MODEL_FIELDS.OSF_PROJECT} defaultValue={record ? record.osf_project : ""} />
         <TextInput
           label={'en.models.locations.portal_url'}
-          source="portal_url"
+          source={MODEL_FIELDS.PORTAL_URL}
           defaultValue={record ? record.portal_url : ""}
           multiline
         />
@@ -315,7 +327,7 @@ class LocationForm extends Component {
           const {formData} = formDataProps
         return( <div className={classes.fakeToolbar}>
           <Button variant={"contained"} color={"primary"} startIcon={<SaveIcon/>} onClick={() => this.handleSubmit(formData)}>{`SAVE`}</Button>
-          {this.props.id && <CustomDeleteButton setRedirect={() => this.setState({redirect: "/locations" })} resource={"locations"} id={this.props.id} /> } 
+          {this.props.id && <CustomDeleteButton setRedirect={() => this.setState({redirect: `/${MODELS.LOCATIONS}` })} resource={MODELS.LOCATIONS} id={this.props.id} /> } 
         </div>)
         }
       }
