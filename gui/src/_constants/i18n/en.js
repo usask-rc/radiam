@@ -416,7 +416,7 @@ export default {
                         extent: {
                             label: 'Extent',
                             EX_Extent: {
-                                label: 'EX Extent',
+                                label: 'Extent',
                                 id: {
                                     label: 'Extent ID'
                                 },
