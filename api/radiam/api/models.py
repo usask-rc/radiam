@@ -542,6 +542,11 @@ class ResearchGroup(MPTTModel, ElasticSearchModel, ResearchGroupPermissionMixin)
     def delete(self, *args, **kwargs):
         self.delete_groupviewgrants()
         self.delete_groupmembers()
+        try:
+            entity = Entity.objects.get(group=self.id)
+            entity.delete()
+        except ObjectDoesNotExist:
+            pass
         ElasticSearchModel.delete(self, *args, **kwargs)
         MPTTModel.delete(self, *args, **kwargs)
 
