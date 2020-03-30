@@ -88,22 +88,6 @@ class LocationLinkout extends Component {
 function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, dataType="projects", projectName, ...props }) {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [listOfRootPaths, setListOfRootPaths] = useState([])
-/*
-const dsSearchModel={
-            bool: {
-              must: {
-                wildcard: {
-                  [`path_parent.keyword`]: `${folder.path}*`
-                },
-              },
-              filter: {
-                term: {
-                  [`location.keyword`]: `${folder.location}`
-                }
-              }
-            }
-          }
-*/
 
   useEffect(() => {
     let _isMounted = true
@@ -188,7 +172,7 @@ const dsSearchModel={
             projectID={projectID}
             datasetID={datasetID}
             key={`${item.location}_folderView`}
-            dataType={dataType}
+            modelType={dataType}
             projectLocation={item.location}
             groupID={props.record ? props.record.group : null}
           />

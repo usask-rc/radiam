@@ -61,12 +61,9 @@ function refreshAccessToken(curTok) {
     .then(token => {
       curTok.access = token.access;
       localStorage.setItem(WEBTOKEN, JSON.stringify(curTok));
-      return Promise.resolve();
+      return Promise.resolve()
     })
-    .catch(Promise.reject()))
-    .catch(
-      Promise.reject()
-    );
+    .catch(e => Promise.reject(e)))
 }
 
 function getRequest(url, suppliedToken) {
@@ -277,13 +274,15 @@ export default (type, params, ...rest) => {
     else{
       return validateToken(JSON.parse(getToken).access)
         .then(() => {
-            Promise.resolve()
+            return Promise.resolve()
           }
         )
-        .catch(
+        .catch(e =>{ //refresh the access token if current one is invalid
           refreshAccessToken(JSON.parse(getToken))
             .then(Promise.resolve())
             .catch(Promise.reject())
+          Promise.reject(e)
+        }
         );
     }
   }

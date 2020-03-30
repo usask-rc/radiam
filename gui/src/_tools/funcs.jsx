@@ -4,7 +4,7 @@ import { isObject, isString, isArray } from "util";
 import { toast } from "react-toastify";
 import radiamRestProvider from "./radiamRestProvider";
 import { httpClient } from ".";
-import { GET_LIST, GET_ONE, CREATE, UPDATE } from "ra-core";
+import { GET_LIST, GET_ONE, CREATE, UPDATE, DELETE } from "ra-core";
 import moment from "moment";
 
 var cloneDeep = require("lodash.clonedeep");
@@ -26,9 +26,18 @@ export function getExportKey(id, type){
   })
 }
 
+export function deleteItem(id, resource){
+  const params = {id: id}
+  return new Promise((resolve, reject) => {
+    dataProvider(DELETE, resource, params).then(data => {
+      resolve(data)
+    }).catch(err => reject(err))
+  })
+}
+
 //for some export key and dataset values, request a download from the API.
 export function requestDownload(key, data){
-  const {id, title} = data
+  const { title } = data
 
   return new Promise((resolve, reject) => {
       const token = localStorage.getItem(WEBTOKEN);
@@ -292,8 +301,6 @@ export function getFolderFiles(
     q: params.q,
   };
 
-  console.log("queryParams in getfolderfiles: ", queryParams)
-
   return new Promise((resolve, reject) => {
     dataProvider(
       "GET_FILES",
@@ -302,8 +309,6 @@ export function getFolderFiles(
     )
       .then(response => {
         let fileList = [];
-
-        console.log("getfolderfiles files: ", response.data)
         response.data.map(file => {
           const newFile = file;
           newFile.key = file.id;
@@ -362,6 +367,7 @@ export function getRootPaths_old(projectID, dataType="datasets"){
         rootPathList.push({
           location: key, path_parent: rootPaths[key].path_parent, locationpromise: getLocationData(key)
         })
+        return key
       })
       resolve(rootPathList)
     }).catch(err => reject(err))
@@ -389,7 +395,6 @@ export function getRootPaths(projectID, dataType="projects", searchModel={}) {
         locationSet = [...locationSet]
         return locationSet
       }).then(locations => {
-        //if (dataType === "projects"){
         return locations.map(location => {
           return {location: location, path_parent: ".", locationpromise: getLocationData(location)}
         })

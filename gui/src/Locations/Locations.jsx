@@ -14,6 +14,8 @@ import {
   TextField,
   TextInput,
   ChipField,
+  ArrayField,
+  SingleFieldList,
 } from 'react-admin';
 import {RESOURCE_OPERATIONS, MODELS, MODEL_FK_FIELDS, MODEL_FIELDS} from "../_constants/index";
 import CustomPagination from '../_components/CustomPagination';
@@ -23,11 +25,7 @@ import TranslationField from '../_components/_fields/TranslationField';
 import TranslationSelect from '../_components/_fields/TranslationSelect';
 import { withStyles } from '@material-ui/core/styles';
 import LocationTitle from './LocationTitle';
-import { SingleFieldList } from 'ra-ui-materialui/lib/list';
-import { ArrayField } from 'ra-ui-materialui/lib/field/ArrayField';
 import { ShowController } from 'ra-core';
-import { DefaultToolbar } from '../_components';
-
 
 const listStyles = {
   actions: {
@@ -123,15 +121,9 @@ export const LocationList = withStyles(listStyles)(({ classes, ...props }) => {
           source={MODEL_FIELDS.LABEL}
         />
       </ReferenceField>
-      <TextField
-        className={classes.showBreaks}
-        label={'en.models.locations.notes'}
-        source={'notes'}
-        multiline
-      />
       <ArrayField source={"projects"} label={"Projects"}>
         <SingleFieldList>
-          <ReferenceField source={"id"} reference={"projects"} link="show">
+          <ReferenceField source={"id"} reference={"projects"} linkType={"show"}>
             <ChipField source={MODEL_FIELDS.NAME} />
           </ReferenceField>
         </SingleFieldList>
@@ -179,10 +171,8 @@ const NotesShow = withStyles(showStyles)(({ classes, record, ...rest }) =>
     : null
 );
 
-
 export const LocationDisplay = props => 
   {
-    //console.log("LocationDisplay data: ", props)
   return(
   <Show {...props}>
     <SimpleShowLayout>
@@ -209,7 +199,7 @@ export const LocationDisplay = props =>
       
       <ArrayField source={"projects"} label={"Projects"}>
         <SingleFieldList>
-          <ReferenceField source={"id"} reference={"projects"} link="show">
+          <ReferenceField source={"id"} reference={"projects"}>
             <ChipField source={MODEL_FIELDS.NAME} />
           </ReferenceField>
         </SingleFieldList>

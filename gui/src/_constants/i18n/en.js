@@ -1047,7 +1047,7 @@ export default {
         portal: 'Portal',
         server: 'Server',
         other: 'Other',
-        hubzero: 'Hub Zero',
+        hubzero: 'HubZero',
       },
     },
     distribution: {
