@@ -95,7 +95,10 @@ export const ProjectForm = ({classes, translate, mode, resource="projects", save
       if (record.id){
         data.id = record.id
       }
+
       delete data.geo
+
+      console.log("handleSubmit data: ", data)
 
       if (!props.record){
         submitObjectWithGeo(data, geo, props).then(data => {
