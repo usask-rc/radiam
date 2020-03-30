@@ -616,6 +616,13 @@ class BaseConfigMetadata extends MetadataComponent {
   handleFieldChange = name => event => {
     const { fields } = this.state
     fields[name].selected = event.target.checked;
+    if (event.target.checked) {
+        var parentField = fields[name].parent;
+        while(parentField) {
+            fields[parentField].selected = true;
+            parentField = fields[parentField].parent;
+        }
+    }
     this.setState({fields})
   };
 
@@ -1030,8 +1037,7 @@ class BaseConfigMetadata extends MetadataComponent {
       <FormControlLabel
         control={
           <Switch
-            disabled={!this.fieldSchemaEnabled(field)
-              || !this.fieldParentsEnabled(field)}
+            disabled={!this.fieldSchemaEnabled(field)}
             checked={this.fieldEnabled(field)}
             color="primary"
             component="span"
@@ -1088,8 +1094,7 @@ class BaseConfigMetadata extends MetadataComponent {
 
         <FormControlLabel control={
           <Switch
-            disabled={!this.fieldSchemaEnabled(field)
-              || !this.fieldParentsEnabled(field)}
+            disabled={!this.fieldSchemaEnabled(field)}
             checked={this.fieldEnabled(field)}
             color="primary"
             component="span"
