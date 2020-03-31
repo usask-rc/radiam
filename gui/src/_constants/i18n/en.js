@@ -248,6 +248,526 @@ export default {
         version: {
           label: 'Version',
         },
+      },
+      iso: {
+        19115 : {
+            2014: {
+              label: 'ISO 19115:2014',
+              short: '19115'
+            },
+            gmd : {
+                characterSet : {
+                    label: 'Character Set'
+                },
+                CI_ResponsibleParty : {
+                    label: 'Responsible Party'
+                },
+                codeList : {
+                    label : 'Code List'
+                },
+                codeListValue : {
+                    label : 'Code List Value'
+                },
+                codeSpace : {
+                    label : 'Code Space'
+                },
+                contact : {
+                    label: 'Contact'
+                },
+                contactInfo: {
+                    label: 'Contact Info',
+                    CI_Contact: {
+                        label: 'Contact',
+                        address: {
+                            label: "Address",
+                            CI_Address: {
+                                label: 'CI Address',
+                                administrativeArea: {
+                                    label: 'Administrative Area Container',
+                                    CharacterString: {
+                                        label: 'Administrative Area'
+                                    }
+                                },
+                                city: {
+                                    label: 'City Container',
+                                    CharacterString: {
+                                        label: 'City'
+                                    }
+                                },
+                                country: {
+                                    label: 'Country Container',
+                                    CharacterString: {
+                                        label: 'Country'
+                                    }
+                                },
+                                deliveryPoint: {
+                                    label: 'Delivery Point Container',
+                                    CharacterString : {
+                                        label: 'Delivery Point'
+                                    }
+                                },
+                                electronicMailAddress: {
+                                    label: 'Email Container',
+                                    CharacterString : {
+                                        label: 'Email'
+                                    }
+                                },
+                                postalCode: {
+                                    label: 'Postal Code Container',
+                                    CharacterString: {
+                                        label: 'Postal Code'
+                                    }
+                                },
+                            },
+                        },
+                        phone: {
+                            label: 'Phone',
+                            CI_Telephone: {
+                                label: 'Telephone',
+                                voice: {
+                                    label: 'Voice Container',
+                                    CharacterString: {
+                                        label: 'Phone Number'
+                                    }
+                                }
+                            },
+                        }
+                    }
+                },
+                dataSetURI : {
+                    label: 'Dataset URI',
+                    CharacterString: {
+                        label: 'Dataset URI'
+                    },
+                },
+                dateStamp: {
+                    label: 'Date Stamp',
+                    'Date': {
+                        label: "Date"
+                    },
+                },
+                fileIdentifier : {
+                    label : 'Metadata File Identifier',
+                    CharacterString: {
+                        label : 'Metadata File Identifier',
+                    }
+                },
+                hierarchyLevel : {
+                    label: 'Hierarchy Level',
+                    MD_ScopeCode : {
+                        label : 'Hierarchy Level Scope Code',
+                        codeList: {
+                            label: 'Hierarchy Level Code List'
+                        },
+                        codeListValue: {
+                            label: 'Hierarchy Level Code List Value'
+                        },
+                        codeSpace: {
+                            label: 'Hierarchy Level Code Space'
+                        },
+                    },
+                },
+                identificationInfo : {
+                    label: 'Identification Information',
+                    MD_DataIdentification: {
+                        label: 'Data Identification',
+                        'abstract': {
+                            label: 'Abstract',
+                            CharacterString: {
+                                label: 'Abstract'
+                            },
+                        },
+                        citation: {
+                            label: 'Citation',
+                            CharacterString: {
+                                label: 'Citation'
+                            }
+                        },
+                        descriptiveKeywords: {
+                            label: 'Descriptive Keywords',
+                            MD_Keywords: {
+                                label: 'Keywords',
+                                keyword: {
+                                    label: 'Keyword',
+                                    CharacterString: {
+                                        label: 'Keyword'
+                                    },
+                                },
+                                thesaurusName: {
+                                    label: "Thesaurus Name"
+                                },
+                                type: {
+                                    label: 'Type',
+                                    MD_KeywordTypeCode: {
+                                        label: 'Keyword Type Code',
+                                        codeList: {
+                                            label: 'Code List'
+                                        },
+                                        codeListValue: {
+                                            label: 'Code List Value'
+                                        },
+                                        codeSpace: {
+                                            label: 'Code Space'
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        extent: {
+                            label: 'Extent',
+                            EX_Extent: {
+                                label: 'Extent',
+                                id: {
+                                    label: 'Extent ID'
+                                },
+                                geographicElement: {
+                                    label: 'Geographic Element',
+                                    EX_BoundingPolygon: {
+                                        label: 'Bounding Polygon',
+                                        polygon: {
+                                            label: 'Polygon',
+                                            Point: {
+                                                label: 'Point',
+                                                coordinates: {
+                                                    label: 'Point Coordinates',
+                                                }
+                                            },
+                                            Polygon: {
+                                                label: 'Polygon',
+                                                exterior: {
+                                                    label: 'Exterior',
+                                                    LinearRing: {
+                                                        label: 'Linear Ring',
+                                                        coordinates: {
+                                                            label: 'Polygon Exterior Coordinates',
+                                                        },
+                                                    }
+                                                },
+                                                interior: {
+                                                    label: 'Interior',
+                                                    LinearRing: {
+                                                        label: 'Linear Ring',
+                                                        coordinates: {
+                                                            label: 'Polygon Interior Coordinates',
+                                                        },
+                                                    }
+                                                },
+                                            },
+                                        },
+                                    },
+                                    EX_GeographicBoundingBox: {
+                                        label: 'Geographic Bounding Box',
+                                        id: {
+                                            label: 'ID',
+                                        },
+                                        westBoundLongitude: {
+                                            label: 'West Bound Longitude',
+                                            Decimal: {
+                                                label: 'West Bound Longitude'
+                                            },
+                                        },
+                                        eastBoundLongitude: {
+                                            label: 'East Bound Longitude',
+                                            Decimal: {
+                                                label: 'East Bound Longitude'
+                                            },
+                                        },
+                                        southBoundLatitude: {
+                                            label: 'South Bound Longitude',
+                                            Decimal: {
+                                                label: 'South Bound Longitude'
+                                            },
+                                        },
+                                        northBoundLatitude: {
+                                            label: 'North Bound Longitude',
+                                            Decimal: {
+                                                label: 'North Bound Longitude'
+                                            },
+                                        },
+                                    },
+                                },
+                                temporalElement: {
+                                    label: 'Temporal Element',
+                                    EX_TemporalExtent: {
+                                        label: 'EX Temporal Element',
+                                        extent: {
+                                            label: 'Extent',
+                                            TimePeriod: {
+                                                label: 'Time Period',
+                                                beginPosition: {
+                                                    label: 'Begin Position',
+                                                },
+                                                description: {
+                                                    label: 'Description',
+                                                },
+                                                endPosition: {
+                                                    label: 'End Position',
+                                                },
+                                                id: {
+                                                    label: 'ID',
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            }
+                        },
+                        language: {
+                            label: 'Dataset Language',
+                            CharacterString: {
+                                label: 'Dataset Language'
+                            }
+                        },
+                        pointOfContact: {
+                            label: 'Point of Contact',
+                            CI_ResponsibleParty: {
+                                label: 'Responsible Party',
+                                contactInfo: {
+                                    label: 'Contact Info',
+                                    CI_Contact: {
+                                        label: 'CI Contact',
+                                        address: {
+                                            label: 'Address',
+                                            CI_Address: {
+                                                label: 'CI Address',
+                                                administrativeArea: {
+                                                    label: 'Administrative Area',
+                                                    CharacterString: {
+                                                        label: 'Administrative Area',
+                                                    },
+                                                },
+                                                city: {
+                                                    label: 'City',
+                                                    CharacterString: {
+                                                        label: 'City',
+                                                    },
+                                                },
+                                                country: {
+                                                    label: 'Country',
+                                                    CharacterString: {
+                                                        label: 'Country',
+                                                    },
+                                                },
+                                                deliveryPoint: {
+                                                    label: 'Delivery Point',
+                                                    CharacterString: {
+                                                        label: 'Delivery Point',
+                                                    },
+                                                },
+                                                electronicMailAddress: {
+                                                    label: 'Email',
+                                                    CharacterString: {
+                                                        label: 'Email',
+                                                    },
+                                                },
+                                                postalCode: {
+                                                    label: 'Postal Code',
+                                                    CharacterString: {
+                                                        label: 'Postal Code',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                        onlineResource: {
+                                            label: 'Online Resource',
+                                            linkage: {
+                                                label: 'Online Resource Link',
+                                                CharacterString: {
+                                                    label: 'Online Resource Link'
+                                                },
+                                            },
+
+                                            protocol: {
+                                                label: 'Online Resource Protocol',
+                                                CharacterString: {
+                                                    label: 'Online Resource Protocol'
+                                                },
+                                            },
+                                        },
+                                        phone: {
+                                            label: 'Phone',
+                                            CI_Telephone: {
+                                                label: 'CI Telephone',
+                                                voice: {
+                                                    label: 'Voice',
+                                                    CharacterString: {
+                                                        label: 'Phone'
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                                individualName: {
+                                    label: 'Individual Name',
+                                    CharacterString: {
+                                        label: 'Individual Name'
+                                    }
+                                },
+                                organisationName:  {
+                                    label: 'Organization Name',
+                                    CharacterString: {
+                                        label: 'Organisation Name'
+                                    }
+                                },
+                                role:  {
+                                    label: 'Role',
+                                    CI_RoleCode: {
+                                        label: 'Role Code',
+                                        codeList: {
+                                            label: "Role Code List"
+                                        },
+                                        codeListValue: {
+                                            label: "Role Code List Value"
+                                        },
+                                        codeSpace: {
+                                            label: "Role Code Space"
+                                        },
+                                    }
+                                },
+                            },
+                        },
+                        purpose: {
+                            label: 'Purpose',
+                            CharacterString: {
+                                label: 'Purpose'
+                            },
+                        },
+                        resourceConstraints: {
+                            label: 'Resource Constraints',
+                            MD_LegalConstraints: {
+                                label: 'Legal Constraints',
+                                accessConstraints: {
+                                    label: 'Access Constraints',
+                                    MD_RestrictionCode: {
+                                        label: 'Access Constraint Restriction Code',
+                                        codeList: {
+                                            label: "Access Constraint Code List"
+                                        },
+                                        codeListValue: {
+                                            label: "Access Constraint Code List Value"
+                                        },
+                                        codeSpace: {
+                                            label: "Access Constraint Code Space"
+                                        },
+                                    },
+                                },
+                                useConstraints: {
+                                    label: 'Use Constraints',
+                                    MD_RestrictionCode: {
+                                        label: 'Use Constraint Restriction Code',
+                                        codeList: {
+                                            label: "Use Constraint Code List"
+                                        },
+                                        codeListValue: {
+                                            label: "Use Constraint Code List Value"
+                                        },
+                                        codeSpace: {
+                                            label: "Use Constraint Code Space"
+                                        },
+                                    },
+                                },
+                                otherConstraints: {
+                                    label: 'Other Constraints Container',
+                                    CharacterString: {
+                                        label: 'Other Constraints'
+                                    }
+                                },
+                            },
+                        },
+                        'status': {
+                            label: 'Status',
+                            MD_ProgressCode: {
+                                label: 'Progress Code',
+                                codeList: {
+                                    label: 'Progress Code List'
+                                },
+                                codeListValue: {
+                                    label: 'Progress Code List Value'
+                                },
+                                codeSpace: {
+                                    label: 'Progress Code Space'
+                                },
+                            },
+                        },
+                        supplementalInformation: {
+                            label: 'Supplemental Information',
+                            CharacterString: {
+                                label: 'Supplemental Information',
+                            }
+                        },
+                        topicCategory: {
+                            label: 'Topic Category',
+                            MD_TopicCategoryCode: {
+                                label: 'Topic Category'
+                            }
+                        },
+                    },
+                },
+                individualName : {
+                    label: 'Individual Name Container',
+                    CharacterString: {
+                        label: 'Individual Name'
+                    },
+                },
+                language : {
+                    label: 'Metadata Language',
+                    CharacterString: {
+                        label: 'Metadata Language',
+                    }
+                },
+                MD_CharacterSetCode : {
+                    label: 'Character Set Code',
+                    CharacterSetCode: {
+                        codeList: {
+                            label: 'Character Set Code List'
+                        },
+                        codeListValue: {
+                            label: 'Character Set Code List Value'
+                        },
+                        codeSpace: {
+                            label: 'Character Set Code Space'
+                        },
+                    }
+                },
+                MD_Metadata : {
+                    label : 'Metadata'
+                },
+                metadataStandardName: {
+                    label: "Metadata Standard Name",
+                    CharacterString: {
+                        label: 'Metadata Standard Name'
+                    },
+                },
+                metadataStandardVersion: {
+                    label: "Metadata Standard Version",
+                    CharacterString: {
+                        label: 'Metadata Standard Version'
+                    },
+                },
+                organisationName: {
+                    label: 'Organisation Name',
+                    CharacterString: {
+                        label: 'Organisation Name'
+                    },
+                },
+                role: {
+                    label: 'Role',
+                    CI_RoleCode: {
+                        label: 'Role Code',
+                        codeList: {
+                            label: 'Role Code List',
+                        },
+                        codeListValue: {
+                            label: 'Role Code List Value',
+                        },
+                        codeSpace: {
+                            label: 'Role Code Space',
+                        },
+                    }
+                },
+            },
+        },
       }
     },
     search: 'Search',
