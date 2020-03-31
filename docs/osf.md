@@ -1,4 +1,4 @@
-# Radiam Open Science Framework plugin
+# Radiam Open Science Framework Plugin
 
 Radiam Agent designed for harvesting metadata from the Open Science Framework.
 

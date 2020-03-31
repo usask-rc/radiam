@@ -135,7 +135,7 @@ function BrowseTab({ projectID, datasetID, searchModel={}, classes, translate, d
     return function cleanup() {
       _isMounted = false;
     }
-  }, [projectID, dataType, datasetID, searchModel]);
+  }, [projectID, dataType]);
 
   return (
     <div className={classes.main}>
