@@ -590,7 +590,7 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
 export const DatasetCreate = props => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Create {...props}>
+    <Create submitOnEnter={false} {...props}>
       <DatasetForm {...other} />
     </Create>
   );
@@ -599,7 +599,7 @@ export const DatasetCreate = props => {
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit actions={<MetadataEditActions />} {...props} >
+    <Edit actions={<MetadataEditActions />} submitOnEnter={false} {...props} >
       <DatasetForm mode={RESOURCE_OPERATIONS.EDIT} {...other} />
     </Edit>
   );
