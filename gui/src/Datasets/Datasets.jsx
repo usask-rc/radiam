@@ -22,7 +22,7 @@ import {
 } from 'react-admin';
 import compose from "recompose/compose";
 import get from 'lodash/get';
-import { ConfigMetadata, ConfigMetadataButton, EditMetadata, ShowMetadata } from "../_components/Metadata.jsx";
+import { ConfigMetadata, EditMetadata, ShowMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODEL_FK_FIELDS, MODELS, ROLE_USER, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
