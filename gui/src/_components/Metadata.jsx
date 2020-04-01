@@ -1460,7 +1460,7 @@ class BaseEditMetadata extends MetadataComponent {
   render() {
     const { entity, error, isLoaded, rootFields } = this.state;
     // eslint-disable-next-line
-    const { addSave, classes, id, record, translate } = this.props;
+    const { addButton, addSave, classes, id, record, translate } = this.props;
 
     if (error) {
       return <div className={classes.section}>
@@ -1475,6 +1475,11 @@ class BaseEditMetadata extends MetadataComponent {
     } else if (entity) {
       return <div className={classes.section}>
         <Typography variant="h5">{translate("en.metadata.edit.title")}</Typography>
+        { addButton ?
+            <ConfigMetadataButton translate={translate} />
+                :
+                null
+        }
           <div className={classes.subsection}>
             {rootFields.map((field, index) => {
               return this.renderField(classes, translate, field, 0, "metadata");
@@ -2013,6 +2018,10 @@ class BaseEditConfigMetadataForm extends Component {
   };
 };
 
+const BaseConfigMetadataButton = ({translate, ...props}) => {
+    return <Button color="primary" onClick={(e) => drawerState.toggle(e)}><SettingsIcon/>{translate("en.metadata.configure")}</Button>
+};
+
 const SaveEditMetadataFormButton = ({doc, onSave, projectID, ...rest}) => {
     const dataProvider = radiamRestProvider(getAPIEndpoint(), httpClient);
     const formState = useFormState();
@@ -2056,6 +2065,7 @@ const SaveEditMetadataFormButton = ({doc, onSave, projectID, ...rest}) => {
 
 export const EditConfigMetadataForm = enhanceEdit(BaseEditConfigMetadataForm);
 export const ConfigMetadata = enhanceConfig(BaseConfigMetadata);
+export const ConfigMetadataButton = enhanceConfig(BaseConfigMetadataButton);
 export const EditMetadata = enhanceEdit(BaseEditMetadata);
 export const MetadataEditActions = enhanceEdit(BaseMetadataEditActions);
 export const ShowMetadata = enhanceShow(BaseShowMetadata);

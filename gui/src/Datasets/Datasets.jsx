@@ -21,7 +21,8 @@ import {
   withTranslate,
 } from 'react-admin';
 import compose from "recompose/compose";
-import { ConfigMetadata, EditMetadata, MetadataEditActions, ShowMetadata } from "../_components/Metadata.jsx";
+import get from 'lodash/get';
+import { ConfigMetadata, ConfigMetadataButton, EditMetadata, ShowMetadata } from "../_components/Metadata.jsx";
 import {RESOURCE_OPERATIONS, MODEL_FK_FIELDS, MODELS, ROLE_USER, MODEL_FIELDS} from "../_constants/index";
 import MapForm from '../_components/_forms/MapForm';
 import MapView from '../_components/_fragments/MapView';
@@ -417,15 +418,12 @@ const CustomLabel = ({classes, translate, labelText} ) => {
   return <p className={classes.label}>{translate(labelText)}</p>
 }
 
-const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
-
-  const [geo, setGeo] = useState(props.record && props.record.geo ? props.record.geo : {})
+const BaseDatasetForm = ({ basePath, classes, location, mode, onSave, record, save, translate, ...props }) => {
+  const [geo, setGeo] = useState(get(record, "geo", {}));
   const [redirect, setRedirect] = useState(null)
-  const [showMap, setShowMap] = useState(props.record && props.record.geo && props.record.geo.geojson && props.record.geo.geojson.features.length > 0 ? true : false)
+  const [showMap, setShowMap] = useState(get(record, "geo.geojson.features.length", 0) > 0);
   //TODO: refactor this
-  const [searchModel, setSearchModel] = useState(props && props.location && props.location.search_model ? JSON.stringify(props.location.search_model) :
-   props && props.record && props.record.search_model ? JSON.stringify(props.record.search_model.search) :
-    "{}")
+  const [searchModel, setSearchModel] = useState(JSON.stringify(get(location, "search_model.search", get(record, "search_model.search", {}))));
 
   function handleChange(e){
     if (e.target && e.target.name === "search_model"){
@@ -465,12 +463,11 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
     ).catch(err => console.error("submitobjectwithgeo dataset error", err))
   };
 
-  const { record } = props
   return(
-    <SimpleForm {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
-    toolbar={mode && mode === "edit" && <DefaultToolbar {...props} />}>
+    <SimpleForm record={record} {...props} save={handleSubmit} redirect={RESOURCE_OPERATIONS.LIST}
+        toolbar={mode && mode === "edit" && <DefaultToolbar {...props} />}>
       <DatasetTitle prefix={props.record && Object.keys(props.record).length > 0 ? "Updating" : "Creating"} />  
-      <TextInput      
+      <TextInput
         label="Title"
         defaultValue={props.location && props.location.title ? props.location.title : ""}
         source={MODEL_FIELDS.TITLE}
@@ -569,16 +566,16 @@ const BaseDatasetForm = ({ basePath, classes, mode, ...props }) => {
          />
       </ReferenceArrayInput>
 
-      { props.mode === RESOURCE_OPERATIONS.EDIT && props.id && (
+      { mode === "edit" && record && (
         <>
-          <EditMetadata id={props.id} values={props.record ? props.record.metadata : null} type="dataset"/>
-          <ConfigMetadata id={props.id} type="dataset" />
+          <EditMetadata id={get(record, "id", null)} values={get(record, "metadata", null)} type="dataset" addButton={true}/>
+          <ConfigMetadata record={record} type="dataset" />
         </>
       )}
       <div className={classes.preMapArea}>
         <Button variant="contained" color={showMap ? "secondary" : "primary"} onClick={() => setShowMap(!showMap)}>{showMap ? `Hide Map Form` : `Show Map Form`}</Button>
       </div>
-      {showMap && 
+      {showMap &&
         <MapForm content_type={'dataset'} recordGeo={geo} id={record && record.id ? record.id : null} geoDataCallback={setGeo}/>
       }
       {redirect && <Redirect to={redirect} /> }
@@ -599,8 +596,8 @@ export const DatasetCreate = props => {
 export const BaseDatasetEdit = withTranslate(({ translate, ...props}) => {
   const { hasCreate, hasEdit, hasList, hasShow, ...other } = props;
   return (
-    <Edit actions={<MetadataEditActions />} {...props} >
-      <DatasetForm mode={RESOURCE_OPERATIONS.EDIT} {...other} />
+    <Edit {...props} >
+      <DatasetForm mode={"edit"} {...other} />
     </Edit>
   );
 });
