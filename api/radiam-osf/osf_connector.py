@@ -40,7 +40,9 @@ def list_(osf_token, project_name, agent_id, location_id):
                 'filesize': file_._get_attribute(data, 'attributes', 'size'),
                 'date_created': file_.date_created,
                 'date_modified': file_.date_modified,
-                'path': path.replace("\\", "/"),
+                'path': '/' + path.replace("\\", "/"),
+                # ignore paths for OSF to get display working for now
+                'path_parent': '.',
                 'type': file_._get_attribute(data, 'attributes', 'kind'),
                 'name': file_._get_attribute(data, 'attributes', 'name'),
                 'provider': file_._get_attribute(data, 'attributes', 'provider'),
