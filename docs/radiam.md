@@ -69,6 +69,8 @@ Run `sudo sysctl -w vm.max_map_count=262144` to fix it on Ubuntu Linux (other di
 
 API documentation exists at the `/api/docs` endpoint of your running instance (ie: http://localhost:8100/api/docs/ )
 
+The OpenAPI spec can be found here: https://app.swaggerhub.com/apis/usask-rc5/Radiam/1.3.20
+
 **Docker tips**
 
 `docker-compose logs` in the same directory as the docker-compose.yml file will tail the logs from all running services.
