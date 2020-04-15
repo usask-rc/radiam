@@ -159,6 +159,7 @@ export const ProjectForm = ({classes, translate, mode, resource="projects", save
       asyncBlurFields={[MODEL_FIELDS.NAME]}
       save={handleSubmit}
       toolbar={<ProjectToolbar setRedirect={setRedirect} id={props.id} {...props} />}
+      initialValues={record}
       >
         <ProjectTitle prefix={record && record.name ? `Updating Project` : `Creating Project`} />
         <TextInput
