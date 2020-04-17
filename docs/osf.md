@@ -1,4 +1,4 @@
-# Radiam Open Science Framework Plugin
+# Radiam Open Science Framework Agent
 
 Radiam Agent designed for harvesting metadata from the Open Science Framework.
 
@@ -17,8 +17,11 @@ Next, you need to configure OSF as a location. Navigate to "Locations" on the si
 Finally, after creating an OSF location, you should automatically be prompted to configure an agent -- if not, you can select "Agents" from the sidebar. Here, you can associate the OSF location you just configured with a Radiam project using the drop-down list: in this example, "OSF demo" is the OSF location, and "example" is the Radiam project. You'll also need to provide an OSF username and API token. Your username should be the email account that you use to log in to OSF, and to avoid having to enter your OSF password multiple places, you can create an OSF token by navigating to your OSF settings page, going to "Personal access tokens," and making sure to grant your new token `osf.full_read` permissions, then pasting it here. You can also set a time interval for how often your OSF project should be updated in Radiam, though the default setting should be fine.
 
 ![Radiam Agent](osf_images/radiam-agent.png)
+
 ![OSF Settings](osf_images/osf-settings.png)
+
 ![OSF Scope](osf_images/osf-scope.png)
+
 ![OSF Token](osf_images/osf-token.png)
 
 OSF files will now be continuously indexed and displayed in your Radiam interface.
