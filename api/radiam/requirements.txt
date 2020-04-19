@@ -1,3 +1,4 @@
+drf-yasg
 configobj
 coverage
 cryptography

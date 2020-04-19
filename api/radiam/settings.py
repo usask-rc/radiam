@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'radiam.api',
     'mptt',
     'django_nose',
+    'drf_yasg',
 ]
 
 # Uncomment this line to use Nose for coverage tests
