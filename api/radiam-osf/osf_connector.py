@@ -118,7 +118,7 @@ def main():
                 logger.error("OSF agent {} is not properly configured".format(agent_id))
         for process in processes:
             process.join()
-        time.sleep(3600)
+        time.sleep(600) # change to 10 minutes for demo only
 
     
 if __name__ == "__main__":
