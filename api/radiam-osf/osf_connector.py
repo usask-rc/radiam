@@ -39,7 +39,7 @@ def list_(osf_token, project_name, agent_id, location_id):
             filemeta_dict = {
                 'filesize': file_._get_attribute(data, 'attributes', 'size'),
                 'date_created': file_.date_created,
-                'date_modified': file_.date_modified,
+                'last_modified': file_.date_modified,
                 'path': '/' + path.replace("\\", "/"),
                 # ignore paths for OSF to get display working for now
                 'path_parent': '.',
@@ -118,7 +118,7 @@ def main():
                 logger.error("OSF agent {} is not properly configured".format(agent_id))
         for process in processes:
             process.join()
-        time.sleep(3600)
+        time.sleep(600) # change to 10 minutes for demo only
 
     
 if __name__ == "__main__":

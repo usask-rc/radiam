@@ -1089,7 +1089,7 @@ class LocationProjectViewSet(RadiamViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        RadiamAuthLocationFilter,
+
     )
 
     filter_fields=('location', 'project')

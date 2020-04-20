@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework.documentation import include_docs_urls
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 from radiam.api import views
 from rest_framework_simplejwt.views import (
@@ -81,6 +84,19 @@ router.register(r'datasets/(?P<dataset_id>[-\w]+)/export',
                 views.DatasetExportViewSet,
                 basename='radiamdatasetexport')
 
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Radiam API",
+      default_version='v1',
+      description="Radiam API",
+      terms_of_service="https://github.com/usask-rc/radiam/blob/master/LICENSE",
+      contact=openapi.Contact(email="developers@frdr.ca"),
+      license=openapi.License(name="MIT License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
@@ -91,5 +107,8 @@ urlpatterns = [
     url(r'^api/token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
     url(r'^api/oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^api/docs/', include_docs_urls(title='Radiam API', public=False, description="Radiam API documentation")),
-    url(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset'))
+    url(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    url(r'^api/swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^api/swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^api/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

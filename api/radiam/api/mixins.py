@@ -347,6 +347,39 @@ class ProjectDetailPermissionMixin(object):
         else:
             return False
 
+
+class LocationProjectPermissionMixin(object):
+    """
+    Permission mixin object to be used with the LocationProject model
+    """
+
+    @staticmethod
+    def has_read_permission(request):
+        """
+        Global 'Model' permission. All users can read the project locations
+        """
+        return True
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        Global 'Model' permission. Everyone can create new project locations.
+        """
+        return True
+
+    def has_object_read_permission(self, request):
+        """
+        Object 'Instance' permission. Everyone can read project locations
+        """
+        return True
+
+    def has_object_write_permission(self, request):
+        """
+        Object 'Instance' permission. Everyone can write.
+        """
+        return True
+
+
 class DatasetPermissionMixin(object):
     """
     Permission mixin object to be used with the Dataset model
