@@ -2,7 +2,7 @@ drf-yasg
 configobj
 coverage
 cryptography
-django==2.2.21
+django==2.2.22
 django-cors-headers
 django-oauth-toolkit
 djangorestframework==3.11.2
