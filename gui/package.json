@@ -32,7 +32,7 @@
     "jss": "^10.0.0",
     "leaflet": "1.6.0",
     "leaflet-draw": "^1.0.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "material-ui-chip-input": "^1.1.0",
     "mini-css-extract-plugin": "^0.8.0",
