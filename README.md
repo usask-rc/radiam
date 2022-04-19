@@ -1,3 +1,5 @@
+## WARNING - this repository is not currently maintained, and the code has known security dependances that need to be fixed before it is used
+
 ## Radiam
 
 Radiam helps researchers keep track of their data, regardless of where it is stored.  
