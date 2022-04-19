@@ -36,7 +36,7 @@
     "lodash.clonedeep": "^4.5.0",
     "material-ui-chip-input": "^1.1.0",
     "mini-css-extract-plugin": "^0.8.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.26",
     "node-sass": "^7.0.0",
     "npx": "^10.2.0",
